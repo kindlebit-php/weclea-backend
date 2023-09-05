@@ -3,9 +3,12 @@ import cors from "cors";
 import dotenv from "dotenv";
 import morgan from "morgan";
 import apiRouter from "./routes/api_routes.js"
-import { db } from "./config/db.js";
+// import { db } from "./config/db.js";
+import "./config/db.js";
+
 dotenv.config();
 const app= express();
+
 
 app.use(cors());
 app.use(express.json());
@@ -17,7 +20,7 @@ app.use("/uploads", express.static("uploads"));
 
 
 
-//db();
+// db();
 app.listen(process.env.PORT,()=>{
     console.log(`server is live on port ${process.env.PORT}`)
 })
