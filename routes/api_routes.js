@@ -1,5 +1,17 @@
 import express from "express";
-const api_routes= express.Router();
+const router = express.Router();
+import userController from "../controllers/userController.js";
+import loadController from "../controllers/LoadController.js";
+import { CheckAuth } from "../middlewares/checkAuth.js";
 
+router.post('/customer-register',userController.customer_register);
+router.post('/customer-address',CheckAuth ,userController.customer_address);
+router.post('/customer-drop-address',CheckAuth ,userController.customer_drop_address);
+router.post('/customer-billing-address',CheckAuth ,userController.customer_billing_address);
+router.get('/get-loads',CheckAuth ,loadController.get_loads);
+router.post('/customer-loads-subscription',CheckAuth ,loadController.customer_loads_subscription);
+router.post('/customer-login',userController.customer_login);
+router.post('/forgot-password',userController.forgot_password);
+router.post('/verify-otp',userController.verify_otp);
 
-export default api_routes;
+export default router;
