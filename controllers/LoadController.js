@@ -35,12 +35,13 @@ export const customer_loads_subscription = async(req,res)=>{
 export const get_load_price = async(req,res)=>{
      try { 
      	const userData = res.user;
-        const {	type,buy_loads,amount} = req.body;
-        if(	type && buy_loads && amount){
-	        var sql = "INSERT INTO customer_loads_subscription (user_id,type,buy_loads,amount) VALUES ('"+userData[0].id+"','"+type+"', '"+buy_loads+"','"+amount+"')";
+        const {	buy_loads} = req.body;
+        if(buy_loads){
+	        var sql = "select loads_price from settings";
 	        dbConnection.query(sql, function (err, result) {
 	        if (err) throw err;
-	            res.json({'status':true,"messagae":"Load added successfully!"});
+            const price = (result[0].loads_price * buy_loads)
+	            res.json({'status':true,"messagae":"Price get successfully!",'data':price});
 	        });
     	}else{
             res.json({'status':true,"messagae":"All fields are required"});
@@ -52,5 +53,6 @@ export const get_load_price = async(req,res)=>{
 
 export default {
 	get_loads,
-	customer_loads_subscription
+	customer_loads_subscription,
+    get_load_price
 }

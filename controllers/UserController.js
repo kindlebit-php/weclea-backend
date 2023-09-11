@@ -174,7 +174,6 @@ export const forgot_password = async(req,res)=>{
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data.length > 0){
 					var otp = 123456
-					console.log(login_id)
 					const mailOptions = {
 					from: 'ankuchauhan68@gmail.com',
 					to: login_id,
@@ -191,7 +190,7 @@ export const forgot_password = async(req,res)=>{
 						} else {
 							
 							const updateUser = "UPDATE users SET otp = '"+otp+"' WHERE id = '"+data[0].id+"';"
-							console.log('updateUser',updateUser)
+						
 							dbConnection.query(updateUser, function (err, datas) {
 								if(err)throw err;
 								res.json({'status':true,"messagae":"Email send successfully!",'data':data});
@@ -211,7 +210,7 @@ export const forgot_password = async(req,res)=>{
 	}
 }
 
-//customer forgot password API
+//customer verify OTP API
 export const verify_otp = async(req,res)=>{
 	try { 
 		const {login_id,otp} = req.body;
@@ -222,7 +221,37 @@ export const verify_otp = async(req,res)=>{
 				if(data.length > 0){
 					res.json({'status':true,"messagae":"OTP verify successfully",'data':data});
 				}else{
-					res.json({'status':true,"messagae":"Incorrect OTP!"});
+					res.json({'status':true,"messagae":"Incorrect login details!"});
+				}
+			});
+		}else{
+			res.json({'status':true,"messagae":"All fields are required"});
+		}
+	}catch (error) {
+		res.json({'status':false,"messagae":error});  
+	}
+}
+
+//customer change password API
+export const change_password = async(req,res)=>{
+	try { 
+      	const saltRounds = 10;
+		const {login_id,password} = req.body;
+		if(login_id && password){
+			const checkIfEmailExist = "select * from users where email = '"+login_id+"'";
+			dbConnection.query(checkIfEmailExist, function (err, data) {
+				// console.log('data',data)
+				if(data.length > 0){
+					bcrypt.hash(password, saltRounds, function(err, hash) {
+						const updateUser = "UPDATE users SET password = '"+hash+"' WHERE email = '"+login_id+"';"
+						
+						dbConnection.query(updateUser, function (err, datas) {
+							if(err)throw err;
+							res.json({'status':true,"messagae":"Password updated successfully!",'data':data});
+						});
+					});
+				}else{
+					res.json({'status':true,"messagae":"User not found!"});
 				}
 			});
 		}else{
@@ -239,5 +268,6 @@ export default {
 	customer_billing_address,
 	customer_drop_address,
 	forgot_password,
-	verify_otp
+	verify_otp,
+	change_password
 }
