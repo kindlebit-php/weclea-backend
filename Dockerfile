@@ -9,8 +9,8 @@ COPY package*.json ./
 # Install project dependencies
 RUN npm install -g npm@9.5.1 && \
     npm install && \
-#    npm cache clean --force && \
-#    rm -rf /tmp/*
+    npm cache clean --force && \
+    rm -rf /tmp/*
 
 # Copy the entire Node.js app to the container
 COPY . .
