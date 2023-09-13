@@ -19,15 +19,15 @@ app.use(cors());
 app.use(express.static('public')); 
 
 const PORT = process.env.PORT || 5000;
+app.use('/api', apiRouter);   
 
 const server = http.createServer(app);
-server.listen(PORT, () => 'Server is running on port '+PORT);    
+server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));    
 // console.log(apiRouter)
-app.use('/api', apiRouter);   
    
 // catch 404 and forward to error handler
 app.use(function(req, res, next) 
 {   
-    res.setHeader("Access-Control-Allow-Origin", "*");
+    // res.setHeader("Access-Control-Allow-Origin", "*");
     res.status(404).json({ status: false, msg: "Api endpoint does not found!" });
 });
