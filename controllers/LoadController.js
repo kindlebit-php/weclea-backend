@@ -40,8 +40,11 @@ export const get_load_price = async(req,res)=>{
 	        var sql = "select loads_price from settings";
 	        dbConnection.query(sql, function (err, result) {
 	        if (err) throw err;
-            const price = (result[0].loads_price * buy_loads)
-	            res.json({'status':true,"messagae":"Price get successfully!",'data':price});
+                const price = (result[0].loads_price * buy_loads)
+                let data = {
+                    "price":price,
+                }
+	            res.json({'status':true,"messagae":"Price get successfully!",'data':data});
 	        });
     	}else{
             res.json({'status':true,"messagae":"All fields are required"});
@@ -51,8 +54,28 @@ export const get_load_price = async(req,res)=>{
     }
 }
 
+//get total load API
+export const get_user_loads = async(req,res)=>{
+     try { 
+        const userData = res.user;
+            var sql = "select available_loads from users";
+            dbConnection.query(sql, function (err, result) {
+            if (err) throw err;
+            const available_loads = result[0].available_loads;
+             let data = {
+                    "available_loads":available_loads,
+                }
+                res.json({'status':true,"messagae":"Price get successfully!",'data':data});
+            });
+        
+    }catch (error) {
+        res.json({'status':false,"messagae":error});  
+    }
+}
+
 export default {
 	get_loads,
 	customer_loads_subscription,
-    get_load_price
+    get_load_price,
+    get_user_loads
 }
