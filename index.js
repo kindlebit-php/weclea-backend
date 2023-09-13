@@ -21,7 +21,7 @@ app.use(express.static('public'));
 const PORT = process.env.PORT || 5000;
 
 const server = http.createServer(app);
-server.listen(PORT, () => 'Server is running on port '+PORT);    
+server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));    
 // console.log(apiRouter)
 app.use('/api', apiRouter);   
    

@@ -2,6 +2,11 @@ import dbConnection from'../config/db.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from "../config/generateToken.js";
 import transport from "../helpers/mail.js";
+import dotenv from "dotenv";
+dotenv.config();
+import Stripe from "stripe";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
 
 //customer register API
 export const customer_register = async(req,res)=>{
@@ -10,6 +15,14 @@ export const customer_register = async(req,res)=>{
         const {name,email,password,mobile,comment} = req.body;
         if(name && email && password  && mobile && comment ){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
+			const stripeCustomer = await stripe.customers.create({
+				email: email,
+				name: name,
+				description: "Opening stripe account",
+				phone: mobile
+			  });
+				const customer_id=stripeCustomer.id;
+			  console.log(customer_id)
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data[0].total > 0 ){
 					res.json({'status':false,"messagae":'Email is already registered'});  
@@ -20,7 +33,7 @@ export const customer_register = async(req,res)=>{
 						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
 					}
 					bcrypt.hash(password, saltRounds, function(err, hash) {
-						var sql = "INSERT INTO users (name, email,password,mobile,comment,role) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+comment+"','1')";
+						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','1')";
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;
 								res.json({'status':true,"messagae":"data insert successfully!"});
@@ -174,7 +187,8 @@ export const forgot_password = async(req,res)=>{
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data.length > 0){
 					var otp = 123456
-					const mailOptions = {
+					const mailOptions = 
+					{
 					from: 'ankuchauhan68@gmail.com',
 					to: login_id,
 					subject: "Verify Your Email",
@@ -184,28 +198,39 @@ export const forgot_password = async(req,res)=>{
 					<h2> OTP=  ${otp} <h2>`,
 					};
 
-					transport.sendMail(mailOptions, function (error, info) {
-						if (error) {
+					transport.sendMail(mailOptions, function (error, info) 
+					{
+						if (error) 
+						{
 							res.json({'status':true,"messagae":error});
-						} else {
+						} 
+						else
+						 {
 							
 							const updateUser = "UPDATE users SET otp = '"+otp+"' WHERE id = '"+data[0].id+"';"
 						
-							dbConnection.query(updateUser, function (err, datas) {
+							dbConnection.query(updateUser, function (err, datas) 
+							{
 								if(err)throw err;
 								res.json({'status':true,"messagae":"Email send successfully!",'data':data});
 							})
 							
 						}
 					});
-				}else{
+				}
+				else
+				{
 					res.json({'status':true,"messagae":"User not found!"});
 				}
 			});
-		}else{
+		}
+		else
+		{
 			res.json({'status':true,"messagae":"All fields are required"});
 		}
-	}catch (error) {
+	}
+	catch (error) 
+	{ 
 		res.json({'status':false,"messagae":error});  
 	}
 }

@@ -4,8 +4,8 @@ import dbConnection from'../config/db.js';
 export const customer_booking = async(req,res)=>{
      try { 
      	const userData = res.user;
-        const {	delievery_day,date,total_loads,order_type} = req.body;
-        if(	delievery_day && date && total_loads && order_type){
+        const {	delievery_day,date,total_loads,driver_id,order_type} = req.body;
+        if(	delievery_day && date && total_loads && driver_id && order_type){
 
         var sql = "select available_loads from users where id = '"+userData[0].id+"'";
         dbConnection.query(sql, function (err, result) {
@@ -16,7 +16,7 @@ export const customer_booking = async(req,res)=>{
                 let hours = dateObject.getHours();
                 let minutes = dateObject.getMinutes();
                 const current_time = hours + ":" + minutes;
-                var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+date+"', '"+current_time+"','"+total_loads+"','"+order_type+"')";
+                var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,driver_id,order_type) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+date+"', '"+current_time+"','"+total_loads+"','"+driver_id+"','"+order_type+"')";
                 dbConnection.query(sql, function (err, result) {
                     if (err) throw err;
                     res.json({'status':true,"messagae":"Booking added successfully!"});
