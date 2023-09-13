@@ -12,8 +12,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 export const customer_register = async(req,res)=>{
       try { 
       	const saltRounds = 10;
-        const {name,email,password,mobile,comment} = req.body;
-        if(name && email && password  && mobile && comment ){
+        const {name,email,password,mobile,comment,role,latitude,longitude} = req.body;
+        if(name && email && password  && mobile && comment && role){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
 			const stripeCustomer = await stripe.customers.create({
 				email: email,
@@ -33,7 +33,7 @@ export const customer_register = async(req,res)=>{
 						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
 					}
 					bcrypt.hash(password, saltRounds, function(err, hash) {
-						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','1')";
+						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"')";
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;
 								res.json({'status':true,"messagae":"data insert successfully!"});
@@ -112,9 +112,9 @@ export const customer_billing_address = async(req,res)=>{
 //customer login API
 export const customer_login = async(req,res)=>{
 	try { 
-		const {login_id,password,type} = req.body;
-		if(login_id && password && type){
-			const checkIfEmailExist = "select * from users where email = '"+login_id+"' and role = '"+type+"'";
+		const {email,password,type} = req.body;
+		if(email && password && type){
+			const checkIfEmailExist = "select * from users where email = '"+email+"' and role = '"+type+"'";
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data.length > 0){
 					if(data[0].status == 1){
@@ -139,35 +139,8 @@ export const customer_login = async(req,res)=>{
 					res.json({'status':true,"messagae":"Your account has been deactivated, please connect with admin!"});
 				}
 				}else{
-					const checkIfEmailExist = "select * from users where mobile = '"+login_id+"' and role = '"+type+"'";
-					dbConnection.query(checkIfEmailExist, function (err, data) {
-						if(data.length > 0){
-						if(data[0].status == 1){
-							bcrypt.compare(password, data[0].password, function(err, result) {
-								if(result == true){
-									var resData = [];
-									data.forEach(element =>
-									{
-										const {id,name,email,mobile,comment,role,status} = element;
-										
-										let initi = {
-											"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'token': generateToken({ userId: id, type: type }),
-										}
-										resData.push(initi);
-									});
-									res.json({'status':true,"messagae":"Logged in successfully!",'data': resData});
-								}else{
-									res.json({'status':true,"messagae":"Incorrect password!"});
-								}
-							});
-						}else{
-							res.json({'status':true,"messagae":"Your account has been deactivated, please connect with admin!"});
-
-						}
-						}else{
 							res.json({'status':true,"messagae":"User not found!"});
-						}
-					});
+						
 				}
 			});
 		}else{
@@ -181,16 +154,16 @@ export const customer_login = async(req,res)=>{
 //customer forgot password API
 export const forgot_password = async(req,res)=>{
 	try { 
-		const {login_id} = req.body;
-		if(login_id){
-			const checkIfEmailExist = "select * from users where email = '"+login_id+"'";
+		const {email} = req.body;
+		if(email){
+			const checkIfEmailExist = "select * from users where email = '"+email+"'";
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data.length > 0){
 					var otp = 123456
 					const mailOptions = 
 					{
 					from: 'ankuchauhan68@gmail.com',
-					to: login_id,
+					to: email,
 					subject: "Verify Your Email",
 					html: `<h2>Hello ${data[0].name}! 
 					Thanks for registering on our site.</h2>
@@ -238,15 +211,15 @@ export const forgot_password = async(req,res)=>{
 //customer verify OTP API
 export const verify_otp = async(req,res)=>{
 	try { 
-		const {login_id,otp} = req.body;
-		if(login_id && otp){
-			const checkIfEmailExist = "select * from users where email = '"+login_id+"' and otp = '"+otp+"'";
+		const {email,otp} = req.body;
+		if(email && otp){
+			const checkIfEmailExist = "select * from users where email = '"+email+"' and otp = '"+otp+"'";
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				// console.log('data',data)
 				if(data.length > 0){
 					res.json({'status':true,"messagae":"OTP verify successfully",'data':data});
 				}else{
-					res.json({'status':true,"messagae":"Incorrect login details!"});
+					res.json({'status':true,"messagae":"Incorrect OTP details!"});
 				}
 			});
 		}else{
@@ -261,14 +234,14 @@ export const verify_otp = async(req,res)=>{
 export const change_password = async(req,res)=>{
 	try { 
       	const saltRounds = 10;
-		const {login_id,password} = req.body;
-		if(login_id && password){
-			const checkIfEmailExist = "select * from users where email = '"+login_id+"'";
+		const {email,password} = req.body;
+		if(email && password){
+			const checkIfEmailExist = "select * from users where email = '"+email+"'";
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				// console.log('data',data)
 				if(data.length > 0){
 					bcrypt.hash(password, saltRounds, function(err, hash) {
-						const updateUser = "UPDATE users SET password = '"+hash+"' WHERE email = '"+login_id+"';"
+						const updateUser = "UPDATE users SET password = '"+hash+"' WHERE email = '"+email+"';"
 						
 						dbConnection.query(updateUser, function (err, datas) {
 							if(err)throw err;
