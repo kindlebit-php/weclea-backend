@@ -14,7 +14,7 @@ var connection = mysql.createConnection({
     multipleStatements: true,
     dateStrings: true
 });
-console.log('db',connection)
+// console.log('db',connection)
 connection.connect((err)=> {
     if(!err)
         console.log('Connection Established Successfully');

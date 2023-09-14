@@ -15,15 +15,7 @@ export const customer_register = async(req,res)=>{
         const {name,email,password,mobile,comment,role,latitude,longitude} = req.body;
         if(name && email && password  && mobile && comment && role){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
-			const stripeCustomer = await stripe.customers.create({
-				email: email,
-				name: name,
-				description: "Opening stripe account",
-				phone: mobile
-			  });
-			console.log('stripeCustomer',stripeCustomer)
-				const customer_id=stripeCustomer.id;
-			  console.log(customer_id)
+			
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data[0].total > 0 ){
 					res.json({'status':false,"messagae":'Email is already registered'});  
@@ -33,6 +25,13 @@ export const customer_register = async(req,res)=>{
 					if(data[0].total > 0 ){
 						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
 					}
+					const stripeCustomer = stripe.customers.create({
+					email: email,
+					name: name,
+					description: "Opening stripe account",
+					phone: mobile
+					});
+					const customer_id=stripeCustomer.id;
 					bcrypt.hash(password, saltRounds, function(err, hash) {
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"')";
 						dbConnection.query(sql, function (err, result) {
@@ -49,7 +48,7 @@ export const customer_register = async(req,res)=>{
             res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 
@@ -68,7 +67,7 @@ export const customer_address = async(req,res)=>{
             res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 
@@ -87,7 +86,7 @@ export const customer_drop_address = async(req,res)=>{
             res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 
@@ -106,7 +105,7 @@ export const customer_billing_address = async(req,res)=>{
             res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 
@@ -148,7 +147,7 @@ export const customer_login = async(req,res)=>{
 			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}catch (error) {
-		res.json({'status':false,"messagae":error});  
+		res.json({'status':false,"messagae":error.message});  
 	}
 }
 
@@ -205,7 +204,7 @@ export const forgot_password = async(req,res)=>{
 	}
 	catch (error) 
 	{ 
-		res.json({'status':false,"messagae":error});  
+		res.json({'status':false,"messagae":error.message});  
 	}
 }
 
@@ -227,7 +226,7 @@ export const verify_otp = async(req,res)=>{
 			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}catch (error) {
-		res.json({'status':false,"messagae":error});  
+		res.json({'status':false,"messagae":error.message});  
 	}
 }
 
@@ -257,7 +256,7 @@ export const change_password = async(req,res)=>{
 			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}catch (error) {
-		res.json({'status':false,"messagae":error});  
+		res.json({'status':false,"messagae":error.message});  
 	}
 }
 
@@ -289,7 +288,7 @@ export const get_user_profile = async(req,res)=>{
             });
       
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 
@@ -297,30 +296,39 @@ export const get_user_profile = async(req,res)=>{
 export const edit_user_profile = async(req,res)=>{
      try { 
         const userData = res.user;
-        const { buy_loads} = req.body;
-            var sql = "select * from users where id = '"+userData[0].id+"' ";
-            dbConnection.query(sql, function (err, result) {
-            if (err) throw err;
-				var resData = [];
-				result.forEach(element =>
-				{
-					const {id,name,email,mobile} = element;
-					if(result[0].profile_image){
-						var img = process.env.BASE_URL+'/'+result[0].profile_image;
+        const saltRounds = 10;
+        const {name,email,password,mobile} = req.body;
+        if(name && email && password  && mobile){
+
+       	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
+			dbConnection.query(checkIfEmailExist, function (err, data) {
+				if(data[0].total > 0 ){
+					res.json({'status':false,"messagae":'Email is already registered'});  
+				}else{
+					const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
+					dbConnection.query(checkIfMobileExist, function (err, data) {
+					if(data[0].total == 0 ){
+					bcrypt.hash(password, saltRounds, function(err, hash) {
+						var sql = "update users set name = '"+name+"', email = '"+email+"',password = '"+hash+"', mobile = '"+mobile+"' where id = '"+userData[0].id+"'";
+						dbConnection.query(sql, function (err, result) {
+							if (err) throw err;
+								res.json({'status':true,"messagae":"data updated successfully!"});
+							}); 
+						});
 					}else{
-						var img = process.env.BASE_URL+'/uploads/profile.png';
+						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
 
 					}
-					let initi = {
-					"id":id,"name":name,"email":email,"mobile":mobile,'profile_img':img
-					}
-					resData.push(initi);
-				});
-				res.json({'status':true,"messagae":"Price get successfully!",'data':resData});
-            });
+					});
+				
+				}
+			})
+		}else{
+            res.json({'status':false,"messagae":"All fields are required"});
+		}
       
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 export default {
@@ -332,5 +340,6 @@ export default {
 	forgot_password,
 	verify_otp,
 	change_password,
+	edit_user_profile,
 	get_user_profile
 }
