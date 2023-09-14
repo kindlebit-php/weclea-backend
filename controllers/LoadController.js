@@ -25,7 +25,7 @@ export const customer_loads_subscription = async(req,res)=>{
 	            res.json({'status':true,"messagae":"Load added successfully!"});
 	        });
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
         res.json({'status':false,"messagae":error});  
@@ -47,12 +47,13 @@ export const get_load_price = async(req,res)=>{
 	            res.json({'status':true,"messagae":"Price get successfully!",'data':data});
 	        });
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
         res.json({'status':false,"messagae":error});  
     }
 }
+
 
 //get total load API
 export const get_user_loads = async(req,res)=>{

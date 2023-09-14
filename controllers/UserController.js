@@ -21,6 +21,7 @@ export const customer_register = async(req,res)=>{
 				description: "Opening stripe account",
 				phone: mobile
 			  });
+			console.log('stripeCustomer',stripeCustomer)
 				const customer_id=stripeCustomer.id;
 			  console.log(customer_id)
 			dbConnection.query(checkIfEmailExist, function (err, data) {
@@ -45,7 +46,7 @@ export const customer_register = async(req,res)=>{
 			})
         	
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
         res.json({'status':false,"messagae":error});  
@@ -64,7 +65,7 @@ export const customer_address = async(req,res)=>{
 	            res.json({'status':true,"messagae":"Address added successfully!"});
 	        });
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
         res.json({'status':false,"messagae":error});  
@@ -83,7 +84,7 @@ export const customer_drop_address = async(req,res)=>{
 	            res.json({'status':true,"messagae":"Address added successfully!"});
 	        });
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
         res.json({'status':false,"messagae":error});  
@@ -102,7 +103,7 @@ export const customer_billing_address = async(req,res)=>{
 	            res.json({'status':true,"messagae":"Address added successfully!"});
 	        });
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
         res.json({'status':false,"messagae":error});  
@@ -132,19 +133,19 @@ export const customer_login = async(req,res)=>{
 							});
 							res.json({'status':true,"messagae":"Logged in successfully!",'data': resData});
 						}else{
-							res.json({'status':true,"messagae":"Incorrect password!"});
+							res.json({'status':false,"messagae":"Incorrect password!"});
 						}
 					});
 				}else{
-					res.json({'status':true,"messagae":"Your account has been deactivated, please connect with admin!"});
+					res.json({'status':false,"messagae":"Your account has been deactivated, please connect with admin!"});
 				}
 				}else{
-							res.json({'status':true,"messagae":"User not found!"});
+							res.json({'status':false,"messagae":"User not found!"});
 						
 				}
 			});
 		}else{
-			res.json({'status':true,"messagae":"All fields are required"});
+			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}catch (error) {
 		res.json({'status':false,"messagae":error});  
@@ -175,7 +176,7 @@ export const forgot_password = async(req,res)=>{
 					{
 						if (error) 
 						{
-							res.json({'status':true,"messagae":error});
+							res.json({'status':false,"messagae":error});
 						} 
 						else
 						 {
@@ -193,13 +194,13 @@ export const forgot_password = async(req,res)=>{
 				}
 				else
 				{
-					res.json({'status':true,"messagae":"User not found!"});
+					res.json({'status':false,"messagae":"User not found!"});
 				}
 			});
 		}
 		else
 		{
-			res.json({'status':true,"messagae":"All fields are required"});
+			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}
 	catch (error) 
@@ -219,11 +220,11 @@ export const verify_otp = async(req,res)=>{
 				if(data.length > 0){
 					res.json({'status':true,"messagae":"OTP verify successfully",'data':data});
 				}else{
-					res.json({'status':true,"messagae":"Incorrect OTP details!"});
+					res.json({'status':false,"messagae":"Incorrect OTP details!"});
 				}
 			});
 		}else{
-			res.json({'status':true,"messagae":"All fields are required"});
+			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}catch (error) {
 		res.json({'status':false,"messagae":error});  
@@ -249,15 +250,78 @@ export const change_password = async(req,res)=>{
 						});
 					});
 				}else{
-					res.json({'status':true,"messagae":"User not found!"});
+					res.json({'status':false,"messagae":"User not found!"});
 				}
 			});
 		}else{
-			res.json({'status':true,"messagae":"All fields are required"});
+			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}catch (error) {
 		res.json({'status':false,"messagae":error});  
 	}
+}
+
+
+//get user profile API
+export const get_user_profile = async(req,res)=>{
+     try { 
+        const userData = res.user;
+        const { buy_loads} = req.body;
+            var sql = "select * from users where id = '"+userData[0].id+"' ";
+            dbConnection.query(sql, function (err, result) {
+            if (err) throw err;
+				var resData = [];
+				result.forEach(element =>
+				{
+					const {id,name,email,mobile} = element;
+					if(result[0].profile_image){
+						var img = process.env.BASE_URL+'/'+result[0].profile_image;
+					}else{
+						var img = process.env.BASE_URL+'/uploads/profile.png';
+
+					}
+					let initi = {
+					"id":id,"name":name,"email":email,"mobile":mobile,'profile_img':img
+					}
+					resData.push(initi);
+				});
+				res.json({'status':true,"messagae":"Price get successfully!",'data':resData});
+            });
+      
+    }catch (error) {
+        res.json({'status':false,"messagae":error});  
+    }
+}
+
+//get user profile API
+export const edit_user_profile = async(req,res)=>{
+     try { 
+        const userData = res.user;
+        const { buy_loads} = req.body;
+            var sql = "select * from users where id = '"+userData[0].id+"' ";
+            dbConnection.query(sql, function (err, result) {
+            if (err) throw err;
+				var resData = [];
+				result.forEach(element =>
+				{
+					const {id,name,email,mobile} = element;
+					if(result[0].profile_image){
+						var img = process.env.BASE_URL+'/'+result[0].profile_image;
+					}else{
+						var img = process.env.BASE_URL+'/uploads/profile.png';
+
+					}
+					let initi = {
+					"id":id,"name":name,"email":email,"mobile":mobile,'profile_img':img
+					}
+					resData.push(initi);
+				});
+				res.json({'status':true,"messagae":"Price get successfully!",'data':resData});
+            });
+      
+    }catch (error) {
+        res.json({'status':false,"messagae":error});  
+    }
 }
 export default {
 	customer_register,
@@ -267,5 +331,6 @@ export default {
 	customer_drop_address,
 	forgot_password,
 	verify_otp,
-	change_password
+	change_password,
+	get_user_profile
 }
