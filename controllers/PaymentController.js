@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
+import dbConnection from'../config/db.js';
 import Stripe from "stripe";
+import { date } from "../helpers/date.js";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const stripes = new Stripe(process.env.STRIPE_PUBLISH_KEY);
 
@@ -64,14 +66,12 @@ export const Attach_Card = async (req, res) => {
 
 //Customer payment api
 export const customer_payment = async (req, res) => {
+  const userData = res.user;
+  const customerId = userData[0].customer_id;
+  const { amount } = req.body;
   try {
-    const userData = res.user;
-    const customerId = userData[0].customer_id;
-    const { amount } = req.body;
-    if(amount){
     const customerData = await stripe.customers.retrieve(customerId);
-    console.log(customerData)
-    if(customerData.length>0){
+    if(customerData.id){
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount * 100,
       currency: "usd",
@@ -81,18 +81,20 @@ export const customer_payment = async (req, res) => {
       confirm: true,
       description: "Payment by client",
     });
-    return res.json({
-      status: true,
-      messagae: "Payment successfully",
-    });
+    if(userData[0].id && amount && paymentIntent.id && date()){
+      var sql = "INSERT INTO payment (user_id,amount,payment_id,date) VALUES ('"+userData[0].id+"','"+amount+"','"+paymentIntent.id+"','"+date()+"')";
+      dbConnection.query(sql, function (err, result) {
+        if (err) throw err;
+        return res.json({status: true,messagae: "Payment successful" });
+        });
+    }else{
+          res.json({'status':false,"messagae":"All fields are required"});
+    }
 }else{
     return res.json({ status: true, messagae: "Customer_id doesn't exists" });
 }
-}else{
-    return res.json({ status: true, messagae: "Please enter amount" });
-}
   } catch (error) {
-    res.json({ status: false, messagae: error });
+    res.json({ status: false, messagae: error.message });
   }
 };
 
@@ -149,7 +151,15 @@ export const ACH_Payment=async(req,res)=>{
       currency: 'usd',
       customer:customerId
     });
-    res.status(200).json({ status: true, messagae: "payment successful" });
+    if(userData[0].id && amount && paymentIntent.id && date()){
+      var sql = "INSERT INTO payment (user_id,amount,payment_id,date) VALUES ('"+userData[0].id+"','"+amount+"','"+paymentIntent.id+"','"+date()+"')";
+      dbConnection.query(sql, function (err, result) {
+        if (err) throw err;
+        return res.json({status: true,messagae: "Payment successful" });
+        });
+    }else{
+          res.json({'status':false,"messagae":"All fields are required"});
+    }
   } catch (error) {
     console.log(error.message)
     res.status(500).json({ error: error.message });
