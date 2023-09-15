@@ -6,11 +6,25 @@ import bookingController from "../controllers/BookingController.js";
 import { CheckAuth } from "../middlewares/checkAuth.js";
 import driverController from "../controllers/DriverController.js";
 import paymentController from "../controllers/PaymentController.js";
+import multer from 'multer';
+
+const storage = multer.diskStorage({
+    destination: function(req, file, cb)
+    {
+        cb(null, 'uploads');
+    },   
+    filename: function (req, file, cb) 
+    {
+      cb(null,file.originalname)
+    }
+});
+
+const profileUpload = multer({storage:storage})
 
 router.post('/customer-register',userController.customer_register);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
 router.post('/customer-drop-address',CheckAuth ,userController.customer_drop_address);
-router.post('/edit-user-profile',CheckAuth ,userController.edit_user_profile);
+router.post('/edit-user-profile',CheckAuth,profileUpload.single('profile_image') ,userController.edit_user_profile);
 router.post('/customer-billing-address',CheckAuth ,userController.customer_billing_address);
 router.get('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
