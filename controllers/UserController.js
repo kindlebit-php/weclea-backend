@@ -129,7 +129,7 @@ export const customer_login = async(req,res)=>{
 		if(email && password && type){
 			const checkIfEmailExist = "select * from users where email = '"+email+"' and role = '"+type+"'";
 			dbConnection.query(checkIfEmailExist, function (err, data) {
-				if(data.length > 0){
+				if(data){
 					if(data[0].status == 1){
 					bcrypt.compare(password, data[0].password, function(err, result) {
 						if(result == true){
