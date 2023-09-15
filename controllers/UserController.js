@@ -5,6 +5,7 @@ import transport from "../helpers/mail.js";
 import dotenv from "dotenv";
 dotenv.config();
 import Stripe from "stripe";
+import Path from 'path'
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
@@ -91,7 +92,7 @@ export const customer_address = async(req,res)=>{
 	        });
     	}
 	            res.json({'status':true,"messagae":"Address added successfully!"});
-    	
+
     }else{
             res.json({'status':false,"messagae":"All fields are required"});
     	}
@@ -145,7 +146,7 @@ export const customer_login = async(req,res)=>{
 		if(email && password && type){
 			const checkIfEmailExist = "select * from users where email = '"+email+"' and role = '"+type+"'";
 			dbConnection.query(checkIfEmailExist, function (err, data) {
-				if(data){
+				if(data.length > 0){
 					if(data[0].status == 1){
 					bcrypt.compare(password, data[0].password, function(err, result) {
 						if(result == true){
@@ -303,7 +304,7 @@ export const get_user_profile = async(req,res)=>{
 				{
 					const {id,name,email,mobile} = element;
 					if(result[0].profile_image){
-						var img = process.env.BASE_URL+'/'+result[0].profile_image;
+						var img = process.env.BASE_URL+'/uploads/'+result[0].profile_image;
 					}else{
 						var img = process.env.BASE_URL+'/uploads/profile.png';
 
@@ -337,8 +338,15 @@ export const edit_user_profile = async(req,res)=>{
 					const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
 					dbConnection.query(checkIfMobileExist, function (err, data) {
 					if(data[0].total == 0 ){
+					// profileUpload.single('profile_image')
+					if(req.file){
+					
+						var userProfile = req.file.originalname;
+					}else{
+						var userProfile = userData[0].profile_image;
+					}
 					bcrypt.hash(password, saltRounds, function(err, hash) {
-						var sql = "update users set name = '"+name+"', email = '"+email+"',password = '"+hash+"', mobile = '"+mobile+"' where id = '"+userData[0].id+"'";
+						var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"' ,email = '"+email+"',password = '"+hash+"', mobile = '"+mobile+"' where id = '"+userData[0].id+"'";
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;
 								res.json({'status':true,"messagae":"data updated successfully!"});
