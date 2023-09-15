@@ -17,12 +17,12 @@ export const customer_register = async(req,res)=>{
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
 			
 			dbConnection.query(checkIfEmailExist, function (err, data) {
-				if(data[0].total > 0 ){
+				if(data){
 					res.json({'status':false,"messagae":'Email is already registered'});  
 				}else{
 					const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
 					dbConnection.query(checkIfMobileExist, function (err, data) {
-					if(data[0].total > 0 ){
+					if(data){
 						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
 					}
 					const stripeCustomer = stripe.customers.create({
