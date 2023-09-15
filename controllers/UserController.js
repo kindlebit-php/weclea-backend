@@ -15,28 +15,41 @@ export const customer_register = async(req,res)=>{
         const {name,email,password,mobile,comment,role,latitude,longitude} = req.body;
         if(name && email && password  && mobile && comment && role){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
-			const stripeCustomer = await stripe.customers.create({
-				email: email,
-				name: name,
-				description: "Opening stripe account",
-				phone: mobile
-			  });
-				const customer_id=stripeCustomer.id;
-			  console.log(customer_id)
+			
 			dbConnection.query(checkIfEmailExist, function (err, data) {
-				if(data[0].total > 0 ){
+				if(data){
 					res.json({'status':false,"messagae":'Email is already registered'});  
 				}else{
 					const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
 					dbConnection.query(checkIfMobileExist, function (err, data) {
-					if(data[0].total > 0 ){
+					if(data){
 						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
 					}
+					const stripeCustomer = stripe.customers.create({
+					email: email,
+					name: name,
+					description: "Opening stripe account",
+					phone: mobile
+					});
+					const customer_id=stripeCustomer.id;
 					bcrypt.hash(password, saltRounds, function(err, hash) {
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"')";
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;
-								res.json({'status':true,"messagae":"data insert successfully!"});
+							var sql = "select * from users where id = '"+result.insertId+"'";
+							dbConnection.query(sql, function (err, userList) {
+							var resData = [];
+							userList.forEach(element =>
+							{
+							const {id,name,email,mobile,comment,role,status} = element;
+
+							let initi = {
+							"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'token': generateToken({ userId: id, type: role }),
+							}
+							resData.push(initi);
+							});
+								res.json({'status':true,"messagae":"data insert successfully!",'data':resData});
+							}); 
 							}); 
 						});
 					});
@@ -45,10 +58,10 @@ export const customer_register = async(req,res)=>{
 			})
         	
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 
@@ -56,18 +69,34 @@ export const customer_register = async(req,res)=>{
 export const customer_address = async(req,res)=>{
      try { 
      	const userData = res.user;
-        const {address,appartment,city,state,zipcode,comment,lat,long} = req.body;
-        if(address && appartment && city  && state && zipcode && lat && long){
-	        var sql = "INSERT INTO customer_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+address+"', '"+appartment+"','"+city+"','"+state+"','"+zipcode+"','"+comment+"',"+lat+"','"+long+"')";
+        const {pickup_address,pickup_appartment,pickup_city,pickup_state,pickup_zipcode,pickup_comment,pickup_lat,pickup_long,drop_address,drop_appartment,drop_city,drop_state,drop_zipcode,drop_comment,drop_lat,drop_long,billing_address,billing_appartment,billing_city,billing_state,billing_zipcode,billing_comment,billing_lat,billing_long} = req.body;
+        if(pickup_address && pickup_appartment && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long && drop_address && drop_appartment && drop_city && drop_state && drop_zipcode && drop_comment && drop_lat && drop_long && billing_address && billing_appartment && billing_city && billing_state && billing_zipcode && billing_comment && billing_lat && billing_long){
+        
+        if(pickup_address && pickup_appartment && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long){
+	        var sql = "INSERT INTO customer_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+pickup_address+"', '"+pickup_appartment+"','"+pickup_city+"','"+pickup_state+"','"+pickup_zipcode+"','"+pickup_comment+"','"+pickup_lat+"','"+pickup_long+"')";
 	        dbConnection.query(sql, function (err, result) {
 	        if (err) throw err;
-	            res.json({'status':true,"messagae":"Address added successfully!"});
 	        });
-    	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+    	}
+    	if(drop_address && drop_appartment && drop_city  && drop_state && drop_zipcode && drop_lat && drop_long){
+	        var sql = "INSERT INTO customer_drop_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+drop_address+"', '"+drop_appartment+"','"+drop_city+"','"+drop_state+"','"+drop_zipcode+"','"+drop_comment+"','"+drop_lat+"','"+drop_long+"')";
+	       await dbConnection.query(sql, function (err, result) {
+	        if (err) throw err;
+	        });
+    	}
+    	if(billing_address && billing_appartment && billing_city  && billing_state && billing_zipcode && billing_lat && billing_long){
+	        var sql = "INSERT INTO customer_billing_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+billing_address+"', '"+billing_appartment+"','"+billing_city+"','"+billing_state+"','"+billing_zipcode+"','"+billing_comment+"','"+billing_lat+"','"+billing_long+"')";
+	        dbConnection.query(sql, function (err, result) {
+	        if (err) throw err;
+	        });
+    	}
+	            res.json({'status':true,"messagae":"Address added successfully!"});
+    	
+    }else{
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 
@@ -83,10 +112,10 @@ export const customer_drop_address = async(req,res)=>{
 	            res.json({'status':true,"messagae":"Address added successfully!"});
 	        });
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 
@@ -102,10 +131,10 @@ export const customer_billing_address = async(req,res)=>{
 	            res.json({'status':true,"messagae":"Address added successfully!"});
 	        });
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 
@@ -116,7 +145,7 @@ export const customer_login = async(req,res)=>{
 		if(email && password && type){
 			const checkIfEmailExist = "select * from users where email = '"+email+"' and role = '"+type+"'";
 			dbConnection.query(checkIfEmailExist, function (err, data) {
-				if(data.length > 0){
+				if(data){
 					if(data[0].status == 1){
 					bcrypt.compare(password, data[0].password, function(err, result) {
 						if(result == true){
@@ -132,22 +161,22 @@ export const customer_login = async(req,res)=>{
 							});
 							res.json({'status':true,"messagae":"Logged in successfully!",'data': resData});
 						}else{
-							res.json({'status':true,"messagae":"Incorrect password!"});
+							res.json({'status':false,"messagae":"Incorrect password!"});
 						}
 					});
 				}else{
-					res.json({'status':true,"messagae":"Your account has been deactivated, please connect with admin!"});
+					res.json({'status':false,"messagae":"Your account has been deactivated, please connect with admin!"});
 				}
 				}else{
-							res.json({'status':true,"messagae":"User not found!"});
+							res.json({'status':false,"messagae":"User not found!"});
 						
 				}
 			});
 		}else{
-			res.json({'status':true,"messagae":"All fields are required"});
+			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}catch (error) {
-		res.json({'status':false,"messagae":error});  
+		res.json({'status':false,"messagae":error.message});  
 	}
 }
 
@@ -175,7 +204,7 @@ export const forgot_password = async(req,res)=>{
 					{
 						if (error) 
 						{
-							res.json({'status':true,"messagae":error});
+							res.json({'status':false,"messagae":error});
 						} 
 						else
 						 {
@@ -193,18 +222,18 @@ export const forgot_password = async(req,res)=>{
 				}
 				else
 				{
-					res.json({'status':true,"messagae":"User not found!"});
+					res.json({'status':false,"messagae":"User not found!"});
 				}
 			});
 		}
 		else
 		{
-			res.json({'status':true,"messagae":"All fields are required"});
+			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}
 	catch (error) 
 	{ 
-		res.json({'status':false,"messagae":error});  
+		res.json({'status':false,"messagae":error.message});  
 	}
 }
 
@@ -219,14 +248,14 @@ export const verify_otp = async(req,res)=>{
 				if(data.length > 0){
 					res.json({'status':true,"messagae":"OTP verify successfully",'data':data});
 				}else{
-					res.json({'status':true,"messagae":"Incorrect OTP details!"});
+					res.json({'status':false,"messagae":"Incorrect OTP details!"});
 				}
 			});
 		}else{
-			res.json({'status':true,"messagae":"All fields are required"});
+			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}catch (error) {
-		res.json({'status':false,"messagae":error});  
+		res.json({'status':false,"messagae":error.message});  
 	}
 }
 
@@ -249,15 +278,87 @@ export const change_password = async(req,res)=>{
 						});
 					});
 				}else{
-					res.json({'status':true,"messagae":"User not found!"});
+					res.json({'status':false,"messagae":"User not found!"});
 				}
 			});
 		}else{
-			res.json({'status':true,"messagae":"All fields are required"});
+			res.json({'status':false,"messagae":"All fields are required"});
 		}
 	}catch (error) {
-		res.json({'status':false,"messagae":error});  
+		res.json({'status':false,"messagae":error.message});  
 	}
+}
+
+
+//get user profile API
+export const get_user_profile = async(req,res)=>{
+     try { 
+        const userData = res.user;
+        const { buy_loads} = req.body;
+            var sql = "select * from users where id = '"+userData[0].id+"' ";
+            dbConnection.query(sql, function (err, result) {
+            if (err) throw err;
+				var resData = [];
+				result.forEach(element =>
+				{
+					const {id,name,email,mobile} = element;
+					if(result[0].profile_image){
+						var img = process.env.BASE_URL+'/'+result[0].profile_image;
+					}else{
+						var img = process.env.BASE_URL+'/uploads/profile.png';
+
+					}
+					let initi = {
+					"id":id,"name":name,"email":email,"mobile":mobile,'profile_img':img
+					}
+					resData.push(initi);
+				});
+				res.json({'status':true,"messagae":"Price get successfully!",'data':resData});
+            });
+      
+    }catch (error) {
+        res.json({'status':false,"messagae":error.message});  
+    }
+}
+
+//get user profile API
+export const edit_user_profile = async(req,res)=>{
+     try { 
+        const userData = res.user;
+        const saltRounds = 10;
+        const {name,email,password,mobile} = req.body;
+        if(name && email && password  && mobile){
+
+       	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
+			dbConnection.query(checkIfEmailExist, function (err, data) {
+				if(data[0].total > 0 ){
+					res.json({'status':false,"messagae":'Email is already registered'});  
+				}else{
+					const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
+					dbConnection.query(checkIfMobileExist, function (err, data) {
+					if(data[0].total == 0 ){
+					bcrypt.hash(password, saltRounds, function(err, hash) {
+						var sql = "update users set name = '"+name+"', email = '"+email+"',password = '"+hash+"', mobile = '"+mobile+"' where id = '"+userData[0].id+"'";
+						dbConnection.query(sql, function (err, result) {
+							if (err) throw err;
+								res.json({'status':true,"messagae":"data updated successfully!"});
+							}); 
+						});
+					}else{
+						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
+
+					}
+					});
+				
+				}
+			})
+		}else{
+            res.json({'status':false,"messagae":"All fields are required"});
+		}
+      
+    }catch (error) {
+        res.json({'status':false,"messagae":error.message});  
+    }
 }
 export default {
 	customer_register,
@@ -267,5 +368,7 @@ export default {
 	customer_drop_address,
 	forgot_password,
 	verify_otp,
-	change_password
+	change_password,
+	edit_user_profile,
+	get_user_profile
 }

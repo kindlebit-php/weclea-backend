@@ -9,7 +9,7 @@ export const get_loads = async(req,res)=>{
 				res.json({'status':true,"messagae":"data get successfully!",'data':data});
 			})
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 
@@ -25,10 +25,10 @@ export const customer_loads_subscription = async(req,res)=>{
 	            res.json({'status':true,"messagae":"Load added successfully!"});
 	        });
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 //get load price API
@@ -47,12 +47,13 @@ export const get_load_price = async(req,res)=>{
 	            res.json({'status':true,"messagae":"Price get successfully!",'data':data});
 	        });
     	}else{
-            res.json({'status':true,"messagae":"All fields are required"});
+            res.json({'status':false,"messagae":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
+
 
 //get total load API
 export const get_user_loads = async(req,res)=>{
@@ -69,7 +70,7 @@ export const get_user_loads = async(req,res)=>{
             });
         
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"messagae":error.message});  
     }
 }
 

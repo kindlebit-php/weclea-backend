@@ -1,7 +1,7 @@
 version: '3'
 services:
   web:
-    image: "kindlebit143/weclea-backend:v0.0"
+    image: "kindlebit143/weclea-backend:v3.0"
     ports:
       - "3000:3000"
     depends_on:
@@ -14,8 +14,6 @@ services:
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
     networks:
       - mynetwork
-  #  volumes:
-  #    - web-data:/app/data  # Mount a named volume for the web service
 
   mysql:
     image: mysql:latest
@@ -25,7 +23,19 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
     volumes:
-      - mysql-data:/var/lib/mysql  # Mount a named volume for the MySQL service
+     - mysql-data:/var/lib/mysql  # Define the volume for MySQL data
+    networks:
+      - mynetwork
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - mysql
     networks:
       - mynetwork
 
@@ -33,6 +43,6 @@ networks:
   mynetwork:
     driver: bridge
 
+# Define volumes
 volumes:
-#  web-data:  # Define a named volume for the web service
-  mysql-data:  # Define a named volume for the MySQL service
+  mysql-data:  # Define the MySQL data volume
