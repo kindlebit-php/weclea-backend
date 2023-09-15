@@ -16,7 +16,7 @@ pipeline {
         stage('Build and Test') {
             steps {
                 // Run Build and tests here
-                sh 'docker build . -t kindlebit143/weclea-backend:v1.0'
+                sh 'docker build . -t kindlebit143/weclea-backend:v3.0'
                 // Add your build and test commands here
             }
         }
@@ -28,7 +28,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                     sh '''
                         docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-                        docker push kindlebit143/weclea-backend:v1.0
+                        docker push kindlebit143/weclea-backend:v3.0
                     '''
                 }
             }
@@ -54,7 +54,7 @@ pipeline {
             // Steps to be executed if the pipeline succeeds
             echo 'Pipeline succeeded'
             emailext (
-                subject: 'Congratulations Team:  Your Frontend Code is Successfully Build and Deploy on Server',
+                subject: 'Congratulations Team:  Your Weclea backend Code is Successfully Build and Deploy on Server',
                 body: 'We are thrilled to announce that our latest pipeline has triumphed with flying colors!',
                 to: 'adityakumar8ks@gmail.com' // Specify multiple email addresses separated by commas
             )
@@ -64,7 +64,7 @@ pipeline {
             // Steps to be executed if the pipeline fails
             echo 'Pipeline failed'
             emailext (
-                subject: 'Attention Team: Your Frontend Code Build and Deployment Failed',
+                subject: 'Attention Team: Your Weclea backend Code Build and Deployment Failed',
                 body: 'The pipeline failed. Please check!',
                 to: 'adityakumar8ks@gmail.com' // Specify multiple email addresses separated by commas
             )
