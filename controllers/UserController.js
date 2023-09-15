@@ -36,7 +36,20 @@ export const customer_register = async(req,res)=>{
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"')";
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;
-								res.json({'status':true,"messagae":"data insert successfully!"});
+							var sql = "select * from users where id = '"+result.insertId+"'";
+							dbConnection.query(sql, function (err, userList) {
+							var resData = [];
+							userList.forEach(element =>
+							{
+							const {id,name,email,mobile,comment,role,status} = element;
+
+							let initi = {
+							"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'token': generateToken({ userId: id, type: role }),
+							}
+							resData.push(initi);
+							});
+								res.json({'status':true,"messagae":"data insert successfully!",'data':resData});
+							}); 
 							}); 
 						});
 					});
@@ -58,7 +71,7 @@ export const customer_address = async(req,res)=>{
      	const userData = res.user;
         const {address,appartment,city,state,zipcode,comment,lat,long} = req.body;
         if(address && appartment && city  && state && zipcode && lat && long){
-	        var sql = "INSERT INTO customer_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+address+"', '"+appartment+"','"+city+"','"+state+"','"+zipcode+"','"+comment+"',"+lat+"','"+long+"')";
+	        var sql = "INSERT INTO customer_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+address+"', '"+appartment+"','"+city+"','"+state+"','"+zipcode+"','"+comment+"','"+lat+"','"+long+"')";
 	        dbConnection.query(sql, function (err, result) {
 	        if (err) throw err;
 	            res.json({'status':true,"messagae":"Address added successfully!"});
