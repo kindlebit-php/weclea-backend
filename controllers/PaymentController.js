@@ -96,7 +96,69 @@ export const customer_payment = async (req, res) => {
   }
 };
 
+
+// Create a bank account token
+export const Add_Bank_Account = async (req, res) => {
+  const userData = res.user;
+  const customerId = userData[0].customer_id;
+  const { account_holder_name, routing_number, account_number, account_holder_type } = req.body;
+  try {
+    const bankToken = await stripe.tokens.create({
+      bank_account: {
+        account_holder_name,
+        routing_number,
+        account_number,
+        country:"US",
+        currency:"usd",
+        account_holder_type,
+      }
+    });
+    const source= await stripe.customers.createSource(customerId,{
+      source:bankToken.id,
+     });
+    
+    const verification=await stripe.customers.verifySource(customerId,source.id,{
+     amounts: [32,45]
+    });
+   
+
+    const updatedSource = await stripe.customers.retrieveSource(customerId,source.id);
+    const verificationStatus = updatedSource.status;
+
+    const customer= await stripe.customers.retrieve(customerId);
+    const updatedData= await stripe.customers.update(customerId,{
+       default_source:source.id,
+     });
+     res.status(200).json({ status: true, messagae: "Bank account added successfully"});
+
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
+export const ACH_Payment=async(req,res)=>{
+  const userData = res.user;
+  const customerId = userData[0].customer_id;
+  const amount=req.body.amount;
+  try {
+    const paymentIntent=await stripe.charges.create({
+      amount:amount*100,
+      currency: 'usd',
+      customer:customerId
+    });
+    res.status(200).json({ status: true, messagae: "payment successful" });
+  } catch (error) {
+    console.log(error.message)
+    res.status(500).json({ error: error.message });
+  }
+}
+
 export default {
   Attach_Card,
   customer_payment,
+  Add_Bank_Account,
+  ACH_Payment
 };

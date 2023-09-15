@@ -56,7 +56,6 @@ export const customer_booking = async(req,res)=>{
                 }
             });
         }
-  
     	}else{
             res.json({'status':true,"messagae":"All fields are required"});
     	}
