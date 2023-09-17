@@ -22,7 +22,13 @@ export const customer_loads_subscription = async(req,res)=>{
 	        var sql = "INSERT INTO customer_loads_subscription (user_id,type,buy_loads,amount) VALUES ('"+userData[0].id+"','"+type+"', '"+buy_loads+"','"+amount+"')";
 	        dbConnection.query(sql, function (err, result) {
 	        if (err) throw err;
-	            res.json({'status':true,"messagae":"Load added successfully!"});
+           console.log(result)
+            const loads = "select * from customer_loads_subscription where id = '"+result.insertId+"'";
+            console.log('loads',loads)
+            dbConnection.query(loads, function (err, data) {
+            if (err) throw err;
+                res.json({'status':true,"messagae":"Loads added successfully!",'data':data});
+            })
 	        });
     	}else{
             res.json({'status':false,"messagae":"All fields are required"});

@@ -16,23 +16,20 @@ export const customer_register = async(req,res)=>{
         const {name,email,password,mobile,comment,role,latitude,longitude} = req.body;
         if(name && email && password  && mobile && comment && role){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
-			
+			const stripeCustomer = await stripe.customers.create({
+			email: email,
+			name: name,
+			description: "Opening stripe account",
+			phone: mobile
+			});
+			const customer_id=stripeCustomer.id;
 			dbConnection.query(checkIfEmailExist, function (err, data) {
-				if(data){
-					res.json({'status':false,"messagae":'Email is already registered'});  
-				}else{
-					const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
-					dbConnection.query(checkIfMobileExist, function (err, data) {
-					if(data){
-						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
-					}
-					const stripeCustomer = stripe.customers.create({
-					email: email,
-					name: name,
-					description: "Opening stripe account",
-					phone: mobile
-					});
-					const customer_id=stripeCustomer.id;
+				// console.log(data[])
+				if(data[0].total == 0){
+					const checkIfMobileExist = "select count(id) as mobiletotal from users where mobile = '"+mobile+"'";
+					dbConnection.query(checkIfMobileExist, function (err, mobiledata) {
+					if(mobiledata[0].mobiletotal == 0){
+					
 					bcrypt.hash(password, saltRounds, function(err, hash) {
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"')";
 						dbConnection.query(sql, function (err, result) {
@@ -53,7 +50,13 @@ export const customer_register = async(req,res)=>{
 							}); 
 							}); 
 						});
+					}else{
+						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
+						
+					}
 					});
+				}else{
+					res.json({'status':false,"messagae":'Email is already registered'});  
 				
 				}
 			})
@@ -195,10 +198,22 @@ export const forgot_password = async(req,res)=>{
 					from: 'ankuchauhan68@gmail.com',
 					to: email,
 					subject: "Verify Your Email",
-					html: `<h2>Hello ${data[0].name}! 
-					Thanks for registering on our site.</h2>
-					<h4>Please verify your email to continue...</h4>
-					<h2> OTP=  ${otp} <h2>`,
+					html: `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+						<div style="margin:50px auto;width:70%;padding:20px 0">
+						<div style="border-bottom:1px solid #eee">
+						<a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">WeClea</a>
+						</div>
+						<p style="font-size:1.1em">Hi ${data[0].name},</p>
+						<p>Thank you for choosing WeClea. Use the following OTP to complete your forgot password procedures.</p>
+						<h2 style="background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;"> ${otp}</h2>
+						<p style="font-size:0.9em;">Regards,<br />WeClea</p>
+						<hr style="border:none;border-top:1px solid #eee" />
+						<div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+						<p>WeClea Inc</p>
+						<p>USA</p>
+						</div>
+						</div>
+						</div>`,
 					};
 
 					transport.sendMail(mailOptions, function (error, info) 
@@ -215,7 +230,7 @@ export const forgot_password = async(req,res)=>{
 							dbConnection.query(updateUser, function (err, datas) 
 							{
 								if(err)throw err;
-								res.json({'status':true,"messagae":"Email send successfully!",'data':data});
+								res.json({'status':true,"messagae":"Email send successfully!"});
 							})
 							
 						}

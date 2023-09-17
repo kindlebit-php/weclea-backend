@@ -10,9 +10,10 @@ const stripes = new Stripe(process.env.STRIPE_PUBLISH_KEY);
 
 export const Attach_Card = async (req, res) => {
   try {
+
     const userData = res.user;
     const customerId = userData[0].customer_id;
-
+    console.log(customerId)
     const { cardNumber, expMonth, expYear, cvc } = req.body;
     if (cardNumber && expMonth && expYear && cvc) {
       if (
@@ -91,7 +92,7 @@ export const customer_payment = async (req, res) => {
           res.json({'status':false,"messagae":"All fields are required"});
     }
 }else{
-    return res.json({ status: true, messagae: "Customer_id doesn't exists" });
+    return res.json({ status: false, messagae: "Customer_id doesn't exists" });
 }
   } catch (error) {
     res.json({ status: false, messagae: error.message });
