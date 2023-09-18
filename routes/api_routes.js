@@ -43,5 +43,4 @@ router.post("/customer-payment",CheckAuth,paymentController.customer_payment);
 router.post("/Add-Bank-Account",CheckAuth,paymentController.Add_Bank_Account)
 router.post("/ACH-Payment",CheckAuth,paymentController.ACH_Payment)
 
-
 export default router;
