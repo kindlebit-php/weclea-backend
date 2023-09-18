@@ -6,10 +6,10 @@ export const get_loads = async(req,res)=>{
         	const loads = "select id,type,loads,price,status from admin_load_subscription";
 			dbConnection.query(loads, function (err, data) {
 			if (err) throw err;
-				res.json({'status':true,"messagae":"data get successfully!",'data':data});
+				res.json({'status':true,"message":"data get successfully!",'data':data});
 			})
     }catch (error) {
-        res.json({'status':false,"messagae":error.message});  
+        res.json({'status':false,"message":error.message});  
     }
 }
 
@@ -27,14 +27,14 @@ export const customer_loads_subscription = async(req,res)=>{
             console.log('loads',loads)
             dbConnection.query(loads, function (err, data) {
             if (err) throw err;
-                res.json({'status':true,"messagae":"Loads added successfully!",'data':data});
+                res.json({'status':true,"message":"Loads added successfully!",'data':data});
             })
 	        });
     	}else{
-            res.json({'status':false,"messagae":"All fields are required"});
+            res.json({'status':false,"message":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error.message});  
+        res.json({'status':false,"message":error.message});  
     }
 }
 //get load price API
@@ -42,21 +42,21 @@ export const get_load_price = async(req,res)=>{
      try { 
      	const userData = res.user;
         const {	buy_loads} = req.body;
-        if(buy_loads){
+        // if(buy_loads){
 	        var sql = "select loads_price from settings";
 	        dbConnection.query(sql, function (err, result) {
 	        if (err) throw err;
-                const price = (result[0].loads_price * buy_loads)
+                // const price = (result[0].loads_price * buy_loads)
                 let data = {
-                    "price":price,
+                    "price":result[0].loads_price,
                 }
-	            res.json({'status':true,"messagae":"Price get successfully!",'data':data});
+	            res.json({'status':true,"message":"Price get successfully!",'data':data});
 	        });
-    	}else{
-            res.json({'status':false,"messagae":"All fields are required"});
-    	}
+    	// }else{
+     //        res.json({'status':false,"message":"All fields are required"});
+    	// }
     }catch (error) {
-        res.json({'status':false,"messagae":error.message});  
+        res.json({'status':false,"message":error.message});  
     }
 }
 
@@ -72,11 +72,11 @@ export const get_user_loads = async(req,res)=>{
              let data = {
                     "available_loads":available_loads,
                 }
-                res.json({'status':true,"messagae":"Price get successfully!",'data':data});
+                res.json({'status':true,"message":"Price get successfully!",'data':data});
             });
         
     }catch (error) {
-        res.json({'status':false,"messagae":error.message});  
+        res.json({'status':false,"message":error.message});  
     }
 }
 

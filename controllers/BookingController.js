@@ -1,5 +1,7 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
+import { getDates } from "../helpers/date.js";
+import geolib from 'geolib';
 //customer booking API
 
 export const customer_booking = async(req,res)=>{
@@ -11,16 +13,26 @@ export const customer_booking = async(req,res)=>{
             var sql = "select available_loads from users where id = '"+userData[0].id+"'";
             dbConnection.query(sql, function (err, result) {
                 if(total_loads > result[0].available_loads){
-                    res.json({'status':false,"messagae":'Insufficient loads,Please buy loads'});  
+                    res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
                     let dateObject = new Date();
                     let hours = dateObject.getHours();
                     let minutes = dateObject.getMinutes();
                     const current_time = hours + ":" + minutes;
-                    var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+date+"', '"+current_time+"','"+total_loads+"','"+order_type+"')";
+
+                    // var sqlDistance = "select * from (select latitude, longitude, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role =2 ORDER BY distance) as vt where vt.distance < 25;";
+
+                    // dbConnection.query(sqlDistance, function (err, results) {
+                    //     if (err) 
+                    //     console.log('err',err)
+                    //     console.log('results',results)
+                    //     // res.json({'status':true,"message":"Booking added successfully!"});
+                    // }); 
+// return false;
+                    var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+date+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52)";
                     dbConnection.query(sql, function (err, result) {
                         if (err) throw err;
-                        res.json({'status':true,"messagae":"Booking added successfully!"});
+                        res.json({'status':true,"message":"Booking added successfully!"});
                     }); 
                 }
             });
@@ -30,12 +42,11 @@ export const customer_booking = async(req,res)=>{
             const lastdate = new Date(currentDate.setMonth(currentDate.getMonth() + 3));
             const endFinalDate = dateFormat.format(lastdate,'YYYY-MM-DD');
 
-            let allDates = getDatesBetween(new Date(currentFinalDate), new Date(endFinalDate),frequency);
-            // console.log(allDates);
+            let allDates =   getDates(new Date(currentFinalDate), new Date(endFinalDate),frequency);
             var sql = "select available_loads from users where id = '"+userData[0].id+"'";
             dbConnection.query(sql, function (err, result) {
                 if(total_loads > result[0].available_loads){
-                    res.json({'status':false,"messagae":'Insufficient loads,Please buy loads'});  
+                    res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
                     var resData = [];
                     allDates.forEach(element =>
@@ -51,28 +62,17 @@ export const customer_booking = async(req,res)=>{
                         if (err) throw err;
                         });
                     }) 
-                        res.json({'status':true,"messagae":"Booking added successfully!"});
+                        res.json({'status':true,"message":"Booking added successfully!"});
 
                 }
             });
         }
     	}else{
-            res.json({'status':false,"messagae":"All fields are required"});
+            res.json({'status':false,"message":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error});  
+        res.json({'status':false,"message":error});  
     }
-}
-function getDatesBetween(startDate, endDate,frequency) {
-  const currentDate = new Date(startDate.getTime());
-  const dates = [];
-  while (currentDate <= endDate) {
-  console.log('frequencyss',frequency)
-    dates.push(new Date(currentDate));
-    currentDate.setDate(currentDate.getDate() + Number(frequency));
-    console.log(currentDate)
-  }
-  return dates;
 }
 
 export default {

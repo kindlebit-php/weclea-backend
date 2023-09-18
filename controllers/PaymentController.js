@@ -23,7 +23,7 @@ export const Attach_Card = async (req, res) => {
       ) {
        return res.json({
           status: true,
-          messagae: "Your card security code is invalid",
+          message: "Your card security code is invalid",
         });
       }
       //create token
@@ -56,12 +56,12 @@ export const Attach_Card = async (req, res) => {
           default_payment_method: attachedPaymentMethod.id,
         },
       });
-      return res.json({status: true,messagae: "card attached successfully"});
+      return res.json({status: true,message: "card attached successfully"});
     } else {
-        return res.json({ status: true, messagae: "All fields are required" });
+        return res.json({ status: true, message: "All fields are required" });
     }
   } catch (error) {
-    res.json({ status: false, messagae: error });
+    res.json({ status: false, message: error });
   }
 };
 
@@ -86,16 +86,16 @@ export const customer_payment = async (req, res) => {
       var sql = "INSERT INTO payment (user_id,amount,payment_id,date) VALUES ('"+userData[0].id+"','"+amount+"','"+paymentIntent.id+"','"+date()+"')";
       dbConnection.query(sql, function (err, result) {
         if (err) throw err;
-        return res.json({status: true,messagae: "Payment successful" });
+        return res.json({status: true,'message': "Payment successful" });
         });
     }else{
-          res.json({'status':false,"messagae":"All fields are required"});
+          res.json({'status':false,"message":"All fields are required"});
     }
 }else{
-    return res.json({ status: false, messagae: "Customer_id doesn't exists" });
+    return res.json({ status: false, "message": "Customer_id doesn't exists" });
 }
   } catch (error) {
-    res.json({ status: false, messagae: error.message });
+    res.json({ status: false, "message": error.message });
   }
 };
 
