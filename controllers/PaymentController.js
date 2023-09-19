@@ -63,12 +63,37 @@ export const Attach_Card = async (req, res) => {
         return res.json({ status: true, messagae: "All fields are required" });
     }
   } catch (error) {
-    res.json({ status: false, messagae: error });
+    return res.json({ status: false, message: error.message });
   }
 };
 
-//Customer payment api
+// Get All Cards API
 
+export const get_all_cards = async (req, res) => {
+  try {
+    const userData = res.user;
+    const customerId = userData[0].customer_id;
+    if (!customerId)
+    return res.json({ status: false, message: "User not found!" });
+
+    const paymentMethods = await stripe.paymentMethods.list({
+      customer: customerId,
+      type: "card",
+    });
+    const cards = paymentMethods.data.map((paymentMethod) => ({
+      cardId: paymentMethod.id,
+      brand: paymentMethod.card.brand,
+      last4: paymentMethod.card.last4,
+    }));
+
+    res.json({'status':true,"messagae":"Cards get successfully!",CardList:cards});
+  } catch (error) {
+    return res.json({ status: false, message: error.message });
+  }
+};
+
+
+//Customer payment api
 
 export const customer_payment = async (req, res) => {
   const userData = res.user;
@@ -180,7 +205,6 @@ export const Add_Bank_Account = async (req, res) => {
        default_source:source.id,
      });
      res.status(200).json({ status: true, messagae: "Bank account added successfully"});
-
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: error.message });
@@ -231,8 +255,7 @@ export const ACH_Payment=async(req,res)=>{
       currency: 'usd',
       customer:customerId
     });
-    console.log(paymentIntent)
-    if(paymentIntent.status === 'succeeded') {
+    if( paymentIntent.status === 'succeeded') {
       const updateStatus = `UPDATE customer_loads_subscription SET payment_status = '1' WHERE id = '${purchase_id}'`;
       dbConnection.query(updateStatus, async function (err, updateStatus) {
         if (err) {
@@ -263,6 +286,7 @@ export const ACH_Payment=async(req,res)=>{
 
 export default {
   Attach_Card,
+  get_all_cards,
   customer_payment,
   Add_Bank_Account,
   ACH_Payment
