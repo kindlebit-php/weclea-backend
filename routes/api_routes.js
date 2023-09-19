@@ -31,7 +31,7 @@ router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
 router.get('/get-user-loads',CheckAuth ,loadController.get_user_loads);
 router.post('/customer-loads-subscription',CheckAuth ,loadController.customer_loads_subscription);
 router.post('/customer-booking',CheckAuth ,bookingController.customer_booking);
-router.post('/get-load-price',CheckAuth ,loadController.get_load_price);
+router.get('/get-load-price',CheckAuth ,loadController.get_load_price);
 router.post('/customer-login',userController.customer_login);
 router.post('/forgot-password',userController.forgot_password);
 router.post('/verify-otp',userController.verify_otp);

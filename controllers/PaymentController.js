@@ -25,7 +25,7 @@ export const Attach_Card = async (req, res) => {
       ) {
        return res.json({
           status: true,
-          messagae: "Your card security code is invalid",
+          message: "Your card security code is invalid",
         });
       }
       //create token
@@ -58,9 +58,11 @@ export const Attach_Card = async (req, res) => {
           default_payment_method: attachedPaymentMethod.id,
         },
       });
+
       return res.json({data:customerId,status: true,messagae: "card attached successfully"});
+
     } else {
-        return res.json({ status: true, messagae: "All fields are required" });
+        return res.json({ status: true, message: "All fields are required" });
     }
   } catch (error) {
     return res.json({ status: false, message: error.message });

@@ -46,26 +46,26 @@ export const customer_register = async(req,res)=>{
 							}
 							resData.push(initi);
 							});
-								res.json({'status':true,"messagae":"data insert successfully!",'data':resData});
+								res.json({'status':true,"message":"data insert successfully!",'data':resData});
 							}); 
 							}); 
 						});
 					}else{
-						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
+						res.json({'status':false,"message":'Mobile Number is already registered'});  
 						
 					}
 					});
 				}else{
-					res.json({'status':false,"messagae":'Email is already registered'});  
+					res.json({'status':false,"message":'Email is already registered'});  
 				
 				}
 			})
         	
     	}else{
-            res.json({'status':false,"messagae":"All fields are required"});
+            res.json({'status':false,"message":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error.message});  
+        res.json({'status':false,"message":error.message});  
     }
 }
 
@@ -94,13 +94,13 @@ export const customer_address = async(req,res)=>{
 	        if (err) throw err;
 	        });
     	}
-	            res.json({'status':true,"messagae":"Address added successfully!"});
+	            res.json({'status':true,"message":"Address added successfully!"});
 
     }else{
-            res.json({'status':false,"messagae":"All fields are required"});
+            res.json({'status':false,"message":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error.message});  
+        res.json({'status':false,"message":error.message});  
     }
 }
 
@@ -113,13 +113,13 @@ export const customer_drop_address = async(req,res)=>{
 	        var sql = "INSERT INTO customer_drop_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+address+"', '"+appartment+"','"+city+"','"+state+"','"+zipcode+"','"+comment+"',"+lat+"','"+long+"')";
 	        dbConnection.query(sql, function (err, result) {
 	        if (err) throw err;
-	            res.json({'status':true,"messagae":"Address added successfully!"});
+	            res.json({'status':true,"message":"Address added successfully!"});
 	        });
     	}else{
-            res.json({'status':false,"messagae":"All fields are required"});
+            res.json({'status':false,"message":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error.message});  
+        res.json({'status':false,"message":error.message});  
     }
 }
 
@@ -132,13 +132,13 @@ export const customer_billing_address = async(req,res)=>{
 	        var sql = "INSERT INTO customer_billing_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+address+"', '"+appartment+"','"+city+"','"+state+"','"+zipcode+"','"+comment+"',"+lat+"','"+long+"')";
 	        dbConnection.query(sql, function (err, result) {
 	        if (err) throw err;
-	            res.json({'status':true,"messagae":"Address added successfully!"});
+	            res.json({'status':true,"message":"Address added successfully!"});
 	        });
     	}else{
-            res.json({'status':false,"messagae":"All fields are required"});
+            res.json({'status':false,"message":"All fields are required"});
     	}
     }catch (error) {
-        res.json({'status':false,"messagae":error.message});  
+        res.json({'status':false,"message":error.message});  
     }
 }
 
@@ -163,24 +163,24 @@ export const customer_login = async(req,res)=>{
 								}
 								resData.push(initi);
 							});
-							res.json({'status':true,"messagae":"Logged in successfully!",'data': resData});
+							res.json({'status':true,"message":"Logged in successfully!",'data': resData});
 						}else{
-							res.json({'status':false,"messagae":"Incorrect password!"});
+							res.json({'status':false,"message":"Incorrect password!"});
 						}
 					});
 				}else{
-					res.json({'status':false,"messagae":"Your account has been deactivated, please connect with admin!"});
+					res.json({'status':false,"message":"Your account has been deactivated, please connect with admin!"});
 				}
 				}else{
-							res.json({'status':false,"messagae":"User not found!"});
+							res.json({'status':false,"message":"User not found!"});
 						
 				}
 			});
 		}else{
-			res.json({'status':false,"messagae":"All fields are required"});
+			res.json({'status':false,"message":"All fields are required"});
 		}
 	}catch (error) {
-		res.json({'status':false,"messagae":error.message});  
+		res.json({'status':false,"message":error.message});  
 	}
 }
 
@@ -220,7 +220,7 @@ export const forgot_password = async(req,res)=>{
 					{
 						if (error) 
 						{
-							res.json({'status':false,"messagae":error});
+							res.json({'status':false,"message":error});
 						} 
 						else
 						 {
@@ -230,7 +230,7 @@ export const forgot_password = async(req,res)=>{
 							dbConnection.query(updateUser, function (err, datas) 
 							{
 								if(err)throw err;
-								res.json({'status':true,"messagae":"Email send successfully!"});
+								res.json({'status':true,"message":"Email send successfully!"});
 							})
 							
 						}
@@ -238,18 +238,18 @@ export const forgot_password = async(req,res)=>{
 				}
 				else
 				{
-					res.json({'status':false,"messagae":"User not found!"});
+					res.json({'status':false,"message":"User not found!"});
 				}
 			});
 		}
 		else
 		{
-			res.json({'status':false,"messagae":"All fields are required"});
+			res.json({'status':false,"message":"All fields are required"});
 		}
 	}
 	catch (error) 
 	{ 
-		res.json({'status':false,"messagae":error.message});  
+		res.json({'status':false,"message":error.message});  
 	}
 }
 
@@ -262,16 +262,16 @@ export const verify_otp = async(req,res)=>{
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				// console.log('data',data)
 				if(data.length > 0){
-					res.json({'status':true,"messagae":"OTP verify successfully",'data':data});
+					res.json({'status':true,"message":"OTP verify successfully",'data':data});
 				}else{
-					res.json({'status':false,"messagae":"Incorrect OTP details!"});
+					res.json({'status':false,"message":"Incorrect OTP details!"});
 				}
 			});
 		}else{
-			res.json({'status':false,"messagae":"All fields are required"});
+			res.json({'status':false,"message":"All fields are required"});
 		}
 	}catch (error) {
-		res.json({'status':false,"messagae":error.message});  
+		res.json({'status':false,"message":error.message});  
 	}
 }
 
@@ -290,18 +290,18 @@ export const change_password = async(req,res)=>{
 						
 						dbConnection.query(updateUser, function (err, datas) {
 							if(err)throw err;
-							res.json({'status':true,"messagae":"Password updated successfully!",'data':data});
+							res.json({'status':true,"message":"Password updated successfully!",'data':data});
 						});
 					});
 				}else{
-					res.json({'status':false,"messagae":"User not found!"});
+					res.json({'status':false,"message":"User not found!"});
 				}
 			});
 		}else{
-			res.json({'status':false,"messagae":"All fields are required"});
+			res.json({'status':false,"message":"All fields are required"});
 		}
 	}catch (error) {
-		res.json({'status':false,"messagae":error.message});  
+		res.json({'status':false,"message":error.message});  
 	}
 }
 
@@ -329,11 +329,11 @@ export const get_user_profile = async(req,res)=>{
 					}
 					resData.push(initi);
 				});
-				res.json({'status':true,"messagae":"Price get successfully!",'data':resData});
+				res.json({'status':true,"message":"Price get successfully!",'data':resData});
             });
       
     }catch (error) {
-        res.json({'status':false,"messagae":error.message});  
+        res.json({'status':false,"message":error.message});  
     }
 }
 
@@ -348,7 +348,7 @@ export const edit_user_profile = async(req,res)=>{
        	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data[0].total > 0 ){
-					res.json({'status':false,"messagae":'Email is already registered'});  
+					res.json({'status':false,"message":'Email is already registered'});  
 				}else{
 					const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
 					dbConnection.query(checkIfMobileExist, function (err, data) {
@@ -364,11 +364,11 @@ export const edit_user_profile = async(req,res)=>{
 						var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"' ,email = '"+email+"',password = '"+hash+"', mobile = '"+mobile+"' where id = '"+userData[0].id+"'";
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;
-								res.json({'status':true,"messagae":"data updated successfully!"});
+								res.json({'status':true,"message":"data updated successfully!"});
 							}); 
 						});
 					}else{
-						res.json({'status':false,"messagae":'Mobile Number is already registered'});  
+						res.json({'status':false,"message":'Mobile Number is already registered'});  
 
 					}
 					});
@@ -376,11 +376,11 @@ export const edit_user_profile = async(req,res)=>{
 				}
 			})
 		}else{
-            res.json({'status':false,"messagae":"All fields are required"});
+            res.json({'status':false,"message":"All fields are required"});
 		}
       
     }catch (error) {
-        res.json({'status':false,"messagae":error.message});  
+        res.json({'status':false,"message":error.message});  
     }
 }
 export default {
