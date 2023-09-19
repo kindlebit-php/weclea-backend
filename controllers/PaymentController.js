@@ -59,10 +59,10 @@ export const Attach_Card = async (req, res) => {
         },
       });
 
-      return res.json({data:customerId,status: true,messagae: "card attached successfully"});
+      return res.json({data:customerId,status: true,message: "card attached successfully"});
 
     } else {
-        return res.json({ status: true, message: "All fields are required" });
+        return res.json({ status: false, message: "All fields are required" });
     }
   } catch (error) {
     res.json({ status: false, message: error });
@@ -181,7 +181,7 @@ export const Add_Bank_Account = async (req, res) => {
     const updatedData= await stripe.customers.update(customerId,{
        default_source:source.id,
      });
-     res.status(200).json({ status: true, messagae: "Bank account added successfully"});
+     res.status(200).json({ status: true, message: "Bank account added successfully"});
 
   } catch (error) {
     console.error(error.message);

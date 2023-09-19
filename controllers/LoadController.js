@@ -27,7 +27,7 @@ export const customer_loads_subscription = async(req,res)=>{
             console.log('loads',loads)
             dbConnection.query(loads, function (err, data) {
             if (err) throw err;
-                res.json({'status':true,"message":"Loads added successfully!",'data':data});
+                res.json({'status':true,"message":"Loads added successfully!",'data':data[0]});
             })
 	        });
     	}else{
