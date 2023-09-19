@@ -287,7 +287,7 @@ export const change_password = async(req,res)=>{
 						
 						dbConnection.query(updateUser, function (err, datas) {
 							if(err)throw err;
-							res.json({'status':true,"message":"Password updated successfully!",'data':data});
+							res.json({'status':true,"message":"Password updated successfully!",'data':data[0]});
 						});
 					});
 				}else{

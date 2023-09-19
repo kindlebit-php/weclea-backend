@@ -66,7 +66,7 @@ export const get_load_price = async(req,res)=>{
 export const get_user_loads = async(req,res)=>{
      try { 
         const userData = res.user;
-            var sql = "select available_loads from users";
+            var sql = "select available_loads from users where id = '"+userData[0].id+"'";
             dbConnection.query(sql, function (err, result) {
             if (err) throw err;
             const available_loads = result[0].available_loads;
