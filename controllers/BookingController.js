@@ -1,7 +1,6 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
 import { getDates } from "../helpers/date.js";
-import geolib from 'geolib';
 //customer booking API
 
 export const customer_booking = async(req,res)=>{
@@ -19,6 +18,15 @@ export const customer_booking = async(req,res)=>{
                     let hours = dateObject.getHours();
                     let minutes = dateObject.getMinutes();
                     const current_time = hours + ":" + minutes;
+
+
+                    for (var i = 0; total_loads > i; i++) {
+                        var sql = "INSERT INTO booking_qr (user_id,delievery_day,date,time,total_loads,order_type,driver_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+date+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52)";
+                        dbConnection.query(sql, function (err, result) {
+                        if (err) throw err;
+                        res.json({'status':true,"message":"Booking added successfully!"});
+                        });     
+                    }
 
                     // var sqlDistance = "select * from (select latitude, longitude, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role =2 ORDER BY distance) as vt where vt.distance < 25;";
 

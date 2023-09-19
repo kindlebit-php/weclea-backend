@@ -60,10 +60,10 @@ export const Attach_Card = async (req, res) => {
 
 
 
-      return res.json({data:customerId,status: true,messagae: "card attached successfully"});
+      return res.json({data:customerId,status: true,message: "card attached successfully"});
 
     } else {
-        return res.json({ status: true, message: "All fields are required" });
+        return res.json({ status: false, message: "All fields are required" });
     }
   } catch (error) {
     return res.json({ status: false, message: error.message });

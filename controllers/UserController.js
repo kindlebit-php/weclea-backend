@@ -36,7 +36,6 @@ export const customer_register = async(req,res)=>{
 							if (err) throw err;
 							var sql = "select * from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
-							var resData = [];
 							userList.forEach(element =>
 							{
 							const {id,name,email,mobile,comment,role,status} = element;
@@ -44,9 +43,9 @@ export const customer_register = async(req,res)=>{
 							let initi = {
 							"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'token': generateToken({ userId: id, type: role }),
 							}
-							resData.push(initi);
+							// resData.push(initi);
+								res.json({'status':true,"message":"data insert successfully!",'data':initi});
 							});
-								res.json({'status':true,"message":"data insert successfully!",'data':resData});
 							}); 
 							}); 
 						});
@@ -153,17 +152,15 @@ export const customer_login = async(req,res)=>{
 					if(data[0].status == 1){
 					bcrypt.compare(password, data[0].password, function(err, result) {
 						if(result == true){
-							var resData = [];
 							data.forEach(element =>
 							{
 								const {id,name,email,mobile,comment,role,status} = element;
 								
-								let initi = {
+								const initi = {
 									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'token': generateToken({ userId: id, type: type }),
 								}
-								resData.push(initi);
+								res.json({'status':true,"message":"Logged in successfully!",'data': initi});
 							});
-							res.json({'status':true,"message":"Logged in successfully!",'data': resData});
 						}else{
 							res.json({'status':false,"message":"Incorrect password!"});
 						}
@@ -314,7 +311,7 @@ export const get_user_profile = async(req,res)=>{
             var sql = "select * from users where id = '"+userData[0].id+"' ";
             dbConnection.query(sql, function (err, result) {
             if (err) throw err;
-				var resData = [];
+				// var resData = [];
 				result.forEach(element =>
 				{
 					const {id,name,email,mobile} = element;
@@ -327,9 +324,9 @@ export const get_user_profile = async(req,res)=>{
 					let initi = {
 					"id":id,"name":name,"email":email,"mobile":mobile,'profile_img':img
 					}
-					resData.push(initi);
+					// resData.push(initi);
+				res.json({'status':true,"message":"Price get successfully!",'data':initi});
 				});
-				res.json({'status':true,"message":"Price get successfully!",'data':resData});
             });
       
     }catch (error) {
