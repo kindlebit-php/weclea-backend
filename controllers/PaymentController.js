@@ -334,6 +334,7 @@ export const customer_payment = async (req, res) => {
           });
           if(paymentIntent.status === 'succeeded') {
             const update_Status = `UPDATE users SET card_status = '1' WHERE id = '${userId}'`;
+            console.log(update_Status)
             dbConnection.query(update_Status, async function (err,update_Status){
               if(err){
                 return res.json({ status: false, message: 'Error updating payment status' });

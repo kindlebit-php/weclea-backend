@@ -19,3 +19,9 @@ export const getDates = (startDate,endDate,frequency, data, res) => {
 	}
 	return dates;
 };
+
+
+export const randomNumber = (booking_id) => {
+	  const currentDate = new Date();
+     return  Math.random().toString(36).slice(2)+'.'+booking_id;
+}

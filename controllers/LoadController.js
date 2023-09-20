@@ -7,7 +7,6 @@ export const get_loads = async(req,res)=>{
         	const loads = "select id,type,loads,price,status from admin_load_subscription";
 			dbConnection.query(loads, function (err, data) {
 			if (err) throw err;
-				res.json({'status':true,"message":"data get successfully!"});
 				res.json({'status':true,"message":"data get successfully!",'data':data, 'card_status':userData[0].card_status});
 			})
     }catch (error) {
@@ -67,7 +66,7 @@ export const get_load_price = async(req,res)=>{
 export const get_user_loads = async(req,res)=>{
      try { 
         const userData = res.user;
-            var sql = "select available_loads from users";
+            var sql = "select available_loads from users where id = '"+userData[0].id+"'";
             dbConnection.query(sql, function (err, result) {
             if (err) throw err;
             const available_loads = result[0].available_loads;
