@@ -325,7 +325,7 @@ export const get_user_profile = async(req,res)=>{
 					"id":id,"name":name,"email":email,"mobile":mobile,'profile_img':img
 					}
 					// resData.push(initi);
-				res.json({'status':true,"message":"Price get successfully!",'data':initi});
+				res.json({'status':true,"message":"Profile get successfully!",'data':initi});
 				});
             });
       

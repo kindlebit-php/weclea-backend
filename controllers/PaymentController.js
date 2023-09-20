@@ -112,7 +112,7 @@ export const customer_payment = async (req, res) => {
         cvc === "0000"
       ) {
        return res.json({
-          status: true,
+          status: false,
           message: "Your card security code is invalid",
         });
       }
