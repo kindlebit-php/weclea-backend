@@ -8,7 +8,7 @@ export const get_orders = async (req, res) =>
      {
         const userData = res.user;
         console.log(userData)
-        const order = `SELECT id, date, time FROM bookings WHERE driver_id = ${userData[0].id}`;
+        const order = `SELECT id,order_id, date, time FROM bookings WHERE driver_id = ${userData[0].id}`;
         dbConnection.query(order, function (err, data) {
             if (err) throw err;
             res.json({ 'status': true, 'message': 'Data retrieved successfully!', 'data': data });
