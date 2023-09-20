@@ -40,6 +40,7 @@ router.get('/get-orders',CheckAuth,driverController.get_orders);
 router.get("/get-order-detail",CheckAuth,driverController.get_order_detail);
 router.post("/attach-card",CheckAuth,paymentController.Attach_Card);
 router.get("/get-all-cards",CheckAuth,paymentController.get_all_cards)
+router.post("/Payment-Card-Id",CheckAuth,paymentController.Payment_Card_Id)
 router.post("/customer-payment",CheckAuth,paymentController.customer_payment);
 router.post("/Add-Bank-Account",CheckAuth,paymentController.Add_Bank_Account)
 router.post("/ACH-Payment",CheckAuth,paymentController.ACH_Payment)

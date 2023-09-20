@@ -58,8 +58,6 @@ export const Attach_Card = async (req, res) => {
         },
       });
 
-
-
       return res.json({data:customerId,status: true,message: "card attached successfully"});
 
     } else {
@@ -92,6 +90,91 @@ export const get_all_cards = async (req, res) => {
     res.json({'status':true,"messagae":"Cards get successfully!",CardList:cards});
   } catch (error) {
     return res.json({ status: false, message: error.message });
+  }
+};
+
+// payment by CardId
+
+export const Payment_Card_Id = async (req, res) => {
+  try {
+    const userData = res.user;
+    const userId = userData[0].id;
+    const { purchase_id, cardId } = req.body;
+
+    const purchase_data = `SELECT * FROM customer_loads_subscription WHERE id = '${purchase_id}'`;
+    dbConnection.query(purchase_data, async function (err, data) {
+      if (err) {
+        return res.status(500).json({ status: false, message: 'Error retrieving purchase data' });
+      }
+
+      if (data.length === 0) {
+        return res.status(404).json({ status: false, message: 'Purchase data not found' });
+      }
+
+      const purchaseAmount = data[0].amount;
+      const user_id = data[0].user_id;
+      
+      if (userId !== user_id) {
+        return res.status(403).json({ status: false, message: 'You are not a valid user' });
+      }
+
+      const user_data = `SELECT * FROM users WHERE id = '${user_id}'`;
+      dbConnection.query(user_data, async function (err, userData) {
+        if (err) {
+          return res.status(500).json({ status: false, message: 'Error retrieving user data' });
+        }
+
+        if (userData.length === 0) {
+          return res.status(404).json({ status: false, message: 'User data not found' });
+        }
+
+        const customerId = userData[0].customer_id;
+
+        try {
+          const customerData = await stripe.customers.retrieve(customerId);
+
+          if (!customerData.id) {
+            return res.status(400).json({ status: false, message: "Customer_id doesn't exist" });
+          }
+
+          const paymentIntent = await stripe.paymentIntents.create({
+            amount: purchaseAmount * 100,
+            currency: 'usd',
+            customer: customerId,
+            payment_method: cardId,
+            off_session: true,
+            confirm: true,
+            description: 'Payment by client',
+          });
+
+          if (paymentIntent.status === 'succeeded') {
+            const updateStatus = `UPDATE customer_loads_subscription SET payment_status = '1' WHERE id = '${purchase_id}'`;
+            dbConnection.query(updateStatus, async function (err, updateStatus) {
+              if (err) {
+                return res.status(500).json({ status: false, message: 'Error updating payment status' });
+              }
+
+              const currentDate = date(); 
+              const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
+                userData[0].id}', '${purchaseAmount}', '${paymentIntent.id}', '${currentDate}')`;
+
+              dbConnection.query(sql, function (err, result) {
+                if (err) {
+                  return res.status(500).json({ status: false, message: err.message });
+                }
+                return res.status(200).json({ status: true, message: 'Payment successful' });
+              });
+            });
+          } else {
+            return res.status(400).json({ status: false, message: 'Payment failed' });
+          }
+        } catch (stripeError) {
+          return res.status(500).json({ status: false, message: `Stripe error: ${stripeError.message}` });
+        }
+      });
+    });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: error.message });
   }
 };
 
@@ -281,7 +364,7 @@ export const customer_payment = async (req, res) => {
     });
   }
   } else {
-    return res.json({ status: true, message: "All fields are required" });
+    return res.json({ status: false, message: "All fields are required" });
 }
   } catch (error) {
     return res.json({ status: false, message: error.message });
@@ -325,7 +408,7 @@ export const Add_Bank_Account = async (req, res) => {
      res.status(200).json({ status: true, messagae: "Bank account added successfully"});
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: error.message });
+     return res.status(500).json({ error: error.message });
   }
 };
 
@@ -373,7 +456,7 @@ export const ACH_Payment=async(req,res)=>{
       currency: 'usd',
       customer:customerId
     });
-    if( paymentIntent.status === 'succeeded') {
+    if( paymentIntent.source.status === 'verified' && paymentIntent.status === 'pending') {
       const updateStatus = `UPDATE customer_loads_subscription SET payment_status = '1' WHERE id = '${purchase_id}'`;
       dbConnection.query(updateStatus, async function (err, updateStatus) {
         if (err) {
@@ -398,13 +481,14 @@ export const ACH_Payment=async(req,res)=>{
 });
   } catch (error) {
     console.log(error.message)
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 }
 
 export default {
   Attach_Card,
   get_all_cards,
+  Payment_Card_Id,
   customer_payment,
   Add_Bank_Account,
   ACH_Payment
