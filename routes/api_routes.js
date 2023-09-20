@@ -29,6 +29,7 @@ router.post('/customer-billing-address',CheckAuth ,userController.customer_billi
 router.get('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
 router.get('/get-user-loads',CheckAuth ,loadController.get_user_loads);
+router.get('/get-user-subscription',CheckAuth ,loadController.get_user_subscription);
 router.post('/customer-loads-subscription',CheckAuth ,loadController.customer_loads_subscription);
 router.post('/customer-booking',CheckAuth ,bookingController.customer_booking);
 router.get('/get-load-price',CheckAuth ,loadController.get_load_price);
