@@ -104,11 +104,11 @@ export const Payment_Card_Id = async (req, res) => {
     const purchase_data = `SELECT * FROM customer_loads_subscription WHERE id = '${purchase_id}'`;
     dbConnection.query(purchase_data, async function (err, data) {
       if (err) {
-        return res.status(500).json({ status: false, message: 'Error retrieving purchase data' });
+        return res.json({ status: false, message: 'Error retrieving purchase data' });
       }
 
       if (data.length === 0) {
-        return res.status(404).json({ status: false, message: 'Purchase data not found' });
+        return res.json({ status: false, message: 'Purchase data not found' });
       }
 
       const purchaseAmount = data[0].amount;
@@ -117,21 +117,21 @@ export const Payment_Card_Id = async (req, res) => {
       const payment_status=data[0].payment_status
       
       if (payment_status == 1) {
-        return res.status(403).json({ status: false, message: 'already paid' });
+        return res.json({ status: false, message: 'already paid' });
       }
 
       if (userId !== user_id) {
-        return res.status(403).json({ status: false, message: 'You are not a valid user' });
+        return res.json({ status: false, message: 'You are not a valid user' });
       }
 
       const user_data = `SELECT * FROM users WHERE id = '${user_id}'`;
       dbConnection.query(user_data, async function (err, userData) {
         if (err) {
-          return res.status(500).json({ status: false, message: 'Error retrieving user data' });
+          return res.json({ status: false, message: 'Error retrieving user data' });
         }
 
         if (userData.length === 0) {
-          return res.status(404).json({ status: false, message: 'User data not found' });
+          return res.json({ status: false, message: 'User data not found' });
         }
 
         const customerId = userData[0].customer_id;
@@ -141,7 +141,7 @@ export const Payment_Card_Id = async (req, res) => {
           const customerData = await stripe.customers.retrieve(customerId);
 
           if (!customerData.id) {
-            return res.status(400).json({ status: false, message: "Customer_id doesn't exist" });
+            return res.json({ status: false, message: "Customer_id doesn't exist" });
           }
 
           const paymentIntent = await stripe.paymentIntents.create({
@@ -158,7 +158,7 @@ export const Payment_Card_Id = async (req, res) => {
             const updateStatus = `UPDATE customer_loads_subscription SET payment_status = '1' WHERE id = '${purchase_id}'`;
             dbConnection.query(updateStatus, async function (err, updateStatus) {
               if (err) {
-                return res.status(500).json({ status: false, message: 'Error updating payment status' });
+                return res.json({ status: false, message: 'Error updating payment status' });
               }
               
               const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
@@ -175,21 +175,21 @@ export const Payment_Card_Id = async (req, res) => {
 
               dbConnection.query(sql, function (err, result) {
                 if (err) {
-                  return res.status(500).json({ status: false, message: err.message });
+                  return res.json({ status: false, message: err.message });
                 }
-                return res.status(200).json({ status: true, message: 'Payment successful' });
+                return res.json({ status: true, message: 'Payment successful' });
               });
             });
           } else {
-            return res.status(400).json({ status: false, message: 'Payment failed' });
+            return res.json({ status: false, message: 'Payment failed' });
           }
         } catch (stripeError) {
-          return res.status(500).json({ status: false, message: `Stripe error: ${stripeError.message}` });
+          return res.json({ status: false, message: `Stripe error: ${stripeError.message}` });
         }
       });
     });
   } catch (error) {
-    return res.status(500).json({ status: false, message: error.message });
+    return res.json({ status: false, message: error.message });
   }
 };
 
@@ -248,9 +248,9 @@ export const customer_payment = async (req, res) => {
           const payment_status=data[0].payment_status
       
           if (payment_status == 1) {
-            return res.status(403).json({ status: false, message: 'already paid' });
+            return res.json({ status: false, message: 'already paid' });
           }
-          
+
           if(userId !== user_id){
             return res.json({ status: false, message: 'You are not a valid user' });
           }
@@ -339,7 +339,7 @@ export const customer_payment = async (req, res) => {
       const payment_status=data[0].payment_status
       
       if (payment_status == 1) {
-        return res.status(403).json({ status: false, message: 'already paid' });
+        return res.json({ status: false, message: 'already paid' });
       }
       if(userId !== user_id){
         return res.json({ status: false, message: 'You are not a valid user' });
@@ -451,10 +451,10 @@ export const Add_Bank_Account = async (req, res) => {
     const updatedData= await stripe.customers.update(customerId,{
        default_source:source.id,
      });
-     res.status(200).json({ status: true, messagae: "Bank account added successfully"});
+     res.json({ status: true, messagae: "Bank account added successfully"});
   } catch (error) {
     console.error(error.message);
-     return res.status(500).json({ error: error.message });
+     return res.json({ error: error.message });
   }
 };
 
@@ -527,7 +527,7 @@ export const ACH_Payment=async(req,res)=>{
 });
   } catch (error) {
     console.log(error.message)
-    return res.status(500).json({ error: error.message });
+    return res.json({ error: error.message });
   }
 }
 
