@@ -113,7 +113,13 @@ export const Payment_Card_Id = async (req, res) => {
 
       const purchaseAmount = data[0].amount;
       const user_id = data[0].user_id;
+      const buy_loads=data[0].buy_loads;
+      const payment_status=data[0].payment_status
       
+      if (payment_status == 1) {
+        return res.status(403).json({ status: false, message: 'already paid' });
+      }
+
       if (userId !== user_id) {
         return res.status(403).json({ status: false, message: 'You are not a valid user' });
       }
@@ -129,6 +135,7 @@ export const Payment_Card_Id = async (req, res) => {
         }
 
         const customerId = userData[0].customer_id;
+        const available_loads=userData[0].available_loads;
 
         try {
           const customerData = await stripe.customers.retrieve(customerId);
@@ -153,6 +160,14 @@ export const Payment_Card_Id = async (req, res) => {
               if (err) {
                 return res.status(500).json({ status: false, message: 'Error updating payment status' });
               }
+              
+              const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
+
+              dbConnection.query(update_available_loads, [buy_loads, userId], async function (err, results) {
+                if (err) {
+                return res.json({ status: false, message: 'Error updating payment status' });
+              }
+            })
 
               const currentDate = date(); 
               const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
@@ -185,6 +200,7 @@ export const customer_payment = async (req, res) => {
   const userData = res.user;
   const userId = userData[0].id;
   const customerId = userData[0].customer_id;
+  const available_loads=userData[0].available_loads;
   const { cardNumber, expMonth, expYear, cvc, purchase_id,card_status } = req.body;
 
   try {
@@ -228,6 +244,13 @@ export const customer_payment = async (req, res) => {
     
           const purchaseAmount = data[0].amount;
           const user_id = data[0].user_id;
+          const buy_loads=data[0].buy_loads;
+          const payment_status=data[0].payment_status
+      
+          if (payment_status == 1) {
+            return res.status(403).json({ status: false, message: 'already paid' });
+          }
+          
           if(userId !== user_id){
             return res.json({ status: false, message: 'You are not a valid user' });
           }
@@ -256,6 +279,14 @@ export const customer_payment = async (req, res) => {
                   if (err) {
                     return res.json({ status: false, message: 'Error updating payment status' });
                   }
+
+                  const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
+
+                  dbConnection.query(update_available_loads, [buy_loads, userId], async function (err, results) {
+                    if (err) {
+                    return res.json({ status: false, message: 'Error updating payment status' });
+                  }
+                })
     
                   const currentDate = date();
                   const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
@@ -304,6 +335,12 @@ export const customer_payment = async (req, res) => {
 
       const purchaseAmount = data[0].amount;
       const user_id = data[0].user_id;
+      const buy_loads=data[0].buy_loads;
+      const payment_status=data[0].payment_status
+      
+      if (payment_status == 1) {
+        return res.status(403).json({ status: false, message: 'already paid' });
+      }
       if(userId !== user_id){
         return res.json({ status: false, message: 'You are not a valid user' });
       }
@@ -318,6 +355,7 @@ export const customer_payment = async (req, res) => {
         }
 
         const customerId = userData[0].customer_id;
+        const available_loads=userData[0].available_loads;
           const customerData = await stripe.customers.retrieve(customerId);
 
           if (!customerData.id) {
@@ -334,7 +372,6 @@ export const customer_payment = async (req, res) => {
           });
           if(paymentIntent.status === 'succeeded') {
             const update_Status = `UPDATE users SET card_status = '1' WHERE id = '${userId}'`;
-            console.log(update_Status)
             dbConnection.query(update_Status, async function (err,update_Status){
               if(err){
                 return res.json({ status: false, message: 'Error updating payment status' });
@@ -346,6 +383,14 @@ export const customer_payment = async (req, res) => {
               if (err) {
                 return res.json({ status: false, message: 'Error updating payment status' });
               }
+
+              const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
+
+              dbConnection.query(update_available_loads, [buy_loads, userId], async function (err, results) {
+                if (err) {
+                return res.json({ status: false, message: 'Error updating payment status' });
+              }
+            })
 
               const currentDate = date();
               const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
