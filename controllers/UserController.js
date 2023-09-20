@@ -187,6 +187,7 @@ export const forgot_password = async(req,res)=>{
 		const {email} = req.body;
 		if(email){
 			const checkIfEmailExist = "select * from users where email = '"+email+"'";
+			console.log('checkIfEmailExist',checkIfEmailExist)
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data.length > 0){
 					var otp = 123456
