@@ -85,27 +85,13 @@ export const get_user_loads = async(req,res)=>{
 export const get_user_subscription = async(req,res)=>{
      try { 
         const userData = res.user;
-            var sql = "select * from customer_loads_subscription where type = 'package' and payment_status = '1' and user_id = '"+userData[0].id+"' limit 1";
+            var sql = "SELECT customer_loads_subscription.id,customer_loads_subscription.type, customer_loads_subscription.payment_status, customer_loads_subscription.user_id, customer_loads_subscription.buy_loads,customer_loads_subscription.amount, users.available_loads,users.id FROM customer_loads_subscription LEFT JOIN users ON customer_loads_subscription.user_id = users.id where customer_loads_subscription.type = 'package' and customer_loads_subscription.payment_status = '1' and customer_loads_subscription.user_id = '"+userData[0].id+"' ORDER BY customer_loads_subscription.id desc limit 1;";
+            console.log('sql',sql)
             dbConnection.query(sql, function (err, subscriptionresult) {
-            // if (err) throw err;
-            if(subscriptionresult.length > 0){
-                var sql = "select date from bookings where user_id = '"+userData[0].id+"'";
-                dbConnection.query(sql, function (err, bookingsresult) {
-                // if (err) throw err;
-                var sql = "select available_loads from users where id = '"+userData[0].id+"'";
-                dbConnection.query(sql, function (err, usersresult) {
                 let initi = {
-                "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"price":subscriptionresult[0].amount,"pending_loads":usersresult[0].available_loads,
+                "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"price":subscriptionresult[0].amount,"pending_loads":subscriptionresult[0].available_loads,
                 }
                     res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
-                });
-
-                });
-
-           }else{
-                res.json({'status':false,"message":"No Subscription found!"});
-
-           }
             });
         
     }catch (error) {
