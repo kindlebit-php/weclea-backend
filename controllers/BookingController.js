@@ -30,6 +30,7 @@ export const customer_booking = async(req,res)=>{
                     // return false;
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+date+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52)";
                     dbConnection.query(sql, function (err, result) {
+                        console.log('sql',sql)
                         console.log('result',result)
                         // // if (err) throw err;
                         // for (var i = 0; total_loads > i; i++) {
