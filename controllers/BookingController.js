@@ -32,19 +32,19 @@ export const customer_booking = async(req,res)=>{
                     dbConnection.query(sql, function (err, result) {
                         console.log('result',result)
                         // // if (err) throw err;
-                        for (var i = 0; total_loads > i; i++) {
-                        var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
-                        dbConnection.query(sql, function (err, results) {
-                        });     
-                        }
+                        // for (var i = 0; total_loads > i; i++) {
+                        // var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
+                        // dbConnection.query(sql, function (err, results) {
+                        // });     
+                        // }
 
 
-                        var order_id = '1001'+result.insertId;
-                        var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
-                        dbConnection.query(sql, function (err, resultss) {
-                        res.json({'status':true,"message":"Booking added successfully!"});
+                        // var order_id = '1001'+result.insertId;
+                        // var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
+                        // dbConnection.query(sql, function (err, resultss) {
+                        // res.json({'status':true,"message":"Booking added successfully!"});
                         
-                        });
+                        // });
                     }); 
                 }
             });
