@@ -34,18 +34,10 @@ export const customer_register = async(req,res)=>{
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"')";
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;
-							var sql = "select * from users where id = '"+result.insertId+"'";
+							var sql = "select id,name,email,mobile,comment,role,status from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
-							userList.forEach(element =>
-							{
-							const {id,name,email,mobile,comment,role,status} = element;
-
-							let initi = {
-							"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'token': generateToken({ userId: id, type: role }),
-							}
-							// resData.push(initi);
-								res.json({'status':true,"message":"data insert successfully!",'data':initi});
-							});
+								userList[0].token = generateToken({ userId: userList[0].id, type: role });
+								res.json({'status':true,"message":"data insert successfully!",'data':userList});
 							}); 
 							}); 
 						});
