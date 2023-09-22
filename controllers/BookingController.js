@@ -10,7 +10,7 @@ export const customer_booking = async(req,res)=>{
         if(	delievery_day && date && total_loads && order_type){
         if(order_type == '1'){
             var sql = "select available_loads from users where id = '"+userData[0].id+"'";
-            dbConnection.query(sql, function (err, result) {
+            dbConnection.query(sql, function (error, result) {
                 if(total_loads > result[0].available_loads){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
@@ -21,21 +21,21 @@ export const customer_booking = async(req,res)=>{
 
                     // var sqlDistance = "select * from (select latitude, longitude, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role =2 ORDER BY distance) as vt where vt.distance < 25;";
 
-                    // dbConnection.query(sqlDistance, function (err, results) {
-                    //     if (err) 
-                    //     console.log('err',err)
+                    // dbConnection.query(sqlDistance, function (error, results) {
+                    //     if (error) 
+                    //     console.log('error',error)
                     //     console.log('results',results)
                     //     // res.json({'status':true,"message":"Booking added successfully!"});
                     // }); 
                     // return false;
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+date+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52)";
-                    dbConnection.query(sql, function (err, result) {
-                        // if (err) throw err;
+                    dbConnection.query(sql, function (error, result) {
+                        // if (error) throw error;
 
                         for (var i = 0; total_loads > i; i++) {
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
-                        dbConnection.query(sql, function (err, result) {
-                        // if (err) throw err;
+                        dbConnection.query(sql, function (error, result) {
+                        // if (error) throw error;
                         // res.json({'status':true,"message":"Booking added successfully!"});
                         });     
                         }
@@ -43,8 +43,8 @@ export const customer_booking = async(req,res)=>{
 
                         var order_id = '1001'+result.insertId;
                         var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
-                        dbConnection.query(sql, function (err, results) {
-                        // if (err) throw err;
+                        dbConnection.query(sql, function (error, results) {
+                        // if (error) throw error;
                         }); 
                         res.json({'status':true,"message":"Booking added successfully!"});
                     }); 
@@ -58,7 +58,7 @@ export const customer_booking = async(req,res)=>{
 
             let allDates =   getDates(new Date(currentFinalDate), new Date(endFinalDate),frequency);
             var sql = "select available_loads from users where id = '"+userData[0].id+"'";
-            dbConnection.query(sql, function (err, result) {
+            dbConnection.query(sql, function (error, result) {
                 if(total_loads > result[0].available_loads){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
@@ -72,8 +72,8 @@ export const customer_booking = async(req,res)=>{
                         let minutes = dateObject.getMinutes();
                         const current_time = hours + ":" + minutes;
                         var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,frequency) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+frequency+"')";
-                        dbConnection.query(sql, function (err, result) {
-                        if (err) throw err;
+                        dbConnection.query(sql, function (error, result) {
+                        if (error) throw error;
                         });
                     }) 
                         res.json({'status':true,"message":"Booking added successfully!"});

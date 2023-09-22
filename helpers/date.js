@@ -7,6 +7,16 @@ export const date=()=> {
     return `${year}-${month}-${day}`;
   }
 
+  export const time = () => {
+	const currentDate = new Date();
+	const hours = String(currentDate.getHours()).padStart(2, "0");
+	const minutes = String(currentDate.getMinutes()).padStart(2, "0");
+	const seconds = String(currentDate.getSeconds()).padStart(2, "0");
+  
+	return `${hours}:${minutes}:${seconds}`;
+  };
+  
+
 // fetch data response 
 export const getDates = (startDate,endDate,frequency, data, res) => {
 	const currentDate = new Date(startDate.getTime());

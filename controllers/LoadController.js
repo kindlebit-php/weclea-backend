@@ -5,8 +5,8 @@ export const get_loads = async(req,res)=>{
       try { 
             const userData = res.user;
         	const loads = "select id,type,loads,price,status from admin_load_subscription";
-			dbConnection.query(loads, function (err, data) {
-			if (err) throw err;
+			dbConnection.query(loads, function (error, data) {
+			if (error) throw error;
 				res.json({'status':true,"message":"data get successfully!",'data':data, 'card_status':userData[0].card_status});
 			})
     }catch (error) {
@@ -21,13 +21,13 @@ export const customer_loads_subscription = async(req,res)=>{
         const {	type,buy_loads,amount} = req.body;
         if(	type && buy_loads && amount){
 	        var sql = "INSERT INTO customer_loads_subscription (user_id,type,buy_loads,amount) VALUES ('"+userData[0].id+"','"+type+"', '"+buy_loads+"','"+amount+"')";
-	        dbConnection.query(sql, function (err, result) {
-	        if (err) throw err;
+	        dbConnection.query(sql, function (error, result) {
+	        if (error) throw error;
            console.log(result)
             const loads = "select * from customer_loads_subscription where id = '"+result.insertId+"'";
             console.log('loads',loads)
-            dbConnection.query(loads, function (err, data) {
-            if (err) throw err;
+            dbConnection.query(loads, function (error, data) {
+            if (error) throw error;
                 res.json({'status':true,"message":"Loads added successfully!",'data':data[0]});
             })
 	        });
@@ -45,8 +45,8 @@ export const get_load_price = async(req,res)=>{
         const {	buy_loads} = req.body;
         // if(buy_loads){
 	        var sql = "select loads_price from settings";
-	        dbConnection.query(sql, function (err, result) {
-	        if (err) throw err;
+	        dbConnection.query(sql, function (error, result) {
+	        if (error) throw error;
                 // const price = (result[0].loads_price * buy_loads)
                 let data = {
                     "price":result[0].loads_price,
@@ -67,8 +67,8 @@ export const get_user_loads = async(req,res)=>{
      try { 
         const userData = res.user;
             var sql = "select available_loads from users where id = '"+userData[0].id+"'";
-            dbConnection.query(sql, function (err, result) {
-            if (err) throw err;
+            dbConnection.query(sql, function (error, result) {
+            if (error) throw error;
             const available_loads = result[0].available_loads;
              let data = {
                     "available_loads":available_loads,
@@ -86,14 +86,14 @@ export const get_user_subscription = async(req,res)=>{
      try { 
         const userData = res.user;
             var sql = "select * from customer_loads_subscription where type = 'package' and payment_status = '1' and user_id = '"+userData[0].id+"' limit 1";
-            dbConnection.query(sql, function (err, subscriptionresult) {
-            // if (err) throw err;
+            dbConnection.query(sql, function (error, subscriptionresult) {
+            // if (error) throw error;
             if(subscriptionresult.length > 0){
                 var sql = "select date from bookings where user_id = '"+userData[0].id+"'";
-                dbConnection.query(sql, function (err, bookingsresult) {
-                // if (err) throw err;
+                dbConnection.query(sql, function (error, bookingsresult) {
+                // if (error) throw error;
                 var sql = "select available_loads from users where id = '"+userData[0].id+"'";
-                dbConnection.query(sql, function (err, usersresult) {
+                dbConnection.query(sql, function (error, usersresult) {
                 let initi = {
                 "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"price":subscriptionresult[0].amount,"pending_loads":usersresult[0].available_loads,
                 }

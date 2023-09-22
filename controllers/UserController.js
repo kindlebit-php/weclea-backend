@@ -23,19 +23,19 @@ export const customer_register = async(req,res)=>{
 			phone: mobile
 			});
 			const customer_id=stripeCustomer.id;
-			dbConnection.query(checkIfEmailExist, function (err, data) {
+			dbConnection.query(checkIfEmailExist, function (error, data) {
 				// console.log(data[])
 				if(data[0].total == 0){
 					const checkIfMobileExist = "select count(id) as mobiletotal from users where mobile = '"+mobile+"'";
-					dbConnection.query(checkIfMobileExist, function (err, mobiledata) {
+					dbConnection.query(checkIfMobileExist, function (error, mobiledata) {
 					if(mobiledata[0].mobiletotal == 0){
 					
-					bcrypt.hash(password, saltRounds, function(err, hash) {
+					bcrypt.hash(password, saltRounds, function(error, hash) {
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"')";
-						dbConnection.query(sql, function (err, result) {
-							if (err) throw err;
+						dbConnection.query(sql, function (error, result) {
+							if (error) throw error;
 							var sql = "select * from users where id = '"+result.insertId+"'";
-							dbConnection.query(sql, function (err, userList) {
+							dbConnection.query(sql, function (error, userList) {
 							userList.forEach(element =>
 							{
 							const {id,name,email,mobile,comment,role,status} = element;
@@ -77,20 +77,20 @@ export const customer_address = async(req,res)=>{
         
         if(pickup_address && pickup_appartment && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long){
 	        var sql = "INSERT INTO customer_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+pickup_address+"', '"+pickup_appartment+"','"+pickup_city+"','"+pickup_state+"','"+pickup_zipcode+"','"+pickup_comment+"','"+pickup_lat+"','"+pickup_long+"')";
-	        dbConnection.query(sql, function (err, result) {
-	        if (err) throw err;
+	        dbConnection.query(sql, function (error, result) {
+	        if (error) throw error;
 	        });
     	}
     	if(drop_address && drop_appartment && drop_city  && drop_state && drop_zipcode && drop_lat && drop_long){
 	        var sql = "INSERT INTO customer_drop_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+drop_address+"', '"+drop_appartment+"','"+drop_city+"','"+drop_state+"','"+drop_zipcode+"','"+drop_comment+"','"+drop_lat+"','"+drop_long+"')";
-	       await dbConnection.query(sql, function (err, result) {
-	        if (err) throw err;
+	       await dbConnection.query(sql, function (error, result) {
+	        if (error) throw error;
 	        });
     	}
     	if(billing_address && billing_appartment && billing_city  && billing_state && billing_zipcode && billing_lat && billing_long){
 	        var sql = "INSERT INTO customer_billing_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+billing_address+"', '"+billing_appartment+"','"+billing_city+"','"+billing_state+"','"+billing_zipcode+"','"+billing_comment+"','"+billing_lat+"','"+billing_long+"')";
-	        dbConnection.query(sql, function (err, result) {
-	        if (err) throw err;
+	        dbConnection.query(sql, function (error, result) {
+	        if (error) throw error;
 	        });
     	}
 	            res.json({'status':true,"message":"Address added successfully!"});
@@ -110,8 +110,8 @@ export const customer_drop_address = async(req,res)=>{
         const {address,appartment,city,state,zipcode,comment,lat,long} = req.body;
         if(address && appartment && city  && state && zipcode && lat && long){
 	        var sql = "INSERT INTO customer_drop_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+address+"', '"+appartment+"','"+city+"','"+state+"','"+zipcode+"','"+comment+"',"+lat+"','"+long+"')";
-	        dbConnection.query(sql, function (err, result) {
-	        if (err) throw err;
+	        dbConnection.query(sql, function (error, result) {
+	        if (error) throw error;
 	            res.json({'status':true,"message":"Address added successfully!"});
 	        });
     	}else{
@@ -129,8 +129,8 @@ export const customer_billing_address = async(req,res)=>{
         const {address,appartment,city,state,zipcode,comment,lat,long} = req.body;
         if(address && appartment && city  && state && zipcode && lat && long){
 	        var sql = "INSERT INTO customer_billing_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+address+"', '"+appartment+"','"+city+"','"+state+"','"+zipcode+"','"+comment+"',"+lat+"','"+long+"')";
-	        dbConnection.query(sql, function (err, result) {
-	        if (err) throw err;
+	        dbConnection.query(sql, function (error, result) {
+	        if (error) throw error;
 	            res.json({'status':true,"message":"Address added successfully!"});
 	        });
     	}else{
@@ -147,10 +147,10 @@ export const customer_login = async(req,res)=>{
 		const {email,password,type} = req.body;
 		if(email && password && type){
 			const checkIfEmailExist = "select * from users where email = '"+email+"' and role = '"+type+"'";
-			dbConnection.query(checkIfEmailExist, function (err, data) {
+			dbConnection.query(checkIfEmailExist, function (error, data) {
 				if(data.length > 0){
 					if(data[0].status == 1){
-					bcrypt.compare(password, data[0].password, function(err, result) {
+					bcrypt.compare(password, data[0].password, function(error, result) {
 						if(result == true){
 							data.forEach(element =>
 							{
@@ -187,7 +187,7 @@ export const forgot_password = async(req,res)=>{
 		const {email} = req.body;
 		if(email){
 			const checkIfEmailExist = "select * from users where email = '"+email+"'";
-			dbConnection.query(checkIfEmailExist, function (err, data) {
+			dbConnection.query(checkIfEmailExist, function (error, data) {
 				if(data.length > 0){
 					var otp = 123456
 					const mailOptions = 
@@ -224,9 +224,9 @@ export const forgot_password = async(req,res)=>{
 							
 							const updateUser = "UPDATE users SET otp = '"+otp+"' WHERE id = '"+data[0].id+"';"
 						
-							dbConnection.query(updateUser, function (err, datas) 
+							dbConnection.query(updateUser, function (error, datas) 
 							{
-								if(err)throw err;
+								if(error)throw error;
 								res.json({'status':true,"message":"Email send successfully!"});
 							})
 							
@@ -256,7 +256,7 @@ export const verify_otp = async(req,res)=>{
 		const {email,otp} = req.body;
 		if(email && otp){
 			const checkIfEmailExist = "select * from users where email = '"+email+"' and otp = '"+otp+"'";
-			dbConnection.query(checkIfEmailExist, function (err, data) {
+			dbConnection.query(checkIfEmailExist, function (error, data) {
 				// console.log('data',data)
 				if(data.length > 0){
 					res.json({'status':true,"message":"OTP verify successfully",'data':data});
@@ -279,14 +279,14 @@ export const change_password = async(req,res)=>{
 		const {email,password} = req.body;
 		if(email && password){
 			const checkIfEmailExist = "select * from users where email = '"+email+"'";
-			dbConnection.query(checkIfEmailExist, function (err, data) {
+			dbConnection.query(checkIfEmailExist, function (error, data) {
 				// console.log('data',data)
 				if(data.length > 0){
-					bcrypt.hash(password, saltRounds, function(err, hash) {
+					bcrypt.hash(password, saltRounds, function(error, hash) {
 						const updateUser = "UPDATE users SET password = '"+hash+"' WHERE email = '"+email+"';"
 						
-						dbConnection.query(updateUser, function (err, datas) {
-							if(err)throw err;
+						dbConnection.query(updateUser, function (error, datas) {
+							if(error)throw error;
 							res.json({'status':true,"message":"Password updated successfully!",'data':data[0]});
 						});
 					});
@@ -309,8 +309,8 @@ export const get_user_profile = async(req,res)=>{
         const userData = res.user;
         const { buy_loads} = req.body;
             var sql = "select * from users where id = '"+userData[0].id+"' ";
-            dbConnection.query(sql, function (err, result) {
-            if (err) throw err;
+            dbConnection.query(sql, function (error, result) {
+            if (error) throw error;
 				// var resData = [];
 				result.forEach(element =>
 				{
@@ -343,12 +343,12 @@ export const edit_user_profile = async(req,res)=>{
         if(name && email && password  && mobile){
 
        	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
-			dbConnection.query(checkIfEmailExist, function (err, data) {
+			dbConnection.query(checkIfEmailExist, function (error, data) {
 				if(data[0].total > 0 ){
 					res.json({'status':false,"message":'Email is already registered'});  
 				}else{
 					const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
-					dbConnection.query(checkIfMobileExist, function (err, data) {
+					dbConnection.query(checkIfMobileExist, function (error, data) {
 					if(data[0].total == 0 ){
 					// profileUpload.single('profile_image')
 					if(req.file){
@@ -357,10 +357,10 @@ export const edit_user_profile = async(req,res)=>{
 					}else{
 						var userProfile = userData[0].profile_image;
 					}
-					bcrypt.hash(password, saltRounds, function(err, hash) {
+					bcrypt.hash(password, saltRounds, function(error, hash) {
 						var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"' ,email = '"+email+"',password = '"+hash+"', mobile = '"+mobile+"' where id = '"+userData[0].id+"'";
-						dbConnection.query(sql, function (err, result) {
-							if (err) throw err;
+						dbConnection.query(sql, function (error, result) {
+							if (error) throw error;
 								res.json({'status':true,"message":"data updated successfully!"});
 							}); 
 						});
