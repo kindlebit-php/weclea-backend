@@ -37,7 +37,7 @@ export const customer_register = async(req,res)=>{
 							var sql = "select id,name,email,mobile,comment,role,status from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
 								userList[0].token = generateToken({ userId: userList[0].id, type: role });
-								res.json({'status':true,"message":"data insert successfully!",'data':userList});
+								res.json({'status':true,"message":"User registered successfully!",'data':userList[0]});
 							}); 
 							}); 
 						});
