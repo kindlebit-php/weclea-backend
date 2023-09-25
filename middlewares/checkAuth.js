@@ -31,7 +31,7 @@ export const CheckAuth = async (req, res, next) => {
 
     // const user = await clientModel.findById(userId);
    var sql = "select * from users where id = '"+userId+"'";
-          dbConnection.query(sql, function (err, user) {
+          dbConnection.query(sql, function (error, user) {
           if (!user) {
       res.json({'status':false,"message":"User not found"});
           
@@ -44,7 +44,7 @@ export const CheckAuth = async (req, res, next) => {
  
 
 
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
 };

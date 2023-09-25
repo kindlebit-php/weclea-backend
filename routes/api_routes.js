@@ -8,6 +8,7 @@ import driverController from "../controllers/DriverController.js";
 import paymentController from "../controllers/PaymentController.js";
 import cronController from "../controllers/CronController.js";
 import multer from 'multer';
+import { upload } from "../utils/multer.js";
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb)
@@ -40,12 +41,15 @@ router.post('/verify-otp',userController.verify_otp);
 router.post('/change-password',userController.change_password);
 router.get('/get-orders',CheckAuth,driverController.get_orders);
 router.get("/get-order-detail",CheckAuth,driverController.get_order_detail);
+router.post("/pickup-loads",CheckAuth,driverController.pickup_loads)
+router.get("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
+router.post("/submit_pickup_details",CheckAuth,upload.array("images", 6),driverController.submit_pickup_details);
 router.get("/booking-subscription-cron",cronController.booking_subscription_cron);
 router.post("/attach-card",CheckAuth,paymentController.Attach_Card);
-router.get("/get-all-cards",CheckAuth,paymentController.get_all_cards)
-router.post("/Payment-Card-Id",CheckAuth,paymentController.Payment_Card_Id)
+router.get("/get-all-cards",CheckAuth,paymentController.get_all_cards);
+router.post("/Payment-Card-Id",CheckAuth,paymentController.Payment_Card_Id);
 router.post("/customer-payment",CheckAuth,paymentController.customer_payment);
 router.post("/Add-Bank-Account",CheckAuth,paymentController.Add_Bank_Account)
-router.post("/ACH-Payment",CheckAuth,paymentController.ACH_Payment)
+router.post("/ACH-Payment",CheckAuth,paymentController.ACH_Payment);
 
 export default router;

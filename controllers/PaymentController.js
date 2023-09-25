@@ -102,9 +102,9 @@ export const Payment_Card_Id = async (req, res) => {
     const { purchase_id, cardId } = req.body;
 
     const purchase_data = `SELECT * FROM customer_loads_subscription WHERE id = '${purchase_id}'`;
-    dbConnection.query(purchase_data, async function (err, data) {
-      if (err) {
-        return res.json({ status: false, message: 'Error retrieving purchase data' });
+    dbConnection.query(purchase_data, async function (error, data) {
+      if (error) {
+        return res.json({ status: false, message: 'error retrieving purchase data' });
       }
 
       if (data.length === 0) {
@@ -125,9 +125,9 @@ export const Payment_Card_Id = async (req, res) => {
       }
 
       const user_data = `SELECT * FROM users WHERE id = '${user_id}'`;
-      dbConnection.query(user_data, async function (err, userData) {
-        if (err) {
-          return res.json({ status: false, message: 'Error retrieving user data' });
+      dbConnection.query(user_data, async function (error, userData) {
+        if (error) {
+          return res.json({ status: false, message: 'error retrieving user data' });
         }
 
         if (userData.length === 0) {
@@ -156,16 +156,16 @@ export const Payment_Card_Id = async (req, res) => {
 
           if (paymentIntent.status === 'succeeded') {
             const updateStatus = `UPDATE customer_loads_subscription SET payment_status = '1' WHERE id = '${purchase_id}'`;
-            dbConnection.query(updateStatus, async function (err, updateStatus) {
-              if (err) {
-                return res.json({ status: false, message: 'Error updating payment status' });
+            dbConnection.query(updateStatus, async function (error, updateStatus) {
+              if (error) {
+                return res.json({ status: false, message: 'error updating payment status' });
               }
               
               const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
 
-              dbConnection.query(update_available_loads, [buy_loads, userId], async function (err, results) {
-                if (err) {
-                return res.json({ status: false, message: 'Error updating payment status' });
+              dbConnection.query(update_available_loads, [buy_loads, userId], async function (error, results) {
+                if (error) {
+                return res.json({ status: false, message: 'error updating payment status' });
               }
             })
 
@@ -173,9 +173,9 @@ export const Payment_Card_Id = async (req, res) => {
               const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
                 userData[0].id}', '${purchaseAmount}', '${paymentIntent.id}', '${currentDate}')`;
 
-              dbConnection.query(sql, function (err, result) {
-                if (err) {
-                  return res.json({ status: false, message: err.message });
+              dbConnection.query(sql, function (error, result) {
+                if (error) {
+                  return res.json({ status: false, message: error.message });
                 }
                 return res.json({ status: true, message: 'Payment successful' });
               });
@@ -183,8 +183,8 @@ export const Payment_Card_Id = async (req, res) => {
           } else {
             return res.json({ status: false, message: 'Payment failed' });
           }
-        } catch (stripeError) {
-          return res.json({ status: false, message: `Stripe error: ${stripeError.message}` });
+        } catch (stripeerror) {
+          return res.json({ status: false, message: `Stripe error: ${stripeerror.message}` });
         }
       });
     });
@@ -233,9 +233,9 @@ export const customer_payment = async (req, res) => {
       });
       if(card_status == 0){
         const purchase_data = `SELECT * FROM customer_loads_subscription WHERE id = '${purchase_id}'`;
-        dbConnection.query(purchase_data, async function (err, data) {
-          if (err) {
-            return res.json({ status: false, message: 'Error retrieving purchase data' });
+        dbConnection.query(purchase_data, async function (error, data) {
+          if (error) {
+            return res.json({ status: false, message: 'error retrieving purchase data' });
           }
     
           if (data.length === 0) {
@@ -255,9 +255,9 @@ export const customer_payment = async (req, res) => {
             return res.json({ status: false, message: 'You are not a valid user' });
           }
           const user_data = `SELECT * FROM users WHERE id = '${user_id}'`;
-          dbConnection.query(user_data, async function (err, userData) {
-            if (err) {
-              return res.json({ status: false, message: 'Error retrieving user data' });
+          dbConnection.query(user_data, async function (error, userData) {
+            if (error) {
+              return res.json({ status: false, message: 'error retrieving user data' });
             }
     
             if (userData.length === 0) {
@@ -275,16 +275,16 @@ export const customer_payment = async (req, res) => {
               });
               if(paymentIntent.status === 'succeeded') {
                 const updateStatus = `UPDATE customer_loads_subscription SET payment_status = '1' WHERE id = '${purchase_id}'`;
-                dbConnection.query(updateStatus, async function (err, updateStatus) {
-                  if (err) {
-                    return res.json({ status: false, message: 'Error updating payment status' });
+                dbConnection.query(updateStatus, async function (error, updateStatus) {
+                  if (error) {
+                    return res.json({ status: false, message: 'error updating payment status' });
                   }
 
                   const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
 
-                  dbConnection.query(update_available_loads, [buy_loads, userId], async function (err, results) {
-                    if (err) {
-                    return res.json({ status: false, message: 'Error updating payment status' });
+                  dbConnection.query(update_available_loads, [buy_loads, userId], async function (error, results) {
+                    if (error) {
+                    return res.json({ status: false, message: 'error updating payment status' });
                   }
                 })
     
@@ -292,9 +292,9 @@ export const customer_payment = async (req, res) => {
                   const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
                     userData[0].id}', '${purchaseAmount}', '${paymentIntent.id}', '${currentDate}')`;
     
-                  dbConnection.query(sql, function (err, result) {
-                    if (err) {
-                      return res.json({ status: false, message: err.message });
+                  dbConnection.query(sql, function (error, result) {
+                    if (error) {
+                      return res.json({ status: false, message: error.message });
                     }
                     return res.json({ status: true, message: 'Payment successful' });
                   });
@@ -324,9 +324,9 @@ export const customer_payment = async (req, res) => {
     // ****************************Payment***************************************//
 
     const purchase_data = `SELECT * FROM customer_loads_subscription WHERE id = '${purchase_id}'`;
-    dbConnection.query(purchase_data, async function (err, data) {
-      if (err) {
-        return res.json({ status: false, message: 'Error retrieving purchase data' });
+    dbConnection.query(purchase_data, async function (error, data) {
+      if (error) {
+        return res.json({ status: false, message: 'error retrieving purchase data' });
       }
 
       if (data.length === 0) {
@@ -345,9 +345,9 @@ export const customer_payment = async (req, res) => {
         return res.json({ status: false, message: 'You are not a valid user' });
       }
       const user_data = `SELECT * FROM users WHERE id = '${user_id}'`;
-      dbConnection.query(user_data, async function (err, userData) {
-        if (err) {
-          return res.json({ status: false, message: 'Error retrieving user data' });
+      dbConnection.query(user_data, async function (error, userData) {
+        if (error) {
+          return res.json({ status: false, message: 'error retrieving user data' });
         }
 
         if (userData.length === 0) {
@@ -372,23 +372,23 @@ export const customer_payment = async (req, res) => {
           });
           if(paymentIntent.status === 'succeeded') {
             const update_Status = `UPDATE users SET card_status = '1' WHERE id = '${userId}'`;
-            dbConnection.query(update_Status, async function (err,update_Status){
-              if(err){
-                return res.json({ status: false, message: 'Error updating payment status' });
+            dbConnection.query(update_Status, async function (error,update_Status){
+              if(error){
+                return res.json({ status: false, message: 'error updating payment status' });
               }
             })
 
             const updateStatus = `UPDATE customer_loads_subscription SET payment_status = '1' WHERE id = '${purchase_id}'`;
-            dbConnection.query(updateStatus, async function (err, updateStatus) {
-              if (err) {
-                return res.json({ status: false, message: 'Error updating payment status' });
+            dbConnection.query(updateStatus, async function (error, updateStatus) {
+              if (error) {
+                return res.json({ status: false, message: 'error updating payment status' });
               }
 
               const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
 
-              dbConnection.query(update_available_loads, [buy_loads, userId], async function (err, results) {
-                if (err) {
-                return res.json({ status: false, message: 'Error updating payment status' });
+              dbConnection.query(update_available_loads, [buy_loads, userId], async function (error, results) {
+                if (error) {
+                return res.json({ status: false, message: 'error updating payment status' });
               }
             })
 
@@ -396,9 +396,9 @@ export const customer_payment = async (req, res) => {
               const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
                 userData[0].id}', '${purchaseAmount}', '${paymentIntent.id}', '${currentDate}')`;
 
-              dbConnection.query(sql, function (err, result) {
-                if (err) {
-                  return res.json({ status: false, message: err.message });
+              dbConnection.query(sql, function (error, result) {
+                if (error) {
+                  return res.json({ status: false, message: error.message });
                 }
                 return res.json({ status: true, message: 'Payment successful' });
               });
@@ -466,9 +466,9 @@ export const ACH_Payment=async(req,res)=>{
   const { purchase_id } = req.body;
   try {
     const purchase_data = `SELECT * FROM customer_loads_subscription WHERE id = '${purchase_id}'`;
-    dbConnection.query(purchase_data, async function (err, data) {
-      if (err) {
-        return res.json({ status: false, message: 'Error retrieving purchase data' });
+    dbConnection.query(purchase_data, async function (error, data) {
+      if (error) {
+        return res.json({ status: false, message: 'error retrieving purchase data' });
       }
 
       if (data.length === 0) {
@@ -481,9 +481,9 @@ export const ACH_Payment=async(req,res)=>{
         return res.json({ status: false, message: 'You are not a valid user' });
       }
       const user_data = `SELECT * FROM users WHERE id = '${user_id}'`;
-      dbConnection.query(user_data, async function (err, userData) {
-        if (err) {
-          return res.json({ status: false, message: 'Error retrieving user data' });
+      dbConnection.query(user_data, async function (error, userData) {
+        if (error) {
+          return res.json({ status: false, message: 'error retrieving user data' });
         }
 
         if (userData.length === 0) {
@@ -504,18 +504,18 @@ export const ACH_Payment=async(req,res)=>{
     });
     if( paymentIntent.source.status === 'verified' && paymentIntent.status === 'pending') {
       const updateStatus = `UPDATE customer_loads_subscription SET payment_status = '1' WHERE id = '${purchase_id}'`;
-      dbConnection.query(updateStatus, async function (err, updateStatus) {
-        if (err) {
-          return res.json({ status: false, message: 'Error updating payment status' });
+      dbConnection.query(updateStatus, async function (error, updateStatus) {
+        if (error) {
+          return res.json({ status: false, message: 'error updating payment status' });
         }
 
         const currentDate = date();
         const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
           userData[0].id}', '${purchaseAmount}', '${paymentIntent.id}', '${currentDate}')`;
 
-        dbConnection.query(sql, function (err, result) {
-          if (err) {
-            return res.json({ status: false, message: err.message });
+        dbConnection.query(sql, function (error, result) {
+          if (error) {
+            return res.json({ status: false, message: error.message });
           }
           return res.json({ status: true, message: 'Payment successful' });
         });
