@@ -6,6 +6,7 @@ import bookingController from "../controllers/BookingController.js";
 import { CheckAuth } from "../middlewares/checkAuth.js";
 import driverController from "../controllers/DriverController.js";
 import paymentController from "../controllers/PaymentController.js";
+import cronController from "../controllers/CronController.js";
 import multer from 'multer';
 import { upload } from "../utils/multer.js";
 
@@ -40,9 +41,10 @@ router.post('/verify-otp',userController.verify_otp);
 router.post('/change-password',userController.change_password);
 router.get('/get-orders',CheckAuth,driverController.get_orders);
 router.get("/get-order-detail",CheckAuth,driverController.get_order_detail);
-router.post("/pickup-loads",CheckAuth,driverController.pickup_loads);
+router.post("/pickup-loads",CheckAuth,driverController.pickup_loads)
 router.get("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
-router.post("/submit_pickup_details",CheckAuth,upload.array("images", 5),driverController.submit_pickup_details);
+router.post("/submit_pickup_details",CheckAuth,upload.array("images", 6),driverController.submit_pickup_details);
+router.get("/booking-subscription-cron",cronController.booking_subscription_cron);
 router.post("/attach-card",CheckAuth,paymentController.Attach_Card);
 router.get("/get-all-cards",CheckAuth,paymentController.get_all_cards);
 router.post("/Payment-Card-Id",CheckAuth,paymentController.Payment_Card_Id);
