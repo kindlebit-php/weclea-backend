@@ -8,7 +8,7 @@ export const CheckAuth = async (req, res, next) => {
     console.log(!header);
 
     if (!header) {
-      res.json({'status':false,"messagae":"Auth header is missing"});
+      res.json({'status':false,"message":"Auth header is missing"});
 
       return;
     }
@@ -17,7 +17,7 @@ export const CheckAuth = async (req, res, next) => {
     const token = header.split("Bearer ")[1] || header;
 
     if (!token) {
-      res.json({'status':false,"messagae":"Auth token is missing"});
+      res.json({'status':false,"message":"Auth token is missing"});
      
       return;
     }
@@ -25,7 +25,7 @@ export const CheckAuth = async (req, res, next) => {
     const userId = verifyJwtToken(token, next);
 
     if (!userId) {
-      res.json({'status':false,"messagae":"incorrect token"});
+      res.json({'status':false,"message":"incorrect token"});
       return;
     }
 
@@ -33,7 +33,7 @@ export const CheckAuth = async (req, res, next) => {
    var sql = "select * from users where id = '"+userId+"'";
           dbConnection.query(sql, function (err, user) {
           if (!user) {
-      res.json({'status':false,"messagae":"User not found"});
+      res.json({'status':false,"message":"User not found"});
           
             return;
           }else{

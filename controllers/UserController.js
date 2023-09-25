@@ -14,7 +14,7 @@ export const customer_register = async(req,res)=>{
       try { 
       	const saltRounds = 10;
         const {name,email,password,mobile,comment,role,latitude,longitude} = req.body;
-        if(name && email && password  && mobile && comment && role){
+        if(name && email && password  && mobile && role){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
 			const stripeCustomer = await stripe.customers.create({
 			email: email,
