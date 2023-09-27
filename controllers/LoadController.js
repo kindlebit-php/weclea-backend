@@ -4,7 +4,7 @@ import dbConnection from'../config/db.js';
 export const get_loads = async(req,res)=>{
       try { 
             const userData = res.user;
-        	const loads = "select id,type,loads,price,status from admin_load_subscription";
+        	const loads = "select id,type,loads,price,status from admin_packages";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"data get successfully!",'data':data, 'card_status':userData[0].card_status});
