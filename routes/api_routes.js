@@ -27,7 +27,7 @@ router.post('/customer-register',userController.customer_register);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
 router.post('/edit-user-profile',CheckAuth,profileUpload.single('profile_image') ,userController.edit_user_profile);
 
-router.get('/get-loads' ,CheckAuth, loadController.get_loads);
+router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
 router.get('/get-user-loads',CheckAuth ,loadController.get_user_loads);
 router.get('/get-user-subscription',CheckAuth ,loadController.get_user_subscription);
