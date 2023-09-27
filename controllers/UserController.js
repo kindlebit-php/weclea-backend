@@ -114,10 +114,10 @@ export const customer_login = async(req,res)=>{
 						if(result == true){
 							data.forEach(element =>
 							{
-								const {id,name,email,mobile,comment,role,status} = element;
+								const {id,name,email,mobile,comment,role,status,category_id} = element;
 								
 								const initi = {
-									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'token': generateToken({ userId: id, type: type }),
+									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,'token': generateToken({ userId: id, type: type }),
 								}
 								res.json({'status':true,"message":"Logged in successfully!",'data': initi});
 							});
