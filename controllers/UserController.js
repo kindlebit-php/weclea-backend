@@ -34,7 +34,7 @@ export const customer_register = async(req,res)=>{
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude,category_id) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"','"+category_id+"')";
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;
-							var sql = "select id,name,email,mobile,comment,role,status from users where id = '"+result.insertId+"'";
+							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
 								userList[0].token = generateToken({ userId: userList[0].id, type: role });
 								res.json({'status':true,"message":"User registered successfully!",'data':userList[0]});
