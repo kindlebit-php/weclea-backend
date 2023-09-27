@@ -299,40 +299,31 @@ export const get_user_profile = async(req,res)=>{
 export const edit_user_profile = async(req,res)=>{
      try { 
         const userData = res.user;
-        const saltRounds = 10;
-        const {name,email,password,mobile} = req.body;
-        if(name && email && password  && mobile){
+        const {name,mobile,dob} = req.body;
+        if(name  && mobile){
+			
+			const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
+			dbConnection.query(checkIfMobileExist, function (error, data) {
+			if(data[0].total == 0 ){
+				if(req.file){
 
-       	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
-			dbConnection.query(checkIfEmailExist, function (error, data) {
-				if(data[0].total > 0 ){
-					res.json({'status':false,"message":'Email is already registered'});  
+					var userProfile = req.file.originalname;
 				}else{
-					const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
-					dbConnection.query(checkIfMobileExist, function (error, data) {
-					if(data[0].total == 0 ){
-					// profileUpload.single('profile_image')
-					if(req.file){
-					
-						var userProfile = req.file.originalname;
-					}else{
-						var userProfile = userData[0].profile_image;
-					}
-					bcrypt.hash(password, saltRounds, function(error, hash) {
-						var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"' ,email = '"+email+"',password = '"+hash+"', mobile = '"+mobile+"' where id = '"+userData[0].id+"'";
-						dbConnection.query(sql, function (error, result) {
-							if (error) throw error;
-								res.json({'status':true,"message":"data updated successfully!"});
-							}); 
-						});
-					}else{
-						res.json({'status':false,"message":'Mobile Number is already registered'});  
-
-					}
-					});
-				
+				var userProfile = userData[0].profile_image;
 				}
-			})
+				var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"', dob ='"+dob+"', mobile = '"+mobile+"' where id = '"+userData[0].id+"'";
+				dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+					res.json({'status':true,"message":"data updated successfully!"});
+				}); 
+			}else{
+				res.json({'status':false,"message":'Mobile Number is already registered'});  
+
+			}
+			});
+				
+				
+		
 		}else{
             res.json({'status':false,"message":"All fields are required"});
 		}
@@ -345,8 +336,6 @@ export default {
 	customer_register,
 	customer_address,
 	customer_login,
-	customer_billing_address,
-	customer_drop_address,
 	forgot_password,
 	verify_otp,
 	change_password,
