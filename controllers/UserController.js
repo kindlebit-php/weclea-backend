@@ -299,28 +299,27 @@ export const get_user_profile = async(req,res)=>{
 export const edit_user_profile = async(req,res)=>{
      try { 
         const userData = res.user;
-        const {name,mobile,dob} = req.body;
-        if(name  && mobile){
+        const {name,dob} = req.body;
+        if(name  && dob){
 			
-			const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
-			dbConnection.query(checkIfMobileExist, function (error, data) {
-			if(data[0].total == 0 ){
+			// const checkIfMobileExist = "select count(id) as total from users where id = '"+userData[0].id+"' and mobile = '"+mobile+"'";
+			// dbConnection.query(checkIfMobileExist, function (error, data) {
+			// if(data[0].total == 1 ){
 				if(req.file){
-
 					var userProfile = req.file.originalname;
 				}else{
 				var userProfile = userData[0].profile_image;
 				}
-				var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"', dob ='"+dob+"', mobile = '"+mobile+"' where id = '"+userData[0].id+"'";
+				var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"', dob ='"+dob+"' where id = '"+userData[0].id+"'";
 				dbConnection.query(sql, function (error, result) {
 				if (error) throw error;
 					res.json({'status':true,"message":"data updated successfully!"});
 				}); 
-			}else{
-				res.json({'status':false,"message":'Mobile Number is already registered'});  
+			// }else{
+			// 	res.json({'status':false,"message":'Mobile Number is already registered'});  
 
-			}
-			});
+			// }
+			// });
 				
 				
 		
