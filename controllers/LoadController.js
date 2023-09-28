@@ -21,7 +21,7 @@ export const customer_loads_subscription = async(req,res)=>{
      	const userData = res.user;
         const {	type,buy_loads,amount} = req.body;
         if(	type && buy_loads && amount){
-	        var sql = "INSERT INTO customer_loads_subscription (user_id,type,buy_loads,amount) VALUES ('"+userData[0].id+"','"+type+"', '"+buy_loads+"','"+amount+"')";
+	        var sql = "INSERT INTO customer_loads_subscription (user_id,category_id,type,buy_loads,amount) VALUES ('"+userData[0].id+"','"+userData[0].category_id+"','"+type+"', '"+buy_loads+"','"+amount+"')";
 	        dbConnection.query(sql, function (error, result) {
 	        if (error) throw error;
            console.log(result)
