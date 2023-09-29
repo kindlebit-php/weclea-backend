@@ -281,14 +281,14 @@ export const customer_payment = async (req, res) => {
                   }
                   else {
                     const update_loads_availability = `
-    UPDATE customer_loads_availabilty AS cla
-    JOIN customer_loads_subscription AS cls ON cla.user_id = cls.user_id
-    SET cla.commercial = CASE WHEN cls.category_id = 1 THEN cls.buy_loads ELSE cla.commercial END,
-        cla.residential = CASE WHEN cls.category_id = 2 THEN cls.buy_loads ELSE cla.residential END,
-        cla.yeshiba = CASE WHEN cls.category_id = 3 THEN cls.buy_loads ELSE cla.yeshiba END
-    WHERE cls.user_id = ?`;
+                    UPDATE customer_loads_availabilty AS cla
+                    JOIN customer_loads_subscription AS cls ON cla.user_id = cls.user_id
+                    SET cla.commercial = CASE WHEN cls.category_id = 1 THEN cla.commercial + cls.buy_loads ELSE cla.commercial END,
+                        cla.residential = CASE WHEN cls.category_id = 2 THEN cla.residential + cls.buy_loads ELSE cla.residential END,
+                        cla.yeshiba = CASE WHEN cls.category_id = 3 THEN cla.yeshiba + cls.buy_loads ELSE cla.yeshiba END
+                    WHERE cls.id = ? AND cls.user_id = ?`;
 
-dbConnection.query(update_loads_availability, [user_id], async function (error, results) {
+dbConnection.query(update_loads_availability, [purchase_id,user_id], async function (error, results) {
   if (error) {
     return res.json({ status: false, message: 'Error in update_loads_availability' });
   }
@@ -402,12 +402,12 @@ dbConnection.query(update_loads_availability, [user_id], async function (error, 
                 const update_loads_availability = `
 UPDATE customer_loads_availabilty AS cla
 JOIN customer_loads_subscription AS cls ON cla.user_id = cls.user_id
-SET cla.commercial = CASE WHEN cls.category_id = 1 THEN cls.buy_loads ELSE cla.commercial END,
-    cla.residential = CASE WHEN cls.category_id = 2 THEN cls.buy_loads ELSE cla.residential END,
-    cla.yeshiba = CASE WHEN cls.category_id = 3 THEN cls.buy_loads ELSE cla.yeshiba END
-WHERE cls.user_id = ?`;
+SET cla.commercial = CASE WHEN cls.category_id = 1 THEN cla.commercial + cls.buy_loads ELSE cla.commercial END,
+    cla.residential = CASE WHEN cls.category_id = 2 THEN cla.residential + cls.buy_loads ELSE cla.residential END,
+    cla.yeshiba = CASE WHEN cls.category_id = 3 THEN cla.yeshiba + cls.buy_loads ELSE cla.yeshiba END
+WHERE cls.id = ? AND cls.user_id = ?`;
 
-dbConnection.query(update_loads_availability, [user_id], async function (error, results) {
+dbConnection.query(update_loads_availability, [purchase_id,user_id], async function (error, results) {
 if (error) {
 return res.json({ status: false, message: 'Error in update_loads_availability' });
 }
