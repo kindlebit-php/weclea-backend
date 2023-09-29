@@ -142,7 +142,10 @@ export const get_user_subscription = async(req,res)=>{
 
              })
 }else{
-                        res.json({'status':false,"message":"No Subscription found!"});
+    let initi = {
+    "id":0,"package":'No Subscription Found',"price":0,"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,
+    }
+    res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
 
 }
             });
@@ -161,7 +164,7 @@ export const get_user_home_data = async(req,res)=>{
      console.log(sql)
         dbConnection.query(sql, function (err, subscriptionresult) {
             console.log('subscriptionresult',subscriptionresult)
-        if(subscriptionresult){
+        if(subscriptionresult.length > 0){
         if(category_id == 1){
             
                     var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
@@ -191,7 +194,10 @@ export const get_user_home_data = async(req,res)=>{
                     })
         }
     }else{
-                        res.json({'status':false,"message":"No Subscription found!"});
+                         let initi = {
+                            "id":0,"package":'No Subscription found',"pending_loads":0
+                        }
+                        res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
 
     }
         })
