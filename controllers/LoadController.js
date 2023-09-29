@@ -92,10 +92,6 @@ export const get_user_loads = async(req,res)=>{
              let data = {
                     "available_loads":available_loads,
                 }
-            }else{
-                let data = {
-                    "available_loads":0,
-                }
             }
                 res.json({'status':true,"message":"Price get successfully!",'data':data});
 
