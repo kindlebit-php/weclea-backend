@@ -120,6 +120,7 @@ export const get_user_subscription = async(req,res)=>{
             var sql = "select * from customer_loads_subscription where type = 'package' and payment_status = '1' and user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
             // console.log('sql',sql)
             dbConnection.query(sql, function (err, subscriptionresult) {
+                if(subscriptionresult){
             if(userData[0].category_id == 1){
                 var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }else if(userData[0].category_id == 2){
@@ -140,7 +141,10 @@ export const get_user_subscription = async(req,res)=>{
             })
 
              })
+}else{
+                        res.json({'status':false,"message":"No Subscription found!"});
 
+}
             });
         
     }catch (error) {
