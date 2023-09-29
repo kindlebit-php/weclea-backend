@@ -275,7 +275,7 @@ export const get_user_profile = async(req,res)=>{
 				// var resData = [];
 				result.forEach(element =>
 				{
-					const {id,name,dob,email,mobile} = element;
+					const {id,name,dob,email,mobile,category_id} = element;
 					if(result[0].profile_image){
 						var img = process.env.BASE_URL+'/uploads/'+result[0].profile_image;
 					}else{
@@ -283,7 +283,7 @@ export const get_user_profile = async(req,res)=>{
 
 					}
 					let initi = {
-					"id":id,"name":name,"dob":dob,"email":email,"mobile":mobile,'profile_img':img
+					"id":id,"name":name,"dob":dob,'category_id':category_id,"email":email,"mobile":mobile,'profile_img':img
 					}
 					// resData.push(initi);
 				res.json({'status':true,"message":"Profile get successfully!",'data':initi});
@@ -323,8 +323,8 @@ export const update_password = async(req,res)=>{
 export const edit_user_profile = async(req,res)=>{
      try { 
         const userData = res.user;
-        const {name,dob} = req.body;
-        if(name  && dob){
+        const {name,dob,category_id} = req.body;
+        if(name  && dob, category_id){
 			
 			// const checkIfMobileExist = "select count(id) as total from users where id = '"+userData[0].id+"' and mobile = '"+mobile+"'";
 			// dbConnection.query(checkIfMobileExist, function (error, data) {
@@ -334,7 +334,7 @@ export const edit_user_profile = async(req,res)=>{
 				}else{
 				var userProfile = userData[0].profile_image;
 				}
-				var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"', dob ='"+dob+"' where id = '"+userData[0].id+"'";
+				var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"', dob ='"+dob+"',category_id = '"+category_id+"' where id = '"+userData[0].id+"'";
 				dbConnection.query(sql, function (error, result) {
 				if (error) throw error;
 					res.json({'status':true,"message":"data updated successfully!"});
