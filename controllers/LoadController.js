@@ -99,7 +99,7 @@ export const get_user_loads = async(req,res)=>{
                     "available_loads":0,
                 }
                 res.json({'status':true,"message":"Price get successfully!",'data':nodata});
-                
+
             }
 
             });
@@ -117,7 +117,7 @@ export const get_user_subscription = async(req,res)=>{
      try { 
         const userData = res.user;
             // var sql = "SELECT customer_loads_subscription.id,customer_loads_subscription.type, customer_loads_subscription.payment_status, customer_loads_subscription.user_id, customer_loads_subscription.buy_loads,customer_loads_subscription.amount, users.available_loads,users.id FROM customer_loads_subscription LEFT JOIN users ON customer_loads_subscription.user_id = users.id where customer_loads_subscription.type = 'package' and customer_loads_subscription.payment_status = '1' and customer_loads_subscription.category_id = '"+userData[0].category_id+"' and customer_loads_subscription.user_id = '"+userData[0].id+"' ORDER BY customer_loads_subscription.id desc limit 1;";
-            var sql = "select * from customer_loads_subscription where user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
+            var sql = "select * from customer_loads_subscription where type = 'package' and payment_status = '1' and user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
             // console.log('sql',sql)
             dbConnection.query(sql, function (err, subscriptionresult) {
             if(userData[0].category_id == 1){
@@ -153,8 +153,11 @@ export const get_user_home_data = async(req,res)=>{
      try { 
         const userData = res.user;
         const { category_id } = req.body;
-        var sql = "select * from customer_loads_subscription where category_id = '"+category_id+"' user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
+        var sql = "select * from customer_loads_subscription where type = 'package' and payment_status = '1' and category_id = '"+category_id+"' and user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
+     console.log(sql)
         dbConnection.query(sql, function (err, subscriptionresult) {
+            console.log('subscriptionresult',subscriptionresult)
+        if(subscriptionresult){
         if(category_id == 1){
             
                     var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
@@ -174,8 +177,21 @@ export const get_user_home_data = async(req,res)=>{
                         res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
                     })
                
+        }else{
+                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+                    dbConnection.query(usrLoads, function (err, usrLoadsresult) {
+                        let initi = {
+                            "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"pending_loads":usrLoadsresult[0].total_loads
+                        }
+                        res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
+                    })
         }
+    }else{
+                        res.json({'status':false,"message":"No Subscription found!"});
+
+    }
         })
+    
             
     }catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -188,5 +204,6 @@ export default {
 	customer_loads_subscription,
     get_load_price,
     get_user_subscription,
-    get_user_loads
+    get_user_loads,
+    get_user_home_data
 }
