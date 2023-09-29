@@ -279,14 +279,29 @@ export const customer_payment = async (req, res) => {
                   if (error) {
                     return res.json({ status: false, message: 'error updating payment status' });
                   }
+                  else {
+                    const update_loads_availability = `
+    UPDATE customer_loads_availabilty AS cla
+    JOIN customer_loads_subscription AS cls ON cla.user_id = cls.user_id
+    SET cla.commercial = CASE WHEN cls.category_id = 1 THEN cls.buy_loads ELSE cla.commercial END,
+        cla.residential = CASE WHEN cls.category_id = 2 THEN cls.buy_loads ELSE cla.residential END,
+        cla.yeshiba = CASE WHEN cls.category_id = 3 THEN cls.buy_loads ELSE cla.yeshiba END
+    WHERE cls.user_id = ?`;
 
-                  const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
+dbConnection.query(update_loads_availability, [user_id], async function (error, results) {
+  if (error) {
+    return res.json({ status: false, message: 'Error in update_loads_availability' });
+  }
+})
+ }
 
-                  dbConnection.query(update_available_loads, [buy_loads, userId], async function (error, results) {
-                    if (error) {
-                    return res.json({ status: false, message: 'error updating payment status' });
-                  }
-                })
+                //   const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
+
+                //   dbConnection.query(update_available_loads, [buy_loads, userId], async function (error, results) {
+                //     if (error) {
+                //     return res.json({ status: false, message: 'error updating payment status' });
+                //   }
+                // })
     
                   const currentDate = date();
                   const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
@@ -375,22 +390,37 @@ export const customer_payment = async (req, res) => {
             dbConnection.query(update_Status, async function (error,update_Status){
               if(error){
                 return res.json({ status: false, message: 'error updating payment status' });
-              }
+              } 
+
             })
 
             const updateStatus = `UPDATE customer_loads_subscription SET payment_status = '1' WHERE id = '${purchase_id}'`;
             dbConnection.query(updateStatus, async function (error, updateStatus) {
               if (error) {
                 return res.json({ status: false, message: 'error updating payment status' });
-              }
+              }else {
+                const update_loads_availability = `
+UPDATE customer_loads_availabilty AS cla
+JOIN customer_loads_subscription AS cls ON cla.user_id = cls.user_id
+SET cla.commercial = CASE WHEN cls.category_id = 1 THEN cls.buy_loads ELSE cla.commercial END,
+    cla.residential = CASE WHEN cls.category_id = 2 THEN cls.buy_loads ELSE cla.residential END,
+    cla.yeshiba = CASE WHEN cls.category_id = 3 THEN cls.buy_loads ELSE cla.yeshiba END
+WHERE cls.user_id = ?`;
 
-              const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
+dbConnection.query(update_loads_availability, [user_id], async function (error, results) {
+if (error) {
+return res.json({ status: false, message: 'Error in update_loads_availability' });
+}
+})
+}
 
-              dbConnection.query(update_available_loads, [buy_loads, userId], async function (error, results) {
-                if (error) {
-                return res.json({ status: false, message: 'error updating payment status' });
-              }
-            })
+            //   const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
+
+            //   dbConnection.query(update_available_loads, [buy_loads, userId], async function (error, results) {
+            //     if (error) {
+            //     return res.json({ status: false, message: 'error updating payment status' });
+            //   }
+            // })
 
               const currentDate = date();
               const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${

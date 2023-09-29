@@ -42,6 +42,11 @@ export const customer_booking = async(req,res)=>{
                         
                         });
 
+                        var bookingsql2 = "INSERT INTO booking_timing (booking_id) VALUES ('"+result.insertId+"')";
+                        dbConnection.query(bookingsql2, function (err, bookingresult) {
+
+                        });
+
                         var order_id = '1001'+result.insertId;
                         var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
                         dbConnection.query(sql, function (err, resultss) {
@@ -85,6 +90,11 @@ export const customer_booking = async(req,res)=>{
                             }
                             var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+result.insertId+"')";
                             dbConnection.query(bookingsql, function (err, bookingresult) {
+
+                            });
+
+                            var bookingsql2 = "INSERT INTO booking_timing (booking_id) VALUES ('"+result.insertId+"')";
+                            dbConnection.query(bookingsql2, function (err, bookingresult) {
 
                             });
 
