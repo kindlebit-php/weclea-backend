@@ -86,12 +86,19 @@ export const get_user_loads = async(req,res)=>{
             }
             // var sql = "select * from users where id = '"+userData[0].id+"'";
             dbConnection.query(usrLoads, function (error, result) {
-            if (error) throw error;
+            if (result.length > 0){
+
             const available_loads = result[0].total_loads;
              let data = {
                     "available_loads":available_loads,
                 }
+            }else{
+                let data = {
+                    "available_loads":0,
+                }
+            }
                 res.json({'status':true,"message":"Price get successfully!",'data':data});
+
             });
         }else{
             res.json({'status':false,"message":"category_id fields are required"});
