@@ -24,7 +24,9 @@ export const booking_subscription_cron = async(req,res)=>{
 
                         }
                     });
-
+                    var bookingsql = "INSERT INTO booking_timing (booking_id) VALUES ('"+elem.id+"')";
+                    dbConnection.query(bookingsql, function (err, bookingresult) {
+                    });
                     var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+elem.id+"')";
                     dbConnection.query(bookingsql, function (err, bookingresult) {
 

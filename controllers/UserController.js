@@ -13,8 +13,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 export const customer_register = async(req,res)=>{
       try { 
       	const saltRounds = 10;
-        const {name,email,password,mobile,comment,role,latitude,longitude} = req.body;
-        if(name && email && password  && mobile && comment && role){
+        const {name,email,password,mobile,comment,role,latitude,longitude,category_id} = req.body;
+        if(name && email && password  && mobile && role && category_id){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
 			const stripeCustomer = await stripe.customers.create({
 			email: email,
@@ -31,13 +31,13 @@ export const customer_register = async(req,res)=>{
 					if(mobiledata[0].mobiletotal == 0){
 					
 					bcrypt.hash(password, saltRounds, function(error, hash) {
-						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"')";
+						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude,category_id) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"','"+category_id+"')";
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;
-							var sql = "select id,name,email,mobile,comment,role,status from users where id = '"+result.insertId+"'";
+							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
 								userList[0].token = generateToken({ userId: userList[0].id, type: role });
-								res.json({'status':true,"message":"data insert successfully!",'data':userList});
+								res.json({'status':true,"message":"User registered successfully!",'data':userList[0]});
 							}); 
 							}); 
 						});
@@ -64,23 +64,29 @@ export const customer_register = async(req,res)=>{
 export const customer_address = async(req,res)=>{
      try { 
      	const userData = res.user;
-        const {pickup_address,pickup_appartment,pickup_city,pickup_state,pickup_zipcode,pickup_comment,pickup_lat,pickup_long,drop_address,drop_appartment,drop_city,drop_state,drop_zipcode,drop_comment,drop_lat,drop_long,billing_address,billing_appartment,billing_city,billing_state,billing_zipcode,billing_comment,billing_lat,billing_long} = req.body;
-        if(pickup_address && pickup_appartment && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long && drop_address && drop_appartment && drop_city && drop_state && drop_zipcode && drop_comment && drop_lat && drop_long && billing_address && billing_appartment && billing_city && billing_state && billing_zipcode && billing_comment && billing_lat && billing_long){
+        const {delievery_instruction,pickup_address,pickup_appartment,pickup_city,pickup_state,pickup_zipcode,pickup_lat,pickup_long,drop_address,drop_appartment,drop_city,drop_state,drop_zipcode,drop_lat,drop_long,billing_address,billing_appartment,billing_city,billing_state,billing_zipcode,billing_lat,billing_long} = req.body;
+        if(pickup_address && pickup_appartment && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long && drop_address && drop_appartment && drop_city && drop_state && drop_zipcode && drop_lat && drop_long && billing_address && billing_appartment && billing_city && billing_state && billing_zipcode && billing_lat && billing_long){
         
         if(pickup_address && pickup_appartment && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long){
-	        var sql = "INSERT INTO customer_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+pickup_address+"', '"+pickup_appartment+"','"+pickup_city+"','"+pickup_state+"','"+pickup_zipcode+"','"+pickup_comment+"','"+pickup_lat+"','"+pickup_long+"')";
+	        var sql = "INSERT INTO customer_address (user_id,address, appartment,city,state,zip,latitude,longitude) VALUES ('"+userData[0].id+"','"+pickup_address+"', '"+pickup_appartment+"','"+pickup_city+"','"+pickup_state+"','"+pickup_zipcode+"','"+pickup_lat+"','"+pickup_long+"')";
 	        dbConnection.query(sql, function (error, result) {
 	        if (error) throw error;
 	        });
     	}
     	if(drop_address && drop_appartment && drop_city  && drop_state && drop_zipcode && drop_lat && drop_long){
-	        var sql = "INSERT INTO customer_drop_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+drop_address+"', '"+drop_appartment+"','"+drop_city+"','"+drop_state+"','"+drop_zipcode+"','"+drop_comment+"','"+drop_lat+"','"+drop_long+"')";
+	        var sql = "INSERT INTO customer_drop_address (user_id,address, appartment,city,state,zip,latitude,longitude) VALUES ('"+userData[0].id+"','"+drop_address+"', '"+drop_appartment+"','"+drop_city+"','"+drop_state+"','"+drop_zipcode+"','"+drop_lat+"','"+drop_long+"')";
 	       await dbConnection.query(sql, function (error, result) {
 	        if (error) throw error;
 	        });
     	}
     	if(billing_address && billing_appartment && billing_city  && billing_state && billing_zipcode && billing_lat && billing_long){
-	        var sql = "INSERT INTO customer_billing_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+billing_address+"', '"+billing_appartment+"','"+billing_city+"','"+billing_state+"','"+billing_zipcode+"','"+billing_comment+"','"+billing_lat+"','"+billing_long+"')";
+	        var sql = "INSERT INTO customer_billing_address (user_id,address, appartment,city,state,zip,latitude,longitude) VALUES ('"+userData[0].id+"','"+billing_address+"', '"+billing_appartment+"','"+billing_city+"','"+billing_state+"','"+billing_zipcode+"','"+billing_lat+"','"+billing_long+"')";
+	        dbConnection.query(sql, function (error, result) {
+	        if (error) throw error;
+	        });
+    	}
+    	if(delievery_instruction != ''){
+    		var sql = "INSERT INTO delievery_insterctions (user_id,longitude) VALUES ('"+userData[0].id+"','"+pickup_address+"')";
 	        dbConnection.query(sql, function (error, result) {
 	        if (error) throw error;
 	        });
@@ -88,44 +94,6 @@ export const customer_address = async(req,res)=>{
 	            res.json({'status':true,"message":"Address added successfully!"});
 
     }else{
-            res.json({'status':false,"message":"All fields are required"});
-    	}
-    }catch (error) {
-        res.json({'status':false,"message":error.message});  
-    }
-}
-
-//customer drop-off address API
-export const customer_drop_address = async(req,res)=>{
-       try { 
-     	const userData = res.user;
-        const {address,appartment,city,state,zipcode,comment,lat,long} = req.body;
-        if(address && appartment && city  && state && zipcode && lat && long){
-	        var sql = "INSERT INTO customer_drop_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+address+"', '"+appartment+"','"+city+"','"+state+"','"+zipcode+"','"+comment+"',"+lat+"','"+long+"')";
-	        dbConnection.query(sql, function (error, result) {
-	        if (error) throw error;
-	            res.json({'status':true,"message":"Address added successfully!"});
-	        });
-    	}else{
-            res.json({'status':false,"message":"All fields are required"});
-    	}
-    }catch (error) {
-        res.json({'status':false,"message":error.message});  
-    }
-}
-
-//customer billing address API
-export const customer_billing_address = async(req,res)=>{
-        try { 
-     	const userData = res.user;
-        const {address,appartment,city,state,zipcode,comment,lat,long} = req.body;
-        if(address && appartment && city  && state && zipcode && lat && long){
-	        var sql = "INSERT INTO customer_billing_address (user_id,address, appartment,city,state,zip,comment,latitude,longitude) VALUES ('"+userData[0].id+"','"+address+"', '"+appartment+"','"+city+"','"+state+"','"+zipcode+"','"+comment+"',"+lat+"','"+long+"')";
-	        dbConnection.query(sql, function (error, result) {
-	        if (error) throw error;
-	            res.json({'status':true,"message":"Address added successfully!"});
-	        });
-    	}else{
             res.json({'status':false,"message":"All fields are required"});
     	}
     }catch (error) {
@@ -146,10 +114,10 @@ export const customer_login = async(req,res)=>{
 						if(result == true){
 							data.forEach(element =>
 							{
-								const {id,name,email,mobile,comment,role,status} = element;
+								const {id,name,email,mobile,comment,role,status,category_id} = element;
 								
 								const initi = {
-									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'token': generateToken({ userId: id, type: type }),
+									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,'token': generateToken({ userId: id, type: type }),
 								}
 								res.json({'status':true,"message":"Logged in successfully!",'data': initi});
 							});
@@ -307,7 +275,7 @@ export const get_user_profile = async(req,res)=>{
 				// var resData = [];
 				result.forEach(element =>
 				{
-					const {id,name,email,mobile} = element;
+					const {id,name,dob,email,mobile,category_id} = element;
 					if(result[0].profile_image){
 						var img = process.env.BASE_URL+'/uploads/'+result[0].profile_image;
 					}else{
@@ -315,7 +283,7 @@ export const get_user_profile = async(req,res)=>{
 
 					}
 					let initi = {
-					"id":id,"name":name,"email":email,"mobile":mobile,'profile_img':img
+					"id":id,"name":name,"dob":dob,'category_id':category_id,"email":email,"mobile":mobile,'profile_img':img
 					}
 					// resData.push(initi);
 				res.json({'status':true,"message":"Profile get successfully!",'data':initi});
@@ -327,44 +295,67 @@ export const get_user_profile = async(req,res)=>{
     }
 }
 
+export const update_password = async(req,res)=>{
+
+	    try { 
+        	const userData = res.user;
+      		const saltRounds = 10;
+          	const { oldpassword, newpassword } = req.body;
+        if(oldpassword, newpassword){
+        	bcrypt.compare(oldpassword, userData[0].password, function(error, result) {
+				if(result == true){
+					bcrypt.hash(newpassword, saltRounds, function(error, hash) {
+						var sql = "update users set password = '"+hash+"' where id = '"+userData[0].id+"'";
+						dbConnection.query(sql, function (error, result) {
+							if (error) throw error;
+							res.json({'status':true,"message":"data updated successfully!"});
+						}); 
+					});	
+				}else{
+					res.json({'status':true,"message":"Incorrect current password!"});
+
+				}
+        	})
+						
+			
+		}else{
+            res.json({'status':false,"message":"All field is required"});
+		}
+      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
+}
+
 //get user profile API
 export const edit_user_profile = async(req,res)=>{
      try { 
         const userData = res.user;
-        const saltRounds = 10;
-        const {name,email,password,mobile} = req.body;
-        if(name && email && password  && mobile){
-
-       	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
-			dbConnection.query(checkIfEmailExist, function (error, data) {
-				if(data[0].total > 0 ){
-					res.json({'status':false,"message":'Email is already registered'});  
+        const {name,dob,category_id} = req.body;
+        if(name  && dob, category_id){
+			
+			// const checkIfMobileExist = "select count(id) as total from users where id = '"+userData[0].id+"' and mobile = '"+mobile+"'";
+			// dbConnection.query(checkIfMobileExist, function (error, data) {
+			// if(data[0].total == 1 ){
+				if(req.file){
+					var userProfile = req.file.originalname;
 				}else{
-					const checkIfMobileExist = "select count(id) as total from users where mobile = '"+mobile+"'";
-					dbConnection.query(checkIfMobileExist, function (error, data) {
-					if(data[0].total == 0 ){
-					// profileUpload.single('profile_image')
-					if(req.file){
-					
-						var userProfile = req.file.originalname;
-					}else{
-						var userProfile = userData[0].profile_image;
-					}
-					bcrypt.hash(password, saltRounds, function(error, hash) {
-						var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"' ,email = '"+email+"',password = '"+hash+"', mobile = '"+mobile+"' where id = '"+userData[0].id+"'";
-						dbConnection.query(sql, function (error, result) {
-							if (error) throw error;
-								res.json({'status':true,"message":"data updated successfully!"});
-							}); 
-						});
-					}else{
-						res.json({'status':false,"message":'Mobile Number is already registered'});  
-
-					}
-					});
-				
+				var userProfile = userData[0].profile_image;
 				}
-			})
+				var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"', dob ='"+dob+"',category_id = '"+category_id+"' where id = '"+userData[0].id+"'";
+				dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+					res.json({'status':true,"message":"data updated successfully!"});
+				}); 
+			// }else{
+			// 	res.json({'status':false,"message":'Mobile Number is already registered'});  
+
+			// }
+			// });
+				
+				
+		
 		}else{
             res.json({'status':false,"message":"All fields are required"});
 		}
@@ -377,11 +368,10 @@ export default {
 	customer_register,
 	customer_address,
 	customer_login,
-	customer_billing_address,
-	customer_drop_address,
 	forgot_password,
 	verify_otp,
 	change_password,
 	edit_user_profile,
+	update_password,
 	get_user_profile
 }

@@ -6,7 +6,7 @@ import { getDates,randomNumber } from "../helpers/date.js";
 export const customer_booking = async(req,res)=>{
      try { 
      	const userData = res.user;
-        const {	delievery_day,date,total_loads,order_type,frequency} = req.body;
+        const {	delievery_day,date,total_loads,order_type,frequency,category_id} = req.body;
         if(	delievery_day && date && total_loads && order_type){
         if(order_type == '1'){
             var sql = "select available_loads from users where id = '"+userData[0].id+"'";
@@ -29,7 +29,7 @@ export const customer_booking = async(req,res)=>{
                     //     // res.json({'status':true,"message":"Booking added successfully!"});
                     // }); 
                     // return false;
-                    var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52)";
+                    var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52,'"+category_id+"')";
                     dbConnection.query(sql, function (err, result) {
                         for (var i = 0; total_loads > i; i++) {
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
@@ -42,7 +42,11 @@ export const customer_booking = async(req,res)=>{
                         
                         });
 
-                        
+                        var bookingsql = "INSERT INTO booking_timing (booking_id) VALUES ('"+result.insertId+"')";
+                        dbConnection.query(bookingsql, function (err, bookingresult) {
+
+                        });
+
                         var order_id = '1001'+result.insertId;
                         var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
                         dbConnection.query(sql, function (err, resultss) {
@@ -77,39 +81,38 @@ export const customer_booking = async(req,res)=>{
                         const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
 
                         if(frequencyDBDate == currentBookingDate ){
-                            var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52,1)";
+                            var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52,1,'"+category_id+"')";
                             dbConnection.query(sql, function (err, result) {
-                            for (var i = 0; total_loads > i; i++) {
-                            var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
-                            dbConnection.query(sql, function (err, results) {
-                            });     
-                            }
-                            var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+result.insertId+"')";
-                            dbConnection.query(bookingsql, function (err, bookingresult) {
+                                for (var i = 0; total_loads > i; i++) {
+                                    var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
+                                    dbConnection.query(sql, function (err, results) {
+                                    });     
+                                }
+                                var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+result.insertId+"')";
+                                dbConnection.query(bookingsql, function (err, bookingresult) {
 
-                            });
+                                });
+                                var bookingsql = "INSERT INTO booking_timing (booking_id) VALUES ('"+result.insertId+"')";
+                                dbConnection.query(bookingsql, function (err, bookingresult) {
 
-                          
+                                });
 
-                            var order_id = '1001'+result.insertId;
-                            var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
-                            dbConnection.query(sql, function (err, resultss) {
-                            // res.json({'status':true,"message":"Booking added successfully!"});
-
-                            });
+                                var order_id = '1001'+result.insertId;
+                                var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
+                                dbConnection.query(sql, function (err, resultss) {
+                                });
                             }); 
                         }else{
-                            var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,frequency) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+frequency+"')";
+                            var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,frequency,category_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+frequency+"','"+category_id+"')";
                             dbConnection.query(sql, function (err, resultsub) {
-                            var order_id = '1001'+resultsub.insertId;
-                            var sql = "update bookings set order_id = '"+order_id+"'where id = '"+resultsub.insertId+"'";
-                            dbConnection.query(sql, function (err, resultss) {
-                            });
+                                var order_id = '1001'+resultsub.insertId;
+                                var sql = "update bookings set order_id = '"+order_id+"'where id = '"+resultsub.insertId+"'";
+                                dbConnection.query(sql, function (err, resultss) {
+                                });
                             });
                         }
                     }) 
                         res.json({'status':true,"message":"Booking added successfully!"});
-
                 }
             });
         }
@@ -119,6 +122,30 @@ export const customer_booking = async(req,res)=>{
     }catch (error) {
         res.json({'status':false,"message":error});  
     }
+}
+
+export const subscription_dates = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            const saltRounds = 10;
+            const { password } = req.body;
+        if(password){
+            bcrypt.hash(password, saltRounds, function(error, hash) {
+                var sql = "update users set password = '"+hash+"' where id = '"+userData[0].id+"'";
+                dbConnection.query(sql, function (error, result) {
+                if (error) throw error;
+                    res.json({'status':true,"message":"data updated successfully!"});
+                }); 
+            }); 
+        }else{
+            res.json({'status':false,"message":"Password field is required"});
+        }
+      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
 }
 
 export default {

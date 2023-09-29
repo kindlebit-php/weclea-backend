@@ -4,7 +4,8 @@ import dbConnection from'../config/db.js';
 export const get_loads = async(req,res)=>{
       try { 
             const userData = res.user;
-        	const loads = "select id,type,loads,price,status from admin_load_subscription";
+            const {category_id} = req.body;
+        	const loads = "select id,type,loads,price from admin_packages where category_id = '"+category_id+"'";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"data get successfully!",'data':data, 'card_status':userData[0].card_status});
@@ -20,12 +21,20 @@ export const customer_loads_subscription = async(req,res)=>{
      	const userData = res.user;
         const {	type,buy_loads,amount} = req.body;
         if(	type && buy_loads && amount){
-	        var sql = "INSERT INTO customer_loads_subscription (user_id,type,buy_loads,amount) VALUES ('"+userData[0].id+"','"+type+"', '"+buy_loads+"','"+amount+"')";
+	        var sql = "INSERT INTO customer_loads_subscription (user_id,category_id,type,buy_loads,amount) VALUES ('"+userData[0].id+"','"+userData[0].category_id+"','"+type+"', '"+buy_loads+"','"+amount+"')";
 	        dbConnection.query(sql, function (error, result) {
-	        if (error) throw error;
-           console.log(result)
+	        // if (error) throw error;
+
+            const checkifloadexist = "select count(id) as total from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            dbConnection.query(checkifloadexist, function (error, loaddata) {
+            if(loaddata[0].total == 0){
+                var sql = "INSERT INTO customer_loads_availabilty (user_id) VALUES ('"+userData[0].id+"')";
+                    dbConnection.query(sql, function (error, result) {
+                })
+            }
+            })
+
             const loads = "select * from customer_loads_subscription where id = '"+result.insertId+"'";
-            console.log('loads',loads)
             dbConnection.query(loads, function (error, data) {
             if (error) throw error;
                 res.json({'status':true,"message":"Loads added successfully!",'data':data[0]});
@@ -85,13 +94,31 @@ export const get_user_loads = async(req,res)=>{
 export const get_user_subscription = async(req,res)=>{
      try { 
         const userData = res.user;
-            var sql = "SELECT customer_loads_subscription.id,customer_loads_subscription.type, customer_loads_subscription.payment_status, customer_loads_subscription.user_id, customer_loads_subscription.buy_loads,customer_loads_subscription.amount, users.available_loads,users.id FROM customer_loads_subscription LEFT JOIN users ON customer_loads_subscription.user_id = users.id where customer_loads_subscription.type = 'package' and customer_loads_subscription.payment_status = '1' and customer_loads_subscription.user_id = '"+userData[0].id+"' ORDER BY customer_loads_subscription.id desc limit 1;";
-            console.log('sql',sql)
+            // var sql = "SELECT customer_loads_subscription.id,customer_loads_subscription.type, customer_loads_subscription.payment_status, customer_loads_subscription.user_id, customer_loads_subscription.buy_loads,customer_loads_subscription.amount, users.available_loads,users.id FROM customer_loads_subscription LEFT JOIN users ON customer_loads_subscription.user_id = users.id where customer_loads_subscription.type = 'package' and customer_loads_subscription.payment_status = '1' and customer_loads_subscription.category_id = '"+userData[0].category_id+"' and customer_loads_subscription.user_id = '"+userData[0].id+"' ORDER BY customer_loads_subscription.id desc limit 1;";
+            var sql = "select * from customer_loads_subscription where user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
+            // console.log('sql',sql)
             dbConnection.query(sql, function (err, subscriptionresult) {
+            if(userData[0].category_id == 1){
+                var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }else if(userData[0].category_id == 2){
+                var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }else{
+                var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }
+             dbConnection.query(usrLoads, function (err, usrLoadsresult) {
+
+            var usrLoadsspe = "select * from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            dbConnection.query(usrLoadsspe, function (err, usrLoadssperesult) {
+
                 let initi = {
-                "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"price":subscriptionresult[0].amount,"pending_loads":subscriptionresult[0].available_loads,
+                "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"price":subscriptionresult[0].amount,"pending_loads":usrLoadsresult[0].total_loads,'commercial':usrLoadssperesult[0].commercial,'residential':usrLoadssperesult[0].residential,'yeshiba':usrLoadssperesult[0].yeshiba,
                 }
                     res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
+
+            })
+
+             })
+
             });
         
     }catch (error) {

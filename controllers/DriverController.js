@@ -1,4 +1,3 @@
-//utf8mb4_unicode_ci
 import dbConnection from "../config/db.js";
 import { date, time } from "../helpers/date.js";
 
