@@ -30,7 +30,7 @@ router.post('/edit-user-profile',CheckAuth,profileUpload.single('profile_image')
 
 router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
-router.get('/get-user-loads',CheckAuth ,loadController.get_user_loads);
+router.post('/get-user-loads',CheckAuth ,loadController.get_user_loads);
 router.get('/get-user-subscription',CheckAuth ,loadController.get_user_subscription);
 router.post('/customer-loads-subscription',CheckAuth ,loadController.customer_loads_subscription);
 router.post('/customer-booking',CheckAuth ,bookingController.customer_booking);
