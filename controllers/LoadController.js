@@ -23,10 +23,12 @@ export const customer_loads_subscription = async(req,res)=>{
         if(	type && buy_loads && amount){
 	        var sql = "INSERT INTO customer_loads_subscription (user_id,category_id,type,buy_loads,amount) VALUES ('"+userData[0].id+"','"+userData[0].category_id+"','"+type+"', '"+buy_loads+"','"+amount+"')";
 	        dbConnection.query(sql, function (error, result) {
-	        if (error) throw error;
+	        // if (error) throw error;
 
             const checkifloadexist = "select count(id) as total from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            console.log('checkifloadexist',checkifloadexist)
             dbConnection.query(checkifloadexist, function (error, loaddata) {
+                console.log('loaddata',loaddata)
             if(loaddata[0].total == 0){
                 var sql = "INSERT INTO customer_loads_availabilty (user_id) VALUES ('"+userData[0].id+"')";
                     dbConnection.query(sql, function (error, result) {
