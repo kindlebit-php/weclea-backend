@@ -295,6 +295,30 @@ export const get_user_profile = async(req,res)=>{
     }
 }
 
+export const update_password = async(req,res)=>{
+
+	    try { 
+        	const userData = res.user;
+      		const saltRounds = 10;
+          	const { password } = req.body;
+        if(password){
+			bcrypt.hash(password, saltRounds, function(error, hash) {
+				var sql = "update users set password = '"+hash+"' where id = '"+userData[0].id+"'";
+				dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+					res.json({'status':true,"message":"data updated successfully!"});
+				}); 
+			});	
+		}else{
+            res.json({'status':false,"message":"Password field is required"});
+		}
+      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
+}
+
 //get user profile API
 export const edit_user_profile = async(req,res)=>{
      try { 
@@ -339,5 +363,6 @@ export default {
 	verify_otp,
 	change_password,
 	edit_user_profile,
+	update_password,
 	get_user_profile
 }
