@@ -79,7 +79,7 @@ export const get_user_loads = async(req,res)=>{
         if(category_id){
           if(category_id == 1){
                 var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
-            }else if(userData[0].category_id == 2){
+            }else if(category_id == 2){
                 var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }else{
                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
@@ -136,6 +136,41 @@ export const get_user_subscription = async(req,res)=>{
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
+}
+
+//get total load API
+export const get_user_home_data = async(req,res)=>{
+     try { 
+        const userData = res.user;
+        const { category_id } = req.body;
+        var sql = "select * from customer_loads_subscription where category_id = '"+category_id+"' user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
+        dbConnection.query(sql, function (err, subscriptionresult) {
+        if(category_id == 1){
+            
+                    var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+                    dbConnection.query(usrLoads, function (err, usrLoadsresult) {
+                        let initi = {
+                            "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"pending_loads":usrLoadsresult[0].total_loads
+                        }
+                        res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
+                    })
+                
+        }else if(category_id == 2){
+                    var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+                    dbConnection.query(usrLoads, function (err, usrLoadsresult) {
+                        let initi = {
+                            "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"pending_loads":usrLoadsresult[0].total_loads
+                        }
+                        res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
+                    })
+               
+        }
+        })
+            
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+        
 }
 
 export default {
