@@ -300,17 +300,26 @@ export const update_password = async(req,res)=>{
 	    try { 
         	const userData = res.user;
       		const saltRounds = 10;
-          	const { password } = req.body;
-        if(password){
-			bcrypt.hash(password, saltRounds, function(error, hash) {
-				var sql = "update users set password = '"+hash+"' where id = '"+userData[0].id+"'";
-				dbConnection.query(sql, function (error, result) {
-				if (error) throw error;
-					res.json({'status':true,"message":"data updated successfully!"});
-				}); 
-			});	
+          	const { oldpassword, newpassword } = req.body;
+        if(oldpassword, newpassword){
+        	bcrypt.compare(oldpassword, userData[0].password, function(error, result) {
+				if(result == true){
+					bcrypt.hash(newpassword, saltRounds, function(error, hash) {
+						var sql = "update users set password = '"+hash+"' where id = '"+userData[0].id+"'";
+						dbConnection.query(sql, function (error, result) {
+							if (error) throw error;
+							res.json({'status':true,"message":"data updated successfully!"});
+						}); 
+					});	
+				}else{
+					res.json({'status':true,"message":"Incorrect current password!"});
+
+				}
+        	})
+						
+			
 		}else{
-            res.json({'status':false,"message":"Password field is required"});
+            res.json({'status':false,"message":"All field is required"});
 		}
       
     }catch (error) {
