@@ -9,6 +9,7 @@ import paymentController from "../controllers/PaymentController.js";
 import cronController from "../controllers/CronController.js";
 import multer from 'multer';
 import { upload } from "../utils/multer.js";
+import DrycleanController from "../controllers/DrycleanController.js";
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb)
@@ -48,7 +49,7 @@ router.post("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detai
 router.post("/submit_pickup_details",CheckAuth,upload.array("images", 5),driverController.submit_pickup_details);
 router.post("/laundry-NotFound",CheckAuth,upload.array("images", 5),driverController.laundry_NotFound);
 router.get("/order-histroy",CheckAuth,driverController.order_histroy);
-router.get("/order-histroy-byOrderId",CheckAuth,driverController.order_histroy_byOrderId);
+router.post("/order-histroy-byOrderId",CheckAuth,driverController.order_histroy_byOrderId);
 router.get("/profile",CheckAuth,driverController.profile)
 router.get("/get-drop-orders",CheckAuth,driverController.get_drop_orders)
 router.post("/get-drop-order-detail",CheckAuth,driverController.get_drop_order_detail);
@@ -63,4 +64,5 @@ router.post("/Payment-Card-Id",CheckAuth,paymentController.Payment_Card_Id);
 router.post("/customer-payment",CheckAuth,paymentController.customer_payment);
 router.post("/Add-Bank-Account",CheckAuth,paymentController.Add_Bank_Account);
 router.post("/ACH-Payment",CheckAuth,paymentController.ACH_Payment);
+router.get("/get-category",DrycleanController.get_category)
 export default router;

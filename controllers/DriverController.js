@@ -61,6 +61,7 @@ export const get_order_detail = async (req, res) => {
   }
 };
 
+
 export const pickup_loads = async (req, res) => {
   try {
     const userData = res.user;
@@ -254,7 +255,7 @@ export const laundry_NotFound = async (req, res) => {
                 if (updateImagesErr) {
                   return res.json({ status: false, message: updateImagesErr.message });
                 } else {
-                  const update_orderStatus = "UPDATE booking SET order_status = '7' WHERE booking_id = ?";
+                  const update_orderStatus = "UPDATE bookings SET order_status = '7' WHERE id = ?";
                   dbConnection.query(update_orderStatus, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
                     if (updateOrderStatusErr) {
                       return res.json({ status: false, message: updateOrderStatusErr.message });
@@ -273,6 +274,7 @@ export const laundry_NotFound = async (req, res) => {
       });
     });
   } catch (error) {
+    console.log( error.message)
     return res.json({ status: false, message: error.message });
   }
 };
@@ -304,7 +306,6 @@ export const get_drop_order_detail = async (req, res) => {
     const orderId = req.body.id;
     const userData = res.user;
     const driverId = userData[0].id;
-
     const userIdQuery = `
             SELECT user_id FROM bookings AS b1
             JOIN users AS u ON u.id = b1.driver_id
@@ -321,7 +322,6 @@ export const get_drop_order_detail = async (req, res) => {
                 JOIN customer_address AS ca ON b.user_id = ca.user_id
                 JOIN users AS u ON b.user_id = u.id
                 WHERE b.order_id = ? AND b.user_id IN (?)`;
-
       dbConnection.query(query, [orderId, userIds], (error, data) => {
         if (error) {
           return res.json({ status: false, message: error.message });
@@ -338,31 +338,38 @@ export const get_drop_order_detail = async (req, res) => {
   }
 };
 
-
-
 export const drop_loads = async (req, res) => {
   try {
     const userData = res.user;
     const driverId = userData[0].id;
     const qr_code = req.body.qr_code;
-
     const bookingDataQuery = "SELECT * FROM booking_qr WHERE qr_code = ?";
+
     dbConnection.query(bookingDataQuery, [qr_code], function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
 
       if (data.length > 0 && data[0].driver_drop_status === 0) {
-        const updateStatus = `UPDATE booking_qr SET driver_drop_status = '1' WHERE id = ${data[0].id}`;
+        const updateStatusQuery = "UPDATE booking_qr SET driver_drop_status = '1' WHERE id = ?";
+        const booking_id = data[0].booking_id;
 
-        dbConnection.query(updateStatus, function (updateerror, updateResult) {
+        dbConnection.query(updateStatusQuery, [data[0].id], function (updateerror, updateResult) {
           if (updateerror) {
             return res.json({ status: false, message: updateerror.message });
           }
-          res.json({
-            status: true,
-            message: "Data retrieved and updated successfully!",
-            booking_id: data[0].booking_id,
+
+          const updateOrderStatusQuery = "UPDATE bookings SET order_status = '5' WHERE id = ?";
+          dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateError, updateResult) {
+            if (updateError) {
+              return res.json({ status: false, message: updateError.message });
+            }
+
+            res.json({
+              status: true,
+              message: "Data retrieved and updated successfully!",
+              booking_id: booking_id,
+            });
           });
         });
       } else {
@@ -373,6 +380,7 @@ export const drop_loads = async (req, res) => {
     res.json({ status: false, message: error.message });
   }
 };
+
 
 
 
@@ -416,61 +424,76 @@ export const submit_drop_details = async (req, res) => {
     const userData = res.user;
     const driverId = userData[0].id;
 
-    const userId = `SELECT user_id FROM bookings WHERE id = ?`;
+    const userIdQuery = `SELECT user_id, order_status FROM bookings WHERE id = ?`;
 
-    dbConnection.query(userId, [booking_id], function (error, data) {
-      console.log(data);
+    dbConnection.query(userIdQuery, [booking_id], function (error, data) {
       if (error) {
-        res.json({ status: false, message: error.message });
+        return res.json({ status: false, message: error.message });
+      } else if (data.length === 0) {
+        return res.json({ status: false, message: "Booking not found" });
       } else {
         const userId = data[0].user_id;
+        const order_status = data[0].order_status;
+
+        // Check if order_status is not equal to 5
+        if (order_status !== 5) {
+          return res.json({ status: false, message: "Invalid order status" });
+        }
+
         const query = `
-            SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
-            FROM bookings AS b
-            JOIN customer_address AS ca ON b.user_id = ca.user_id
-            JOIN users AS u ON b.user_id = u.id
-            WHERE  b.user_id = ? AND b.id = ? `;
+          SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
+          FROM bookings AS b
+          JOIN customer_address AS ca ON b.user_id = ca.user_id
+          JOIN users AS u ON b.user_id = u.id
+          WHERE b.user_id = ? AND b.id = ? `;
 
         dbConnection.query(query, [userId, booking_id], (error, data) => {
           if (error) {
             return res.json({ status: false, message: error.message });
           }
+
           const currentTime = time();
           const currentDate = date();
-          const update_Date_Time = `UPDATE booking_timing SET deliever_time = '${currentTime}' , deliever_date = '${currentDate}' WHERE booking_id
-            = ${booking_id}`;
+          const update_Date_Time = `UPDATE booking_timing SET deliever_time = '${currentTime}' , deliever_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
 
-          dbConnection.query(
-            update_Date_Time,
-            function (updateTimeErr, updateTimeResult) {
-              if (updateTimeErr) {
-                return res.json({status: false, message: updateTimeErr.message});
-              } else {
-                const imageArray = [];
-                req.files.forEach((e, i) => {
-                  imageArray.push(e.path);
-                });
-                if (req.files.length > 5) {
-                  return res.json({status: false, message: "only 5 images are allowed"});
-                }
-                const dropImagesJSON = JSON.stringify(imageArray);
-
-                const update_dropimages =
-                  "UPDATE booking_images SET drop_images = ? WHERE booking_id = ?";
-                dbConnection.query(update_dropimages, [dropImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
-                    if (updateImagesErr) {
-                      return res.json({ status: false,  message: updateImagesErr.message});
-                    } else {
-                      const responseData = { status: true, message: "Submitted successfully!",
-                        data: { data, deliever_time : currentTime, deliever_date : currentDate, drop_images: imageArray},
-                      };
-                      return res.json(responseData);
-                    }
-                  }
-                );
+          dbConnection.query(update_Date_Time, function (updateTimeErr, updateTimeResult) {
+            if (updateTimeErr) {
+              return res.json({ status: false, message: updateTimeErr.message });
+            } else {
+              const imageArray = [];
+              req.files.forEach((e, i) => {
+                imageArray.push(e.path);
+              });
+              if (req.files.length > 5) {
+                return res.json({ status: false, message: "Only 5 images are allowed" });
               }
+              const dropImagesJSON = JSON.stringify(imageArray);
+
+              const update_dropimages = "UPDATE booking_images SET drop_image = ? WHERE booking_id = ?";
+              dbConnection.query(update_dropimages, [dropImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
+                if (updateImagesErr) {
+                  return res.json({ status: false, message: updateImagesErr.message });
+                } else {
+                  if (updateImagesResult) {
+                    const updateStatus = `UPDATE bookings SET order_status = '6' WHERE id = ${booking_id}`;
+
+                    dbConnection.query(updateStatus, function (updateerror, updateResult) {
+                      if (updateerror) {
+                        return res.json({ status: false, message: updateerror.message });
+                      } else {
+                        const responseData = {
+                          status: true,
+                          message: "Submitted successfully!",
+                          data: { data, deliever_time: currentTime, deliever_date: currentDate, drop_images: imageArray },
+                        };
+                        return res.json(responseData);
+                      }
+                    });
+                  }
+                }
+              });
             }
-          );
+          });
         });
       }
     });
@@ -478,6 +501,7 @@ export const submit_drop_details = async (req, res) => {
     res.json({ status: false, message: error.message });
   }
 };
+
 
 export const order_histroy=async(req,res)=>{
   try {
@@ -524,7 +548,7 @@ export const order_histroy_byOrderId=async(req,res)=>{
   try {
     const userData = res.user;
     const driverId = userData[0].id;
-    const orderId = req.query.orderId;
+    const orderId = req.body.orderId;
 
     const userIdQuery = `
             SELECT user_id FROM bookings AS b1
