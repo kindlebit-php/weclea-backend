@@ -308,11 +308,11 @@ export const update_password = async(req,res)=>{
 						var sql = "update users set password = '"+hash+"' where id = '"+userData[0].id+"'";
 						dbConnection.query(sql, function (error, result) {
 							if (error) throw error;
-							res.json({'status':true,"message":"data updated successfully!"});
+							res.json({'status':true,"message":"Your password has been updated successfully"});
 						}); 
 					});	
 				}else{
-					res.json({'status':true,"message":"Incorrect current password!"});
+					res.json({'status':false,"message":"Incorrect current password!"});
 
 				}
         	})
@@ -346,7 +346,7 @@ export const edit_user_profile = async(req,res)=>{
 				var sql = "update users set name = '"+name+"', profile_image ='"+userProfile+"', dob ='"+dob+"',category_id = '"+category_id+"' where id = '"+userData[0].id+"'";
 				dbConnection.query(sql, function (error, result) {
 				if (error) throw error;
-					res.json({'status':true,"message":"data updated successfully!"});
+					res.json({'status':true,"message":"our profile has been updated!"});
 				}); 
 			// }else{
 			// 	res.json({'status':false,"message":'Mobile Number is already registered'});  
