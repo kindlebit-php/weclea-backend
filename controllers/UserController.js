@@ -312,7 +312,7 @@ export const update_password = async(req,res)=>{
 						}); 
 					});	
 				}else{
-					res.json({'status':true,"message":"Incorrect current password!"});
+					res.json({'status':false,"message":"Incorrect current password!"});
 
 				}
         	})
