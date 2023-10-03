@@ -308,7 +308,7 @@ export const update_password = async(req,res)=>{
 						var sql = "update users set password = '"+hash+"' where id = '"+userData[0].id+"'";
 						dbConnection.query(sql, function (error, result) {
 							if (error) throw error;
-							res.json({'status':true,"message":"data updated successfully!"});
+							res.json({'status':true,"message":"Your password has been updated successfully"});
 						}); 
 					});	
 				}else{

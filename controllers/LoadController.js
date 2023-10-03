@@ -128,7 +128,7 @@ export const get_user_subscription = async(req,res)=>{
             }else{
                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }
-             dbConnection.query(usrLoads, function (err, usrLoadsresult) {
+            dbConnection.query(usrLoads, function (err, usrLoadsresult) {
 
             var usrLoadsspe = "select * from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             dbConnection.query(usrLoadsspe, function (err, usrLoadssperesult) {
