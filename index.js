@@ -18,7 +18,7 @@ app.use(cors());
 // inside public directory.
 app.use(express.static('public')); 
 app.use("/uploads", express.static("uploads"));
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.use('/api', apiRouter);   
 
 const server = http.createServer(app);
