@@ -6,6 +6,7 @@ import { date, time } from "../helpers/date.js";
 export const get_orders = async (req, res) => {
   try {
     const userData = res.user;
+    console.log(userData)
     const order = `SELECT id,order_id, date, time FROM bookings WHERE driver_id = ${userData[0].id}`;
     dbConnection.query(order, function (error, data) {
       if (error) throw error;
@@ -23,7 +24,7 @@ export const get_orders = async (req, res) => {
 // Driver order detail
 export const get_order_detail = async (req, res) => {
   try {
-    const orderId = req.query.id;
+    const orderId = req.body.id;
     const userData = res.user;
     const driverId = userData[0].id;
 
@@ -300,7 +301,7 @@ export const get_drop_orders = async (req, res) => {
 // Driver order detail
 export const get_drop_order_detail = async (req, res) => {
   try {
-    const orderId = req.query.id;
+    const orderId = req.body.id;
     const userData = res.user;
     const driverId = userData[0].id;
 
