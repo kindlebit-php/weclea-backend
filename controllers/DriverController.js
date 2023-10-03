@@ -97,7 +97,7 @@ export const pickup_loads = async (req, res) => {
 
 export const pickup_loads_detail = async (req, res) => {
   try {
-    const booking_id = req.query.booking_id;
+    const booking_id = req.body.booking_id;
     const userData = res.user;
     const driverId = userData[0].id;
     const userId = `SELECT user_id FROM bookings WHERE id = ?`;
@@ -378,7 +378,7 @@ export const drop_loads = async (req, res) => {
 
 export const drop_loads_detail = async (req, res) => {
   try {
-    const booking_id = req.query.booking_id;
+    const booking_id = req.body.booking_id;
     const userData = res.user;
     const driverId = userData[0].id;
     const userId = `SELECT user_id FROM bookings WHERE id = ?`;

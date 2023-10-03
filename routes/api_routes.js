@@ -44,7 +44,7 @@ router.post('/change-password',userController.change_password);
 router.get('/get-orders',CheckAuth,driverController.get_orders);
 router.post("/get-order-detail",CheckAuth,driverController.get_order_detail);
 router.post("/pickup-loads",CheckAuth,driverController.pickup_loads)
-router.get("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
+router.post("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
 router.post("/submit_pickup_details",CheckAuth,upload.array("images", 5),driverController.submit_pickup_details);
 router.post("/laundry-NotFound",CheckAuth,upload.array("images", 5),driverController.laundry_NotFound);
 router.get("/order-histroy",CheckAuth,driverController.order_histroy);
@@ -53,7 +53,7 @@ router.get("/profile",CheckAuth,driverController.profile)
 router.get("/get-drop-orders",CheckAuth,driverController.get_drop_orders)
 router.post("/get-drop-order-detail",CheckAuth,driverController.get_drop_order_detail);
 router.post("/drop-loads",CheckAuth,driverController.drop_loads)
-router.get("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
+router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
 router.post("/submit_drop_details",CheckAuth,upload.array("images", 5),driverController.submit_drop_details);
 /////////////////////////////////////////////////////////////////////////////
 router.get("/booking-subscription-cron",cronController.booking_subscription_cron);
