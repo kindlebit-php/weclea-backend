@@ -160,14 +160,22 @@ export const Payment_Card_Id = async (req, res) => {
               if (error) {
                 return res.json({ status: false, message: 'error updating payment status' });
               }
-              
-              const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
+              else {
+                const update_loads_availability = `
+                UPDATE customer_loads_availabilty AS cla
+                JOIN customer_loads_subscription AS cls ON cla.user_id = cls.user_id
+                SET cla.commercial = CASE WHEN cls.category_id = 1 THEN cla.commercial + cls.buy_loads ELSE cla.commercial END,
+                    cla.residential = CASE WHEN cls.category_id = 2 THEN cla.residential + cls.buy_loads ELSE cla.residential END,
+                    cla.yeshiba = CASE WHEN cls.category_id = 3 THEN cla.yeshiba + cls.buy_loads ELSE cla.yeshiba END
+                WHERE cls.id = ? AND cls.user_id = ?`;
 
-              dbConnection.query(update_available_loads, [buy_loads, userId], async function (error, results) {
-                if (error) {
-                return res.json({ status: false, message: 'error updating payment status' });
-              }
-            })
+dbConnection.query(update_loads_availability, [purchase_id,user_id], async function (error, results) {
+if (error) {
+return res.json({ status: false, message: 'Error in update_loads_availability' });
+}
+})
+}
+
 
               const currentDate = date(); 
               const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
