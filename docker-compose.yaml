@@ -1,7 +1,7 @@
 version: "3"
 services:
   app:
-    image: "kindlebit143/weclea_backend:v0.0"
+    image: "kindlebit143/weclea_backend:v0.1"
     ports:
       - "3000:3000"
     depends_on:
