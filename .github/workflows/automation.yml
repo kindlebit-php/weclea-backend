@@ -1,9 +1,9 @@
-name: CI/CD Pipeline
+#name: CI/CD Pipeline
 
-on:
+#on:
   push:
     branches:
-      - main
+   #   - main
 
 jobs:
   build:
@@ -31,7 +31,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Deploy on server
+      #- name: Deploy on server
         run: |
           # Load secrets from GitHub Secrets into environment variables
           export PORT=3000
@@ -45,5 +45,5 @@ jobs:
           export STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}"
           
           # Example: Deploy using Docker Compose
-          docker-compose down
-          docker-compose up -d
+          #docker-compose down
+         # docker-compose up -d
