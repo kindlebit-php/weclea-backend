@@ -24,7 +24,7 @@ export const get_orders = async (req, res) => {
 // Driver order detail
 export const get_order_detail = async (req, res) => {
   try {
-    const orderId = req.body.id;
+    const orderId = req.body.orderId;
     const userData = res.user;
     const driverId = userData[0].id;
 
@@ -303,7 +303,7 @@ export const get_drop_orders = async (req, res) => {
 // Driver order detail
 export const get_drop_order_detail = async (req, res) => {
   try {
-    const orderId = req.body.id;
+    const orderId = req.body.orderId;
     const userData = res.user;
     const driverId = userData[0].id;
     const userIdQuery = `

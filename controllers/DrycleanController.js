@@ -25,7 +25,7 @@ export const get_category = async (req, res) => {
         const { id, price, quantity } = item;
   
         const existingCartItem = 'SELECT * FROM cart WHERE service_id = ? AND booking_id = ?';
-        dbConnection.query(existingCartItem, [id, booking_id], function ( error, data ) { 
+        dbConnection.query(existingCartItem, [id, booking_id], function (error, data) {
           if (error) {
             return res.json({ status: false, message: error.message });
           }
@@ -33,32 +33,35 @@ export const get_category = async (req, res) => {
           if (data.length > 0) {
             const update_cart =
               'UPDATE cart SET quantity = ?, amount = ? WHERE service_id = ? AND booking_id = ?';
-            dbConnection.query(update_cart,[quantity, price * quantity, id, booking_id],
-              function (updateError) {
-                if (updateError) {return res.json({ status: false, message: updateError.message });
-                }
-                totalAmount += price * quantity;
+            dbConnection.query(update_cart, [quantity, price * quantity, id, booking_id], function (updateError) {
+              if (updateError) {
+                return res.json({ status: false, message: updateError.message });
               }
-            );
+              totalAmount += price * quantity;
+              if (item === cartItems[cartItems.length - 1]) {
+                res.status(200).json({ message: 'Items added to cart successfully', totalAmount });
+              }
+            });
           } else {
-            const insertService ='INSERT INTO cart (service_id, price, quantity, amount, booking_id) VALUES (?, ?, ?, ?, ?)';
-            dbConnection.query(insertService,[id, price, quantity, price * quantity, booking_id],function (insertError) {
-                if (insertError) {
-                  return res.json({status: false,message: insertError.message});
-                } else {
-                  totalAmount += price * quantity;
+            const insertService = 'INSERT INTO cart (service_id, price, quantity, amount, booking_id) VALUES (?, ?, ?, ?, ?)';
+            dbConnection.query(insertService, [id, price, quantity, price * quantity, booking_id], function (insertError) {
+              if (insertError) {
+                return res.json({ status: false, message: insertError.message });
+              } else {
+                totalAmount += price * quantity;
+                if (item === cartItems[cartItems.length - 1]) {
+                  res.status(200).json({ message: 'Items added to cart successfully', totalAmount });
                 }
               }
-            );
+            });
           }
         });
       }
-  
-      res.status(200).json({ message: 'Items added to cart successfully', totalAmount });
     } catch (error) {
       res.json({ status: false, message: error.message });
     }
   };
+  
   
   
   
