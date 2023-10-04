@@ -1,9 +1,9 @@
-#name: CI/CD Pipeline
+name: CI/CD Pipeline
 
-#on:
+on:
   push:
     branches:
-   #   - main
+      - main
 
 jobs:
   build:
@@ -15,13 +15,13 @@ jobs:
 
       - name: Build and Test
         run: |
-          docker build . -t kindlebit143/weclea_backend:v0.1
+          docker build . -t kindlebit143/weclea_backend:v0.2
 
       - name: Login to DockerHub
         run: |
           echo 'Pushing code to DockerHub'
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push kindlebit143/weclea_backend:v0.1
+          docker push kindlebit143/weclea_backend:v0.2
 
   deploy:
     runs-on: self-hosted  # Use your self-hosted runner label here
@@ -31,19 +31,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      #- name: Deploy on server
+      - name: Copy .env file
         run: |
-          # Load secrets from GitHub Secrets into environment variables
-          export PORT=3000
-          export DB_HOST=${{ secrets.DB_HOST }}
-          export DB_USER=${{ secrets.DB_USER }}
-          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          export HTTPURL=${{ secrets.HTTPURL }}
-          export DB_DATABASE=${{ secrets.DB_DATABASE }}
-          export ACCESS_TOKEN_SECRET="${{ secrets.ACCESS_TOKEN_SECRET }}"
-          export STRIPE_PUBLISH_KEY="${{ secrets.STRIPE_PUBLISH_KEY }}"
-          export STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}"
-          
-          # Example: Deploy using Docker Compose
-          #docker-compose down
-         # docker-compose up -d
+          cp /home/ubuntu/.env /var/weclea/weclea_backend/weclea-backend/weclea-backend/weclea-backend
+
+      - name: Deploy on server
+        run: |
+          docker-compose down
+          docker-compose up -d
+          # Add your cleanup commands here
