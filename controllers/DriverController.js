@@ -39,7 +39,7 @@ export const get_order_detail = async (req, res) => {
 
       const userIds = userIdResult.map((row) => row.user_id);
       const query = `
-                SELECT u.name, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.total_loads
+                SELECT u.name, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
                 FROM bookings AS b
                 JOIN customer_address AS ca ON b.user_id = ca.user_id
                 JOIN users AS u ON b.user_id = u.id
