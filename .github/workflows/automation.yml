@@ -6,26 +6,8 @@ on:
       - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build and Test
-        run: |
-          docker build . -t kindlebit143/weclea_backend:v0.2
-
-      - name: Login to DockerHub
-        run: |
-          echo 'Pushing code to DockerHub'
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-          docker push kindlebit143/weclea_backend:v0.2
-
-  deploy:
+  build-and-deploy:
     runs-on: self-hosted  # Use your self-hosted runner label here
-    needs: build  # Indicates that this job depends on the 'build' job
 
     steps:
       - name: Checkout code
@@ -35,8 +17,19 @@ jobs:
         run: |
           cp /home/ubuntu/.env /var/weclea/weclea_backend/weclea-backend/weclea-backend/weclea-backend
 
+      - name: Build and Test
+        run: |
+          docker build . -t kindlebit143/weclea_backend:v0.2
+      
+      - name: Login to DockerHub
+        run: |
+          echo 'Pushing code to DockerHub'
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+          docker kindlebit143/weclea_backend:v0.2   
+
       - name: Deploy on server
         run: |
+          # Perform cleanup steps here (e.g., deleting temporary files)
           docker-compose down
           docker-compose up -d
           # Add your cleanup commands here
