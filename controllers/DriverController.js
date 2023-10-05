@@ -48,7 +48,10 @@ export const get_order_detail = async (req, res) => {
       dbConnection.query(query, [orderId, userIds], (error, data) => {
         if (error) {
           return res.json({ status: false, message: error.message });
+        } else if (data.length === 0) {
+          return res.json({ status: false, message: " not found" });
         }
+
         const {name, profile_image, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads} = data[0];
         const resData = {
           name, profile_image:`${profile_image === 'null' ? "" : profile_image}`, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads
