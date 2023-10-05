@@ -14,7 +14,7 @@ export const get_orders = async (req, res) => {
         status: true,
         message: "Data retrieved successfully!",
         data: data,
-      });
+      });  
     });
   } catch (error) {
     res.json({ status: false, message: error.message });
@@ -69,7 +69,7 @@ export const get_order_detail = async (req, res) => {
 };
 
 
-
+0
 export const print_All_QrCode = async (req, res) => {
   try {
     const userData = res.user;

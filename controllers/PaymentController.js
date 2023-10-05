@@ -296,21 +296,13 @@ export const customer_payment = async (req, res) => {
                         cla.yeshiba = CASE WHEN cls.category_id = 3 THEN cla.yeshiba + cls.buy_loads ELSE cla.yeshiba END
                     WHERE cls.id = ? AND cls.user_id = ?`;
 
-dbConnection.query(update_loads_availability, [purchase_id,user_id], async function (error, results) {
-  if (error) {
-    return res.json({ status: false, message: 'Error in update_loads_availability' });
-  }
-})
- }
+                    dbConnection.query(update_loads_availability, [purchase_id,user_id], async function (error, results) {
+                    if (error) {
+                    return res.json({ status: false, message: 'Error in update_loads_availability' });
+                               }
+                            })
+                          }
 
-                //   const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
-
-                //   dbConnection.query(update_available_loads, [buy_loads, userId], async function (error, results) {
-                //     if (error) {
-                //     return res.json({ status: false, message: 'error updating payment status' });
-                //   }
-                // })
-    
                   const currentDate = date();
                   const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
                     userData[0].id}', '${purchaseAmount}', '${paymentIntent.id}', '${currentDate}')`;
@@ -569,11 +561,302 @@ export const ACH_Payment=async(req,res)=>{
   }
 }
 
+// Payment with Booking id
+export const customer_payment_BookingId = async (req, res) => {
+  const userData = res.user;
+  const userId = userData[0].id;
+  const customerId = userData[0].customer_id;
+  const { cardNumber, expMonth, expYear, cvc, booking_id,card_status } = req.body;
+
+  try {
+    if (cardNumber && expMonth && expYear && cvc && booking_id,card_status) {
+      if (
+        (cvc.length !== 3 && cvc.length !== 4) ||
+        cvc === "000" ||
+        cvc === "0000"
+      ) {
+       return res.json({
+          status: false,
+          message: "Your card security code is invalid",
+        });
+      }
+      //create token
+      const createCard = await stripes.tokens.create({
+        card: {
+          number: cardNumber,
+          exp_month: expMonth,
+          exp_year: expYear,
+          cvc: cvc,
+        },
+      });
+      // Create Payment Method
+      const paymentMethod = await stripe.paymentMethods.create({
+        type: "card",
+        card: {
+          token: createCard.id,
+        },
+      });
+      if(card_status == 0){
+        const booking_data = `SELECT * FROM bookings WHERE id = '${booking_id}'`;
+        dbConnection.query(booking_data, async function (error, data) {
+          if (error) {
+            return res.json({ status: false, message: 'error retrieving booking data' });
+          }
+    
+          if (data.length === 0) {
+            return res.json({ status: false, message: 'booking data not found' });
+          }
+    
+          const bookingAmount = data[0].total_amount;
+          const user_id = data[0].user_id;
+          const payment_status=data[0].payment_status
+      
+          if (payment_status == 1) {
+            return res.json({ status: false, message: 'already paid' });
+          }
+
+          if(userId !== user_id){
+            return res.json({ status: false, message: 'You are not a valid user' });
+          }
+          const user_data = `SELECT * FROM users WHERE id = '${user_id}'`;
+          dbConnection.query(user_data, async function (error, userData) {
+            if (error) {
+              return res.json({ status: false, message: 'error retrieving user data' });
+            }
+    
+            if (userData.length === 0) {
+              return res.json({ status: false, message: 'User data not found' });
+            }
+    
+              const paymentIntent = await stripe.paymentIntents.create({
+                amount: bookingAmount * 100,
+                currency: 'usd',
+                customer: customerId,
+                payment_method:paymentMethod.id,
+                off_session: true,
+                confirm: true,
+                description: 'Payment by client',
+              });
+              if(paymentIntent.status === 'succeeded') {
+                const updateStatus = `UPDATE bookings SET payment_status = '1' WHERE id = '${booking_id}'`;
+                dbConnection.query(updateStatus, async function (error, updateStatus) {
+                  if (error) {
+                    return res.json({ status: false, message: 'error updating payment status' });
+                  }else if (updateStatus.length === 0) {
+                    return res.json({ status: false, message: "data does not exist" });
+                  }
+                  else {
+                    const update_cart_status = `UPDATE cart SET status = '1' WHERE booking_id = '${booking_id}'`;
+                    
+
+                    dbConnection.query(update_cart_status, [booking_id], async function (error, results) {
+                    if (error) {
+                    return res.json({ status: false, message: 'Error in update_cart_status' });
+                               }
+                               return res.json({ status: true, message: 'Payment successful' });
+                            })
+                          }
+                });
+              } else {
+                return res.json({ status: false, message: 'Payment failed' });
+              }
+          });
+        });
+      }else{
+      // Attach Payment Method
+      const attachedPaymentMethod = await stripe.paymentMethods.attach(
+        paymentMethod.id,
+        {
+          customer: customerId,
+        }
+      );
+
+      // Update Customer
+      const updateCustomer = await stripe.customers.update(customerId, {
+        invoice_settings: {
+          default_payment_method: attachedPaymentMethod.id,
+        },
+      });
+
+   
+    // ****************************Payment***************************************//
+
+    const booking_data = `SELECT * FROM bookings WHERE id = '${booking_id}'`;
+    dbConnection.query(booking_data, async function (error, data) {
+      if (error) {
+        return res.json({ status: false, message: 'error retrieving booking data' });
+      }
+
+      if (data.length === 0) {
+        return res.json({ status: false, message: 'booking data not found' });
+      }
+
+      const bookingAmount = data[0].total_amount;
+      const user_id = data[0].user_id;
+      const payment_status=data[0].payment_status
+  
+      if (payment_status == 1) {
+        return res.json({ status: false, message: 'already paid' });
+      }
+      if(userId !== user_id){
+        return res.json({ status: false, message: 'You are not a valid user' });
+      }
+      const user_data = `SELECT * FROM users WHERE id = '${user_id}'`;
+      dbConnection.query(user_data, async function (error, userData) {
+        if (error) {
+          return res.json({ status: false, message: 'error retrieving user data' });
+        }
+
+        if (userData.length === 0) {
+          return res.json({ status: false, message: 'User data not found' });
+        }
+
+        const customerId = userData[0].customer_id;
+          const customerData = await stripe.customers.retrieve(customerId);
+
+          if (!customerData.id) {
+            return res.json({ status: false, message: "Customer_id doesn't exist" });
+          }
+          const paymentIntent = await stripe.paymentIntents.create({
+            amount: purchaseAmount * 100,
+            currency: 'usd',
+            customer: customerId,
+            payment_method: customerData.invoice_settings.default_payment_method,
+            off_session: true,
+            confirm: true,
+            description: 'Payment by client',
+          });
+          if(paymentIntent.status === 'succeeded') {
+            const updateStatus = `UPDATE bookings SET payment_status = '1' WHERE id = '${booking_id}'`;
+            dbConnection.query(updateStatus, async function (error, updateStatus) {
+              if (error) {
+                return res.json({ status: false, message: 'error updating payment status' });
+              }else if (updateStatus.length === 0) {
+                return res.json({ status: false, message: "data does not exist" });
+              }
+              else {
+                const update_cart_status = `UPDATE cart SET status = '1' WHERE booking_id = '${booking_id}'`;
+                
+
+                dbConnection.query(update_cart_status, [booking_id], async function (error, results) {
+                if (error) {
+                return res.json({ status: false, message: 'Error in update_cart_status' });
+                           }
+                           return res.json({ status: true, message: 'Payment successful' });
+                        })
+                      }
+            });
+          } else {
+            return res.json({ status: false, message: 'Payment failed' });
+          }
+      });
+    });
+  }
+  } else {
+    return res.json({ status: false, message: "All fields are required" });
+}
+  } catch (error) {
+    return res.json({ status: false, message: error.message });
+  }
+};
+
+
+
+export const Payment_CardId_BookingId = async (req, res) => {
+  try {
+    const userData = res.user;
+    const userId = userData[0].id;
+    const { booking_id, cardId } = req.body;
+
+    const booking_data = `SELECT * FROM bookings WHERE id = '${booking_id}'`;
+    dbConnection.query(booking_data, async function (error, data) {
+      if (error) {
+        return res.json({ status: false, message: 'error retrieving booking data' });
+      }
+
+      if (data.length === 0) {
+        return res.json({ status: false, message: 'booking data not found' });
+      }
+
+      const bookingAmount = data[0].total_amount;
+      const user_id = data[0].user_id;
+      const payment_status=data[0].payment_status
+  
+      if (payment_status == 1) {
+        return res.json({ status: false, message: 'already paid' });
+      }
+
+      if(userId !== user_id){
+        return res.json({ status: false, message: 'You are not a valid user' });
+      }
+
+      const user_data = `SELECT * FROM users WHERE id = '${user_id}'`;
+      dbConnection.query(user_data, async function (error, userData) {
+        if (error) {
+          return res.json({ status: false, message: 'error retrieving user data' });
+        }
+
+        if (userData.length === 0) {
+          return res.json({ status: false, message: 'User data not found' });
+        }
+        const customerId = userData[0].customer_id;
+        try {
+          const customerData = await stripe.customers.retrieve(customerId);
+          if (!customerData.id) {
+            return res.json({ status: false, message: "Customer_id doesn't exist" });
+          }
+
+          const paymentIntent = await stripe.paymentIntents.create({
+            amount: bookingAmount * 100,
+            currency: 'usd',
+            customer: customerId,
+            payment_method: cardId,
+            off_session: true,
+            confirm: true,
+            description: 'Payment by client',
+          });
+
+          if (paymentIntent.status === 'succeeded') {
+            const updateStatus = `UPDATE bookings SET payment_status = '1' WHERE id = '${booking_id}'`;
+                dbConnection.query(updateStatus, async function (error, updateStatus) {
+                  if (error) {
+                    return res.json({ status: false, message: 'error updating payment status' });
+                  }else if (updateStatus.length === 0) {
+                    return res.json({ status: false, message: "data does not exist" });
+                  }
+                  else {
+                    const update_cart_status = `UPDATE cart SET status = '1' WHERE booking_id = '${booking_id}'`;
+                    
+
+                    dbConnection.query(update_cart_status, [booking_id], async function (error, results) {
+                    if (error) {
+                    return res.json({ status: false, message: 'Error in update_cart_status' });
+                               }
+                               return res.json({ status: true, message: 'Payment successful' });
+                            })
+                          }
+                });
+              } else {
+                return res.json({ status: false, message: 'Payment failed' });
+              }
+        } catch (stripeerror) {
+          return res.json({ status: false, message: `Stripe error: ${stripeerror.message}` });
+        }
+      });
+    });
+  } catch (error) {
+    return res.json({ status: false, message: error.message });
+  }
+};
+
+
 export default {
   Attach_Card,
   get_all_cards,
   Payment_Card_Id,
   customer_payment,
   Add_Bank_Account,
-  ACH_Payment
+  ACH_Payment,
+  customer_payment_BookingId,
+  Payment_CardId_BookingId,
 };
