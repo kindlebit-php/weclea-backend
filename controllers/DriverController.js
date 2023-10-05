@@ -49,7 +49,7 @@ export const get_order_detail = async (req, res) => {
         if (error) {
           return res.json({ status: false, message: error.message });
         } else if (data.length === 0) {
-          return res.json({ status: false, message: " not found" });
+          return res.json({ status: false, message: "data Not found" });
         }
 
         const {name, profile_image, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads} = data[0];
