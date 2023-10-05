@@ -39,7 +39,7 @@ export const get_order_detail = async (req, res) => {
 
       const userIds = userIdResult.map((row) => row.user_id);
       const query = `
-                SELECT u.name, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
+                SELECT u.name,u.profile_image, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
                 FROM bookings AS b
                 JOIN customer_address AS ca ON b.user_id = ca.user_id
                 JOIN users AS u ON b.user_id = u.id
@@ -49,10 +49,14 @@ export const get_order_detail = async (req, res) => {
         if (error) {
           return res.json({ status: false, message: error.message });
         }
+        const {name, profile_image, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads} = data[0];
+        const resData = {
+          name, profile_image:`${profile_image === 'null' ? "" : profile_image}`, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads
+        }
         res.json({
           status: true,
           message: "Order details retrieved successfully!",
-          data: data,
+          data: resData,
         });
       });
     });
@@ -61,6 +65,25 @@ export const get_order_detail = async (req, res) => {
   }
 };
 
+
+
+export const print_All_QrCode = async (req, res) => {
+  try {
+    const userData = res.user;
+    const booking_id=req.body.booking_id
+    const data = `SELECT qr_code,driver_pickup_status FROM booking_qr WHERE booking_id = ${booking_id}`;
+    dbConnection.query(data, function (error, data) {
+      if (error) throw error;
+      res.json({
+        status: true,
+        message: "Data retrieved successfully!",
+        data: data,
+      });
+    });
+  } catch (error) {
+    res.json({ status: false, message: error.message });
+  }
+};
 
 export const pickup_loads = async (req, res) => {
   try {
@@ -81,10 +104,13 @@ export const pickup_loads = async (req, res) => {
           if (updateerror) {
             return res.json({ status: false, message: updateerror.message });
           }
+         const result={ booking_id: data[0].booking_id,
+            driver_pickup_status: 1
+          }
           res.json({
             status: true,
             message: "Data retrieved and updated successfully!",
-            booking_id: data[0].booking_id,
+            data:result
           });
         });
       } else {
@@ -123,7 +149,7 @@ export const pickup_loads_detail = async (req, res) => {
           res.json({
             status: true,
             message: "Details retrieved successfully!",
-            data: data,
+            data: data[0],
           });
         });
       }
@@ -163,7 +189,7 @@ export const submit_pickup_details = async (req, res) => {
           const currentDate = date();
           const update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id
             = ${booking_id}`;
-
+          const result=data[0]
           dbConnection.query(
             update_Date_Time,
             function (updateTimeErr, updateTimeResult) {
@@ -185,9 +211,25 @@ export const submit_pickup_details = async (req, res) => {
                     if (updateImagesErr) {
                       return res.json({ status: false,  message: updateImagesErr.message});
                     } else {
-                      const responseData = { status: true, message: "Submitted successfully!",
-                        data: { data, driver_pick_time: currentTime, driver_pick_date: currentDate, driver_pick_images: imageArray},
-                      };
+                      const responseData = {
+                        status: true,
+                        message: "Submitted successfully!",
+                        data:{name: result.name,
+                        address: result.address,
+                        appartment: result.appartment,
+                        city: result.city,
+                        state: result.state,
+                        zip: result.zip,
+                        latitude: result.latitude,
+                        longitude: result.longitude,
+                        driver_pick_time: currentTime,
+                        driver_pick_date: currentDate,
+                        driver_pick_images: imageArray,
+                      }
+                    };
+                      
+                      return res.json(responseData);
+                      
                       return res.json(responseData);
                     }
                   }
@@ -234,7 +276,7 @@ export const laundry_NotFound = async (req, res) => {
         const currentTime = time();
         const currentDate = date();
         const update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
-
+        const result=bookingData[0]
         dbConnection.query(
           update_Date_Time,
           function (updateTimeErr, updateTimeResult) {
@@ -260,9 +302,22 @@ export const laundry_NotFound = async (req, res) => {
                     if (updateOrderStatusErr) {
                       return res.json({ status: false, message: updateOrderStatusErr.message });
                     } else {
-                      const responseData = {status: true,message: "Submitted successfully!",
-                        data: {bookingData,driver_pick_time: currentTime,driver_pick_date: currentDate,driver_pick_images: imageArray},
-                      };
+                      const responseData = {
+                        status: true,
+                        message: "Submitted successfully!",
+                        data:{name: result.name,
+                        address: result.address,
+                        appartment: result.appartment,
+                        city: result.city,
+                        state: result.state,
+                        zip: result.zip,
+                        latitude: result.latitude,
+                        longitude: result.longitude,
+                        driver_pick_time: currentTime,
+                        driver_pick_date: currentDate,
+                        driver_pick_images: imageArray,
+                      }
+                    };
                       return res.json(responseData);
                     }
                   });
@@ -329,7 +384,7 @@ export const get_drop_order_detail = async (req, res) => {
         res.json({
           status: true,
           message: "Order details retrieved successfully!",
-          data: data,
+          data: data[0],
         });
       });
     });
@@ -408,7 +463,7 @@ export const drop_loads_detail = async (req, res) => {
           if (error) {
             return res.json({ status: false, message: error.message });
           }
-          res.json({ status: true, message: "Details retrieved successfully!", data: data });
+          res.json({ status: true, message: "Details retrieved successfully!", data: data[0] });
         });
       }
     });
@@ -455,7 +510,7 @@ export const submit_drop_details = async (req, res) => {
           const currentTime = time();
           const currentDate = date();
           const update_Date_Time = `UPDATE booking_timing SET deliever_time = '${currentTime}' , deliever_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
-
+          const result=data[0]
           dbConnection.query(update_Date_Time, function (updateTimeErr, updateTimeResult) {
             if (updateTimeErr) {
               return res.json({ status: false, message: updateTimeErr.message });
@@ -484,7 +539,14 @@ export const submit_drop_details = async (req, res) => {
                         const responseData = {
                           status: true,
                           message: "Submitted successfully!",
-                          data: { data, deliever_time: currentTime, deliever_date: currentDate, drop_images: imageArray },
+                          data: { name: result.name,
+                            address: result.address,
+                            appartment: result.appartment,
+                            city: result.city,
+                            state: result.state,
+                            zip: result.zip,
+                            latitude: result.latitude,
+                            longitude: result.longitude, deliever_time: currentTime, deliever_date: currentDate, drop_images: imageArray },
                         };
                         return res.json(responseData);
                       }
@@ -576,7 +638,7 @@ export const order_histroy_byOrderId=async(req,res)=>{
         if (error) {
           return res.json({ status: false, message: error.message });
         }
-        res.json({ status: true, message: "Order details retrieved successfully!", data: data});
+        res.json({ status: true, message: "Order details retrieved successfully!", data: data[0]});
       });
     });
   } catch (error) {
@@ -595,7 +657,7 @@ export const profile = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
-      res.json({ status: true, data: userIdResult }); 
+      res.json({ status: true, data: userIdResult[0] }); 
     });
   } catch (error) {
     res.json({ status: false, message: error.message });
@@ -604,6 +666,7 @@ export const profile = async (req, res) => {
 export default {
   get_orders,
   get_order_detail,
+  print_All_QrCode,
   pickup_loads,
   pickup_loads_detail,
   submit_pickup_details,
