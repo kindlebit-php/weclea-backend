@@ -10,6 +10,7 @@ import cronController from "../controllers/CronController.js";
 import multer from 'multer';
 import { upload } from "../utils/multer.js";
 import DrycleanController from "../controllers/DrycleanController.js";
+import FolderController from "../controllers/Folder/FolderController.js";
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb)
@@ -41,10 +42,10 @@ router.post('/customer-login',userController.customer_login);
 router.post('/forgot-password',userController.forgot_password);
 router.post('/verify-otp',userController.verify_otp);
 router.post('/change-password',userController.change_password);
-//////////////////////////////////////////////////////////////////////////
+//********************************Driver Module**************************************//
 router.get('/get-orders',CheckAuth,driverController.get_orders);
 router.post("/get-order-detail",CheckAuth,driverController.get_order_detail);
-router.get("/print-All-QrCode",CheckAuth,driverController.print_All_QrCode)
+router.post("/print-All-QrCode",CheckAuth,driverController.print_All_QrCode)
 router.post("/pickup-loads",CheckAuth,driverController.pickup_loads)
 router.post("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
 router.post("/submit_pickup_details",CheckAuth,upload.array("images", 5),driverController.submit_pickup_details);
@@ -57,7 +58,10 @@ router.post("/get-drop-order-detail",CheckAuth,driverController.get_drop_order_d
 router.post("/drop-loads",CheckAuth,driverController.drop_loads)
 router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
 router.post("/submit_drop_details",CheckAuth,upload.array("images", 5),driverController.submit_drop_details);
-/////////////////////////////////////////////////////////////////////////////
+//********************************Folder Module**************************************//
+router.post("/Scan_received_loads",CheckAuth,FolderController.Scan_received_loads)
+
+//**********************************************************************************//
 router.get("/booking-subscription-cron",cronController.booking_subscription_cron);
 router.post("/attach-card",CheckAuth,paymentController.Attach_Card);
 router.get("/get-all-cards",CheckAuth,paymentController.get_all_cards);
