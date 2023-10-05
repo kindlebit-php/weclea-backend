@@ -2,7 +2,7 @@ import dbConnection from'../config/db.js';
 export const get_category = async (req, res) => {
     try {
       var resData = [];
-    const category = `SELECT id, title, price, image FROM dry_clean_services WHERE status = '1' `;
+    const category = `SELECT id, title, price, image FROM dry_clean_services WHERE status = 1 `;
       console.log('category',category)
       dbConnection.query(category, function (error, data) {
         if (error) throw error;
