@@ -75,4 +75,5 @@ router.get("/get-dry-clean-services",CheckAuth,DrycleanController.get_category)
 router.get("/get-cart-item",CheckAuth,DrycleanController.get_cart_items)
 router.post("/add-to-cart",CheckAuth,DrycleanController.Add_To_Cart)
 router.post("/delete-cart-item",CheckAuth,DrycleanController.delete_cart_item)
+router.post("/dry-clean-booking",CheckAuth,DrycleanController.dry_clean_booking)
 export default router;
