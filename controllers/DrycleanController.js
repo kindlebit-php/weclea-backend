@@ -74,7 +74,23 @@ export const get_category = async (req, res) => {
       res.json({ status: false, message: error.message });
     }
   }
+   
+  export const get_cart_items = async (req, res) => {
+    try {
+       const userData = res.user;
+        const items = "SELECT cart.id,dry_clean_services.title,cart.amount,cart.quantity FROM cart LEFT JOIN dry_clean_services ON cart.service_id = dry_clean_services.id WHERE cart.user_id = '"+userData[0].id+"' and cart.status = '0'";
+        
+          dbConnection.query(items, function (error, data) {
+             if(error) throw error;
+          res.json({'status':true,"message":"Item deleted successfully",'data':data});
+                
+              
+            });
+    }catch (error) {
+      res.json({ status: false, message: error.message });
+    }
+  }
   
 
-  export default {get_category ,Add_To_Cart,delete_cart_item}
+  export default {get_category ,Add_To_Cart,delete_cart_item,get_cart_items}
   
