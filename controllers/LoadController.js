@@ -157,7 +157,7 @@ export const get_user_subscription = async(req,res)=>{
 }else{
    var getloadsSQL= "select * from customer_loads_subscription where user_id = '"+userData[0].id+"'"
             dbConnection.query(getloadsSQL, function (err, getloadsresult) {
-                if(getloadsresult){
+                if(getloadsresult.length > 0){
             if(userData[0].category_id == 1){
                 var usrLoadss = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }else if(userData[0].category_id == 2){
