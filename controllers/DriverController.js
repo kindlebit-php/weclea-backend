@@ -6,28 +6,28 @@ import { date, time } from "../helpers/date.js";
 export const get_orders = async (req, res) => {
   try {
     const userData = res.user;
-    console.log(userData)
+    console.log(userData)   
     const order = `SELECT id,order_id, date, time FROM bookings WHERE driver_id = ${userData[0].id}`;
     dbConnection.query(order, function (error, data) {
       if (error) throw error;
-      res.json({
+      res.json({    
         status: true,
-        message: "Data retrieved successfully!",
-        data: data,
-      });  
+        message: "Data retrieved successfully!",          
+        data: data,   
+      });           
     });
-  } catch (error) {
-    res.json({ status: false, message: error.message });
-  }
-};
+  } catch (error) {   
+    res.json({ status: false, message: error.message });   
+  }   
+};  
 
 // Driver order detail
-export const get_order_detail = async (req, res) => {
+export const get_order_detail = async (req, res) => {  
   try {
-    const orderId = req.body.orderId;
-    const userData = res.user;
-    const driverId = userData[0].id;
-
+    const orderId = req.body.orderId;     
+    const userData = res.user;      
+    const driverId = userData[0].id;   
+                                    
     const userIdQuery = `
             SELECT user_id FROM bookings AS b1
             JOIN users AS u ON u.id = b1.driver_id
@@ -572,7 +572,7 @@ export const order_histroy=async(req,res)=>{
   try {
     const userData = res.user;
     const driverId = userData[0].id;
-
+   
     const userIdQuery = `
             SELECT user_id FROM bookings AS b1
             JOIN users AS u ON u.id = b1.driver_id
@@ -583,8 +583,7 @@ export const order_histroy=async(req,res)=>{
       }
       const userIds = userIdResult.map((row) => row.user_id);
       const query = `
-      SELECT
-        u.mobile,
+      SELECT u.mobile,
         CONCAT(ca.address, ', ', ca.appartment, ', ', ca.city, ', ', ca.state, ', ', ca.zip) AS address,
         b.user_id AS Customer_Id,
         b.order_id,

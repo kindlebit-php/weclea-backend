@@ -59,7 +59,10 @@ router.post("/drop-loads",CheckAuth,driverController.drop_loads)
 router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
 router.post("/submit_drop_details",CheckAuth,upload.array("images", 5),driverController.submit_drop_details);
 //********************************Folder Module**************************************//
-router.post("/Scan_received_loads",CheckAuth,FolderController.Scan_received_loads)
+router.post("/Scan-received-loads",CheckAuth,FolderController.Scan_received_loads)
+router.get("/customer-list-wash",CheckAuth,FolderController.customer_list_wash)
+router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id)
+router.post("/submit-wash-detail",CheckAuth,upload.array("images", 5),FolderController.submit_wash_detail)
 
 //**********************************************************************************//
 router.get("/booking-subscription-cron",cronController.booking_subscription_cron);
