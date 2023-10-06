@@ -1,4 +1,6 @@
 import dbConnection from'../config/db.js';
+import dateFormat from 'date-and-time';
+
 
 //get loads API
 export const get_loads = async(req,res)=>{
@@ -116,6 +118,8 @@ export const get_user_loads = async(req,res)=>{
 export const get_user_subscription = async(req,res)=>{
      try { 
         const userData = res.user;
+        var datetime = new Date();
+        const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
             // var sql = "SELECT customer_loads_subscription.id,customer_loads_subscription.type, customer_loads_subscription.payment_status, customer_loads_subscription.user_id, customer_loads_subscription.buy_loads,customer_loads_subscription.amount, users.available_loads,users.id FROM customer_loads_subscription LEFT JOIN users ON customer_loads_subscription.user_id = users.id where customer_loads_subscription.type = 'package' and customer_loads_subscription.payment_status = '1' and customer_loads_subscription.category_id = '"+userData[0].category_id+"' and customer_loads_subscription.user_id = '"+userData[0].id+"' ORDER BY customer_loads_subscription.id desc limit 1;";
             var sql = "select * from customer_loads_subscription where type = 'package' and payment_status = '1' and user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
             // console.log('sql',sql)
@@ -129,24 +133,65 @@ export const get_user_subscription = async(req,res)=>{
                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }
             dbConnection.query(usrLoads, function (err, usrLoadsresult) {
+            var bookingSQL = "select date from bookings where cron_status = 1 and date > '"+currentFinalDate+"' limit 1";
+            dbConnection.query(bookingSQL, function (err, bookingSQLresult) {
+                if(bookingSQLresult){
+                    var next_pickup = bookingSQLresult[0].date;
+                }else{
+                    var next_pickup = 'Booking not confirmed yet';
 
+                }
+            console.log('bookingSQLresult',bookingSQLresult)
             var usrLoadsspe = "select * from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             dbConnection.query(usrLoadsspe, function (err, usrLoadssperesult) {
 
                 let initi = {
-                "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"price":subscriptionresult[0].amount,"pending_loads":usrLoadsresult[0].total_loads,'commercial':usrLoadssperesult[0].commercial,'residential':usrLoadssperesult[0].residential,'yeshiba':usrLoadssperesult[0].yeshiba,
+                "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"price":subscriptionresult[0].amount,"pending_loads":usrLoadsresult[0].total_loads,'commercial':usrLoadssperesult[0].commercial,'residential':usrLoadssperesult[0].residential,'yeshiba':usrLoadssperesult[0].yeshiba,'next_pickup':next_pickup
                 }
                     res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
 
             })
+        })
 
              })
 }else{
-    let initi = {
-    "id":0,"package":'No Subscription Found',"price":0,"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,
-    }
-    res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
+   var getloadsSQL= "select * from customer_loads_subscription where user_id = '"+userData[0].id+"'"
+            dbConnection.query(getloadsSQL, function (err, getloadsresult) {
+                if(getloadsresult){
+            if(userData[0].category_id == 1){
+                var usrLoadss = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }else if(userData[0].category_id == 2){
+                var usrLoadss = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }else{
+                var usrLoadss = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }
+            dbConnection.query(usrLoadss, function (err, usrLoadsresult) {
+                if(usrLoadsresult.length > 0){
+                var usrLoads = "select * from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+                    dbConnection.query(usrLoads, function (err, getloadsresult) {
+                        let initi = {
+                        "id":getloadsresult[0].id,"package":'No Subscription Found',"price":getloadsresult[0].amount,"pending_loads":usrLoadsresult[0].total_loads,'commercial':getloadsresult[0].commercial,'residential':getloadsresult[0].residential,'yeshiba':getloadsresult[0].yeshiba,'next_pickup':'No pickup'
+                        }
+                        res.json({'status':true,"message":"Subscription not found!",'data':initi});
 
+                    }) 
+                }else{
+                     let initi = {
+                    "id":0,"package":'No Subscription Found',"price":0,"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
+                    }
+                    res.json({'status':true,"message":"Subscription not found!",'data':initi});
+                }
+                })   
+                }else{
+                    let initi = {
+                    "id":0,"package":'No Subscription Found',"price":0,"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
+                    }
+                    res.json({'status':true,"message":"Subscription not found!",'data':initi});
+
+                }
+            })
+    
+  
 }
             });
         

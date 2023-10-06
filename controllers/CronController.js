@@ -8,8 +8,6 @@ export const booking_subscription_cron = async(req,res)=>{
 
         var datetime = new Date();
         const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-        // console.log('currentFinalDate',currentFinalDate)
-        // return false;
      	const bookingsql = "select id,cron_status,user_id,category_id,total_loads from bookings where date = '"+currentFinalDate+"' and order_type = '2' and cron_status = '0'";
         dbConnection.query(bookingsql, function (err, bookingresult) {
             if(bookingresult){
