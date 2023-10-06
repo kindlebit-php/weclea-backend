@@ -8,11 +8,28 @@ export const booking_subscription_cron = async(req,res)=>{
 
         var datetime = new Date();
         const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-     	const bookingsql = "select id,cron_status,total_loads from bookings where date = '"+currentFinalDate+"' and order_type = '2' and cron_status = '0'";
+        // console.log('currentFinalDate',currentFinalDate)
+        // return false;
+     	const bookingsql = "select id,cron_status,user_id,category_id,total_loads from bookings where date = '"+currentFinalDate+"' and order_type = '2' and cron_status = '0'";
         dbConnection.query(bookingsql, function (err, bookingresult) {
             if(bookingresult){
+             
+
                     Object.keys(bookingresult).forEach(function(key) {
                     var elem = bookingresult[key];
+
+                       if(elem.category_id == 1){
+                var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
+                }else if(elem.category_id == 2){
+                var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
+                }else{
+                var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
+                }
+                dbConnection.query(usrLoads, function (error, resultss) {
+                    if(elem.total_loads > resultss[0].total_loads){
+                    res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
+                }else{
+
                     const sqlqr = "select count(id) as total from booking_qr where booking_id = '"+elem.id+"'";
                     dbConnection.query(sqlqr, function (err, qrresult) {
                         if(qrresult[0].total == 0){
@@ -24,6 +41,20 @@ export const booking_subscription_cron = async(req,res)=>{
 
                         }
                     });
+ 
+                    var updateLoads = (resultss[0].total_loads - elem.total_loads);
+                    console.log('updateLoads',updateLoads)
+                    if(elem.category_id == 1){
+                    var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+elem.user_id+"'";
+                    }else if(elem.category_id == 2){
+                    var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+elem.user_id+"'";
+                    }else{
+                    var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+elem.user_id+"' ";
+                    }
+                    console.log('usrLoadsup',usrLoadsup)
+                    dbConnection.query(usrLoadsup, function (error, result) {
+                    })
+
                     var bookingsql = "INSERT INTO booking_timing (booking_id) VALUES ('"+elem.id+"')";
                     dbConnection.query(bookingsql, function (err, bookingresult) {
                     });
@@ -35,8 +66,10 @@ export const booking_subscription_cron = async(req,res)=>{
                     dbConnection.query(updatesql, function (err, resultss) {
                  
                     });
+              
+                }
                 })
-             
+             })
             }
         });
     	

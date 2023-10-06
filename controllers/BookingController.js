@@ -115,9 +115,9 @@ export const customer_booking = async(req,res)=>{
                                 if(category_id == 1){
                                 var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
                                 }else if(category_id == 2){
-                                var usrLoadsup = "select customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+userData[0].id+"'";
+                                var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+userData[0].id+"'";
                                 }else{
-                                var usrLoadsup = "select customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
+                                var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
                                 }
                                 dbConnection.query(usrLoadsup, function (error, result) {
                                 })
