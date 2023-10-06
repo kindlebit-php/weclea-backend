@@ -133,7 +133,7 @@ export const get_user_subscription = async(req,res)=>{
                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }
             dbConnection.query(usrLoads, function (err, usrLoadsresult) {
-            var bookingSQL = "select date from bookings where cron_status = 1 and date > '"+currentFinalDate+"' limit 1";
+            var bookingSQL = "select date from bookings where cron_status = 1 and user_id ='"+userData[0].id+"' and date > '"+currentFinalDate+"' limit 1";
             dbConnection.query(bookingSQL, function (err, bookingSQLresult) {
                 if(bookingSQLresult.length > 0){
                     var next_pickup = bookingSQLresult[0].date;
