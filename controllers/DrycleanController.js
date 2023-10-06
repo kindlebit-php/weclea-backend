@@ -106,7 +106,7 @@ export const get_category = async (req, res) => {
         const current_time = hours + ":" + minutes;
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
 
-        var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,order_type,driver_id,category_id,total_amount) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','3',52,'"+userData[0].category_id+"','"+amount+"')";
+        var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,order_type,driver_id,category_id,total_amount) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"',3,52,'"+userData[0].category_id+"','"+amount+"')";
         dbConnection.query(sql, function (err, result) {
 
         var order_id = '1001'+result.insertId;
