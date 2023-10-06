@@ -24,7 +24,7 @@ export const customer_loads_subscription = async(req,res)=>{
         const {	type,buy_loads,amount,category_id } = req.body;
         if(	type && buy_loads && amount){
 	        var sql = "INSERT INTO customer_loads_subscription (user_id,category_id,type,buy_loads,amount) VALUES ('"+userData[0].id+"','"+category_id+"','"+type+"', '"+buy_loads+"','"+amount+"')";
-	        dbConnection.query(sql, function (error, result) {
+	        dbConnection.query(sql, function (error, results) {
 	        // if (error) throw error;
 
             const checkifloadexist = "select count(id) as total from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
@@ -36,7 +36,7 @@ export const customer_loads_subscription = async(req,res)=>{
             }
             })
 
-            const loads = "select * from customer_loads_subscription where id = '"+result.insertId+"'";
+            const loads = "select * from customer_loads_subscription where id = '"+results.insertId+"'";
             dbConnection.query(loads, function (error, data) {
             if (error) throw error;
                 res.json({'status':true,"message":"Loads added successfully!",'data':data[0]});

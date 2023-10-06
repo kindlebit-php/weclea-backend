@@ -11,17 +11,15 @@ export const booking_subscription_cron = async(req,res)=>{
      	const bookingsql = "select id,cron_status,user_id,category_id,total_loads from bookings where date = '"+currentFinalDate+"' and order_type = '2' and cron_status = '0'";
         dbConnection.query(bookingsql, function (err, bookingresult) {
             if(bookingresult){
-             
+                Object.keys(bookingresult).forEach(function(key) {
+                var elem = bookingresult[key];
 
-                    Object.keys(bookingresult).forEach(function(key) {
-                    var elem = bookingresult[key];
-
-                       if(elem.category_id == 1){
-                var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
+                if(elem.category_id == 1){
+                    var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
                 }else if(elem.category_id == 2){
-                var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
+                    var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
                 }else{
-                var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
+                    var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
                 }
                 dbConnection.query(usrLoads, function (error, resultss) {
                     if(elem.total_loads > resultss[0].total_loads){
@@ -41,13 +39,12 @@ export const booking_subscription_cron = async(req,res)=>{
                     });
  
                     var updateLoads = (resultss[0].total_loads - elem.total_loads);
-                    console.log('updateLoads',updateLoads)
                     if(elem.category_id == 1){
-                    var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+elem.user_id+"'";
+                        var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+elem.user_id+"'";
                     }else if(elem.category_id == 2){
-                    var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+elem.user_id+"'";
+                        var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+elem.user_id+"'";
                     }else{
-                    var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+elem.user_id+"' ";
+                        var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+elem.user_id+"' ";
                     }
                     console.log('usrLoadsup',usrLoadsup)
                     dbConnection.query(usrLoadsup, function (error, result) {
