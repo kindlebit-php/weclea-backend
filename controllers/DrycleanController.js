@@ -47,6 +47,7 @@ export const get_category = async (req, res) => {
             });
           }else{
             const insertService = "INSERT INTO cart (user_id,service_id, quantity, amount) VALUES ( '"+userData[0].id+"', '"+id+"', '"+qty+"', '"+price+"')";
+            console.log('insertService',insertService)
             dbConnection.query(insertService, function (insertError) {
              
               res.json({'status':true,"message":"Items added to cart successfully"});
@@ -81,11 +82,11 @@ export const get_category = async (req, res) => {
   export const get_cart_items = async (req, res) => {
     try {
        const userData = res.user;
-        const items = "SELECT cart.id,dry_clean_services.title,cart.amount,cart.quantity FROM cart LEFT JOIN dry_clean_services ON cart.service_id = dry_clean_services.id WHERE cart.user_id = '"+userData[0].id+"' and cart.status = '0'";
+        const items = "SELECT cart.service_id ,cart.id,dry_clean_services.title,cart.amount,cart.quantity FROM cart LEFT JOIN dry_clean_services ON cart.service_id = dry_clean_services.id WHERE cart.user_id = '"+userData[0].id+"' and cart.status = '0'";
         
           dbConnection.query(items, function (error, data) {
              if(error) throw error;
-          res.json({'status':true,"message":"Item deleted successfully",'data':data});
+          res.json({'status':true,"message":"Item list",'data':data});
                 
               
             });
@@ -98,14 +99,15 @@ export const get_category = async (req, res) => {
     try {
         const userData = res.user;
         const { delievery_day,date,amount} = req.body;
-        if(  delievery_day && date && amount){
+        if(delievery_day && date && amount){
         let dateObject = new Date();
         let hours = dateObject.getHours();
         let minutes = dateObject.getMinutes();
         const current_time = hours + ":" + minutes;
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
 
-        var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,order_type,driver_id,category_id,total_amount) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','3',52,'"+userData[0].category_id+"','"+amount+"')";
+        var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,order_type,driver_id,category_id,total_amount) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"',3,52,'"+userData[0].category_id+"','"+amount+"')";
+        console.log('kailash',sql)
         dbConnection.query(sql, function (err, result) {
 
         var order_id = '1001'+result.insertId;
@@ -117,7 +119,7 @@ export const get_category = async (req, res) => {
         const updateService = "update cart set booking_id = '"+result.insertId+"' where user_id = '"+userData[0].id+"' and status = '0'";
         dbConnection.query(updateService, function (error, data) {
              if(error) throw error;
-              res.json({'status':true,"message":"booking created successfully",'booking_id':result.insertId});  
+              res.json({'status':true,"message":"booking created successfully",'booking_id':result.insertId, 'card_status':userData[0].card_status});  
               
             });
 
