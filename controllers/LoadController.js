@@ -121,7 +121,7 @@ export const get_user_subscription = async(req,res)=>{
         var datetime = new Date();
         const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
             // var sql = "SELECT customer_loads_subscription.id,customer_loads_subscription.type, customer_loads_subscription.payment_status, customer_loads_subscription.user_id, customer_loads_subscription.buy_loads,customer_loads_subscription.amount, users.available_loads,users.id FROM customer_loads_subscription LEFT JOIN users ON customer_loads_subscription.user_id = users.id where customer_loads_subscription.type = 'package' and customer_loads_subscription.payment_status = '1' and customer_loads_subscription.category_id = '"+userData[0].category_id+"' and customer_loads_subscription.user_id = '"+userData[0].id+"' ORDER BY customer_loads_subscription.id desc limit 1;";
-            var sql = "select * from customer_loads_subscription where type = 'package' and payment_status = '1' and user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
+            var sql = "select * from customer_loads_subscription where type = 'package' and payment_status = 1 and user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
             // console.log('sql',sql)
             dbConnection.query(sql, function (err, subscriptionresult) {
             if(subscriptionresult.length > 0){
