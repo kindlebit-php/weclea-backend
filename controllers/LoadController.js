@@ -204,20 +204,29 @@ export const get_user_subscription = async(req,res)=>{
 export const get_user_home_data = async(req,res)=>{
      try { 
         const userData = res.user;
+        var datetime = new Date();
+        const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
         const { category_id } = req.body;
         var sql = "select * from customer_loads_subscription where type = 'package' and payment_status = '1' and category_id = '"+category_id+"' and user_id = '"+userData[0].id+"' ORDER BY id desc limit 1";
-     console.log(sql)
         dbConnection.query(sql, function (err, subscriptionresult) {
-            console.log('subscriptionresult',subscriptionresult)
         if(subscriptionresult.length > 0){
         if(category_id == 1){
             
                     var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
                     dbConnection.query(usrLoads, function (err, usrLoadsresult) {
+                    var bookingSQL = "select date from bookings where cron_status = 1 and date > '"+currentFinalDate+"' limit 1";
+                    dbConnection.query(bookingSQL, function (err, bookingSQLresult) {
+                        if(bookingSQLresult){
+                            var next_pickup = bookingSQLresult[0].date;
+                        }else{
+                            var next_pickup = 'Booking not confirmed yet';
+
+                        }
                         let initi = {
-                            "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"pending_loads":usrLoadsresult[0].total_loads
+                            "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per',"pending_loads":usrLoadsresult[0].total_loads,'next_pickup':next_pickup
                         }
                         res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
+                    })
                     })
                 
         }else if(category_id == 2){
