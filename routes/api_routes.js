@@ -69,6 +69,8 @@ router.post("/Payment-Card-Id",CheckAuth,paymentController.Payment_Card_Id);
 router.post("/customer-payment",CheckAuth,paymentController.customer_payment);
 router.post("/Add-Bank-Account",CheckAuth,paymentController.Add_Bank_Account);
 router.post("/ACH-Payment",CheckAuth,paymentController.ACH_Payment);
+router.post("/customer-payment-BookingId",CheckAuth,paymentController.customer_payment_BookingId)
+router.post("/Payment-CardId-BookingId",CheckAuth,paymentController.Payment_CardId_BookingId)
 router.get("/get-dry-clean-services",CheckAuth,DrycleanController.get_category)
 router.get("/get-cart-item",CheckAuth,DrycleanController.get_cart_items)
 router.post("/add-to-cart",CheckAuth,DrycleanController.Add_To_Cart)
