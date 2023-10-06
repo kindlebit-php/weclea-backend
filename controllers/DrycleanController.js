@@ -47,6 +47,7 @@ export const get_category = async (req, res) => {
             });
           }else{
             const insertService = "INSERT INTO cart (user_id,service_id, quantity, amount) VALUES ( '"+userData[0].id+"', '"+id+"', '"+qty+"', '"+price+"')";
+            console.log('insertService',insertService)
             dbConnection.query(insertService, function (insertError) {
              
               res.json({'status':true,"message":"Items added to cart successfully"});
@@ -81,11 +82,11 @@ export const get_category = async (req, res) => {
   export const get_cart_items = async (req, res) => {
     try {
        const userData = res.user;
-        const items = "SELECT cart.id,dry_clean_services.title,cart.amount,cart.quantity FROM cart LEFT JOIN dry_clean_services ON cart.service_id = dry_clean_services.id WHERE cart.user_id = '"+userData[0].id+"' and cart.status = '0'";
+        const items = "SELECT cart.service_id ,cart.id,dry_clean_services.title,cart.amount,cart.quantity FROM cart LEFT JOIN dry_clean_services ON cart.service_id = dry_clean_services.id WHERE cart.user_id = '"+userData[0].id+"' and cart.status = '0'";
         
           dbConnection.query(items, function (error, data) {
              if(error) throw error;
-          res.json({'status':true,"message":"Item deleted successfully",'data':data});
+          res.json({'status':true,"message":"Item list",'data':data});
                 
               
             });

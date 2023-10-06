@@ -9,9 +9,15 @@ export const customer_booking = async(req,res)=>{
         const {	delievery_day,date,total_loads,order_type,frequency,category_id} = req.body;
         if(	delievery_day && date && total_loads && order_type){
         if(order_type == '1'){
-            var sql = "select available_loads from users where id = '"+userData[0].id+"'";
-            dbConnection.query(sql, function (error, result) {
-                if(total_loads > result[0].available_loads){
+            if(category_id == 1){
+                var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }else if(category_id == 2){
+                var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }else{
+                var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }
+            dbConnection.query(usrLoads, function (error, results) {
+                if(total_loads > results[0].total_loads){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
                     let dateObject = new Date();
@@ -31,6 +37,17 @@ export const customer_booking = async(req,res)=>{
                     // return false;
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52,'"+category_id+"')";
                     dbConnection.query(sql, function (err, result) {
+                    var updateLoads = (results[0].total_loads - total_loads);
+                    if(category_id == 1){
+                        var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
+                    }else if(category_id == 2){
+                        var usrLoadsup = "select customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+userData[0].id+"'";
+                    }else{
+                        var usrLoadsup = "select customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
+                    }
+                    dbConnection.query(usrLoadsup, function (error, result) {
+                    })
+
                         for (var i = 0; total_loads > i; i++) {
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
                         dbConnection.query(sql, function (err, results) {
@@ -63,10 +80,15 @@ export const customer_booking = async(req,res)=>{
             const endFinalDate = dateFormat.format(lastdate,'YYYY-MM-DD');
 
             let allDates =   getDates(new Date(currentFinalDate), new Date(endFinalDate),frequency);
-            console.log('allDates',allDates)
-            var sql = "select available_loads from users where id = '"+userData[0].id+"'";
-            dbConnection.query(sql, function (error, result) {
-                if(total_loads > result[0].available_loads){
+            if(category_id == 1){
+                var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }else if(category_id == 2){
+                var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }else{
+                var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }
+            dbConnection.query(usrLoads, function (error, resultss) {
+                if(total_loads > resultss[0].total_loads){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
                     var resData = [];
@@ -88,6 +110,17 @@ export const customer_booking = async(req,res)=>{
                                     dbConnection.query(sql, function (err, results) {
                                     });     
                                 }
+                                var updateLoads = (resultss[0].total_loads - total_loads);
+// console.log('updateLoads',updateLoads)
+                                if(category_id == 1){
+                                var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
+                                }else if(category_id == 2){
+                                var usrLoadsup = "select customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+userData[0].id+"'";
+                                }else{
+                                var usrLoadsup = "select customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
+                                }
+                                dbConnection.query(usrLoadsup, function (error, result) {
+                                })
                                 var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+result.insertId+"')";
                                 dbConnection.query(bookingsql, function (err, bookingresult) {
 
