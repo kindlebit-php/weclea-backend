@@ -99,7 +99,7 @@ export const get_category = async (req, res) => {
     try {
         const userData = res.user;
         const { delievery_day,date,amount} = req.body;
-        if(  delievery_day && date && amount){
+        if(delievery_day && date && amount){
         let dateObject = new Date();
         let hours = dateObject.getHours();
         let minutes = dateObject.getMinutes();
