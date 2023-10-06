@@ -119,7 +119,7 @@ export const get_category = async (req, res) => {
         const updateService = "update cart set booking_id = '"+result.insertId+"' where user_id = '"+userData[0].id+"' and status = '0'";
         dbConnection.query(updateService, function (error, data) {
              if(error) throw error;
-              res.json({'status':true,"message":"booking created successfully",'booking_id':result.insertId});  
+              res.json({'status':true,"message":"booking created successfully",'booking_id':result.insertId, 'card_status':userData[0].card_status});  
               
             });
 
