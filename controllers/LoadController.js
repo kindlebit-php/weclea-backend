@@ -162,6 +162,7 @@ export const get_user_subscription = async(req,res)=>{
                 }else{
                     var usrLoadss = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
                 }
+                console.log('usrLoadss',usrLoadss)
                 dbConnection.query(usrLoadss, function (err, usrLoadsresult) {
                     if(usrLoadsresult.length > 0){
                         var usrLoads = "select * from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
