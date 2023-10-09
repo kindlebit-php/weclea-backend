@@ -162,7 +162,6 @@ export const get_user_subscription = async(req,res)=>{
                 }else{
                     var usrLoadss = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
                 }
-                console.log('usrLoadss',usrLoadss)
                 dbConnection.query(usrLoadss, function (err, usrLoadsresult) {
                     if(usrLoadsresult.length > 0){
                         var usrLoads = "select * from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
@@ -210,7 +209,7 @@ export const get_user_home_data = async(req,res)=>{
                 var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }else if(category_id == 2){
                 var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";              
-            }else{
+            }else if(category_id == 3){
                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }
             dbConnection.query(usrLoads, function (err, usrLoadsresult) {
@@ -236,9 +235,9 @@ export const get_user_home_data = async(req,res)=>{
         dbConnection.query(getloadsSQL, function (err, getloadsresult) {
             console.log('getloadsresult',getloadsresult)
             if(getloadsresult.length > 0){
-                if(userData[0].category_id == 1){
+                if(category_id == 1){
                     var usrLoadss = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
-                }else if(userData[0].category_id == 2){
+                }else if(category_id == 2){
                     var usrLoadss = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
                 }else{
                     var usrLoadss = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
