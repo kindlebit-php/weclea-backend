@@ -9,9 +9,10 @@ export const Scan_received_loads = (req, res) => {
     try {
       const verifyQr = "SELECT * FROM booking_qr WHERE  qr_code = ?";
       dbConnection.query(verifyQr, [qr_code], function (error, data) {
+        console.log(data)
         if (error) {
           return res.json({ status: false, message: error.message });
-        } else if (data.length > 0 && data[0].driver_pickup_status == '1') { 
+        } else if (data.length > 0 && data[0].driver_pickup_status == '1' &&  data[0].folder_recive_status == '0') { 
           const updateStatus = `UPDATE booking_qr SET folder_recive_status = '1' WHERE id = ${data[0].id}`;
           dbConnection.query(updateStatus, function (updateerror, updateResult) {
             if (updateerror) {
@@ -33,7 +34,7 @@ export const Scan_received_loads = (req, res) => {
                     if (updateBookingErr) {
                       return res.json({ status: false, message: updateBookingErr.message });
                     } else if (updateBookingResult.affectedRows === 1) {
-                      return res.json({ status: true, message: "Updated successfully!" });
+                      return res.json({ status: true, message: "Verified successfully!" });
                     } else {
                       return res.json({ status: false, message: "Invalid folder_id" });
                     }
@@ -177,7 +178,7 @@ export const Scan_received_loads = (req, res) => {
         const currentTime = time();
         const currentDate = date();
         const updateDateTimeQuery = `UPDATE booking_timing SET wash_time = ?, wash_date = ? WHERE booking_id = ?`;
-  
+    
         dbConnection.query(
           updateDateTimeQuery,
           [currentTime, currentDate, booking_id],
@@ -208,7 +209,7 @@ export const Scan_received_loads = (req, res) => {
   
                 const updateOrderStatusQuery = 'UPDATE bookings SET order_status = ? WHERE id = ?';
   
-                dbConnection.query(updateOrderStatusQuery, ['completed', booking_id], function (
+                dbConnection.query(updateOrderStatusQuery, ['1', booking_id], function (
                   updateOrderStatusErr,
                   updateOrderStatusResult
                 ) {
@@ -233,9 +234,299 @@ export const Scan_received_loads = (req, res) => {
       res.json({ status: false, message: error.message });
     }
   };
+      
+
+  
+  export const Scan_loads_For_Dry = (req, res) => {
+    const userData = res.user;
+    const folder_id = userData[0].id;
+    const qr_code = req.body.qr_code;
+  
+    try {
+      const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ?";
+      dbConnection.query(verifyQr, [qr_code], function (error, data) {
+        console.log("retyyyouiygtik",data[0].folder_recive_status);
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        } else if ( data[0].folder_recive_status == '1') {
+          const verifyStatus = `SELECT * FROM bookings WHERE order_status = '1' AND id = ${data[0].booking_id}`;
+          dbConnection.query(verifyStatus, function (verifyerror, verifyResult) {
+            if (verifyerror) {
+              return res.json({ status: false, message: verifyerror.message });
+            } else if (verifyResult.length > 0) {
+              const currentTime = time();
+              const currentDate = date();
+              const dry_scan_timing = `${currentDate} ${currentTime}`;
+              const update_Date_Time = `UPDATE booking_timing SET dry_scan_timing = '${dry_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+              dbConnection.query(update_Date_Time, function (updateTimeErr, updateTimeResult) {
+                console.log(updateTimeResult);
+                console.log(updateTimeErr);
+                if (updateTimeErr) {
+                  return res.json({ status: false, message: updateTimeErr.message });
+                } else if (updateTimeResult.affectedRows === 1) {
+                  return res.json({ status: true, message: "Verified successfully!" });
+                } else {
+                  return res.json({ status: false, message: "Failed to update timing" });
+                }
+              });
+            } else {
+              return res.json({ status: false, message: "Invalid qr_code!" });
+            }
+          });
+        } else {
+          return res.json({ status: false, message: "Invalid qr_code!" });
+        }
+      });
+    } catch (error) {
+      res.json({ status: false, message: error.message });
+    }
+  };
+  
+  
+  export const submit_dry_detail = async (req, res) => {
+    const userData = res.user;
+    const folder_id = userData[0].id;
+    const { booking_id } = req.body;
+  
+    try {
+      const userIdQuery = 'SELECT user_id FROM bookings WHERE id = ?';
+  
+      dbConnection.query(userIdQuery, [booking_id], function (error, data) {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+  
+        const currentTime = time();
+        const currentDate = date();
+        const updateDateTimeQuery = `UPDATE booking_timing SET dry_time = ?, dry_date = ? WHERE booking_id = ?`;
+  
+        dbConnection.query(
+          updateDateTimeQuery,
+          [currentTime, currentDate, booking_id],
+          function (updateTimeErr, updateTimeResult) {
+            if (updateTimeErr) {
+              return res.json({ status: false, message: updateTimeErr.message });
+            }
+  
+            const imageArray = [];
+            req.files.forEach((e, i) => {
+              imageArray.push(e.path);
+            });
+  
+            if (imageArray.length > 5) {
+              return res.json({ status: false, message: "Only 5 images are allowed" });
+            }
+  
+            const pickupImagesJSON = JSON.stringify(imageArray);
+            const updatePickupImagesQuery = 'UPDATE booking_images SET dry_images = ? WHERE booking_id = ?';
+  
+            dbConnection.query(
+              updatePickupImagesQuery,
+              [pickupImagesJSON, booking_id],
+              function (updateImagesErr, updateImagesResult) {
+                if (updateImagesErr) {
+                  return res.json({ status: false, message: updateImagesErr.message });
+                }
+  
+                const updateOrderStatusQuery = 'UPDATE bookings SET order_status = ? WHERE id = ?';
+  
+                dbConnection.query(updateOrderStatusQuery, ['2', booking_id], function (
+                  updateOrderStatusErr,
+                  updateOrderStatusResult
+                ) {
+                  if (updateOrderStatusErr) {
+                    return res.json({ status: false, message: updateOrderStatusErr.message });
+                  }
+  
+                  const responseData = {
+                    status: true,
+                    message: "Dry process is completed! Please go to the next step",
+                    data: {
+                      customer_id: data[0].user_id,
+                    },
+                  };
+  
+                  return res.json(responseData);
+                });
+              });
+          });
+      });
+    } catch (error) {
+      res.json({ status: false, message: error.message });
+    }
+  };
+  
+ 
+  export const Scan_loads_For_Fold = (req, res) => {
+    const userData = res.user;
+    const folder_id = userData[0].id;
+    const qr_code = req.body.qr_code;
+  
+    try {
+      const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ?";
+      dbConnection.query(verifyQr, [qr_code], function (error, data) {
+        console.log("retyyyouiygtik",data[0].folder_recive_status);
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        } else if ( data[0].folder_recive_status == '1') {
+          const verifyStatus = `SELECT * FROM bookings WHERE order_status = '2' AND id = ${data[0].booking_id}`;
+          dbConnection.query(verifyStatus, function (verifyerror, verifyResult) {
+            if (verifyerror) {
+              return res.json({ status: false, message: verifyerror.message });
+            } else if (verifyResult.length > 0) {
+              const currentTime = time();
+              const currentDate = date();
+              const fold_scan_timing = `${currentDate} ${currentTime}`;
+              const update_Date_Time = `UPDATE booking_timing SET fold_scan_timing = '${fold_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+              dbConnection.query(update_Date_Time, function (updateTimeErr, updateTimeResult) {
+                console.log(updateTimeResult);
+                console.log(updateTimeErr);
+                if (updateTimeErr) {
+                  return res.json({ status: false, message: updateTimeErr.message });
+                } else if (updateTimeResult.affectedRows === 1) {
+                  return res.json({ status: true, message: "Verified successfully!" });
+                } else {
+                  return res.json({ status: false, message: "Failed to update timing" });
+                }
+              });
+            } else {
+              return res.json({ status: false, message: "Invalid qr_code!" });
+            }
+          });
+        } else {
+          return res.json({ status: false, message: "Invalid qr_code!" });
+        }
+      });
+    } catch (error) {
+      res.json({ status: false, message: error.message });
+    }
+  };
+  
+
+  
+  export const submit_fold_detail = async (req, res) => {
+    const userData = res.user;
+    const folder_id = userData[0].id;
+    const { booking_id } = req.body;
+  
+    try {
+      const userIdQuery = 'SELECT user_id FROM bookings WHERE id = ?';
+  
+      dbConnection.query(userIdQuery, [booking_id], function (error, data) {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+  
+        const currentTime = time();
+        const currentDate = date();
+        const updateDateTimeQuery = `UPDATE booking_timing SET fold_time = ?, fold_date = ? WHERE booking_id = ?`;
+  
+        dbConnection.query(
+          updateDateTimeQuery,
+          [currentTime, currentDate, booking_id],
+          function (updateTimeErr, updateTimeResult) {
+            if (updateTimeErr) {
+              return res.json({ status: false, message: updateTimeErr.message });
+            }
+  
+            const imageArray = [];
+            req.files.forEach((e, i) => {
+              imageArray.push(e.path);
+            });
+  
+            if (imageArray.length > 5) {
+              return res.json({ status: false, message: "Only 5 images are allowed" });
+            }
+  
+            const pickupImagesJSON = JSON.stringify(imageArray);
+            const updatePickupImagesQuery = 'UPDATE booking_images SET fold_images = ? WHERE booking_id = ?';
+  
+            dbConnection.query(
+              updatePickupImagesQuery,
+              [pickupImagesJSON, booking_id],
+              function (updateImagesErr, updateImagesResult) {
+                if (updateImagesErr) {
+                  return res.json({ status: false, message: updateImagesErr.message });
+                }
+  
+                const updateOrderStatusQuery = 'UPDATE bookings SET order_status = ? WHERE id = ?';
+  
+                dbConnection.query(updateOrderStatusQuery, ['3', booking_id], function (
+                  updateOrderStatusErr,
+                  updateOrderStatusResult
+                ) {
+                  if (updateOrderStatusErr) {
+                    return res.json({ status: false, message: updateOrderStatusErr.message });
+                  }
+  
+                  const responseData = {
+                    status: true,
+                    message: "Fold process is completed! Please go to the next step",
+                    data: {
+                      customer_id: data[0].user_id,
+                    },
+                  };
+  
+                  return res.json(responseData);
+                });
+              });
+          });
+      });
+    } catch (error) {
+      res.json({ status: false, message: error.message });
+    }
+  };
+  
+ 
+  export const Scan_loads_For_Pack = (req, res) => {
+    const userData = res.user;
+    const folder_id = userData[0].id;
+    const qr_code = req.body.qr_code;
+  
+    try {
+      const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ?";
+      dbConnection.query(verifyQr, [qr_code], function (error, data) {
+        console.log("retyyyouiygtik",data[0].folder_recive_status);
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        } else if ( data[0].folder_recive_status == '1') {
+          const verifyStatus = `SELECT * FROM bookings WHERE order_status = '3' AND id = ${data[0].booking_id}`;
+          dbConnection.query(verifyStatus, function (verifyerror, verifyResult) {
+            if (verifyerror) {
+              return res.json({ status: false, message: verifyerror.message });
+            } else if (verifyResult.length > 0) {
+              const currentTime = time();
+              const currentDate = date();
+              const pack_scan_timing = `${currentDate} ${currentTime}`;
+              const update_Date_Time = `UPDATE booking_timing SET pack_scan_timing = '${pack_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+              dbConnection.query(update_Date_Time, function (updateTimeErr, updateTimeResult) {
+                console.log(updateTimeResult);
+                console.log(updateTimeErr);
+                if (updateTimeErr) {
+                  return res.json({ status: false, message: updateTimeErr.message });
+                } else if (updateTimeResult.affectedRows === 1) {
+                  return res.json({ status: true, message: "Verified successfully!" });
+                } else {
+                  return res.json({ status: false, message: "Failed to update timing" });
+                }
+              });
+            } else {
+              return res.json({ status: false, message: "Invalid qr_code!" });
+            }
+          });
+        } else {
+          return res.json({ status: false, message: "Invalid qr_code!" });
+        }
+      });
+    } catch (error) {
+      res.json({ status: false, message: error.message });
+    }
+  };
+  
+
   
 
 
-  
 
-export default {Scan_received_loads,customer_list_wash, wash_detail_ByCustomer_id,submit_wash_detail}
+export default {Scan_received_loads,customer_list_wash, wash_detail_ByCustomer_id,submit_wash_detail,Scan_loads_For_Dry,submit_dry_detail,
+  Scan_loads_For_Fold, submit_fold_detail,Scan_loads_For_Pack}

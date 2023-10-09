@@ -368,26 +368,30 @@ export const get_drop_order_detail = async (req, res) => {
 
       const userIds = userIdResult.map((row) => row.user_id);
       const query = `
-                SELECT u.name, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
+                SELECT u.name,u.profile_image, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude,b.id AS booking_id,
                 FROM bookings AS b
                 JOIN customer_address AS ca ON b.user_id = ca.user_id
                 JOIN users AS u ON b.user_id = u.id
                 WHERE b.order_id = ? AND b.user_id IN (?)`;
-      dbConnection.query(query, [orderId, userIds], (error, data) => {
-        if (error) {
-          return res.json({ status: false, message: error.message });
-        }
-        res.json({
-          status: true,
-          message: "Order details retrieved successfully!",
-          data: data[0],
-        });
-      });
-    });
-  } catch (error) {
-    res.json({ status: false, message: error.message });
-  }
-};
+                dbConnection.query(query, [orderId, userIds], (error, data) => {
+                  if (error) {
+                    return res.json({ status: false, message: error.message });
+                  } else if (data.length === 0) {
+                    return res.json({ status: false, message: "data Not found" });
+                  }
+          
+                  const {name, profile_image, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads} = data[0];
+                  const resData = {
+                    name, profile_image:`${profile_image === 'null' ? "" : profile_image}`, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads
+                  }
+                  res.json({status: true,message: "Order details retrieved successfully!",data: resData});
+                });
+              });
+            } catch (error) {
+              res.json({ status: false, message: error.message });
+            }
+          };
+          
 
 export const drop_loads = async (req, res) => {
   try {
