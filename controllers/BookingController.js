@@ -165,7 +165,7 @@ export const subscription_dates = async(req,res)=>{
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
             var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"'";
              dbConnection.query(sql, function (err, resultss) {
-                res.json({'status':false,"message":"Password field is required",'data':resultss});
+                res.json({'status':false,"message":"user subscriptions list",'data':resultss});
             });
         
       
