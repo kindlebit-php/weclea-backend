@@ -53,9 +53,9 @@ router.post("/laundry-NotFound",CheckAuth,upload.array("images", 5),driverContro
 router.get("/order-histroy",CheckAuth,driverController.order_histroy);
 router.post("/order-histroy-byOrderId",CheckAuth,driverController.order_histroy_byOrderId);
 router.get("/profile",CheckAuth,driverController.profile)
-router.get("/get-drop-orders",CheckAuth,driverController.get_drop_orders)
+router.get("/get-drop-orders",CheckAuth,driverController.get_drop_orders);
 router.post("/get-drop-order-detail",CheckAuth,driverController.get_drop_order_detail);
-router.post("/drop-loads",CheckAuth,driverController.drop_loads)
+router.post("/drop-loads",CheckAuth,driverController.drop_loads);
 router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
 router.post("/submit_drop_details",CheckAuth,upload.array("images", 5),driverController.submit_drop_details);
 //********************************Folder Module**************************************//
@@ -63,6 +63,13 @@ router.post("/Scan-received-loads",CheckAuth,FolderController.Scan_received_load
 router.get("/customer-list-wash",CheckAuth,FolderController.customer_list_wash)
 router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id)
 router.post("/submit-wash-detail",CheckAuth,upload.array("images", 5),FolderController.submit_wash_detail)
+router.post("/Scan-loads-For-Dry",CheckAuth,FolderController.Scan_loads_For_Dry)
+router.post("/submit-dry-detail",CheckAuth,upload.array("images", 5),FolderController.submit_dry_detail)
+router.post("/Scan-loads-For-Fold",CheckAuth,FolderController.Scan_loads_For_Fold)
+router.post("/submit-fold-detail",CheckAuth,upload.array("images", 5),FolderController.submit_fold_detail)
+router.post("/Scan-loads-For-Pack",CheckAuth,FolderController.Scan_loads_For_Pack)
+
+router.get("/profile",CheckAuth,driverController.profile)
 
 //**********************************************************************************//
 router.get("/booking-subscription-cron",cronController.booking_subscription_cron);

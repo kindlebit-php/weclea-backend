@@ -296,7 +296,6 @@ export const get_user_profile = async(req,res)=>{
 }
 
 export const update_password = async(req,res)=>{
-
 	    try { 
         	const userData = res.user;
       		const saltRounds = 10;
