@@ -47,6 +47,7 @@ router.post('/change-password',userController.change_password);
 router.get('/get-orders',CheckAuth,driverController.get_orders);
 router.post("/get-order-detail",CheckAuth,driverController.get_order_detail);
 router.post("/print-All-QrCode",CheckAuth,driverController.print_All_QrCode)
+router.post("/print-All-Drop-QrCode",CheckAuth,driverController.print_All_Drop_QrCode)
 router.post("/pickup-loads",CheckAuth,driverController.pickup_loads)
 router.post("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
 router.post("/submit_pickup_details",CheckAuth,upload.array("images", 5),driverController.submit_pickup_details);
