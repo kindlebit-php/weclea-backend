@@ -382,15 +382,16 @@ export const get_drop_order_detail = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
-
       const userIds = userIdResult.map((row) => row.user_id);
+      console.log(orderId, userIds)
       const query = `
-                SELECT u.name,u.profile_image, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude,b.id AS booking_id,
+                SELECT u.name,u.profile_image, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude,b.id AS booking_id
                 FROM bookings AS b
                 JOIN customer_address AS ca ON b.user_id = ca.user_id
                 JOIN users AS u ON b.user_id = u.id
                 WHERE b.order_id = ? AND b.user_id IN (?)`;
                 dbConnection.query(query, [orderId, userIds], (error, data) => {
+                    console.log(data,"skfjuhk")
                   if (error) {
                     return res.json({ status: false, message: error.message });
                   } else if (data.length === 0) {
