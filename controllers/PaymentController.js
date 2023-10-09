@@ -718,7 +718,7 @@ export const customer_payment_BookingId = async (req, res) => {
             return res.json({ status: false, message: "Customer_id doesn't exist" });
           }
           const paymentIntent = await stripe.paymentIntents.create({
-            amount: purchaseAmount * 100,
+            amount: bookingAmount * 100,
             currency: 'usd',
             customer: customerId,
             payment_method: customerData.invoice_settings.default_payment_method,
