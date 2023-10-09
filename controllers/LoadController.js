@@ -154,7 +154,7 @@ export const get_user_subscription = async(req,res)=>{
 }else{
         var getloadsSQL= "select * from customer_loads_subscription type = 'individual' and payment_status = 1 and user_id = '"+userData[0].id+"' ORDER BY id desc limit 1"
         dbConnection.query(getloadsSQL, function (err, getloadsresult) {
-            if(getloadsresult.length > 0){
+            if(getloadsresult){
                 if(userData[0].category_id == 1){
                     var usrLoadss = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
                 }else if(userData[0].category_id == 2){
@@ -163,7 +163,7 @@ export const get_user_subscription = async(req,res)=>{
                     var usrLoadss = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
                 }
                 dbConnection.query(usrLoadss, function (err, usrLoadsresult) {
-                    if(usrLoadsresult > 0){
+                    if(usrLoadsresult.length > 0){
                         var usrLoads = "select * from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
                         dbConnection.query(usrLoads, function (err, getloadsresult) {
                             let initi = {
