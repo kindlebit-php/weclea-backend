@@ -1,5 +1,6 @@
 import dbConnection from "../../config/db.js";
 import { date, time } from "../../helpers/date.js";
+
 export const Scan_received_loads = (req, res) => {
     const userData = res.user;
     const folder_id = userData[0].id;
@@ -233,6 +234,8 @@ export const Scan_received_loads = (req, res) => {
     }
   };
   
+
+
   
 
 export default {Scan_received_loads,customer_list_wash, wash_detail_ByCustomer_id,submit_wash_detail}
