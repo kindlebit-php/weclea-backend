@@ -158,7 +158,8 @@ export const get_user_subscription = async(req,res)=>{
                 var usrLoadss = "select * from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
 
                 dbConnection.query(usrLoadss, function (err, usrLoadsresult) {
-                    if(usrLoadsresult.length > 0){
+                    console.log('usrLoadsresult',usrLoadsresult)
+                    if(usrLoadsresult){
                         if(userData[0].category_id == 1){
                             var total_loads = usrLoadsresult[0].commercial;
                         }else if(userData[0].category_id == 2){
@@ -168,14 +169,13 @@ export const get_user_subscription = async(req,res)=>{
                         }else{
                             var total_loads = '0';
                         }
-                        var usrLoads = "select * from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
-                        dbConnection.query(usrLoads, function (err, getloadsresult) {
+                        console.log('total_loads',total_loads)
                             let initi = {
-                                "id":getloadsresult[0].id,"package":'No Subscription Found',"price":getloadsresult[0].amount,"pending_loads":total_loads,'commercial':getloadsresult[0].commercial,'residential':getloadsresult[0].residential,'yeshiba':getloadsresult[0].yeshiba,'next_pickup':'No pickup'
+                                "id":usrLoadsresult[0].id,"package":'No Subscription Found',"price":usrLoadsresult[0].amount,"pending_loads":total_loads,'commercial':usrLoadsresult[0].commercial,'residential':usrLoadsresult[0].residential,'yeshiba':usrLoadsresult[0].yeshiba,'next_pickup':'No pickup'
                             }
                             res.json({'status':true,"message":"Subscription not found!",'data':initi});
 
-                        }) 
+                        
                     }else{
                         let initi = {
                             "id":0,"package":'No Subscription Found',"price":0,"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
