@@ -10,10 +10,7 @@ export const get_orders = async (req, res) => {
     const order = `SELECT id,order_id, date, time FROM bookings WHERE driver_id = ${userData[0].id}`;
     dbConnection.query(order, function (error, data) {
       if (error) throw error;
-      res.json({    
-        status: true,
-        message: "Data retrieved successfully!",          
-        data: data,   
+      res.json({status: true, message: "Data retrieved successfully!", data: data,   
       });           
     });
   } catch (error) {   
@@ -56,11 +53,7 @@ export const get_order_detail = async (req, res) => {
         const resData = {
           name, profile_image:`${profile_image === 'null' ? "" : profile_image}`, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads
         }
-        res.json({
-          status: true,
-          message: "Order details retrieved successfully!",
-          data: resData,
-        });
+        res.json({status: true,message: "Order details retrieved successfully!",data: resData});
       });
     });
   } catch (error) {
