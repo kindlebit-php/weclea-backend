@@ -152,7 +152,7 @@ export const get_user_subscription = async(req,res)=>{
 
              })
 }else{
-        var getloadsSQL= "select * from customer_loads_subscription type = 'individual' and payment_status = 1 and user_id = '"+userData[0].id+"' ORDER BY id desc limit 1"
+        var getloadsSQL= "select * from customer_loads_subscription where type = 'individual' and payment_status = 1 and user_id = '"+userData[0].id+"' ORDER BY id desc limit 1"
         console.log('getloadsSQL',getloadsSQL)
         dbConnection.query(getloadsSQL, function (err, getloadsresult) {
             if(getloadsresult){
