@@ -62,7 +62,7 @@ export const get_order_detail = async (req, res) => {
 };
 
 
-0
+
 export const print_All_QrCode = async (req, res) => {
   try {
     const userData = res.user;
@@ -70,16 +70,32 @@ export const print_All_QrCode = async (req, res) => {
     const data = `SELECT qr_code,driver_pickup_status FROM booking_qr WHERE booking_id = ${booking_id}`;
     dbConnection.query(data, function (error, data) {
       if (error) throw error;
-      res.json({
-        status: true,
-        message: "Data retrieved successfully!",
-        data: data,
-      });
+      res.json({status: true,message: "Data retrieved successfully!", data: data });
     });
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
 };
+
+export const print_All_Drop_QrCode = async (req, res) => {
+  try {
+    const userData = res.user;
+    const booking_id=req.body.booking_id
+    const data = `SELECT qr_code,folder_pack_status,driver_drop_status FROM booking_qr WHERE folder_pack_status = 1 AND booking_id = ${booking_id}`;
+    dbConnection.query(data, function (error, data) {
+      if (error) {
+        return res.json({ status: false, message: error.message });
+      }else if(data.length < 0 &&  data[0].driver_drop_status == '1'){
+        return res.json({ status: false, message: "Invalid qr_code!!" })
+      }else{
+      res.json({status: true,message: "Data retrieved successfully!", data: data });
+      }
+    });
+  } catch (error) {
+    res.json({ status: false, message: error.message });
+  }
+};
+
 
 export const pickup_loads = async (req, res) => {
   try {
@@ -336,6 +352,7 @@ export const laundry_NotFound = async (req, res) => {
 export const get_drop_orders = async (req, res) => {
   try {
     const userData = res.user;
+    console.log(userData[0].id)
     const order = `SELECT order_id FROM bookings WHERE order_status = '4' AND driver_id = ${userData[0].id}`;
     dbConnection.query(order, function (error, data) {
       if (error) throw error;
@@ -649,7 +666,6 @@ export const order_histroy_byOrderId=async(req,res)=>{
 export const profile = async (req, res) => {
   const userData = res.user;
   const id = userData[0].id;
-
   try {
     const userIdData = `SELECT profile_image, name, email, mobile FROM users WHERE id = ${id}`;
     dbConnection.query(userIdData, async (error, userIdResult) => {
@@ -666,6 +682,7 @@ export default {
   get_orders,
   get_order_detail,
   print_All_QrCode,
+  print_All_Drop_QrCode,
   pickup_loads,
   pickup_loads_detail,
   submit_pickup_details,
