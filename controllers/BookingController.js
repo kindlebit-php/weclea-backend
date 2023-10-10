@@ -36,7 +36,7 @@ export const customer_booking = async(req,res)=>{
                     // }); 
                     // return false;
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52,'"+category_id+"',1)";
-                    dbConnection.query(sql, function (err, resultsss) {
+                    dbConnection.query(sql, function (err, result) {
                     var updateLoads = (results[0].total_loads - total_loads);
                     if(category_id == 1){
                         var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
@@ -49,7 +49,7 @@ export const customer_booking = async(req,res)=>{
                     })
 
                         for (var i = 0; total_loads > i; i++) {
-                        var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+resultsss.insertId+"','"+randomNumber(result.insertId)+"')";
+                        var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
                         dbConnection.query(sql, function (err, results) {
                         });     
                         }
