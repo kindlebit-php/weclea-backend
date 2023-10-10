@@ -583,11 +583,10 @@ export const submit_drop_details = async (req, res) => {
 };
 
 
-export const order_histroy=async(req,res)=>{
+export const order_histroy = async (req, res) => {
   try {
     const userData = res.user;
     const driverId = userData[0].id;
-   
     const userIdQuery = `
             SELECT user_id FROM bookings AS b1
             JOIN users AS u ON u.id = b1.driver_id
@@ -602,25 +601,52 @@ export const order_histroy=async(req,res)=>{
         CONCAT(ca.address, ', ', ca.appartment, ', ', ca.city, ', ', ca.state, ', ', ca.zip) AS address,
         b.user_id AS Customer_Id,
         b.order_id,
+        b.date AS DATE,
         CONCAT(b.date, ' ', b.time) AS PickUp_date_time
       FROM bookings AS b
       JOIN customer_address AS ca ON b.user_id = ca.user_id
       JOIN users AS u ON b.user_id = u.id
       WHERE b.order_status = '6' AND b.driver_id = ? AND b.user_id IN (?)
-        ORDER BY PickUp_date_time DESC`;
-      
+        ORDER BY DATE DESC, PickUp_date_time DESC`;
+
       dbConnection.query(query, [driverId, userIds], (error, data) => {
-        console.log(userIds,driverId , data)
         if (error) {
           return res.json({ status: false, message: error.message });
         }
-        res.json({ status: true, message: "Order details retrieved successfully!", data: data});
+
+        const groupedData = {};
+        data.forEach((row) => {
+          const date = row.DATE;
+          if (!groupedData[date]) {
+            groupedData[date] = [];
+          }
+          groupedData[date].push({
+            mobile: row.mobile,
+            address: row.address,
+            Customer_Id: row.Customer_Id,
+            order_id: row.order_id,
+            PickUp_date_time: row.PickUp_date_time,
+          });
+        });
+
+        // Create the response format
+        const resultData = {
+          status: true,
+          message: "Order details retrieved successfully!",
+          data: Object.entries(groupedData).map(([date, orders]) => ({
+            Date: date,
+            orders: orders,
+          })),
+        };
+
+        res.json(resultData);
       });
     });
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
-}
+};
+
 
 
 export const order_histroy_byOrderId=async(req,res)=>{
@@ -644,6 +670,7 @@ export const order_histroy_byOrderId=async(req,res)=>{
         CONCAT(ca.address, ', ', ca.appartment, ', ', ca.city, ', ', ca.state, ', ', ca.zip) AS address,
         b.user_id AS Customer_Id,
         b.order_id,
+        b.date AS DATE,
         CONCAT(b.date, ' ', b.time) AS PickUp_date_time
       FROM bookings AS b
       JOIN customer_address AS ca ON b.user_id = ca.user_id
@@ -655,13 +682,38 @@ export const order_histroy_byOrderId=async(req,res)=>{
         if (error) {
           return res.json({ status: false, message: error.message });
         }
-        res.json({ status: true, message: "Order details retrieved successfully!", data: data[0]});
+        const groupedData = {};
+        data.forEach((row) => {
+          const date = row.DATE;
+          if (!groupedData[date]) {
+            groupedData[date] = [];
+          }
+          groupedData[date].push({
+            mobile: row.mobile,
+            address: row.address,
+            Customer_Id: row.Customer_Id,
+            order_id: row.order_id,
+            PickUp_date_time: row.PickUp_date_time,
+          });
+        });
+
+        // Create the response format
+        const resultData = {
+          status: true,
+          message: "Order details retrieved successfully!",
+          data: Object.entries(groupedData).map(([date, orders]) => ({
+            Date: date,
+            orders: orders,
+          })),
+        };
+
+        res.json(resultData);
       });
     });
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
-}    
+};
 
 
 export const profile = async (req, res) => {

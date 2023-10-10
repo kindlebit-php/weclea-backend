@@ -10,7 +10,7 @@ const stripes = new Stripe(process.env.STRIPE_PUBLISH_KEY);
 // Add & Attach Card Api
 
 export const Attach_Card = async (req, res) => {
-  try {
+  try {        
 
     // validation 
     const userData = res.user;
@@ -19,7 +19,7 @@ export const Attach_Card = async (req, res) => {
     if (cardNumber && expMonth && expYear && cvc) {
       if (
         (cvc.length !== 3 && cvc.length !== 4) ||
-        cvc === "000" ||
+        cvc === "000" ||          
         cvc === "0000"
       ) {
        return res.json({
