@@ -161,19 +161,13 @@ export const subscription_dates = async(req,res)=>{
 
         try { 
             const userData = res.user;
-            const saltRounds = 10;
-            const { password } = req.body;
-        if(password){
-            bcrypt.hash(password, saltRounds, function(error, hash) {
-                var sql = "update users set password = '"+hash+"' where id = '"+userData[0].id+"'";
-                dbConnection.query(sql, function (error, result) {
-                if (error) throw error;
-                    res.json({'status':true,"message":"data updated successfully!"});
-                }); 
-            }); 
-        }else{
-            res.json({'status':false,"message":"Password field is required"});
-        }
+            var datetime = new Date();
+            const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+            var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"'";
+             dbConnection.query(sql, function (err, resultss) {
+                res.json({'status':false,"message":"user subscriptions list",'data':resultss});
+            });
+        
       
     }catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -182,5 +176,6 @@ export const subscription_dates = async(req,res)=>{
 }
 
 export default {
-	customer_booking
+	customer_booking,
+    subscription_dates
 }
