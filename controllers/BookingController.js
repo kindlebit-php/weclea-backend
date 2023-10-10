@@ -7,7 +7,7 @@ export const customer_booking = async(req,res)=>{
      try { 
      	const userData = res.user;
         const {	delievery_day,date,total_loads,order_type,frequency,category_id} = req.body;
-        if(	delievery_day && date && total_loads && order_type){
+        if(	date && total_loads && order_type){
         if(order_type == '1'){
             if(category_id == 1){
                 var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
@@ -103,7 +103,7 @@ export const customer_booking = async(req,res)=>{
                         const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
 
                         if(frequencyDBDate == currentBookingDate ){
-                            var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52,1,'"+category_id+"')";
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52,1,'"+category_id+"')";
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
                                     var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
@@ -136,7 +136,7 @@ export const customer_booking = async(req,res)=>{
                                 });
                             }); 
                         }else{
-                            var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,frequency,category_id) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+frequency+"','"+category_id+"')";
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,frequency,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+frequency+"','"+category_id+"')";
                             dbConnection.query(sql, function (err, resultsub) {
                                 var order_id = '1001'+resultsub.insertId;
                                 var sql = "update bookings set order_id = '"+order_id+"'where id = '"+resultsub.insertId+"'";
@@ -167,8 +167,22 @@ export const subscription_dates = async(req,res)=>{
              dbConnection.query(sql, function (err, resultss) {
                 res.json({'status':false,"message":"user subscriptions list",'data':resultss});
             });
-        
-      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
+}
+
+export const booking_tracking_status = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            var datetime = new Date();
+            const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+            var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"'";
+             dbConnection.query(sql, function (err, resultss) {
+                res.json({'status':false,"message":"user subscriptions list",'data':resultss});
+            });
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
