@@ -7,7 +7,7 @@ export const customer_booking = async(req,res)=>{
      try { 
      	const userData = res.user;
         const {	delievery_day,date,total_loads,order_type,frequency,category_id} = req.body;
-        if(	delievery_day && date && total_loads && order_type){
+        if(	date && total_loads && order_type){
         if(order_type == '1'){
             if(category_id == 1){
                 var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
@@ -167,8 +167,22 @@ export const subscription_dates = async(req,res)=>{
              dbConnection.query(sql, function (err, resultss) {
                 res.json({'status':false,"message":"user subscriptions list",'data':resultss});
             });
-        
-      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
+}
+
+export const booking_tracking_status = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            var datetime = new Date();
+            const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+            var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"'";
+             dbConnection.query(sql, function (err, resultss) {
+                res.json({'status':false,"message":"user subscriptions list",'data':resultss});
+            });
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
