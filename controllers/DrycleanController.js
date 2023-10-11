@@ -5,9 +5,10 @@ export const get_category = async (req, res) => {
     try {
       var resData = [];
     const category = `SELECT id, title, price, image FROM dry_clean_services WHERE status = 1 `;
-      console.log('category',category)
       dbConnection.query(category, function (error, data) {
         if (error) throw error;
+        const dryCleanChares = `SELECT dry_clean_charges FROM settings `;
+        dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
           data.forEach(element =>
           {
             const {id,title,price,image} = element;
@@ -17,11 +18,12 @@ export const get_category = async (req, res) => {
               var img = process.env.BASE_URL+'/uploads/profile.png';
             }
             const initi = {
-            "id":id,"title":title,"price":price,"image":img,
+            "id":id,"title":title,"price":price,"image":img
             }
             resData.push(initi);
           });
-            res.json({'status':true,"message":"Category retrieved successfully!",'data': resData});
+            res.json({'status':true,"message":"Category retrieved successfully!",'data': resData,'dry_clean_min_amount':dryCleanCharesdata[0].dry_clean_charges});
+      });
       });
 
     } catch (error) {
