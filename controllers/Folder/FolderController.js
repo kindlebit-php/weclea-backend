@@ -144,7 +144,7 @@ export const Scan_received_loads = (req, res) => {
                       const images = JSON.parse(pickup_images);
                       for(const image of images)
                       {
-                          imageArray.push({img_path:image? `${process.env.BASE_URL}${image}` : ''})
+                          imageArray.push({img_path:image? `${process.env.BASE_URL}/${image}` : ''})
                       }
                       resData.push({
                           Customer_Id,date,time,order_status,imageArray
