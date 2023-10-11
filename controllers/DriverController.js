@@ -215,8 +215,8 @@ export const submit_pickup_details = async (req, res) => {
                 if (req.files.length > 5) {
                   return res.json({status: false, message: "only 5 images are allowed"});
                 }
-                const pickupImagesJSON = JSON.stringify(imageArray);
-
+                const pickupImagesJSON =  imageArray.join(', ');
+               
                 const update_pickupimages =
                   "UPDATE booking_images SET pickup_images = ? WHERE booking_id = ?";
                 dbConnection.query(update_pickupimages, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
@@ -287,9 +287,9 @@ export const laundry_NotFound = async (req, res) => {
                 imageArray.push(e.path);
               });
               if (req.files.length > 5) {
-                return res.json({ status: false, message: "only 5 images are allowed" });
+                return res.json({status: false, message: "only 5 images are allowed"});
               }
-              const pickupImagesJSON = JSON.stringify(imageArray);
+              const pickupImagesJSON =  imageArray.join(', ');
 
               const update_pickupimages = "UPDATE booking_images SET pickup_images = ? WHERE booking_id = ?";
               dbConnection.query(update_pickupimages, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
@@ -525,9 +525,9 @@ export const submit_drop_details = async (req, res) => {
                 imageArray.push(e.path);
               });
               if (req.files.length > 5) {
-                return res.json({ status: false, message: "Only 5 images are allowed" });
+                return res.json({status: false, message: "only 5 images are allowed"});
               }
-              const dropImagesJSON = JSON.stringify(imageArray);
+              const dropImagesJSON =  imageArray.join(', ');
 
               const update_dropimages = "UPDATE booking_images SET drop_image = ? WHERE booking_id = ?";
               dbConnection.query(update_dropimages, [dropImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
