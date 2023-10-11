@@ -579,7 +579,7 @@ export const customer_payment_BookingId = async (req, res) => {
       }
 
       // Create a token
-      const createCard = await stripe.tokens.create({
+      const createCard = await stripes.tokens.create({
         card: {
           number: cardNumber,
           exp_month: expMonth,
@@ -587,7 +587,6 @@ export const customer_payment_BookingId = async (req, res) => {
           cvc: cvc,
         },
       });
-
       // Create a Payment Method
       const paymentMethod = await stripe.paymentMethods.create({
         type: "card",
