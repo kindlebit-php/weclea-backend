@@ -27,6 +27,7 @@ const profileUpload = multer({storage:storage})
 
 router.post('/customer-register',userController.customer_register);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
+router.get('/get-notification',CheckAuth ,userController.get_notification);
 router.post('/update-password',CheckAuth ,userController.update_password);
 router.post('/edit-user-profile',CheckAuth,profileUpload.single('profile_image') ,userController.edit_user_profile);
 
