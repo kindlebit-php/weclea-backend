@@ -868,8 +868,8 @@ export const customer_extra_payment = async (req, res) => {
   const userData = res.user;
   const userId = userData[0].id;
   const customerId = userData[0].customer_id;
+  console.log(customerId)
   const { cardNumber, expMonth, expYear, amount, cvc, card_status } = req.body;
-
   try {
     if (cardNumber && expMonth && expYear && cvc && amount && card_status !== undefined) {
       if ((cvc.length !== 3 && cvc.length !== 4) || cvc === "000" || cvc === "0000") {
@@ -880,7 +880,7 @@ export const customer_extra_payment = async (req, res) => {
       }
 
       // Create a token
-      const createCard = await stripe.tokens.create({
+      const createCard = await stripes.tokens.create({
         card: {
           number: cardNumber,
           exp_month: expMonth,
@@ -906,9 +906,9 @@ export const customer_extra_payment = async (req, res) => {
           confirm: true,
           description: 'Payment by client',
         });
-
+        console.log(paymentIntent)
         if (paymentIntent.status === 'succeeded') {
-          return res.json({ status: true, message: 'Payment successful' });
+          return res.json({ status: true, message: 'Payment successful',paymentId:paymentIntent.id});
         } else {
           return res.json({ status: false, message: 'Payment failed' });
         }
@@ -943,7 +943,7 @@ export const customer_extra_payment = async (req, res) => {
           confirm: true,
           description: 'Payment by client',
         });
-
+        console.log(paymentIntent)
         if (paymentIntent.status === 'succeeded') {
           return res.json({ status: true, message: 'Payment successful',paymentId:paymentIntent.id});
         } else {
