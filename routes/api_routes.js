@@ -38,6 +38,7 @@ router.get('/get-user-subscription',CheckAuth ,loadController.get_user_subscript
 router.post('/customer-loads-subscription',CheckAuth ,loadController.customer_loads_subscription);
 router.post('/customer-booking',CheckAuth ,bookingController.customer_booking);
 router.get('/user-subscription-dates',CheckAuth ,bookingController.subscription_dates);
+router.get('/booking-tracking-status',CheckAuth ,bookingController.booking_tracking_status);
 router.get('/get-load-price',CheckAuth ,loadController.get_load_price);
 router.post('/customer-login',userController.customer_login);
 router.post('/forgot-password',userController.forgot_password);
