@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 import dbConnection from'../config/db.js';
 import Stripe from "stripe";
-import { date } from "../helpers/date.js";
 import { customer_loads_subscription } from "./LoadController.js";
+import { date } from "../helpers/date.js";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const stripes = new Stripe(process.env.STRIPE_PUBLISH_KEY);
 
@@ -303,7 +303,7 @@ export const customer_payment = async (req, res) => {
                             })
                           }
 
-                  const currentDate = date();
+                  const currentDate = date;
                   const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
                     userData[0].id}', '${purchaseAmount}', '${paymentIntent.id}', '${currentDate}')`;
     
@@ -651,7 +651,7 @@ export const customer_payment_BookingId = async (req, res) => {
                     if (error) {
                       return res.json({ status: false, message: 'Error in update_cart_status' });
                     }
-                    const currentDate = new Date();
+                    const currentDate = date();
                     const insertData = "INSERT INTO payment (user_id, booking_id, amount, payment_id, date) VALUES ('" + user_id + "', '" + booking_id + "','" + bookingAmount + "','" + paymentIntent.id + "','" + currentDate + "')";
                     dbConnection.query(insertData, function (err, result) {
                       if (err) throw err;
@@ -745,7 +745,7 @@ export const customer_payment_BookingId = async (req, res) => {
                     if (error) {
                       return res.json({ status: false, message: 'Error in update_cart_status' });
                     }
-                    const currentDate = new Date();
+                    const currentDate = date();
                     const insertData = "INSERT INTO payment (user_id, booking_id, amount, payment_id, date) VALUES ('" + user_id + "', '" + booking_id + "','" + bookingAmount + "','" + paymentIntent.id + "','" + currentDate + "')";
                     dbConnection.query(insertData, function (err, result) {
                       if (err) throw err;
@@ -839,7 +839,7 @@ export const Payment_CardId_BookingId = async (req, res) => {
                       if (error) {
                         return res.json({ status: false, message: 'Error in update_cart_status' });
                       }
-                      const currentDate = new Date();
+                      const currentDate = date();
                       const insertData = "INSERT INTO payment (user_id, booking_id, amount, payment_id, date) VALUES ('" + user_id + "', '" + booking_id + "','" + bookingAmount + "','" + paymentIntent.id + "','" + currentDate + "')";
                       dbConnection.query(insertData, function (err, result) {
                         if (err) throw err;
