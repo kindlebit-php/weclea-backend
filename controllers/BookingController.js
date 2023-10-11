@@ -165,7 +165,7 @@ export const subscription_dates = async(req,res)=>{
             var datetime = new Date();
             var resData = [];
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-            var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' order by id desc";
+            var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' order by date desc";
              dbConnection.query(sql, function (err, resultss) {
                 // console.log('resultss',resultss)
                 resultss.forEach(function callback(elem, key){
