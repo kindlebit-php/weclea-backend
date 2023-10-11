@@ -100,7 +100,7 @@ export const get_category = async (req, res) => {
   export const dry_clean_booking = async (req, res) => {
     try {
         const userData = res.user;
-        const { delievery_day,date,amount} = req.body;
+        const { delievery_day,date,amount,payment_id} = req.body;
         if(delievery_day && date && amount){
         let dateObject = new Date();
         let hours = dateObject.getHours();
@@ -109,8 +109,16 @@ export const get_category = async (req, res) => {
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
 
         var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,order_type,driver_id,category_id,total_amount) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"',3,52,'"+userData[0].category_id+"','"+amount+"')";
-        console.log('kailash',sql)
+
         dbConnection.query(sql, function (err, result) {
+        if(result){
+
+        if(payment_id != ''){
+          var paymentsql = "update payment set booking_id = '"+result.insertId+"'where id = '"+payment_id+"'";
+          dbConnection.query(paymentsql, function (err,paymentResult ) {
+
+          });
+        }
 
         var order_id = '1001'+result.insertId;
         var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
@@ -124,7 +132,10 @@ export const get_category = async (req, res) => {
               res.json({'status':true,"message":"booking created successfully",'booking_id':result.insertId, 'card_status':userData[0].card_status});  
               
             });
+        }else{
+            res.json({'status':false,"message":err.sqlMessage});
 
+        }
         });     
         }else{
             res.json({'status':false,"message":"All fields are required"});

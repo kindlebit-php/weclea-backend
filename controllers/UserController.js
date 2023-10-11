@@ -363,8 +363,23 @@ export const edit_user_profile = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+
+//notification verify OTP API
+export const get_notification = async(req,res)=>{
+	try {	
+        	const userData = res.user;
+			const notificationSQL = "select * from notification where user_id = '"+userData[0].id+"'";
+			dbConnection.query(notificationSQL, function (error, data) {
+					res.json({'status':true,"message":"Notification List",'data':data});
+			});
+		
+	}catch (error) {
+		res.json({'status':false,"message":error.message});  
+	}
+}
 export default {
 	customer_register,
+	get_notification,
 	customer_address,
 	customer_login,
 	forgot_password,
