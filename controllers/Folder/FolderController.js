@@ -89,8 +89,8 @@ export const Scan_received_loads = (req, res) => {
                 for(const elem of data)
                 {
                     const {Customer_Id, date,time,order_status, pickup_images} = elem;
-                    const images = JSON.parse(pickup_images);
-                    for(const image of images)
+
+                    for(const image of pickup_images)
                     {
                         imageArray.push({img_path:image? `${process.env.HTTPURL}${image}` : ''})
                     }
@@ -141,8 +141,7 @@ export const Scan_received_loads = (req, res) => {
                   for(const elem of data)
                   {
                       const {Customer_Id, date,time,order_status, pickup_images} = elem;
-                      const images = JSON.parse(pickup_images);
-                      for(const image of images)
+                      for(const image of pickup_images)
                       {
                           imageArray.push({img_path:image? `${process.env.BASE_URL}/${image}` : ''})
                       }
@@ -192,11 +191,10 @@ export const Scan_received_loads = (req, res) => {
               imageArray.push(e.path);
             });
   
-            if (imageArray.length > 5) {
-              return res.json({ status: false, message: "Only 5 images are allowed" });
+            if (req.files.length > 5) {
+              return res.json({status: false, message: "only 5 images are allowed"});
             }
-  
-            const pickupImagesJSON = JSON.stringify(imageArray);
+            const pickupImagesJSON =  imageArray.join(', ');
             const updatePickupImagesQuery = 'UPDATE booking_images SET wash_images = ? WHERE booking_id = ?';
   
             dbConnection.query(
@@ -313,11 +311,10 @@ export const Scan_received_loads = (req, res) => {
               imageArray.push(e.path);
             });
   
-            if (imageArray.length > 5) {
-              return res.json({ status: false, message: "Only 5 images are allowed" });
+            if (req.files.length > 5) {
+              return res.json({status: false, message: "only 5 images are allowed"});
             }
-  
-            const pickupImagesJSON = JSON.stringify(imageArray);
+            const pickupImagesJSON =  imageArray.join(', ');
             const updatePickupImagesQuery = 'UPDATE booking_images SET dry_images = ? WHERE booking_id = ?';
   
             dbConnection.query(
@@ -434,11 +431,10 @@ export const Scan_received_loads = (req, res) => {
               imageArray.push(e.path);
             });
   
-            if (imageArray.length > 5) {
-              return res.json({ status: false, message: "Only 5 images are allowed" });
+            if (req.files.length > 5) {
+              return res.json({status: false, message: "only 5 images are allowed"});
             }
-  
-            const pickupImagesJSON = JSON.stringify(imageArray);
+            const pickupImagesJSON =  imageArray.join(', ');
             const updatePickupImagesQuery = 'UPDATE booking_images SET fold_images = ? WHERE booking_id = ?';
   
             dbConnection.query(
@@ -563,8 +559,7 @@ export const order_histroy = async (req, res) => {
               for(const elem of data)
               {
                   const {Customer_Id, PickUp_date_time, pack_images} = elem;
-                  const images = JSON.parse(pack_images);
-                  for(const image of images)
+                  for(const image of pack_images)
                   {
                       imageArray.push({img_path:image? `${process.env.HTTPURL}${image}` : ''})
                   }
@@ -623,8 +618,7 @@ export const Filter_order_histroy = async (req, res) => {
               for(const elem of data)
               {
                   const {Customer_Id, PickUp_date_time, pack_images} = elem;
-                  const images = JSON.parse(pack_images);
-                  for(const image of images)
+                  for(const image of pack_images)
                   {
                       imageArray.push({img_path:image? `${process.env.HTTPURL}${image}` : ''})
                   }
