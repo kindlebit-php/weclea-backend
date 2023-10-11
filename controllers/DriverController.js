@@ -229,8 +229,7 @@ export const submit_pickup_details = async (req, res) => {
                     };
                       
                       return res.json(responseData);
-                      
-                      return res.json(responseData);
+                    
                     }
                   }
                 );
