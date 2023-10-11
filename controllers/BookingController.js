@@ -163,7 +163,7 @@ export const subscription_dates = async(req,res)=>{
             const userData = res.user;
             var datetime = new Date();
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-            var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"'";
+            var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' order by id desc";
              dbConnection.query(sql, function (err, resultss) {
                 res.json({'status':false,"message":"user subscriptions list",'data':resultss});
             });
@@ -176,12 +176,30 @@ export const subscription_dates = async(req,res)=>{
 export const booking_tracking_status = async(req,res)=>{
 
         try { 
+            var resData = [];
+            var resImg = [];
             const userData = res.user;
             var datetime = new Date();
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-            var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"'";
-             dbConnection.query(sql, function (err, resultss) {
-                res.json({'status':false,"message":"user subscriptions list",'data':resultss});
+            var sql = "select bookings.id,bookings.order_type,booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.customer_pick_date, ' ', booking_timing.customer_pick_time) AS pickup_confirm_date,booking_qr.driver_pickup_status from bookings left join booking_timing on bookings.id = booking_timing.booking_id left join booking_qr on booking_qr.booking_id = bookings.id left join booking_images on booking_images.booking_id = bookings.id where bookings.date >= '"+currentFinalDate+"' and bookings.cron_status = 1 and booking_qr.driver_pickup_status = 1 and booking_timing.customer_pick_time IS NOT NULL group by booking_qr.booking_id";
+            dbConnection.query(sql, function (err, resultss) {
+            resultss.forEach(element =>
+            {
+                const {id,order_type,pickup_images,request_confirm_date,status,pickup_confirm_date,driver_pickup_status} = element;
+                if(pickup_images){
+                    const pickup_images_array = pickup_images.split(',');
+                    pickup_images_array.forEach(function callback(img, key)
+                    {
+                        resImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                    // var img = process.env.BASE_URL+'/uploads/'+image;
+                }
+                const initi = {
+                    "id":id,"order_type":order_type,"request_confirm_date":request_confirm_date,"status":status,'pickup_confirm_date':pickup_confirm_date,'driver_pickup_status':driver_pickup_status,'pickup_img':resImg
+                }
+                resData.push(initi);
+            })
+                res.json({'status':false,"message":"user order list",'data':resData});
             });
     }catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -191,5 +209,6 @@ export const booking_tracking_status = async(req,res)=>{
 
 export default {
 	customer_booking,
-    subscription_dates
+    subscription_dates,
+    booking_tracking_status
 }
