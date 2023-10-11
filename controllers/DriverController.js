@@ -81,7 +81,7 @@ export const print_All_Drop_QrCode = async (req, res) => {
   try {
     const userData = res.user;
     const booking_id=req.body.booking_id
-    const data = `SELECT qr_code,driver_drop_status FROM booking_qr WHERE folder_pack_status = 1 AND booking_id = ${booking_id}`;
+    const data = `SELECT qr_code,driver_drop_status FROM booking_qr WHERE folder_pack_status = 1 AND booking_id  = ${booking_id}`;
     dbConnection.query(data, function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
@@ -225,19 +225,7 @@ export const submit_pickup_details = async (req, res) => {
                     } else {
                       const responseData = {
                         status: true,
-                        message: "Submitted successfully!",
-                        data:{name: result.name,
-                        address: result.address,
-                        appartment: result.appartment,
-                        city: result.city,
-                        state: result.state,
-                        zip: result.zip,
-                        latitude: result.latitude,
-                        longitude: result.longitude,
-                        driver_pick_time: currentTime,
-                        driver_pick_date: currentDate,
-                        driver_pick_images: imageArray,
-                      }
+                        message: "Submitted successfully!"
                     };
                       
                       return res.json(responseData);
