@@ -109,7 +109,10 @@ export const customer_list_wash = (req, res) => {
           const resData = [];
           if (data?.length > 0) {
             for (const elem of data) {
+              console.log("ksjfhg",data);
               const { Customer_Id, date, time, order_status, pickup_images } = elem;
+
+              console.log('images',pickup_images)
               const separatedStrings = pickup_images.split(", ")
                const imagesUrl=separatedStrings.map((val) => {
                return `${process.env.BASE_URL}/${val}`;
