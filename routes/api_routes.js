@@ -78,6 +78,7 @@ router.get("/profile",CheckAuth,driverController.profile)
 
 //**********************************************************************************//
 router.get("/booking-subscription-cron",cronController.booking_subscription_cron);
+//*********************************PAYMENT******************************************//
 router.post("/attach-card",CheckAuth,paymentController.Attach_Card);
 router.get("/get-all-cards",CheckAuth,paymentController.get_all_cards);
 router.post("/Payment-Card-Id",CheckAuth,paymentController.Payment_Card_Id);
@@ -86,6 +87,9 @@ router.post("/Add-Bank-Account",CheckAuth,paymentController.Add_Bank_Account);
 router.post("/ACH-Payment",CheckAuth,paymentController.ACH_Payment);
 router.post("/customer-payment-BookingId",CheckAuth,paymentController.customer_payment_BookingId)
 router.post("/Payment-CardId-BookingId",CheckAuth,paymentController.Payment_CardId_BookingId)
+router.post("/customer-extra-payment",CheckAuth,paymentController.customer_extra_payment)
+router.post("/customer-extra-payment-cardId",CheckAuth,paymentController.customer_extra_payment_cardId)
+//**********************************************************************************//
 router.get("/get-dry-clean-services",CheckAuth,DrycleanController.get_category)
 router.get("/get-cart-item",CheckAuth,DrycleanController.get_cart_items)
 router.post("/add-to-cart",CheckAuth,DrycleanController.Add_To_Cart)
