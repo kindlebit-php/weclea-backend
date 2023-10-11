@@ -206,11 +206,11 @@ export const booking_tracking_status = async(req,res)=>{
                     // var img = process.env.BASE_URL+'/uploads/'+image;
                 }
                 const initi = {
-                    "id":id,"order_type":order_type,"request_confirm_date":request_confirm_date,"status":status,'pickup_confirm_date':pickup_confirm_date,'driver_pickup_status':driver_pickup_status,'pickup_img':resImg
+                    "id":id,"order_type":order_type,"request_confirm_date":request_confirm_date,"status":status,'pickup_confirm_date':pickup_confirm_date,'driver_pickup_status':driver_pickup_status,'pickup_img':resPickImg
                 }
                 resData.push(initi);
             })
-                res.json({'status':false,"message":"user order list",'data':resData});
+                res.json({'status':true,"message":"user order list",'data':resData});
             });
     }catch (error) {
         res.json({'status':false,"message":error.message});  
