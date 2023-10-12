@@ -203,6 +203,7 @@ export const booking_tracking_status = async(req,res)=>{
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
             var sql = "select bookings.id,booking_images.wash_images,booking_images.dry_images,booking_images.fold_images,booking_images.pack_images,booking_images.drop_image,bookings.order_status,bookings.order_type,booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.customer_pick_date, ' ', booking_timing.customer_pick_time) AS pickup_confirm_date,booking_qr.driver_pickup_status ,CONCAT(booking_timing.wash_date, ' ', booking_timing.wash_time) AS wash_date,CONCAT(booking_timing.dry_date, ' ', booking_timing.dry_time) AS dry_date,CONCAT(booking_timing.fold_date, ' ', booking_timing.fold_time) AS fold_date,CONCAT(booking_timing.pack_date, ' ', booking_timing.pack_time) AS pack_date from bookings left join booking_timing on bookings.id = booking_timing.booking_id left join booking_qr on booking_qr.booking_id = bookings.id left join booking_images on booking_images.booking_id = bookings.id where bookings.date >= '"+currentFinalDate+"' and bookings.cron_status = 1 and booking_qr.driver_pickup_status = 1 and booking_timing.customer_pick_time IS NOT NULL group by booking_qr.booking_id";
             dbConnection.query(sql, function (err, resultss) {
+            if(resultss){
             resultss.forEach(element =>
             {
                 const {id,order_type,dry_images,wash_images,fold_images,pack_images,dry_date,fold_date,pack_date,order_status,pickup_images,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status} = element;
@@ -266,6 +267,10 @@ export const booking_tracking_status = async(req,res)=>{
                 resData.push(initi);
             })
                 res.json({'status':true,"message":"user order list",'data':resData});
+            }else{
+                res.json({'status':false,"message":"Not found"});
+
+            }
             });
     }catch (error) {
         res.json({'status':false,"message":error.message});  
