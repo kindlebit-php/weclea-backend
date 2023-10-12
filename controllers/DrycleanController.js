@@ -15,7 +15,7 @@ export const get_category = async (req, res) => {
             if(image){
               var img = process.env.BASE_URL+'/uploads/'+image;
             }else{
-              var img = process.env.BASE_URL+'/uploads/profile.png';
+              var img = process.env.BASE_URL+'/uploads/shirt.jpg';
             }
             const initi = {
             "id":id,"title":title,"price":price,"image":img

@@ -277,7 +277,7 @@ export const booking_pickup_instruction = async(req,res)=>{
         try { 
             const userData = res.user;
             const { pickup_instruction} = req.body;
-            var sql = "update delievery_instruction set pickup_instruction = '"+pickup_instruction+"' where user_id = '"+userData[0].id+"'";
+            var sql = "update booking_instructions set pickup_instruction = '"+pickup_instruction+"' where user_id = '"+userData[0].id+"'";
             dbConnection.query(sql, function (err, results) {
                 res.json({'status':true,"message":"Instruction added successfully"});
             }); 
@@ -291,7 +291,7 @@ export const booking_delievery_instruction = async(req,res)=>{
         try { 
             const userData = res.user;
             const { delievery_instruction} = req.body;
-            var sql = "update delievery_instruction set delievery_instruction = '"+delievery_instruction+"' where user_id = '"+userData[0].id+"'";
+            var sql = "update booking_instructions set delievery_instruction = '"+delievery_instruction+"' where user_id = '"+userData[0].id+"'";
             dbConnection.query(sql, function (err, results) {
                 res.json({'status':true,"message":"Instruction added successfully"});
             }); 
