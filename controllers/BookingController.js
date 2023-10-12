@@ -48,7 +48,8 @@ export const customer_booking = async(req,res)=>{
                     }
                     dbConnection.query(usrLoadsup, function (error, resulst) {
                     })
-                    if(payment_id != ''){
+                    
+                    if(typeof payment_id != 'undefined'){
                         var paymentsql = "update payment set booking_id = '"+result.insertId+"'where id = '"+payment_id+"'";
                         dbConnection.query(paymentsql, function (err,paymentResult ) {
 
