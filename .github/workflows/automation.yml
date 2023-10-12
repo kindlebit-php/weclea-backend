@@ -15,6 +15,10 @@ jobs:
 
       - name: Copy .env file
         run: |
+          cp -r /home/ubuntu/uploads /var/weclea/weclea_backend/weclea-backend/weclea-backend/weclea-backend
+
+      - name: Copy .env file
+        run: |
           cp /home/ubuntu/.env /var/weclea/weclea_backend/weclea-backend/weclea-backend/weclea-backend
 
       - name: Build and Test

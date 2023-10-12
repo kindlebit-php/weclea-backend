@@ -91,7 +91,7 @@ export const customer_address = async(req,res)=>{
     	}else{
     		var instruction = 'NULL';
     	}
-    		var sql = "INSERT INTO delievery_instruction (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
+    		var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
 	        dbConnection.query(sql, function (error, result) {
 	        });
 	        res.json({'status':true,"message":"Address added successfully!"});
