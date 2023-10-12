@@ -303,7 +303,7 @@ export const customer_payment = async (req, res) => {
                             })
                           }
 
-                  const currentDate = date;
+                  const currentDate = date();
                   const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${
                     userData[0].id}', '${purchaseAmount}', '${paymentIntent.id}', '${currentDate}')`;
     
@@ -413,14 +413,6 @@ return res.json({ status: false, message: 'Error in update_loads_availability' }
 }
 })
 }
-
-            //   const update_available_loads = 'UPDATE users SET available_loads = available_loads + ? WHERE id = ?';
-
-            //   dbConnection.query(update_available_loads, [buy_loads, userId], async function (error, results) {
-            //     if (error) {
-            //     return res.json({ status: false, message: 'error updating payment status' });
-            //   }
-            // })
 
               const currentDate = date();
               const sql = `INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('${

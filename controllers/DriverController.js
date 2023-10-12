@@ -36,10 +36,11 @@ export const get_order_detail = async (req, res) => {
 
       const userIds = userIdResult.map((row) => row.user_id);
       const query = `
-                SELECT u.name,u.profile_image, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
+                SELECT u.name,u.profile_image, bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
                 FROM bookings AS b
                 JOIN customer_address AS ca ON b.user_id = ca.user_id
                 JOIN users AS u ON b.user_id = u.id
+                JOIN booking_instructions AS bin ON b.user_id = bin.user_id
                 WHERE b.order_id = ? AND b.user_id IN (?)`;
 
       dbConnection.query(query, [orderId, userIds], (error, data) => {
@@ -148,10 +149,11 @@ export const pickup_loads_detail = async (req, res) => {
         const userId = data[0].user_id;
         console.log(userId);
         const query = `
-            SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
+            SELECT u.name,bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
             FROM bookings AS b
             JOIN customer_address AS ca ON b.user_id = ca.user_id
             JOIN users AS u ON b.user_id = u.id
+            JOIN booking_instructions AS bin ON b.user_id = bin.user_id
             WHERE  b.user_id = ? AND b.id = ? `;
 
         dbConnection.query(query, [userId, booking_id], (error, data) => {
@@ -353,6 +355,9 @@ export const get_drop_orders = async (req, res) => {
     res.json({ status: false, message: error.message });
   }
 };
+
+
+
 
 
 // Driver order detail
