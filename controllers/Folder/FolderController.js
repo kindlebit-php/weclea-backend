@@ -766,6 +766,76 @@ export const Filter_order_histroy = async (req, res) => {
   }
 };
 
+export const order_histroy_detail= async(req,res)=>{
+  try {
+    const userData = res.user;
+    const folder_id = userData[0].id;
+    const order_id=req.body.order_id;
+    const userIdQuery = `
+            SELECT  b1.id,b1.user_id FROM bookings AS b1
+            JOIN users AS u ON u.id = b1.folder_id
+            WHERE u.id = ?`;
+    dbConnection.query(
+      userIdQuery,
+      [folder_id],
+      async (error, userIdResult) => {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+        const userIds = userIdResult.map((row) => row.user_id);
+        const bookingIds = userIdResult.map((row) => row.id);
+
+        console.log(userIds, bookingIds, folder_id);
+        const query = ` SELECT  b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time ,bi.pack_images
+      FROM bookings AS b
+      JOIN users AS u ON b.user_id = u.id
+      JOIN booking_images AS bi ON b.id = bi.booking_id 
+      WHERE  b.order_status = '4' AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)
+        ORDER BY PickUp_date_time DESC`;
+
+        dbConnection.query(
+          query,
+          [folder_id, userIds, bookingIds],
+          (error, data) => {
+            console.log(data);
+            if (error) {
+              return res.json({ status: false, message: error.message });
+            } else if (data.length < 0) {
+              return res.json({ status: false, message: "data not found" });
+            } else {
+              const resData = [];
+              const imageArray = [];
+              if (data?.length > 0) {
+                for (const elem of data) {
+                  const { Customer_Id, PickUp_date_time, pack_images } = elem;
+                  for (const image of pack_images) {
+                    imageArray.push({
+                      img_path: image ? `${process.env.HTTPURL}${image}` : "",
+                    });
+                  }
+                  resData.push({
+                    Customer_Id,
+                    PickUp_date_time,
+                    imageArray,
+                  });
+                }
+              }
+              return res.json({
+                status: true,
+                message: "Updated successfully!",
+                data: resData,
+              });
+            }
+          }
+        );
+      }
+    );
+  }  catch (error) {
+    console.log(error.message);
+    res.json({ status: false, message: error.message });
+  }
+}
+
 export default {
   Scan_received_loads,
   customer_list_wash,

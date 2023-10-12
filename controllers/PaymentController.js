@@ -908,7 +908,14 @@ export const customer_extra_payment = async (req, res) => {
         });
         console.log(paymentIntent)
         if (paymentIntent.status === 'succeeded') {
-          return res.json({ status: true, message: 'Payment successful',paymentId:paymentIntent.id});
+          const currentDate = date();
+          const insertData = "INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('" + userId + "','" + amount + "','" + paymentIntent.id + "','" + currentDate + "')";
+          dbConnection.query(insertData, function (err, result) {
+            if (err) throw err;
+            if (result) {
+              return res.json({ status: true, message: 'Payment successful',paymentId:result.insertId});
+            }
+          });
         } else {
           return res.json({ status: false, message: 'Payment failed' });
         }
@@ -945,7 +952,14 @@ export const customer_extra_payment = async (req, res) => {
         });
         console.log(paymentIntent)
         if (paymentIntent.status === 'succeeded') {
-          return res.json({ status: true, message: 'Payment successful',paymentId:paymentIntent.id});
+          const currentDate = date();
+          const insertData = "INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('" + userId + "','" + amount + "','" + paymentIntent.id + "','" + currentDate + "')";
+          dbConnection.query(insertData, function (err, result) {
+            if (err) throw err;
+            if (result) {
+              return res.json({ status: true, message: 'Payment successful',paymentId:result.insertId});
+            }
+          });
         } else {
           return res.json({ status: false, message: 'Payment failed' });
         }
@@ -977,7 +991,14 @@ export const customer_extra_payment_cardId = async (req, res) => {
     });
 
     if (paymentIntent.status === 'succeeded') {
-      return res.json({ status: true, message: 'Payment successful',paymentId:paymentIntent.id});
+      const currentDate = date();
+      const insertData = "INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('" + userId + "','" + amount + "','" + paymentIntent.id + "','" + currentDate + "')";
+      dbConnection.query(insertData, function (err, result) {
+        if (err) throw err;
+        if (result) {
+          return res.json({ status: true, message: 'Payment successful',paymentId:result.insertId});
+        }
+      });
     } else {
       return res.json({ status: false, message: 'Payment failed' });
     }
