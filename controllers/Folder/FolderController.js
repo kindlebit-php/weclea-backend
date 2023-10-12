@@ -109,7 +109,6 @@ export const customer_list_wash = (req, res) => {
           const resData = [];
           if (data?.length > 0) {
             for (const elem of data) {
-              console.log("ksjfhg",data);
               const { Customer_Id, date, time, order_status, pickup_images } = elem;
 
               console.log('images',pickup_images)
@@ -168,6 +167,7 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
           const resData = [];
           if (data?.length > 0) {
             for (const elem of data) {
+              console.log("ksjfhg",data);
               const { Booking_id,Customer_Id, date, time, order_status, pickup_images } =
                 elem;
               const separatedStrings = pickup_images.split(", ")
@@ -175,14 +175,14 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
                return `${process.env.BASE_URL}/${val}`;
               });
 
-              resData.push(
+              resData.push({
                 Booking_id,
                 Customer_Id,
                 date,
                 time,
                 order_status,
                 imagesUrl,
-            );
+              });
             }
           }
           return res.json({
