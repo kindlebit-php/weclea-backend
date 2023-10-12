@@ -1008,6 +1008,193 @@ export const customer_extra_payment_cardId = async (req, res) => {
 };
 
 
+export const load_Subscription = async (req, res) => {
+  const userData = res.user;
+  const userId = userData[0].id;
+  const customerId = userData[0].customer_id;
+  const category_id = userData[0].category_id;
+  const { cardNumber, expMonth, expYear, cvc, clsId, card_status } = req.body;
+
+  try {
+    const sqlQuery = 'SELECT buy_loads, amount FROM customer_loads_subscription WHERE id = ?';
+    dbConnection.query(sqlQuery, [clsId], async (error, data) => {
+      if (error) {
+        return res.json({ status: false, message: error.message });
+      } else if (data.length === 0) {
+        return res.json({ status: false, message: 'Data not found' });
+      } else {
+        const insertData = `INSERT INTO customer_loads_subscription (user_id, category_id, type, buy_loads, amount, payment_status) VALUES (?, ?, ?, ?, ?, ?)`;
+        const insertValues = [userId, category_id, 'package', data[0].buy_loads, data[0].amount, 0];
+        dbConnection.query(insertData, insertValues, async (err, result) => {
+          if (err) {
+            return res.json({ status: false, message: 'Failed to insert data' });
+          }
+          const amount = data[0].amount;
+
+          if (!cardNumber || !expMonth || !expYear || !cvc || amount === undefined || card_status === undefined) {
+            return res.json({ status: false, message: 'All fields are required' });
+          }
+
+          if (cvc.length !== 3 && cvc.length !== 4) {
+            return res.json({ status: false, message: 'Your card security code is invalid' });
+          }
+
+          try {
+            // Create a token
+            const createCard = await stripes.tokens.create({
+              card: {
+                number: cardNumber,
+                exp_month: expMonth,
+                exp_year: expYear,
+                cvc: cvc,
+              },
+            });
+
+            // Create a Payment Method
+            const paymentMethod = await stripe.paymentMethods.create({
+              type: 'card',
+              card: {
+                token: createCard.id,
+              },
+            });
+
+            if (card_status === 0) {
+              const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount * 100,
+                currency: 'usd',
+                customer: customerId,
+                payment_method: paymentMethod.id,
+                off_session: true,
+                confirm: true,
+                description: 'Payment by client',
+              });
+
+              if (paymentIntent.status === 'succeeded') {
+                const updateStatus = 'UPDATE customer_loads_subscription SET payment_status = 1 WHERE id = ?';
+                dbConnection.query(updateStatus, [result.insertId], (err, result) => {
+                  if (err) {
+                    return res.json({ status: false, message: 'Failed to update payment status' });
+                  }
+                  return res.json({ status: true, message: 'Payment successful' });
+                });
+              } else {
+                return res.json({ status: false, message: 'Payment failed' });
+              }
+            } else {
+              // Attach Payment Method
+              const attachedPaymentMethod = await stripe.paymentMethods.attach(paymentMethod.id, {
+                customer: customerId,
+              });
+
+              // Update Customer
+              await stripe.customers.update(customerId, {
+                invoice_settings: {
+                  default_payment_method: attachedPaymentMethod.id,
+                },
+              });
+
+              const customerData = await stripe.customers.retrieve(customerId);
+
+              if (!customerData.id) {
+                return res.json({ status: false, message: "Customer_id doesn't exist" });
+              }
+
+              const paymentIntent = await stripe.paymentIntents.create({
+                amount: amount * 100,
+                currency: 'usd',
+                customer: customerId,
+                payment_method: customerData.invoice_settings.default_payment_method,
+                off_session: true,
+                confirm: true,
+                description: 'Payment by client',
+              });
+
+              if (paymentIntent.status === 'succeeded') {
+                const updateStatus = 'UPDATE customer_loads_subscription SET payment_status = 1 WHERE id = ?';
+                dbConnection.query(updateStatus, [result.insertId], (err, result) => {
+                  if (err) {
+                    return res.json({ status: false, message: 'Failed to update payment status' });
+                  }
+                  return res.json({ status: true, message: 'Payment successful' });
+                });
+              } else {
+                return res.json({ status: false, message: 'Payment failed' });
+              }
+            }
+          } catch (stripeError) {
+            console.log(stripeError.message)
+            return res.json({ status: false, message: stripeError.message });
+          }
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error.message)
+    return res.json({ status: false, message: error.message });
+  }
+};
+
+
+export const load_Subscription_cardId = async (req, res) => {
+  const userData = res.user;
+  const userId = userData[0].id;
+  const customerId = userData[0].customer_id;
+  const category_id = userData[0].category_id;
+  const { clsId, cardId } = req.body;
+
+  try {
+    const sqlQuery = 'SELECT buy_loads, amount FROM customer_loads_subscription WHERE id = ?';
+    dbConnection.query(sqlQuery, [clsId], async (error, data) => {
+      if (error) {
+        return res.json({ status: false, message: error.message });
+      } else if (data.length === 0) {
+        return res.json({ status: false, message: 'Data not found' });
+      } else {
+        const insertData = 'INSERT INTO customer_loads_subscription (user_id, category_id, type, buy_loads, amount, payment_status) VALUES (?, ?, ?, ?, ?, ?)';
+        const insertValues = [userId, category_id, 'package', data[0].buy_loads, data[0].amount, 0];
+        dbConnection.query(insertData, insertValues, async (err, result) => {
+          if (err) {
+            return res.json({ status: false, message: 'Failed to insert data' });
+          }
+          const amount = data[0].amount;
+
+          try {
+            const paymentIntent = await stripe.paymentIntents.create({
+              amount: amount * 100,
+              currency: 'usd',
+              customer: customerId,
+              payment_method: cardId,
+              off_session: true,
+              confirm: true,
+              description: 'Payment by client',
+            });
+
+            if (paymentIntent.status === 'succeeded') {
+              const updateStatus = 'UPDATE customer_loads_subscription SET payment_status = 1 WHERE id = ?';
+              dbConnection.query(updateStatus, [result.insertId], (err, updateResult) => {
+                if (err) {
+                  return res.json({ status: false, message: 'Failed to update payment status' });
+                }
+                return res.json({ status: true, message: 'Payment successful' });
+              });
+            } else {
+              return res.json({ status: false, message: 'Payment failed' });
+            }
+          } catch (stripeError) {
+            console.log(stripeError.message);
+            return res.json({ status: false, message: stripeError.message });
+          }
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.json({ status: false, message: error.message });
+  }
+};
+
+
+
 export default {
   Attach_Card,
   get_all_cards,
@@ -1018,5 +1205,7 @@ export default {
   customer_payment_BookingId,
   Payment_CardId_BookingId,
   customer_extra_payment,
-  customer_extra_payment_cardId
+  customer_extra_payment_cardId,
+  load_Subscription,
+  load_Subscription_cardId
 };

@@ -91,6 +91,8 @@ router.post("/customer-payment-BookingId",CheckAuth,paymentController.customer_p
 router.post("/Payment-CardId-BookingId",CheckAuth,paymentController.Payment_CardId_BookingId)
 router.post("/customer-extra-payment",CheckAuth,paymentController.customer_extra_payment)
 router.post("/customer-extra-payment-cardId",CheckAuth,paymentController.customer_extra_payment_cardId)
+router.post("/load_Subscription",CheckAuth,paymentController.load_Subscription)
+router.post("/load-Subscription-cardId",CheckAuth,paymentController.load_Subscription_cardId)
 //**********************************************************************************//
 router.get("/get-dry-clean-services",CheckAuth,DrycleanController.get_category)
 router.get("/get-cart-item",CheckAuth,DrycleanController.get_cart_items)

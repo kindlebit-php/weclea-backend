@@ -167,7 +167,6 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
           const resData = [];
           if (data?.length > 0) {
             for (const elem of data) {
-              console.log("ksjfhg",data);
               const { Booking_id,Customer_Id, date, time, order_status, pickup_images } =
                 elem;
               const separatedStrings = pickup_images.split(", ")
