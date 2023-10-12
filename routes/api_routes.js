@@ -69,6 +69,7 @@ router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_
 router.post("/submit-wash-detail",CheckAuth,upload.array("images", 5),FolderController.submit_wash_detail)
 router.post("/Scan-loads-For-Dry",CheckAuth,FolderController.Scan_loads_For_Dry)
 router.post("/submit-dry-detail",CheckAuth,upload.array("images", 5),FolderController.submit_dry_detail)
+router.post("/booking-pickup-instruction",CheckAuth,bookingController.booking_pickup_instruction)
 router.post("/Scan-loads-For-Fold",CheckAuth,FolderController.Scan_loads_For_Fold)
 router.post("/submit-fold-detail",CheckAuth,upload.array("images", 5),FolderController.submit_fold_detail)
 router.post("/Scan-loads-For-Pack",CheckAuth,FolderController.Scan_loads_For_Pack)

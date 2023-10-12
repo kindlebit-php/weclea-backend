@@ -146,7 +146,7 @@ export const get_user_subscription = async(req,res)=>{
                 let initi = {
                 "id":subscriptionresult[0].id,"package":subscriptionresult[0].buy_loads+' Loads. Min 2 Load Pick Up per order',"price":subscriptionresult[0].amount,"pending_loads":usrLoadsresult[0].total_loads,'commercial':usrLoadssperesult[0].commercial,'residential':usrLoadssperesult[0].residential,'yeshiba':usrLoadssperesult[0].yeshiba,'next_pickup':next_pickup
                 }
-                    res.json({'status':true,"message":"Subscription get successfully!",'data':initi});
+                    res.json({'status':true,"message":"Subscription get successfully!",'data':initi,'card_status':userData[0].card_status});
             })
         })
 
@@ -170,7 +170,6 @@ console.log('usrLoadss',usrLoadss)
                         }else{
                             var total_loads = '0';
                         }
-                        console.log('total_loads',total_loads)
                             let initi = {
                                 "id":usrLoadsresult[0].id,"package":'No Subscription Found',"price":usrLoadsresult[0].amount,"pending_loads":total_loads,'commercial':usrLoadsresult[0].commercial,'residential':usrLoadsresult[0].residential,'yeshiba':usrLoadsresult[0].yeshiba,'next_pickup':'No pickup'
                             }
@@ -282,6 +281,17 @@ export const get_user_home_data = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
         
+}
+export const cancel_subscriptioin = async(req,res)=>{
+    try {
+        const userData = res.user;
+        var sql = "update customer_loads_subscription set payment_status = 0 where id = '"+id+"'";
+        dbConnection.query(sql, function (err, subscriptionresult) {
+            res.json({'status':true,"message":"Subscription deleted successfully!"});
+        })
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
 }
 
 export default {

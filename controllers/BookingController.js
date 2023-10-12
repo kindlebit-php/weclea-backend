@@ -46,9 +46,14 @@ export const customer_booking = async(req,res)=>{
                     }else{
                         var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
                     }
-                    dbConnection.query(usrLoadsup, function (error, result) {
+                    dbConnection.query(usrLoadsup, function (error, resulst) {
                     })
+                    if(payment_id != ''){
+                        var paymentsql = "update payment set booking_id = '"+result.insertId+"'where id = '"+payment_id+"'";
+                        dbConnection.query(paymentsql, function (err,paymentResult ) {
 
+                        });
+                    }
                         for (var i = 0; total_loads > i; i++) {
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
                         dbConnection.query(sql, function (err, results) {
@@ -267,9 +272,26 @@ export const booking_tracking_status = async(req,res)=>{
     }
 
 }
+export const booking_pickup_instruction = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            const { pickup_instruction} = req.body;
+            var sql = "select count(id) as total from delievery_instruction where user_id = '"+userData+"'";
+            dbConnection.query(sql, function (err, results) {
+            var sql = "INSERT INTO delievery_instruction (user_id,pickup_instruction) VALUES ('"+userData[0].id+"','"+pickup_instruction+"')";
+            dbConnection.query(sql, function (err, results) {
+                res.json({'status':true,"message":"Pickup instruction added successfully"});
+            });
+            }); 
+        }catch (error) {
+            res.json({'status':false,"message":error.message});  
+        }
+}
 
 export default {
 	customer_booking,
     subscription_dates,
-    booking_tracking_status
+    booking_tracking_status,
+    booking_pickup_instruction
 }
