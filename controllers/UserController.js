@@ -85,13 +85,16 @@ export const customer_address = async(req,res)=>{
 	        if (error) throw error;
 	        });
     	}
-    	if(delievery_instruction != ''){
-    		var sql = "INSERT INTO delievery_insterctions (user_id,longitude) VALUES ('"+userData[0].id+"','"+pickup_address+"')";
-	        dbConnection.query(sql, function (error, result) {
-	        if (error) throw error;
-	        });
+    	if(typeof delievery_instruction != 'undefined'){
+    		console.log('delievery_instruction',delievery_instruction)
+    		var instruction = delievery_instruction;
+    	}else{
+    		var instruction = 'NULL';
     	}
-	            res.json({'status':true,"message":"Address added successfully!"});
+    		var sql = "INSERT INTO delievery_instruction (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
+	        dbConnection.query(sql, function (error, result) {
+	        });
+	        res.json({'status':true,"message":"Address added successfully!"});
 
     }else{
             res.json({'status':false,"message":"All fields are required"});

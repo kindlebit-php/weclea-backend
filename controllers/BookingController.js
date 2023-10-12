@@ -277,12 +277,9 @@ export const booking_pickup_instruction = async(req,res)=>{
         try { 
             const userData = res.user;
             const { pickup_instruction} = req.body;
-            var sql = "select count(id) as total from delievery_instruction where user_id = '"+userData+"'";
+            var sql = "update delievery_instruction set pickup_instruction = '"+pickup_instruction+"' where user_id = '"+userData[0].id+"'";
             dbConnection.query(sql, function (err, results) {
-            var sql = "INSERT INTO delievery_instruction (user_id,pickup_instruction) VALUES ('"+userData[0].id+"','"+pickup_instruction+"')";
-            dbConnection.query(sql, function (err, results) {
-                res.json({'status':true,"message":"Pickup instruction added successfully"});
-            });
+                res.json({'status':true,"message":"Instruction added successfully"});
             }); 
         }catch (error) {
             res.json({'status':false,"message":error.message});  
