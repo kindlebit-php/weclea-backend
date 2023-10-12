@@ -46,9 +46,14 @@ export const customer_booking = async(req,res)=>{
                     }else{
                         var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
                     }
-                    dbConnection.query(usrLoadsup, function (error, result) {
+                    dbConnection.query(usrLoadsup, function (error, resulst) {
                     })
+                    if(payment_id != ''){
+                        var paymentsql = "update payment set booking_id = '"+result.insertId+"'where id = '"+payment_id+"'";
+                        dbConnection.query(paymentsql, function (err,paymentResult ) {
 
+                        });
+                    }
                         for (var i = 0; total_loads > i; i++) {
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
                         dbConnection.query(sql, function (err, results) {
@@ -267,9 +272,38 @@ export const booking_tracking_status = async(req,res)=>{
     }
 
 }
+export const booking_pickup_instruction = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            const { pickup_instruction} = req.body;
+            var sql = "update delievery_instruction set pickup_instruction = '"+pickup_instruction+"' where user_id = '"+userData[0].id+"'";
+            dbConnection.query(sql, function (err, results) {
+                res.json({'status':true,"message":"Instruction added successfully"});
+            }); 
+        }catch (error) {
+            res.json({'status':false,"message":error.message});  
+        }
+}
+
+export const booking_delievery_instruction = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            const { delievery_instruction} = req.body;
+            var sql = "update delievery_instruction set delievery_instruction = '"+delievery_instruction+"' where user_id = '"+userData[0].id+"'";
+            dbConnection.query(sql, function (err, results) {
+                res.json({'status':true,"message":"Instruction added successfully"});
+            }); 
+        }catch (error) {
+            res.json({'status':false,"message":error.message});  
+        }
+}
 
 export default {
 	customer_booking,
     subscription_dates,
-    booking_tracking_status
+    booking_tracking_status,
+    booking_pickup_instruction,
+    booking_delievery_instruction
 }

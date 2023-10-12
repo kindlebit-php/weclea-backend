@@ -1,6 +1,7 @@
 .env
 node_modules
 config
+uploads
 ==docker-composebk
 docker-omposebackup
 package-lock.json
