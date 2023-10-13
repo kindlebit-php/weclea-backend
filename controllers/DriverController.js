@@ -10,8 +10,7 @@ export const get_orders = async (req, res) => {
     const order = `SELECT id,order_id, date, time FROM bookings WHERE cron_status = 1 AND driver_id = ${userData[0].id}`;
     dbConnection.query(order, function (error, data) {
       if (error) throw error;
-      res.json({status: true, message: "Data retrieved successfully!", data: data,   
-      });           
+      res.json({status: true, message: "Data retrieved successfully!", data: data});           
     });
   } catch (error) {   
     res.json({ status: false, message: error.message });   

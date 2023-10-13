@@ -1073,10 +1073,29 @@ export const load_Subscription = async (req, res) => {
                 dbConnection.query(updateStatus, [result.insertId], (err, result) => {
                   if (err) {
                     return res.json({ status: false, message: 'Failed to update payment status' });
+                  } else {
+                    const total_loads = data[0].buy_loads;
+                    if (category_id) {
+                      if (category_id === 1) {
+                        usrLoads = "UPDATE customer_loads_availabilty SET commercial = commercial + ? WHERE user_id = ?";
+                        updateColumn = "commercial";
+                      } else if (category_id === 2) {
+                        usrLoads = "UPDATE customer_loads_availabilty SET residential = residential + ? WHERE user_id = ?";
+                        updateColumn = "residential";
+                      } else {
+                        usrLoads = "UPDATE customer_loads_availabilty SET yeshiba = yeshiba + ? WHERE user_id = ?";
+                        updateColumn = "yeshiba";
+                      }
+                      dbConnection.query(usrLoads, [total_loads, userId], function (error, result) {
+                        if (error) {
+                          return res.json({ status: false, message: error.message });
+                        } else {
+                          return res.json({ status: true, message: 'Payment successful' });
+                        }
+                      });
+                    }
                   }
-                  return res.json({ status: true, message: 'Payment successful' });
                 });
-              } else {
                 return res.json({ status: false, message: 'Payment failed' });
               }
             } else {
@@ -1113,18 +1132,31 @@ export const load_Subscription = async (req, res) => {
                 dbConnection.query(updateStatus, [result.insertId], (err, result) => {
                   if (err) {
                     return res.json({ status: false, message: 'Failed to update payment status' });
-                  }
-                  else{
-                    const updatedStatus = 'UPDATE users SET card_status = 1 WHERE id = ?';
-                    dbConnection.query(updatedStatus, [userId], (err, results) => {
-                      if (err) {
-                        return res.json({ status: false, message: 'Failed to update payment status' });
+                  } else {
+                    const total_loads = data[0].buy_loads;
+                    if (category_id) {
+                      console.log("data1",total_loads,category_id)
+                      if (category_id === 1) {
+                        usrLoads = "UPDATE customer_loads_availabilty SET commercial = commercial + ? WHERE user_id = ?";
+                        updateColumn = "commercial";
+                      } else if (category_id === 2) {
+                        usrLoads = "UPDATE customer_loads_availabilty SET residential = residential + ? WHERE user_id = ?";
+                        updateColumn = "residential";
+                      } else {
+                        usrLoads = "UPDATE customer_loads_availabilty SET yeshiba = yeshiba + ? WHERE user_id = ?";
+                        updateColumn = "yeshiba";
                       }
-                      return res.json({ status: true, message: 'Payment successful' });
-                    });
+                      dbConnection.query(usrLoads, [total_loads, userId], function (error, result) {
+                        console.log("slkfhdsk",result)
+                        if (error) {
+                          return res.json({ status: false, message: error.message });
+                        } else {
+                          return res.json({ status: true, message: 'Payment successful' });
+                        }
+                      });
+                    }
                   }
                 });
-              } else {
                 return res.json({ status: false, message: 'Payment failed' });
               }
             }
