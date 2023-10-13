@@ -118,7 +118,9 @@ export const pickup_loads = async (req, res) => {
             return res.json({ status: false, message: updateerror.message });
           }
          const result={ booking_id: data[0].booking_id,
-            driver_pickup_status: 1
+          qrCode_id:data[0].id,
+            driver_pickup_status: 1,
+
           }
           res.json({
             status: true,
