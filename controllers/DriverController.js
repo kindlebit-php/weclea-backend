@@ -102,10 +102,10 @@ export const pickup_loads = async (req, res) => {
   try {
     const userData = res.user;
     const driverId = userData[0].id;
-    const qr_code = req.body.qr_code;
+    const {qr_code,qr_codeID} = req.body;
 
-    const bookingDataQuery = "SELECT * FROM booking_qr WHERE qr_code = ?";
-    dbConnection.query(bookingDataQuery, [qr_code], function (error, data) {
+    const bookingDataQuery = "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
+    dbConnection.query(bookingDataQuery, [qr_code,qr_codeID], function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
@@ -409,10 +409,10 @@ export const drop_loads = async (req, res) => {
   try {
     const userData = res.user;
     const driverId = userData[0].id;
-    const qr_code = req.body.qr_code;
-    const bookingDataQuery = "SELECT * FROM booking_qr WHERE qr_code = ?";
+    const {qr_code,qr_codeID} = req.body;
+    const bookingDataQuery = "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
 
-    dbConnection.query(bookingDataQuery, [qr_code], function (error, data) {
+    dbConnection.query(bookingDataQuery, [qr_code,qr_codeID], function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
@@ -436,6 +436,7 @@ export const drop_loads = async (req, res) => {
               status: true,
               message: "Data retrieved and updated successfully!",
               booking_id: booking_id,
+              qrCode_id:data[0].id,
             });
           });
         });
