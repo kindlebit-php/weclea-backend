@@ -1107,7 +1107,15 @@ export const load_Subscription = async (req, res) => {
                   if (err) {
                     return res.json({ status: false, message: 'Failed to update payment status' });
                   }
-                  return res.json({ status: true, message: 'Payment successful' });
+                  else{
+                    const updatedStatus = 'UPDATE users SET card_status = 1 WHERE id = ?';
+                    dbConnection.query(updatedStatus, [userId], (err, results) => {
+                      if (err) {
+                        return res.json({ status: false, message: 'Failed to update payment status' });
+                      }
+                      return res.json({ status: true, message: 'Payment successful' });
+                    });
+                  }
                 });
               } else {
                 return res.json({ status: false, message: 'Payment failed' });
