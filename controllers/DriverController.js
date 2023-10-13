@@ -72,7 +72,7 @@ export const print_All_QrCode = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }else if(data.length == 0 ){
-        return res.json({ status: false, message: "All qr code already scanned!!" })
+        return res.json({ status: false, message: "All loads already scanned!!" })
       }else{
         res.json({status: true,message: "Data retrieved successfully!", data: data });
       }
@@ -91,7 +91,7 @@ export const print_All_Drop_QrCode = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }else if(data.length == 0 &&  data[0].driver_drop_status == '1'){
-        return res.json({ status: false, message: "All qr code already scanned!!" })
+        return res.json({ status: false, message: "All loads already scanned!!" })
       }else{
       res.json({status: true,message: "Data retrieved successfully!", data: data });
       }
