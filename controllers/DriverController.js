@@ -68,7 +68,7 @@ export const print_All_QrCode = async (req, res) => {
   try {
     const userData = res.user;
     const booking_id=req.body.booking_id
-    const data = `SELECT qr_code,driver_pickup_status FROM booking_qr WHERE booking_id = ${booking_id}`;
+    const data = `SELECT qr_code,driver_pickup_status FROM booking_qr WHERE driver_pickup_status = 0 AND booking_id = ${booking_id}`;
     dbConnection.query(data, function (error, data) {
       if (error) throw error;
       res.json({status: true,message: "Data retrieved successfully!", data: data });
