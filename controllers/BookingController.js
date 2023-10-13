@@ -27,14 +27,11 @@ export const customer_booking = async(req,res)=>{
                     const current_time = hours + ":" + minutes;
                     const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
 
-                    // var sqlDistance = "select * from (select latitude, longitude, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role =2 ORDER BY distance) as vt where vt.distance < 25;";
+                    var sqlDistance = "select * from (select latitude, longitude, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role =2 ORDER BY distance) as vt where vt.distance < 25;";
 
-                    // dbConnection.query(sqlDistance, function (error, results) {
-                    //     if (error) 
-                    //     console.log('error',error)
-                    //     console.log('results',results)
-                    //     // res.json({'status':true,"message":"Booking added successfully!"});
-                    // }); 
+                    dbConnection.query(sqlDistance, function (error, results) {
+                        
+                    }); 
                     // return false;
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52,'"+category_id+"',1)";
                     dbConnection.query(sql, function (err, result) {
@@ -80,7 +77,7 @@ export const customer_booking = async(req,res)=>{
                     }); 
                 }
             });
-        }else if(frequency != ''){
+        }else if(order_type == '2'){
             var currentDate = new Date(date);
             const currentFinalDate = dateFormat.format(currentDate,'YYYY-MM-DD');
             const lastdate = new Date(currentDate.setMonth(currentDate.getMonth() + 3));
@@ -118,13 +115,13 @@ export const customer_booking = async(req,res)=>{
                                     });     
                                 }
                                 var updateLoads = (resultss[0].total_loads - total_loads);
-// console.log('updateLoads',updateLoads)
+
                                 if(category_id == 1){
-                                var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
+                                    var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
                                 }else if(category_id == 2){
-                                var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+userData[0].id+"'";
+                                    var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+userData[0].id+"'";
                                 }else{
-                                var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
+                                    var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
                                 }
                                 dbConnection.query(usrLoadsup, function (error, result) {
                                 })
