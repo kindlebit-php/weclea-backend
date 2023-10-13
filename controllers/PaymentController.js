@@ -948,8 +948,15 @@ export const customer_extra_payment = async (req, res) => {
           const insertData = "INSERT INTO payment (user_id, amount, payment_id, date) VALUES ('" + userId + "','" + amount + "','" + paymentIntent.id + "','" + currentDate + "')";
           dbConnection.query(insertData, function (err, result) {
             if (err) throw err;
-            if (result) {
-              return res.json({ status: true, message: 'Payment successful',paymentId:result.insertId});
+            else {
+              const updatedStatus = 'UPDATE users SET card_status = 1 WHERE id = ?';
+              dbConnection.query(updatedStatus, [userId], (err, results) => {
+                if (err) {
+                  return res.json({ status: false, message: 'Failed to update payment status' });
+                }
+                return res.json({ status: true, message: 'Payment successful',paymentId:result.insertId});
+              });
+             
             }
           });
         } else {
