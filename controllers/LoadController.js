@@ -94,13 +94,13 @@ export const get_user_loads = async(req,res)=>{
              let data = {
                     "available_loads":available_loads,
                 }
-                res.json({'status':true,"message":"Price get successfully!",'data':data});
+                res.json({'status':true,"message":"Price get successfully!",'data':data,'card_status':userData[0].card_status});
 
             }else{
                 let nodata = {
                     "available_loads":0,
                 }
-                res.json({'status':true,"message":"Price get successfully!",'data':nodata});
+                res.json({'status':true,"message":"Price get successfully!",'data':nodata,'card_status':userData[0].card_status});
 
             }
 
