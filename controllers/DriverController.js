@@ -501,7 +501,7 @@ export const submit_drop_details = async (req, res) => {
         const order_status = data[0].order_status;
 
         // Check if order_status is not equal to 5
-        if (order_status !== 5) {
+        if (order_status < 5) {
           return res.json({ status: false, message: "Invalid order status" });
         }
 
