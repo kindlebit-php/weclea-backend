@@ -100,15 +100,15 @@ export const get_category = async (req, res) => {
   export const dry_clean_booking = async (req, res) => {
     try {
         const userData = res.user;
-        const { delievery_day,date,amount,payment_id} = req.body;
-        if(delievery_day && date && amount){
+        const {date,amount,payment_id} = req.body;
+        if(date && amount){
         let dateObject = new Date();
         let hours = dateObject.getHours();
         let minutes = dateObject.getMinutes();
         const current_time = hours + ":" + minutes;
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
 
-        var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,order_type,driver_id,category_id,total_amount) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"',3,52,'"+userData[0].category_id+"','"+amount+"')";
+        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,category_id,total_amount) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,52,'"+userData[0].category_id+"','"+amount+"')";
 
         dbConnection.query(sql, function (err, result) {
         if(result){
