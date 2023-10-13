@@ -171,7 +171,7 @@ export const get_user_subscription = async(req,res)=>{
                             let initi = {
                                 "id":usrLoadsresult[0].id,"package":'No Subscription Found',"price":usrLoadsresult[0].amount,"pending_loads":total_loads,'commercial':usrLoadsresult[0].commercial,'residential':usrLoadsresult[0].residential,'yeshiba':usrLoadsresult[0].yeshiba,'next_pickup':'No pickup'
                             }
-                            res.json({'status':true,"message":"Subscription not found!",'data':initi});
+                            res.json({'status':true,"message":"Subscription not found!",'data':initi,'card_status':userData[0].card_status});
 
                         
                     }else{
