@@ -286,7 +286,7 @@ export const subscription_dates = async(req,res)=>{
                     }
                     resData.push(init)
                 })
-                res.json({'status':false,"message":"user subscriptions list",'data':resData});
+                res.json({'status':true,"message":"user subscriptions list",'data':resData});
             });
     }catch (error) {
         res.json({'status':false,"message":error.message});  
