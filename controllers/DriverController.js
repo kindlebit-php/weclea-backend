@@ -153,7 +153,6 @@ export const pickup_loads_detail = async (req, res) => {
         res.json({ status: false, message: error.message });
       } else {
         const userId = data[0].user_id;
-        console.log(userId);
         const query = `
             SELECT u.name,bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
             FROM bookings AS b
@@ -166,11 +165,7 @@ export const pickup_loads_detail = async (req, res) => {
           if (error) {
             return res.json({ status: false, message: error.message });
           }
-          res.json({
-            status: true,
-            message: "Details retrieved successfully!",
-            data: data[0],
-          });
+          res.json({ status: true,message: "Details retrieved successfully!",data: data[0]});
         });
       }
     });
