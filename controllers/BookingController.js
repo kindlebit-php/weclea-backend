@@ -122,7 +122,7 @@ export const customer_booking = async(req,res)=>{
                             if(locationResult.length > 0){
                                 var driver_id = locationResult[0].id
                             }else{
-                                var driver_id = ''
+                                var driver_id = 0
                             }
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
                             console.log('sql',sql)
