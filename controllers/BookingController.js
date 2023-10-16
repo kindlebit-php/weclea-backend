@@ -247,7 +247,8 @@ export const customer_booking = async(req,res)=>{
                             }); 
                             }); 
                         }else{
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,frequency,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+frequency+"','"+category_id+"')";
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+category_id+"')";
+                            console.log('sql',sql)
                             dbConnection.query(sql, function (err, resultsub) {
                                 var order_id = '1001'+resultsub.insertId;
                                 var sql = "update bookings set order_id = '"+order_id+"'where id = '"+resultsub.insertId+"'";
