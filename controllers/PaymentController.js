@@ -1075,11 +1075,12 @@ export const load_Subscription = async (req, res) => {
                     return res.json({ status: false, message: 'Failed to update payment status' });
                   } else {
                     const total_loads = data[0].buy_loads;
+              
                     if (category_id) {
-                      if (category_id === 1) {
+                      if (category_id == 1) {
                         usrLoads = "UPDATE customer_loads_availabilty SET commercial = commercial + ? WHERE user_id = ?";
                         updateColumn = "commercial";
-                      } else if (category_id === 2) {
+                      } else if (category_id == 2) {
                         usrLoads = "UPDATE customer_loads_availabilty SET residential = residential + ? WHERE user_id = ?";
                         updateColumn = "residential";
                       } else {
@@ -1134,12 +1135,12 @@ export const load_Subscription = async (req, res) => {
                     return res.json({ status: false, message: 'Failed to update payment status' });
                   } else {
                     const total_loads = data[0].buy_loads;
+                    console.log(total_loads,category_id)
                     if (category_id) {
-                      console.log("data1",total_loads,category_id)
-                      if (category_id === 1) {
+                      if (category_id == 1) {
                         usrLoads = "UPDATE customer_loads_availabilty SET commercial = commercial + ? WHERE user_id = ?";
                         updateColumn = "commercial";
-                      } else if (category_id === 2) {
+                      } else if (category_id == 2) {
                         usrLoads = "UPDATE customer_loads_availabilty SET residential = residential + ? WHERE user_id = ?";
                         updateColumn = "residential";
                       } else {
