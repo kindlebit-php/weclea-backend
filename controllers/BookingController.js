@@ -26,14 +26,17 @@ export const customer_booking = async(req,res)=>{
                     let minutes = dateObject.getMinutes();
                     const current_time = hours + ":" + minutes;
                     const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
-
-                    var sqlDistance = "select * from (select latitude, longitude, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role =2 ORDER BY distance) as vt where vt.distance < 25;";
-
-                    dbConnection.query(sqlDistance, function (error, results) {
-                        
-                    }); 
+                    const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
+                    dbConnection.query(custmer_address, function (error, custmeraddressResult) {
+                    var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
+                    dbConnection.query(sqlDistance, function (error, locationResult) {
                     // return false;
-                    var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52,'"+category_id+"',1)";
+                    if(locationResult.length > 0){
+                        var driver_id = locationResult[0].id
+                    }else{
+                        var driver_id = ''
+                    }
+                    var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+category_id+"',1)";
                     dbConnection.query(sql, function (err, result) {
                     var updateLoads = (results[0].total_loads - total_loads);
                     if(category_id == 1){
@@ -74,16 +77,20 @@ export const customer_booking = async(req,res)=>{
                         res.json({'status':true,"message":"Booking added successfully!"});
                         
                         });
-                    }); 
+                    });
+                    });  
+                }); 
                 }
             });
         }else if(order_type == '2'){
             var currentDate = new Date(date);
             const currentFinalDate = dateFormat.format(currentDate,'YYYY-MM-DD');
+            // console.log('currentFinalDate',currentDate)
             const lastdate = new Date(currentDate.setMonth(currentDate.getMonth() + 3));
             const endFinalDate = dateFormat.format(lastdate,'YYYY-MM-DD');
 
             let allDates =   getDates(new Date(currentFinalDate), new Date(endFinalDate),frequency);
+            // console.log('allDates',allDates)
             if(category_id == 1){
                 var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }else if(category_id == 2){
@@ -107,7 +114,17 @@ export const customer_booking = async(req,res)=>{
                         const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
 
                         if(frequencyDBDate == currentBookingDate ){
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"',52,1,'"+category_id+"')";
+                            const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
+                            dbConnection.query(custmer_address, function (error, custmeraddressResult) {
+                            var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
+                            dbConnection.query(sqlDistance, function (error, locationResult) {
+                            // return false;
+                            if(locationResult.length > 0){
+                                var driver_id = locationResult[0].id
+                            }else{
+                                var driver_id = ''
+                            }
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
                                     var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
@@ -139,6 +156,8 @@ export const customer_booking = async(req,res)=>{
                                 dbConnection.query(sql, function (err, resultss) {
                                 });
                             }); 
+                            }); 
+                            }); 
                         }else{
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,frequency,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+frequency+"','"+category_id+"')";
                             dbConnection.query(sql, function (err, resultsub) {
@@ -153,6 +172,9 @@ export const customer_booking = async(req,res)=>{
                 }
             });
         }
+        // else if(order_type == '3'){
+
+        // }
     	}else{
             res.json({'status':false,"message":"All fields are required"});
     	}
@@ -303,8 +325,23 @@ export const booking_delievery_instruction = async(req,res)=>{
         }
 }
 
+export const delete_booking_date = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            const { date} = req.body;
+            var sql = "delete from bookings where user_id = '"+userData[0].id+"' and date = '"+date+"'";
+            dbConnection.query(sql, function (err, results) {
+                res.json({'status':true,"message":"Booking deleted successfully"});
+            }); 
+        }catch (error) {
+            res.json({'status':false,"message":error.message});  
+        }
+}
+
 export default {
 	customer_booking,
+    delete_booking_date,
     subscription_dates,
     booking_tracking_status,
     booking_pickup_instruction,
