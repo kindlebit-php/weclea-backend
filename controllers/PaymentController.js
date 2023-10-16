@@ -1015,6 +1015,8 @@ export const load_Subscription = async (req, res) => {
   const { cardNumber, expMonth, expYear, cvc, clsId, card_status } = req.body;
 
   try {
+    let usrLoads;
+    let updateColumn;
     const sqlQuery = 'SELECT buy_loads, amount FROM customer_loads_subscription WHERE id = ?';
     dbConnection.query(sqlQuery, [clsId], async (error, data) => {
       if (error) {
@@ -1057,7 +1059,7 @@ export const load_Subscription = async (req, res) => {
               },
             });
 
-            if (card_status === 0) {
+            if (card_status == 0) {
               const paymentIntent = await stripe.paymentIntents.create({
                 amount: amount * 100,
                 currency: 'usd',
@@ -1068,14 +1070,15 @@ export const load_Subscription = async (req, res) => {
                 description: 'Payment by client',
               });
 
-              if (paymentIntent.status === 'succeeded') {
+              if (paymentIntent.status == 'succeeded') {
                 const updateStatus = 'UPDATE customer_loads_subscription SET payment_status = 1 WHERE id = ?';
                 dbConnection.query(updateStatus, [result.insertId], (err, result) => {
                   if (err) {
                     return res.json({ status: false, message: 'Failed to update payment status' });
                   } else {
                     const total_loads = data[0].buy_loads;
-              
+                    //console.log(total_loads,category_id,userId)
+                    
                     if (category_id) {
                       if (category_id == 1) {
                         usrLoads = "UPDATE customer_loads_availabilty SET commercial = commercial + ? WHERE user_id = ?";
@@ -1088,6 +1091,7 @@ export const load_Subscription = async (req, res) => {
                         updateColumn = "yeshiba";
                       }
                       dbConnection.query(usrLoads, [total_loads, userId], function (error, result) {
+                        console.log(result)
                         if (error) {
                           return res.json({ status: false, message: error.message });
                         } else {
@@ -1148,7 +1152,6 @@ export const load_Subscription = async (req, res) => {
                         updateColumn = "yeshiba";
                       }
                       dbConnection.query(usrLoads, [total_loads, userId], function (error, result) {
-                        console.log("slkfhdsk",result)
                         if (error) {
                           return res.json({ status: false, message: error.message });
                         } else {

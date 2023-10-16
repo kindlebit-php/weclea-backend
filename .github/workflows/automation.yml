@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Copy .env file
+      - name: Copy uploads folder
         run: |
           cp -r /home/ubuntu/uploads /var/weclea/weclea_backend/weclea-backend/weclea-backend/weclea-backend
 

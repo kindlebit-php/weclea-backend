@@ -215,20 +215,20 @@ export const submit_wash_detail = async (req, res) => {
       let updatePickupImagesQuery;
       let updateOrderStatusQuery;
 
-      if (type === 1) {
+      if (type == 1) {
         updateDateTimeQuery = `UPDATE booking_timing SET wash_time = ?, wash_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET wash_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
-      } else if (type === 2) {
+      } else if (type == 2) {
         updateDateTimeQuery = `UPDATE booking_timing SET dry_time = ?, dry_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET dry_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
-      } else if (type === 3) {
+      } else if (type == 3) {
         updateDateTimeQuery = `UPDATE booking_timing SET fold_time = ?, fold_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET fold_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
       } else {
-        return res.json({ status: false, message: "Invalid 'type' value" });
+        return res.json({ status: false, message: "Invalid type value" });
       }
 
       dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
@@ -240,13 +240,13 @@ export const submit_wash_detail = async (req, res) => {
         req.files.forEach((e, i) => {
           imageArray.push(e.path);
         });
-
+        console.log(imageArray)
         if (imageArray.length > 5) {
           return res.json({ status: false, message: "Only 5 images are allowed" });
         }
 
         const pickupImagesJSON = imageArray.join(", ");
-
+        console.log(pickupImagesJSON)
         dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
           if (updateImagesErr) {
             return res.json({ status: false, message: updateImagesErr.message });
@@ -303,24 +303,12 @@ export const Scan_loads_For_Dry = (req, res) => {
             dbConnection.query(
               update_Date_Time,
               function (updateTimeErr, updateTimeResult) {
-                console.log(updateTimeResult);
-                console.log(updateTimeErr);
                 if (updateTimeErr) {
-                  return res.json({
-                    status: false,
-                    message: updateTimeErr.message,
-                  });
+                  return res.json({ status: false,message: updateTimeErr.message});
                 } else if (updateTimeResult.affectedRows === 1) {
-                  return res.json({
-                    status: true,
-                    message: "Verified successfully!",
-                  });
+                  return res.json({status: true,message: "Verified successfully!"});
                 } else {
-                  return res.json({
-                    status: false,
-                    message: "Failed to update timing",
-                  });
-                }
+                  return res.json({ status: false, message: "Failed to update timing"});}
               }
             );
           } else {
