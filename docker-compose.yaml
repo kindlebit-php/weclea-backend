@@ -15,7 +15,7 @@ services:
     networks:
       - myconnection
     volumes:
-      - /var/weclea/weclea_backend/weclea-backend/weclea-backend/weclea-backend/uploads:/app/uploads
+      - /home/ubuntu/uploads:/app/uploads
 
   mysql:
     image: mysql:5.7
