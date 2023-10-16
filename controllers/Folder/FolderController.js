@@ -1,82 +1,90 @@
 import dbConnection from "../../config/db.js";
 import { date, time } from "../../helpers/date.js";
-
 export const Scan_received_loads = (req, res) => {
   const userData = res.user;
   const folder_id = userData[0].id;
-  const qr_code = req.body.qr_code;
+  const { qr_code, qr_codeID, type } = req.body;
+  const currentTime = time();
+  const currentDate = date();
+  const wash_scan_timing = `${currentDate} ${currentTime}`;
 
   try {
-    const verifyQr = "SELECT * FROM booking_qr WHERE  qr_code = ?";
-    dbConnection.query(verifyQr, [qr_code], function (error, data) {
-      console.log(data);
+    const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
+    dbConnection.query(verifyQr, [qr_code, qr_codeID], function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
-      } else if ( data.length > 0 && data[0].driver_pickup_status == "1" && data[0].folder_recive_status == "0"
-      ) {
+      }
+
+
+      if (type == 1) {
+        if (data.length == 0 || data[0].driver_pickup_status != 1 || data[0].folder_recive_status != 0) {
+          return res.json({ status: false, message: "Invalid QR code or load status" });
+        }
         const updateStatus = `UPDATE booking_qr SET folder_recive_status = '1' WHERE id = ${data[0].id}`;
+        const update_Date_Time = `UPDATE booking_timing SET wash_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+        const updateBooking = `UPDATE bookings SET folder_id = ${folder_id} WHERE id = ${data[0].booking_id}`;
+
         dbConnection.query(updateStatus, function (updateerror, updateResult) {
           if (updateerror) {
             return res.json({ status: false, message: updateerror.message });
-          } else if (updateResult.affectedRows === 1) {
-            const currentTime = time();
-            const currentDate = date();
-            const wash_scan_timing = `${currentDate} ${currentTime}`;
-            console.log(data[0].booking_id);
-            const update_Date_Time = `UPDATE booking_timing SET wash_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-            dbConnection.query(
-              update_Date_Time,
-              function (updateTimeErr, updateTimeResult) {
-                console.log(updateTimeResult);
-                console.log(updateTimeErr);
-                if (updateTimeErr) {
-                  return res.json({
-                    status: false,
-                    message: updateTimeErr.message,
-                  });
-                } else if (updateTimeResult.affectedRows === 1) {
-                  const updateBooking = `UPDATE bookings SET folder_id = ${folder_id} WHERE id = ${data[0].booking_id}`;
-                  dbConnection.query(
-                    updateBooking,
-                    function (updateBookingErr, updateBookingResult) {
-                      if (updateBookingErr) {
-                        return res.json({
-                          status: false,
-                          message: updateBookingErr.message,
-                        });
-                      } else if (updateBookingResult.affectedRows === 1) {
-                        return res.json({
-                          status: true,
-                          message: "Verified successfully!",
-                        });
-                      } else {
-                        return res.json({
-                          status: false,
-                          message: "Invalid folder_id",
-                        });
-                      }
-                    }
-                  );
-                } else {
-                  return res.json({
-                    status: false,
-                    message: "Failed to update timing",
-                  });
-                }
+          }
+          if (updateResult.affectedRows === 1) {
+            dbConnection.query(update_Date_Time, function (updateTimeErr, updateTimeResult) {
+              if (updateTimeErr) {
+                return res.json({ status: false, message: updateTimeErr.message });
               }
-            );
-          } else {
-            return res.json({ status: false, message: "Invalid qr_code!" });
+              if (updateTimeResult.affectedRows === 1) {
+                dbConnection.query(updateBooking, function (updateBookingErr, updateBookingResult) {
+                  if (updateBookingErr) {
+                    return res.json({ status: false, message: updateBookingErr.message });
+                  }
+                  return res.json({ status: true, message: "Load scanned and updated." });
+                });
+              }
+            });
           }
         });
+      } else if (type >= 2 && type <= 4) {
+        if (data.length == 0 || data[0].driver_pickup_status != 1 || data[0].folder_recive_status != 1) {
+          return res.json({ status: false, message: "Invalid QR code or load status" });
+        }
+        let update_Date_Time2;
+        let verifyStatus;
+
+        if (type == 2) {
+          update_Date_Time2 = `UPDATE booking_timing SET dry_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+          verifyStatus = `SELECT * FROM bookings WHERE order_status = '1' AND id = ${data[0].booking_id}`;
+        } else if (type == 3) {
+          update_Date_Time2 = `UPDATE booking_timing SET fold_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+          verifyStatus = `SELECT * FROM bookings WHERE order_status = '2' AND id = ${data[0].booking_id}`;
+        } else if (type == 4) {
+          update_Date_Time2 = `UPDATE booking_timing SET pack_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+          verifyStatus = `SELECT * FROM bookings WHERE order_status = '3' AND id = ${data[0].booking_id}`;
+        }
+
+        dbConnection.query(verifyStatus, function (verifyStatusErr, verifyStatusResult) {
+          if (verifyStatusErr) {
+            return res.json({ status: false, message: verifyStatusErr.message });
+          }
+          dbConnection.query(update_Date_Time2, function (updateTimeErr, updateTimeResult) {
+            if (updateTimeErr) {
+              return res.json({ status: false, message: updateTimeErr.message });
+            }
+            if (updateTimeResult.affectedRows === 1) {
+              return res.json({ status: true, message: "Load scanned and updated." });
+            }
+          });
+        });
       } else {
-        return res.json({ status: false, message: "Invalid qr_code!!" });
+        return res.json({ status: false, message: "Invalid 'type' value" });
       }
     });
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
 };
+
+
 
 export const customer_list_wash = (req, res) => {
   const userData = res.user;
