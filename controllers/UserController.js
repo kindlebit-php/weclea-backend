@@ -288,8 +288,15 @@ export const get_user_profile = async(req,res)=>{
 					let initi = {
 					"id":id,"name":name,"dob":dob,'category_id':category_id,"email":email,"mobile":mobile,'profile_img':img
 					}
-					// resData.push(initi);
-				res.json({'status':true,"message":"Profile get successfully!",'data':initi});
+					const get_address_count = "select count(id) as total_records from customer_address where user_id = '"+userData[0].id+"'";
+					dbConnection.query(get_address_count, function (error, addressresult) {
+					if(addressresult.length > 0){
+						var addresscount = 1
+					}else{
+						var addresscount = 0
+					}
+					res.json({'status':true,"message":"Profile get successfully!",'data':initi,'address_count':addresscount});
+				});
 				});
             });
       

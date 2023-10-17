@@ -7,6 +7,7 @@ import { CheckAuth } from "../middlewares/checkAuth.js";
 import driverController from "../controllers/DriverController.js";
 import paymentController from "../controllers/PaymentController.js";
 import cronController from "../controllers/CronController.js";
+import AdminController from "../controllers/Admin/AdminController.js";
 import multer from 'multer';
 import { upload } from "../utils/multer.js";
 import DrycleanController from "../controllers/DrycleanController.js";
@@ -100,4 +101,11 @@ router.get("/get-cart-item",CheckAuth,DrycleanController.get_cart_items)
 router.post("/add-to-cart",CheckAuth,DrycleanController.Add_To_Cart)
 router.post("/delete-cart-item",CheckAuth,DrycleanController.delete_cart_item)
 router.post("/dry-clean-booking",CheckAuth,DrycleanController.dry_clean_booking)
+
+/***********Admin panel***************/
+
+router.get("/get_content",AdminController.get_page_content)
+router.get("/get_faq",AdminController.get_faq_content)
+
+/**********************/
 export default router;
