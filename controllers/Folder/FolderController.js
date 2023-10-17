@@ -1,5 +1,6 @@
 import dbConnection from "../../config/db.js";
 import { date, time } from "../../helpers/date.js";
+import { fcm_notification } from "../../helpers/fcm.js";
 export const Scan_received_loads = (req, res) => {
   const userData = res.user;
   const folder_id = userData[0].id;
@@ -211,7 +212,6 @@ export const submit_wash_detail = async (req, res) => {
     const { booking_id, type } = req.body;
     const currentTime = time();
     const currentDate = date();
-
     const userIdQuery = "SELECT user_id FROM bookings WHERE id = ?";
 
     dbConnection.query(userIdQuery, [booking_id], function (error, data) {
@@ -276,7 +276,22 @@ export const submit_wash_detail = async (req, res) => {
               message: processMessages[type],
               data: { customer_id: data[0].user_id },
             };
-
+            const title={
+              1: "loads Washed",
+              2: "loads Dry",
+              3: "loads fold",
+            }
+            const body={
+              1: "Wash process is completed!",
+              2: "Dry process is completed! ",
+              3: "Fold process is completed! ",
+            };
+            const fold_type={
+              1: "Wash",
+              2: "Dry",
+              3: "Fold",
+            };
+            fcm_notification(title[type], body[type], data[0].user_id, fold_type[type])
             return res.json(responseData);
           });
         });
