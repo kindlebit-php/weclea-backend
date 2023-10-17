@@ -72,7 +72,7 @@ export const print_All_QrCode = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }else if(data.length == 0 ){
-        return res.json({ status: false, message: "All loads already scanned!!" })
+        return res.json({status:1})
       }else{
         res.json({status: true,message: "Data retrieved successfully!", data: data });
       }
