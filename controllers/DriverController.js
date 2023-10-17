@@ -493,10 +493,11 @@ export const submit_drop_details = async (req, res) => {
     const userIdQuery = `SELECT user_id, order_status FROM bookings WHERE id = ?`;
 
     dbConnection.query(userIdQuery, [booking_id], function (error, data) {
+  
       if (error) {
         return res.json({ status: false, message: error.message });
-      } else if (data.length === 0) {
-        return res.json({ status: false, message: "Booking not found" });
+      } else if (data.length === 0){
+        return res.json({ status: flse, message: "Booking not found" });
       } else {
         const userId = data[0].user_id;
         const order_status = data[0].order_status;
