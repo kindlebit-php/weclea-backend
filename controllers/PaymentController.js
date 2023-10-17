@@ -1187,6 +1187,8 @@ export const load_Subscription_cardId = async (req, res) => {
   const { clsId, cardId } = req.body;
 
   try {
+    let usrLoads;
+   let updateColumn;
     const sqlQuery = 'SELECT buy_loads, amount FROM customer_loads_subscription WHERE id = ?';
     dbConnection.query(sqlQuery, [clsId], async (error, data) => {
       if (error) {
