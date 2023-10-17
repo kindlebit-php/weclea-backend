@@ -3,7 +3,7 @@ import dbConnection from'../../config/db.js';
 //get loads API
 export const get_page_content = async(req,res)=>{
       try { 
-        	const loads = "select * from wc_page_content";
+        	const loads = "select `user_id`, `section`, JSON_TYPE(content) content from wc_page_content";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
