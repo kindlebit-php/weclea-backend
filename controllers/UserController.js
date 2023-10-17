@@ -377,7 +377,7 @@ export const edit_user_profile = async(req,res)=>{
 export const get_notification = async(req,res)=>{
 	try {	
         	const userData = res.user;
-			const notificationSQL = "select * from notification where user_id = '"+userData[0].id+"'";
+			const notificationSQL = "select * from notifications where user_id = '"+userData[0].id+"'";
 			dbConnection.query(notificationSQL, function (error, data) {
 					res.json({'status':true,"message":"Notification List",'data':data});
 			});
