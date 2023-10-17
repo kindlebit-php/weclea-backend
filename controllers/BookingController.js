@@ -122,9 +122,10 @@ export const customer_booking = async(req,res)=>{
                             if(locationResult.length > 0){
                                 var driver_id = locationResult[0].id
                             }else{
-                                var driver_id = ''
+                                var driver_id = 0
                             }
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
+                            console.log('sql',sql)
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
                                     var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
@@ -172,9 +173,95 @@ export const customer_booking = async(req,res)=>{
                 }
             });
         }
-        // else if(order_type == '3'){
+        else if(order_type == '3'){
+            var currentDate = new Date(date);
+            const currentFinalDate = dateFormat.format(currentDate,'YYYY-MM-DD');
+            const lastdate = new Date(currentDate.setMonth(currentDate.getMonth() + 3));
+            const endFinalDate = dateFormat.format(lastdate,'YYYY-MM-DD');
+            let allDates = date.split(',');
+            if(category_id == 1){
+                var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }else if(category_id == 2){
+                var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }else{
+                var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+            }
+            dbConnection.query(usrLoads, function (error, resultss) {
+                if(total_loads > resultss[0].total_loads){
+                    res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
+                }else{
+                    var resData = [];
+                    allDates.forEach(function callback(element, key)
+                    {
+                        var frequencyDate = new Date(allDates[key]);
+                        const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
+                        let dateObject = new Date();
+                        let hours = dateObject.getHours();
+                        let minutes = dateObject.getMinutes();
+                        const current_time = hours + ":" + minutes;
+                        const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
 
-        // }
+                        if(frequencyDBDate == currentBookingDate ){
+                            const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
+                            dbConnection.query(custmer_address, function (error, custmeraddressResult) {
+                            var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
+                            dbConnection.query(sqlDistance, function (error, locationResult) {
+                            // return false;
+                            if(locationResult.length > 0){
+                                var driver_id = locationResult[0].id
+                            }else{
+                                var driver_id = 0
+                            }
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
+                            console.log('kailash',sql)
+                            dbConnection.query(sql, function (err, result) {
+                                for (var i = 0; total_loads > i; i++) {
+                                    var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
+                                    dbConnection.query(sql, function (err, results) {
+                                    });     
+                                }
+                                var updateLoads = (resultss[0].total_loads - total_loads);
+
+                                if(category_id == 1){
+                                    var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
+                                }else if(category_id == 2){
+                                    var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+userData[0].id+"'";
+                                }else{
+                                    var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
+                                }
+                                dbConnection.query(usrLoadsup, function (error, result) {
+                                })
+                                var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+result.insertId+"')";
+                                dbConnection.query(bookingsql, function (err, bookingresult) {
+
+                                });
+                                var bookingsql = "INSERT INTO booking_timing (booking_id) VALUES ('"+result.insertId+"')";
+                                dbConnection.query(bookingsql, function (err, bookingresult) {
+
+                                });
+
+                                var order_id = '1001'+result.insertId;
+                                var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
+                                dbConnection.query(sql, function (err, resultss) {
+                                });
+                            }); 
+                            }); 
+                            }); 
+                        }else{
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+category_id+"')";
+                            console.log('sql',sql)
+                            dbConnection.query(sql, function (err, resultsub) {
+                                var order_id = '1001'+resultsub.insertId;
+                                var sql = "update bookings set order_id = '"+order_id+"'where id = '"+resultsub.insertId+"'";
+                                dbConnection.query(sql, function (err, resultss) {
+                                });
+                            });
+                        }
+                    }) 
+                        res.json({'status':true,"message":"Booking added successfully!"});
+                }
+            });
+        }
     	}else{
             res.json({'status':false,"message":"All fields are required"});
     	}
@@ -201,7 +288,7 @@ export const subscription_dates = async(req,res)=>{
                     }
                     resData.push(init)
                 })
-                res.json({'status':false,"message":"user subscriptions list",'data':resData});
+                res.json({'status':true,"message":"user subscriptions list",'data':resData});
             });
     }catch (error) {
         res.json({'status':false,"message":error.message});  
