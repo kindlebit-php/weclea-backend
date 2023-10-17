@@ -66,23 +66,24 @@ export const customer_address = async(req,res)=>{
      	const userData = res.user;
         const {delievery_instruction,pickup_address,pickup_appartment,pickup_city,pickup_state,pickup_zipcode,pickup_lat,pickup_long,drop_address,drop_appartment,drop_city,drop_state,drop_zipcode,drop_lat,drop_long,billing_address,billing_appartment,billing_city,billing_state,billing_zipcode,billing_lat,billing_long} = req.body;
         if(pickup_address && pickup_appartment && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long && drop_address && drop_appartment && drop_city && drop_state && drop_zipcode && drop_lat && drop_long && billing_address && billing_appartment && billing_city && billing_state && billing_zipcode && billing_lat && billing_long){
-        
+        const checkIfAddressExist = "select count(id) as total from customer_address where user_id = '"+userData[0].id+"'";
+        dbConnection.query(checkIfAddressExist, function (error, resultAddress) {
+        	if(resultAddress[0].total == 0){
+
+        	
         if(pickup_address && pickup_appartment && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long){
 	        var sql = "INSERT INTO customer_address (user_id,address, appartment,city,state,zip,latitude,longitude) VALUES ('"+userData[0].id+"','"+pickup_address+"', '"+pickup_appartment+"','"+pickup_city+"','"+pickup_state+"','"+pickup_zipcode+"','"+pickup_lat+"','"+pickup_long+"')";
 	        dbConnection.query(sql, function (error, result) {
-	        if (error) throw error;
 	        });
     	}
     	if(drop_address && drop_appartment && drop_city  && drop_state && drop_zipcode && drop_lat && drop_long){
 	        var sql = "INSERT INTO customer_drop_address (user_id,address, appartment,city,state,zip,latitude,longitude) VALUES ('"+userData[0].id+"','"+drop_address+"', '"+drop_appartment+"','"+drop_city+"','"+drop_state+"','"+drop_zipcode+"','"+drop_lat+"','"+drop_long+"')";
-	       await dbConnection.query(sql, function (error, result) {
-	        if (error) throw error;
+	        dbConnection.query(sql, function (error, result) {
 	        });
     	}
     	if(billing_address && billing_appartment && billing_city  && billing_state && billing_zipcode && billing_lat && billing_long){
 	        var sql = "INSERT INTO customer_billing_address (user_id,address, appartment,city,state,zip,latitude,longitude) VALUES ('"+userData[0].id+"','"+billing_address+"', '"+billing_appartment+"','"+billing_city+"','"+billing_state+"','"+billing_zipcode+"','"+billing_lat+"','"+billing_long+"')";
 	        dbConnection.query(sql, function (error, result) {
-	        if (error) throw error;
 	        });
     	}
     	if(typeof delievery_instruction != 'undefined'){
@@ -90,11 +91,57 @@ export const customer_address = async(req,res)=>{
     	}else{
     		var instruction = 'NULL';
     	}
-    		var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
-	        dbConnection.query(sql, function (error, result) {
-	        });
-	        res.json({'status':true,"message":"Address added successfully!"});
+    	const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
+	        dbConnection.query(delieverySql, function (error, delieveryresult) {
+	        if(delieveryresult[0].delieveryCount == 0){
+				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
+				dbConnection.query(sql, function (error, result) {
+				});
+	        }else{
+	        	var sql = "update booking_instructions set delievery_instruction='"+instruction+"' where  user_id ='"+userData[0].id+"'";
+				dbConnection.query(sql, function (error, result) {
+				});
+	        }
+	        })
 
+	        res.json({'status':true,"message":"Address added successfully!"});
+	}else{
+		if(pickup_address && pickup_appartment && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long){
+			var sql = "update customer_address set address='"+pickup_address+"', appartment='"+pickup_appartment+"',city='"+pickup_city+"',state='"+pickup_state+"',zip='"+pickup_zipcode+"',latitude='"+pickup_lat+"',longitude='"+pickup_lat+"' where user_id = '"+userData[0].id+"'";
+			dbConnection.query(sql, function (error, result) {
+			});
+		}
+		if(drop_address && drop_appartment && drop_city  && drop_state && drop_zipcode && drop_lat && drop_long){
+			var sql = "update customer_drop_address set address='"+drop_address+"', appartment='"+drop_appartment+"',city='"+drop_city+"',state='"+drop_state+"',zip='"+drop_zipcode+"',latitude='"+drop_lat+"',longitude='"+drop_lat+"' where user_id = '"+userData[0].id+"'";
+			dbConnection.query(sql, function (error, result) {
+			});
+		}
+		if(billing_address && billing_appartment && billing_city  && billing_state && billing_zipcode && billing_lat && billing_long){
+			var sql = "update customer_billing_address set address='"+billing_address+"', appartment='"+billing_appartment+"',city='"+billing_city+"',state='"+billing_state+"',zip='"+billing_zipcode+"',latitude='"+billing_lat+"',longitude='"+billing_lat+"' where user_id = '"+userData[0].id+"'";
+			dbConnection.query(sql, function (error, result) {
+			});
+		}
+		  	if(typeof delievery_instruction != 'undefined'){
+    		var instruction = delievery_instruction;
+    	}else{
+    		var instruction = 'NULL';
+    	}
+    	const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
+	        dbConnection.query(delieverySql, function (error, delieveryresult) {
+	        if(delieveryresult[0].delieveryCount == 0){
+				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
+				dbConnection.query(sql, function (error, result) {
+				});
+	        }else{
+	        	var sql = "update booking_instructions set delievery_instruction='"+instruction+"' where  user_id ='"+userData[0].id+"'";
+				dbConnection.query(sql, function (error, result) {
+				});
+	        }
+	        })
+	    res.json({'status':true,"message":"Address updated successfully!"});
+
+	}
+   })
     }else{
             res.json({'status':false,"message":"All fields are required"});
     	}
