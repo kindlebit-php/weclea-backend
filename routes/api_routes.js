@@ -53,7 +53,7 @@ router.post("/print-All-QrCode",CheckAuth,driverController.print_All_QrCode)
 router.post("/print-All-Drop-QrCode",CheckAuth,driverController.print_All_Drop_QrCode)
 router.post("/pickup-loads",CheckAuth,driverController.pickup_loads)
 router.post("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
-router.post("/submit_pickup_details",CheckAuth,upload.array("images", 5),driverController.submit_pickup_details);
+router.post("/submit_pickup_details",CheckAuth,upload.array("images[]", 5),driverController.submit_pickup_details);
 router.post("/laundry-NotFound",CheckAuth,upload.array("images", 5),driverController.laundry_NotFound);
 router.get("/order-histroy",CheckAuth,driverController.order_histroy);
 router.post("/order-histroy-byOrderId",CheckAuth,driverController.order_histroy_byOrderId);
