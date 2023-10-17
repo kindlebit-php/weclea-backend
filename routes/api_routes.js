@@ -27,6 +27,7 @@ const storage = multer.diskStorage({
 const profileUpload = multer({storage:storage})
 
 router.post('/customer-register',userController.customer_register);
+router.post('/newsletter',userController.newsletter);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
 router.get('/get-notification',CheckAuth ,userController.get_notification);
 router.post('/update-password',CheckAuth ,userController.update_password);

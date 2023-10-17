@@ -388,7 +388,7 @@ export const edit_user_profile = async(req,res)=>{
      try { 
         const userData = res.user;
         const {name,dob,category_id} = req.body;
-        if(name  && dob, category_id){
+        if(name  && dob && category_id){
 			
 			// const checkIfMobileExist = "select count(id) as total from users where id = '"+userData[0].id+"' and mobile = '"+mobile+"'";
 			// dbConnection.query(checkIfMobileExist, function (error, data) {
@@ -433,6 +433,24 @@ export const get_notification = async(req,res)=>{
 		res.json({'status':false,"message":error.message});  
 	}
 }
+
+//newsletter API
+export const newsletter = async(req,res)=>{
+	try {
+			const {email} = req.body;
+			if(email){
+			var sql = "INSERT INTO newsletters (email) VALUES ('"+email+"')";
+			dbConnection.query(sql, function (err, result) {
+				res.json({'status':true,"message":"subscribed successfully"});
+			});
+			}else{
+				res.json({'status':false,"message":"All fields are required"});
+			}
+		
+	}catch (error) {
+		res.json({'status':false,"message":error.message});  
+	}
+}
 export default {
 	customer_register,
 	get_notification,
@@ -440,6 +458,7 @@ export default {
 	customer_login,
 	forgot_password,
 	verify_otp,
+	newsletter,
 	change_password,
 	edit_user_profile,
 	update_password,
