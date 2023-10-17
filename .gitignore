@@ -1,6 +1,7 @@
 .env
 node_modules
 config
+helpers/limit.js
 uploads
 ==docker-composebk
 docker-omposebackup
