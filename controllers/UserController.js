@@ -86,7 +86,6 @@ export const customer_address = async(req,res)=>{
 	        });
     	}
     	if(typeof delievery_instruction != 'undefined'){
-    		console.log('delievery_instruction',delievery_instruction)
     		var instruction = delievery_instruction;
     	}else{
     		var instruction = 'NULL';
@@ -288,9 +287,9 @@ export const get_user_profile = async(req,res)=>{
 					let initi = {
 					"id":id,"name":name,"dob":dob,'category_id':category_id,"email":email,"mobile":mobile,'profile_img':img
 					}
-					const get_address_count = "select count(id) as total_records from customer_address where user_id = '"+userData[0].id+"'";
+					const get_address_count = "select count(id)  as total from customer_address where user_id = '"+userData[0].id+"'";
 					dbConnection.query(get_address_count, function (error, addressresult) {
-					if(addressresult.length > 0){
+					if(addressresult[0].total > 0){
 						var addresscount = 1
 					}else{
 						var addresscount = 0
