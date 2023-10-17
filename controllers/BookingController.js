@@ -85,12 +85,11 @@ export const customer_booking = async(req,res)=>{
         }else if(order_type == '2'){
             var currentDate = new Date(date);
             const currentFinalDate = dateFormat.format(currentDate,'YYYY-MM-DD');
-            // console.log('currentFinalDate',currentDate)
             const lastdate = new Date(currentDate.setMonth(currentDate.getMonth() + 3));
             const endFinalDate = dateFormat.format(lastdate,'YYYY-MM-DD');
 
             let allDates =   getDates(new Date(currentFinalDate), new Date(endFinalDate),frequency);
-            // console.log('allDates',allDates)
+         
             if(category_id == 1){
                 var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }else if(category_id == 2){
@@ -125,7 +124,7 @@ export const customer_booking = async(req,res)=>{
                                 var driver_id = 0
                             }
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
-                            console.log('sql',sql)
+                       
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
                                     var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
@@ -213,7 +212,7 @@ export const customer_booking = async(req,res)=>{
                                 var driver_id = 0
                             }
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
-                            console.log('kailash',sql)
+                           
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
                                     var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
@@ -249,7 +248,7 @@ export const customer_booking = async(req,res)=>{
                             }); 
                         }else{
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+category_id+"')";
-                            console.log('sql',sql)
+                      
                             dbConnection.query(sql, function (err, resultsub) {
                                 var order_id = '1001'+resultsub.insertId;
                                 var sql = "update bookings set order_id = '"+order_id+"'where id = '"+resultsub.insertId+"'";
@@ -279,7 +278,6 @@ export const subscription_dates = async(req,res)=>{
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
             var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' order by date desc";
              dbConnection.query(sql, function (err, resultss) {
-                // console.log('resultss',resultss)
                 resultss.forEach(function callback(elem, key){
                 var resversDate = new Date(elem.date)
                 var finalDate = dateFormat.format(resversDate,'MM-DD-YYYY');

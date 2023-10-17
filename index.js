@@ -8,7 +8,7 @@ import "./config/db.js";
 var app = express();
 //Configuring express server
 app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({ extended: false }));
+app.use(bodyparser.urlencoded({ extended: false,limit: '50mb' }));
 
 // enabled cors 
 app.use(cors());
