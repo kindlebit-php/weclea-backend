@@ -342,7 +342,6 @@ export const laundry_NotFound = async (req, res) => {
 export const get_drop_orders = async (req, res) => {
   try {
     const userData = res.user;
-    console.log(userData[0].id)
     const order = `SELECT order_id FROM bookings WHERE order_status = '4' AND driver_id = ${userData[0].id}`;
     dbConnection.query(order, function (error, data) {
       if (error) throw error;
