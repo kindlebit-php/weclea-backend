@@ -108,7 +108,7 @@ export const customer_list_wash = (req, res) => {
       dbConnection.query(query, [booking_id], (error, data) => {
         if (error) {
           return res.json({ status: false, message: error.message });
-        } else if (data.length === 0) {
+        } else if (data.length == 0) {
           return res.json({ status: false, message: "Data not found" });
         } else {
           const resData = [];
