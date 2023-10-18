@@ -21,11 +21,18 @@ export const customer_booking = async(req,res)=>{
                 if(total_loads > results[0].total_loads){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
+                  
+
+
                     let dateObject = new Date();
                     let hours = dateObject.getHours();
                     let minutes = dateObject.getMinutes();
                     const current_time = hours + ":" + minutes;
                     const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
+                      const checkIfDateExist = "select count(id) as total_date from bookings where date = '"+oneTimeDate+"' and user_id = '"+userData[0].id+"'";
+                    dbConnection.query(checkIfDateExist, function (error, checkIfresults) {
+                        if(checkIfresults[0].total_date == 0){
+
                     const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
                     dbConnection.query(custmer_address, function (error, custmeraddressResult) {
                     var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
@@ -80,6 +87,11 @@ export const customer_booking = async(req,res)=>{
                     });
                     });  
                 }); 
+                       }else{
+                        res.json({'status':false,"message":"Booking already added for "+date+" date!"});
+
+                       }
+                    })
                 }
             });
         }else if(order_type == '2'){
@@ -106,6 +118,13 @@ export const customer_booking = async(req,res)=>{
                     {
                         var frequencyDate = new Date(allDates[key]);
                         const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
+                        
+                    const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"'";
+                    dbConnection.query(checkIfDateExist, function (error, checkIfresults) {
+                        if(checkIfresults[0].tpyedate == 0){
+
+                    
+
                         let dateObject = new Date();
                         let hours = dateObject.getHours();
                         let minutes = dateObject.getMinutes();
@@ -167,6 +186,8 @@ export const customer_booking = async(req,res)=>{
                                 });
                             });
                         }
+                            }
+                    })
                     }) 
                         res.json({'status':true,"message":"Booking added successfully!"});
                 }
@@ -194,6 +215,12 @@ export const customer_booking = async(req,res)=>{
                     {
                         var frequencyDate = new Date(allDates[key]);
                         const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
+                        
+                        const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"'";
+                        dbConnection.query(checkIfDateExist, function (error, checkIfresults) {
+                        if(checkIfresults[0].tpyedate == 0){
+
+
                         let dateObject = new Date();
                         let hours = dateObject.getHours();
                         let minutes = dateObject.getMinutes();
@@ -256,6 +283,8 @@ export const customer_booking = async(req,res)=>{
                                 });
                             });
                         }
+                          }
+                        })
                     }) 
                         res.json({'status':true,"message":"Booking added successfully!"});
                 }
