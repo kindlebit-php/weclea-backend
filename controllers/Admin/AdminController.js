@@ -151,12 +151,14 @@ export const get_faq_content = async(req,res)=>{
 
 export const update_faq = async(req,res)=>{
 	const reqData = req.body;
+	const userData = res.user;
+  	const userId = userData[0].id;
     try { 
     	const qrySelect = "select id from wc_faq where title=? and id!=?";
 		dbConnection.query(qrySelect,[reqData.section,reqData.faq_id], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) {
-			    var updateContnetQry = "update wc_page_content set faq_type='"+reqData.faq_type+"', title = '"+reqData.title+"',content = '"+reqData.content+"' where id = "+reqData.faq_id+" ";
+			    var updateContnetQry = "update wc_page_content set user_id='"+userId+"', faq_type='"+reqData.faq_type+"', title = '"+reqData.title+"',content = '"+reqData.content+"' where id = "+reqData.faq_id+" ";
 			    dbConnection.query(updateContnetQry, function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":"FAQ has been updated successfully",'data':data});
@@ -172,12 +174,14 @@ export const update_faq = async(req,res)=>{
 
 export const create_faq = async(req,res)=>{
 	const reqData = req.body;
+	const userData = res.user;
+  	const userId = userData[0].id;
     try { 
     	const qrySelect = "select id from wc_faq where title=?";
 		dbConnection.query(qrySelect,[reqData.section], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) {
-			    var updateContnetQry = "insert wc_faq set faq_type='"+reqData.faq_type+"',title = '"+reqData.title+"',content = '"+reqData.content+"'";
+			    var updateContnetQry = "insert wc_faq set user_id='"+userId+"', faq_type='"+reqData.faq_type+"',title = '"+reqData.title+"',content = '"+reqData.content+"'";
 			    dbConnection.query(updateContnetQry, function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":"FAQ has been saved successfully",'data':data});
