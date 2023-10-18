@@ -181,75 +181,80 @@ export const submit_pickup_details = async (req, res) => {
     const userData = res.user;
     const driverId = userData[0].id;
 
-    const userId = `SELECT user_id FROM bookings WHERE id = ?`;
+    const userIdQuery = `SELECT user_id FROM bookings WHERE id = ?`;
 
-    dbConnection.query(userId, [booking_id], function (error, data) {
-      console.log(data);
+    dbConnection.query(userIdQuery, [booking_id], function (error, data) {
       if (error) {
-        res.json({ status: false, message: error.message });
-      } else {
-        const userId = data[0].user_id;
-        console.log(userId);
-        const query = `
-            SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
-            FROM bookings AS b
-            JOIN customer_address AS ca ON b.user_id = ca.user_id
-            JOIN users AS u ON b.user_id = u.id
-            WHERE  b.user_id = ? AND b.id = ? `;
-
-        dbConnection.query(query, [userId, booking_id], (error, data) => {
-          if (error) {
-            return res.json({ status: false, message: error.message });
-          }
-          const currentTime = time();
-          const currentDate = date();
-          const update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id
-            = ${booking_id}`;
-          const result=data[0]
-          dbConnection.query(
-            update_Date_Time,
-            function (updateTimeErr, updateTimeResult) {
-              if (updateTimeErr) {
-                return res.json({status: false, message: updateTimeErr.message});
-              } else {
-                const imageArray = [];
-                req.files.forEach((e, i) => {
-                  imageArray.push(e.path);
-                });
-                if (req.files.length > 5) {
-                  return res.json({status: false, message: "only 5 images are allowed"});
-                }
-                const pickupImagesJSON =  imageArray.join(', ');
-               
-                const update_pickupimages =
-                  "UPDATE booking_images SET pickup_images = ? WHERE booking_id = ?";
-                dbConnection.query(update_pickupimages, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
-                    if (updateImagesErr) {
-                      return res.json({ status: false,  message: updateImagesErr.message});
-                    } else {
-                      const title="Loads pickup";
-                      const body="Your loads pickup successfully";
-                      fcm_notification(title, body, userId, "Pickup")
-                      const responseData = {
-                        status: true,
-                        message: "Submitted successfully!"
-                    };
-                      
-                      return res.json(responseData);
-                    
-                    }
-                  }
-                );
-              }
-            }
-          );
-        });
+        return res.json({ status: false, message: error.message });
       }
+
+      const userId = data[0].user_id;
+      const query = `
+        SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
+        FROM bookings AS b
+        JOIN customer_address AS ca ON b.user_id = ca.user_id
+        JOIN users AS u ON b.user_id = u.id
+        WHERE b.user_id = ? AND b.id = ?`;
+
+      dbConnection.query(query, [userId, booking_id], (error, data) => {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+
+        const currentTime = time(); 
+        const currentDate = date(); 
+
+        const update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+
+        dbConnection.query(update_Date_Time, function (updateTimeErr, updateTimeResult) {
+          if (updateTimeErr) {
+            return res.json({ status: false, message: updateTimeErr.message });
+          }
+
+          const imageArray = [];
+          req.files.forEach((e, i) => {
+            imageArray.push(e.path);
+          });
+
+          if (req.files.length > 5) {
+            return res.json({ status: false, message: "Only 5 images are allowed" });
+          }
+
+          const pickupImagesJSON = imageArray.join(', ');
+          const update_pickupimages = "UPDATE booking_images SET pickup_images = ? WHERE booking_id = ?";
+
+          dbConnection.query(update_pickupimages, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
+            if (updateImagesErr) {
+              return res.json({ status: false, message: updateImagesErr.message });
+            } else {
+              const updateStatus = `UPDATE bookings SET order_status = '8' WHERE id = ${booking_id}`;
+
+              dbConnection.query(updateStatus, function (updateerror, updateResult) {
+                if (updateerror) {
+                  return res.json({ status: false, message: updateerror.message });
+                } else {
+                  const title = "Loads pickup";
+                  const body = "Your loads pickup successfully";
+                  fcm_notification(title, body, userId, "Pickup"); 
+
+                  const responseData = {
+                    status: true,
+                    message: "Submitted successfully!",
+                  };
+
+                  return res.json(responseData);
+                }
+              });
+            }
+          });
+        });
+      });
     });
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
 };
+
 
 
 
@@ -324,6 +329,9 @@ export const laundry_NotFound = async (req, res) => {
                         driver_pick_images: imageArray,
                       }
                     };
+                    const title="Not found";
+                    const body="Laundry loads not found";
+                    fcm_notification(title, body, userId, "Laundry_Unavailable")
                       return res.json(responseData);
                     }
                   });
