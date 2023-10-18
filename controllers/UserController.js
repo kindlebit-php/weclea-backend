@@ -451,7 +451,24 @@ export const newsletter = async(req,res)=>{
 		res.json({'status':false,"message":error.message});  
 	}
 }
+
+//get address API
+export const  user_registered_address = async(req,res)=>{
+	try {
+        	const userData = res.user;
+
+			var sql = "select customer_address.address,customer_address.appartment,customer_address.city,customer_address.state,customer_address.zip,customer_address.latitude,customer_address.longitude, customer_billing_address.address as billing_address,customer_billing_address.appartment as billing_appartment,customer_billing_address.city as billing_city,customer_billing_address.state as billing_state,customer_billing_address.zip as billing_zip,customer_billing_address.latitude as billing_lat,customer_billing_address.longitude as billing_long, customer_drop_address.address as drop_address,customer_drop_address.appartment as drop_appartment,customer_drop_address.city as drop_city,customer_drop_address.state as drop_state,customer_drop_address.zip as drop_zip,customer_drop_address.latitude as drop_lat,customer_drop_address.longitude as drop_long,booking_instructions.delievery_instruction from customer_address left join customer_drop_address on customer_address.user_id =customer_drop_address.user_id left join customer_billing_address on customer_billing_address.user_id = customer_address.user_id left join booking_instructions on customer_address.user_id = booking_instructions.user_id where customer_address.user_id = '"+userData[0].id+"'";
+			dbConnection.query(sql, function (err, result) {
+				res.json({'status':true,"message":"subscribed successfully",'data':result});
+			});
+			
+		
+	}catch (error) {
+		res.json({'status':false,"message":error.message});  
+	}
+}
 export default {
+	user_registered_address,
 	customer_register,
 	get_notification,
 	customer_address,
