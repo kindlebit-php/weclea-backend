@@ -8,12 +8,14 @@ export const get_dashboard_content = async(req,res)=>{
     	const loads = "SELECT COUNT(id),sum(total_loads),  FROM `bookings` WHERE status=1 and bookings.order_type!=3";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
-			const loads = "SELECT count(id) total_users, users.role FROM `users` WHERE status=1 GROUP by role";
+			/*const loads = "SELECT count(id) total_users, users.role FROM `users` WHERE status=1 GROUP by role";
 			dbConnection.query(loads, function (error, users) {
 			if (error) throw error;
 				data[0]['users']=users
 				res.json({'status':true,"message":"Success",'data':data});
-			})
+			})*/
+			res.json({'status':true,"message":"Success",'data':data});
+
 		})
     }catch (error) {
         res.json({'status':false,"message":error.message});  
