@@ -199,7 +199,7 @@ export const delete_faq = async(req,res)=>{
 	const reqData = req.body;
     try { 
     	const qrySelect = "select id from wc_faq where id=?";
-		dbConnection.query(qrySelect,[reqData.section], function (error, data) {
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
 			    var updateContnetQry = "delete from wc_faq id=? ";
