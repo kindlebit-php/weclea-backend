@@ -114,6 +114,8 @@ router.post("/update_page_content",AdminController.update_page_content)
 router.post("/create_faq",AdminController.create_faq)
 router.post("/update_faq",AdminController.update_faq)
 router.post("/delete_faq",AdminController.delete_faq)
+router.get("/get_dashboard_content",AdminController.get_dashboard_content)
+
 
 /**********************/
 export default router;
