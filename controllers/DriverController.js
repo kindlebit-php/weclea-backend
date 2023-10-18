@@ -1,5 +1,6 @@
 import dbConnection from "../config/db.js";
 import { date, time } from "../helpers/date.js";
+import { fcm_notification } from "../helpers/fcm.js";
 
 // Driver order api
 
@@ -222,6 +223,9 @@ export const submit_pickup_details = async (req, res) => {
                     if (updateImagesErr) {
                       return res.json({ status: false,  message: updateImagesErr.message});
                     } else {
+                      const title="Loads pickup";
+                      const body="Your loads pickup successfully";
+                      fcm_notification(title, body, userId, "Pickup")
                       const responseData = {
                         status: true,
                         message: "Submitted successfully!"
@@ -489,18 +493,19 @@ export const submit_drop_details = async (req, res) => {
     const userIdQuery = `SELECT user_id, order_status FROM bookings WHERE id = ?`;
 
     dbConnection.query(userIdQuery, [booking_id], function (error, data) {
+  
       if (error) {
         return res.json({ status: false, message: error.message });
-      } else if (data.length === 0) {
-        return res.json({ status: false, message: "Booking not found" });
+      } else if (data.length === 0){
+        return res.json({ status: flse, message: "Booking not found" });
       } else {
         const userId = data[0].user_id;
         const order_status = data[0].order_status;
 
         // Check if order_status is not equal to 5
-        if (order_status < 5) {
-          return res.json({ status: false, message: "Invalid order status" });
-        }
+        // if (order_status < 5) {
+        //   return res.json({ status: false, message: "Invalid order status" });
+        // }
 
         const query = `
           SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
@@ -555,6 +560,9 @@ export const submit_drop_details = async (req, res) => {
                             latitude: result.latitude,
                             longitude: result.longitude, deliever_time: currentTime, deliever_date: currentDate, drop_images: imageArray },
                         };
+                        const title="Loads drop";
+                      const body="Your loads drop successfully";
+                      fcm_notification(title, body, userId, "DROP")
                         return res.json(responseData);
                       }
                     });

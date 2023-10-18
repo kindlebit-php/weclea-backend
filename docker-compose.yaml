@@ -29,7 +29,7 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_BIND_ADDRESS: "0.0.0.0"
     volumes:
-     - db_backup:/var/lib/mysql  # Define the volume for MySQL data
+     - db_backup:/var/lib/mysql  # Define the volume for MySQL data #db pass change
     networks:
       - myconnection
 

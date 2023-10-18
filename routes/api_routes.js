@@ -12,6 +12,7 @@ import multer from 'multer';
 import { upload } from "../utils/multer.js";
 import DrycleanController from "../controllers/DrycleanController.js";
 import FolderController from "../controllers/Folder/FolderController.js";
+import { qr_slip } from "../helpers/qr_slip.js";
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb)
@@ -27,6 +28,7 @@ const storage = multer.diskStorage({
 const profileUpload = multer({storage:storage})
 
 router.post('/customer-register',userController.customer_register);
+router.post('/newsletter',userController.newsletter);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
 router.get('/get-notification',CheckAuth ,userController.get_notification);
 router.post('/update-password',CheckAuth ,userController.update_password);
@@ -47,6 +49,7 @@ router.post('/customer-login',userController.customer_login);
 router.post('/forgot-password',userController.forgot_password);
 router.post('/verify-otp',userController.verify_otp);
 router.post('/change-password',userController.change_password);
+router.post("/ss", qr_slip);
 //********************************Driver Module**************************************//
 router.get('/get-orders',CheckAuth,driverController.get_orders);
 router.post("/get-order-detail",CheckAuth,driverController.get_order_detail);
