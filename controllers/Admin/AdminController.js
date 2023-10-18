@@ -2,7 +2,7 @@ import dbConnection from'../../config/db.js';
 
 //get loads API
 //
-//SELECT COUNT(id),sum(total_loads) FROM `bookings` WHERE status=1 and bookings.order_type!=3;
+
 export const get_dashboard_content = async(req,res)=>{
     try { 
     	const loads = "SELECT COUNT(id),sum(total_loads),  FROM `bookings` WHERE status=1 and bookings.order_type!=3";
@@ -10,11 +10,27 @@ export const get_dashboard_content = async(req,res)=>{
 		if (error) throw error;
 			const loads = "SELECT count(id) total_users, users.role FROM `users` WHERE status=1 GROUP by role";
 			dbConnection.query(loads, function (error, users) {
+				if (error){ 
+					throw error
+				}else{
+					data[0]['users']=users;
+					res.json({'status':true,"message":"Success",'data':data});
+				}
+			})
+			//res.json({'status':true,"message":"Success",'data':data});
+
+		})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const get_page_content = async(req,res)=>{
+      try { 
+        	const loads = "select `user_id`, `section`, content from wc_page_content";
+			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
-				data[0]['users']=users
 				res.json({'status':true,"message":"Success",'data':data});
 			})
-		})
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
