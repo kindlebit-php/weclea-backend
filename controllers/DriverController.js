@@ -1,5 +1,6 @@
 import dbConnection from "../config/db.js";
 import { date, time } from "../helpers/date.js";
+import dateFormat from 'date-and-time';
 import { fcm_notification } from "../helpers/fcm.js";
 
 // Driver order api
@@ -7,8 +8,11 @@ import { fcm_notification } from "../helpers/fcm.js";
 export const get_orders = async (req, res) => {
   try {
     const userData = res.user;
-    console.log(userData)   
-    const order = `SELECT id,order_id, date, time FROM bookings WHERE cron_status = 1 AND driver_id = ${userData[0].id}`;
+    var datetime = new Date();
+    const currentDate = dateFormat.format(datetime,'YYYY-MM-DD');
+    const order = `SELECT id,order_id, date, order_type time FROM bookings WHERE
+    cron_status = 1 and order_status = 8 AND date = ${currentDate}
+    and driver_id = ${userData[0].id}`;
     dbConnection.query(order, function (error, data) {
       if (error) throw error;
       res.json({status: true, message: "Data retrieved successfully!", data: data});           
