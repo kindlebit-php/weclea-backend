@@ -12,7 +12,7 @@ export const get_dashboard_content = async(req,res)=>{
 			dbConnection.query(loads, function (error, users) {
 			if (error) throw error;
 				data[0]['users']=users
-				res.json({'status':true,"message":"Success",'data':data);
+				res.json({'status':true,"message":"Success",'data':data});
 			})
 		})
     }catch (error) {
