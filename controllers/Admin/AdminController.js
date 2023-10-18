@@ -37,13 +37,13 @@ export const get_page_content = async(req,res)=>{
 
 export const update_page_content = async(req,res)=>{
 	const reqData = req.body;
-	console.log("content==>",reqData.content);
+	console.log("content==>",reqData.content,JSON.stringify(reqData.content));
     try { 
     	const qrySelect = "select `user_id`, `section`, content from wc_page_content where section=?";
 		dbConnection.query(qrySelect,[reqData.section], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
-			    var updateContnetQry = "update wc_page_content set content = '"+reqData.content+"' where section = '"+reqData.section+"' ";
+			    var updateContnetQry = "update wc_page_content set content = '"+JSON.stringify(reqData.content)+"' where section = '"+reqData.section+"' ";
 			    dbConnection.query(updateContnetQry, function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Content has been updated successfully",'data':data});
