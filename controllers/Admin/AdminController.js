@@ -158,7 +158,7 @@ export const update_faq = async(req,res)=>{
 		dbConnection.query(qrySelect,[reqData.section,reqData.faq_id], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) {
-			    var updateContnetQry = "update wc_page_content set user_id='"+userId+"', faq_type='"+reqData.faq_type+"', title = '"+reqData.title+"',content = '"+reqData.content+"' where id = "+reqData.faq_id+" ";
+			    var updateContnetQry = "update wc_faq set user_id='"+userId+"', faq_type='"+reqData.faq_type+"', title = '"+reqData.title+"',content = '"+reqData.content+"' where id = "+reqData.faq_id+" ";
 			    dbConnection.query(updateContnetQry, function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":"FAQ has been updated successfully",'data':data});
