@@ -109,6 +109,10 @@ router.post("/dry-clean-booking",CheckAuth,DrycleanController.dry_clean_booking)
 
 router.get("/get_content",AdminController.get_page_content)
 router.get("/get_faq",AdminController.get_faq_content)
+router.post("/update_page_content",AdminController.update_page_content)
+router.post("/create_faq",AdminController.create_faq)
+router.post("/update_faq",AdminController.update_faq)
+router.post("/delete_faq",AdminController.delete_faq)
 
 /**********************/
 export default router;
