@@ -152,7 +152,7 @@ export const get_faq_content = async(req,res)=>{
 export const update_faq = async(req,res)=>{
 	const reqData = req.body;
 	const userData = res.user;
-  	const userId = userData[0].id;
+  	const userId =1;// userData[0].id;
     try { 
     	const qrySelect = "select id from wc_faq where title=? and id!=?";
 		dbConnection.query(qrySelect,[reqData.section,reqData.faq_id], function (error, data) {
