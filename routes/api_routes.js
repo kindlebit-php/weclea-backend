@@ -30,6 +30,7 @@ const profileUpload = multer({storage:storage})
 router.post('/customer-register',userController.customer_register);
 router.post('/newsletter',userController.newsletter);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
+router.get('/user-registered-address',CheckAuth ,userController.user_registered_address);
 router.get('/get-notification',CheckAuth ,userController.get_notification);
 router.post('/update-password',CheckAuth ,userController.update_password);
 router.post('/edit-user-profile',CheckAuth,profileUpload.single('profile_image') ,userController.edit_user_profile);
@@ -109,6 +110,10 @@ router.post("/dry-clean-booking",CheckAuth,DrycleanController.dry_clean_booking)
 
 router.get("/get_content",AdminController.get_page_content)
 router.get("/get_faq",AdminController.get_faq_content)
+router.post("/update_page_content",AdminController.update_page_content)
+router.post("/create_faq",AdminController.create_faq)
+router.post("/update_faq",AdminController.update_faq)
+router.post("/delete_faq",AdminController.delete_faq)
 
 /**********************/
 export default router;
