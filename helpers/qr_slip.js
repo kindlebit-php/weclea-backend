@@ -2,105 +2,160 @@ import dbConnection from "../config/db.js";
 import { PDFDocument, rgb } from "pdf-lib";
 import qrcode from "qrcode";
 import { promises as fsPromises } from "fs";
+import { v4 as uuidv4 } from 'uuid'; 
+import pdf from "pdf-creator-node"; 
+import fs from 'fs';
+
 
 export const qr_slip = async (req, res) => {
-  try {
-    const booking_id = req.body.booking_id;
+    try {
+      const booking_id = req.body.booking_id;
+      console.log(booking_id);
+  
+      const 
+      userData = await getUserData(booking_id);
+      if (!userData) {
+        return res.status(404).send("Booking not found");
+      }
+  
+      const qrCode = await generateQRCode(userData.QR_code);
+  
+      if (!qrCode.startsWith("data:image/png;base64,")) {
+        return res.status(500).send("Invalid QR code format");
+      }
+  
+      const pdfBytes = await generatePDF(userData, qrCode);
+  
+      const random = Math.floor(Math.random() * 100000);
+
+      const localFilePath = `uploads/${random}-qr_slip.pdf`;
+      await fsPromises.writeFile(localFilePath, pdfBytes);
+      
+  
+      // Set response headers for download
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", 'attachment; filename="qr_slip.pdf"');
+      res.end(pdfBytes);
+  
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).send("An error occurred");
+    }
+  };
+
+
+async function getUserData(booking_id) {
+  return new Promise((resolve, reject) => {
     const userIdQuery = `SELECT user_id, order_status FROM bookings WHERE id = ?`;
-    dbConnection.query(userIdQuery, [booking_id], async (error, data) => {
+    dbConnection.query(userIdQuery, [booking_id], (error, data) => {
       if (error) {
-        console.error("Error:", error);
-        return;
+        reject(error);
       }
       if (data && data.length > 0) {
         const userId = data[0].user_id;
         const query = `
           SELECT bq.qr_code AS QR_code, b.order_id, b.date,
-          CONCAT(ca.address, ', ', ca.appartment, ', ', ca.city, ', ', ca.state, ', ', ca.zip, ', ', ca.latitude, ', ', ca.longitude) AS address
+          CONCAT(ca.address, ', ', ca.appartment, ', ', ca.city, ', ', ca.state, ', ', ca.zip) AS address
           FROM bookings AS b
           JOIN customer_address AS ca ON b.user_id = ca.user_id
           JOIN users AS u ON b.user_id = u.id
           JOIN booking_qr AS bq ON b.id = bq.booking_id
           WHERE b.user_id = ? AND b.id = ? `;
-
-        dbConnection.query(
-          query,
-          [userId, booking_id],
-          async (error, data2) => {
-            if (error) {
-              console.error("Error:", error);
-              return;
-            }
-            if (data2 && data2.length > 0) {
-              const qr_code = data2[0].QR_code;
-              const qrCode = await generateQRCode(qr_code);
-
-              
-              if (!qrCode.startsWith("data:image/png;base64,")) {
-                console.error("Invalid QR code format.");
-                return;
-              }
-
-             
-              const pdfDoc = await PDFDocument.create();
-              const page = pdfDoc.addPage([600, 400]);
-              const { width, height } = page.getSize();
-
-              
-              const qrCodeImageData = qrCode.split("data:image/png;base64,")[1];
-
-              
-              const qrCodeImage = await pdfDoc.embedPng(
-                Buffer.from(qrCodeImageData, "base64")
-              );
-              page.drawImage(qrCodeImage, {
-                x: 50,
-                y: height - 200, 
-                width: 100,
-                height: 100,
-              });
-
-              const content = `
-                Order ID: ${data2[0].order_id}
-                Date: ${data2[0].date}
-                Address: ${data2[0].address}
-              `;
-
-              page.drawText(content, {
-                x: 200,
-                y: height - 50, 
-                size: 14,
-                color: rgb(0, 0, 0),
-              });
-
-              // Save the PDF to a file
-              const pdfBytes = await pdfDoc.save();
-
-              // Set response headers for download
-              res.setHeader("Content-Type", "application/pdf");
-              res.setHeader(
-                "Content-Disposition",
-                'attachment; filename="qr_slip.pdf"'
-              );
-
-              
-              res.end(pdfBytes);
-            }
+        
+        dbConnection.query(query, [userId, booking_id], (error, data2) => {
+          if (error) {
+            reject(error);
           }
-        );
+          if (data2 && data2.length > 0) {
+            resolve(data2[0]);
+          }
+        });
+      } else {
+        resolve(null); 
       }
     });
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
+  });
+}
+
+async function generatePDF(data, qrCode) {
+    const qrCodeImageData = qrCode.split('data:image/png;base64,')[1];
+  
+    const options = {
+      format: 'A4',
+      orientation: 'portrait',
+      border: '10mm',
+      header: {
+        height: '0mm',
+      },
+      footer: {
+        height: '0mm',
+      },
+      type: 'pdf',
+    };
+  
+    const document = {
+      html: `<!DOCTYPE html>
+      <head>
+      <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;700&display=swap" rel="stylesheet">
+      </head>
+      <html>
+          <body style="background: #dfdfdf;">
+              <div style="margin:0 auto;font-family: 'Lexend Deca', sans-serif;width: 375px;background: #ffffff;padding: 0px;display: flex;align-items: start;justify-content: space-between;flex-wrap:wrap;">
+                  <table class="table" style="border-collapse: collapse;width:100%;display: table;">
+                      <thead>
+                          <tr>
+                              <th scope="col" style="padding: 15px 5px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;"><img src="logo.png" style="width: 70%;"> </th>
+                              <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
+                                  <p style="margin: 0 0 8px;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Invoice # <span>07292022</span></p>
+                                  <p style="margin: 0;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Issue Date <span>04 Oct, 2023</span></p>
+                              </th>
+                          </tr>
+                      </thead>
+                  </table>
+                  <table class="table" style="border-collapse: collapse;width:100%;display: table;">
+                      <thead>
+                          <tr>
+                             <td colspan="3" style="color: #212121;padding: 15px 15px;font-size: 14px;border-bottom: 1px solid #ccc;font-weight: 600;">Pickup Address <p style="font-size: 14px;margin: 8px 0 0;font-weight: 500;color: #4a4a4a;">1 Redwood Court, Soldotna,ak, 99669, USA</p></td>
+                          </tr>
+                          <tr>
+                             
+                              <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
+                                  <p style="margin: 0 0 8px;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Contact:</p>
+                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">Weclea</p>
+                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">hello@weclea.com</p>
+                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">(123) 456-7890</p>
+                              </th>
+                              <th scope="col" style="padding: 0px 0px 0px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;"><img src="Qr.png" style="width: 80%;"> </th>
+                          </tr>
+                      </thead>
+                  </table>
+              </div>
+          </body>
+          
+      </html>`, 
+      data: {
+        qrCodeImage: 'data:image/png;base64,' + qrCodeImageData,
+      },
+      path: `uploads/${uuidv4()}.pdf`, // Use a unique file name
+    };
+  
+    const pdfPromise = new Promise((resolve, reject) => {
+      pdf.create(document, options)
+        .then((res) => {
+          resolve(res.filename);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+    return pdfPromise;
+}
 
 
 async function generateQRCode(qr_code) {
   return new Promise((resolve, reject) => {
     qrcode.toDataURL(qr_code, (err, qrCode) => {
       if (err) {
-        console.error("Error generating QR code:", err);
         reject(err);
       }
       resolve(qrCode);
