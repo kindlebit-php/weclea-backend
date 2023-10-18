@@ -37,7 +37,7 @@ export const get_page_content = async(req,res)=>{
 
 export const update_page_content = async(req,res)=>{
 	const reqData = req.body;
-	console.log(reqData);
+	console.log("content==>",reqData.content);
     try { 
     	const qrySelect = "select `user_id`, `section`, content from wc_page_content where section=?";
 		dbConnection.query(qrySelect,[reqData.section], function (error, data) {
