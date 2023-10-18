@@ -1,10 +1,8 @@
 import dbConnection from "../config/db.js";
-import { PDFDocument, rgb } from "pdf-lib";
 import qrcode from "qrcode";
-import { promises as fsPromises } from "fs";
 import { v4 as uuidv4 } from 'uuid'; 
 import pdf from "pdf-creator-node"; 
-import fs from 'fs';
+
 
 
 export const qr_slip = async (req, res) => {
@@ -12,8 +10,7 @@ export const qr_slip = async (req, res) => {
       const booking_id = req.body.booking_id;
       console.log(booking_id);
   
-      const 
-      userData = await getUserData(booking_id);
+      const userData = await getUserData(booking_id);
       if (!userData) {
         return res.status(404).send("Booking not found");
       }
@@ -23,19 +20,9 @@ export const qr_slip = async (req, res) => {
       if (!qrCode.startsWith("data:image/png;base64,")) {
         return res.status(500).send("Invalid QR code format");
       }
-  
+      console.log(qrCode)
       const pdfBytes = await generatePDF(userData, qrCode);
-  
-      const random = Math.floor(Math.random() * 100000);
-
-      const localFilePath = `uploads/${random}-qr_slip.pdf`;
-      await fsPromises.writeFile(localFilePath, pdfBytes);
-      
-  
-      // Set response headers for download
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", 'attachment; filename="qr_slip.pdf"');
-      res.end(pdfBytes);
+      return res.end(pdfBytes)
   
     } catch (error) {
       console.error("Error:", error);
@@ -78,12 +65,14 @@ async function getUserData(booking_id) {
 }
 
 async function generatePDF(data, qrCode) {
+    const order_id=data.order_id;
+    const date=data.date;
+    const address=data.address;
     const qrCodeImageData = qrCode.split('data:image/png;base64,')[1];
   
     const options = {
       format: 'A4',
       orientation: 'portrait',
-      border: '10mm',
       header: {
         height: '0mm',
       },
@@ -93,50 +82,49 @@ async function generatePDF(data, qrCode) {
       type: 'pdf',
     };
   
-    const document = {
-      html: `<!DOCTYPE html>
-      <head>
-      <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;700&display=swap" rel="stylesheet">
-      </head>
-      <html>
-          <body style="background: #dfdfdf;">
-              <div style="margin:0 auto;font-family: 'Lexend Deca', sans-serif;width: 375px;background: #ffffff;padding: 0px;display: flex;align-items: start;justify-content: space-between;flex-wrap:wrap;">
-                  <table class="table" style="border-collapse: collapse;width:100%;display: table;">
-                      <thead>
-                          <tr>
-                              <th scope="col" style="padding: 15px 5px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;"><img src="logo.png" style="width: 70%;"> </th>
-                              <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
-                                  <p style="margin: 0 0 8px;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Invoice # <span>07292022</span></p>
-                                  <p style="margin: 0;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Issue Date <span>04 Oct, 2023</span></p>
-                              </th>
-                          </tr>
-                      </thead>
-                  </table>
-                  <table class="table" style="border-collapse: collapse;width:100%;display: table;">
-                      <thead>
-                          <tr>
-                             <td colspan="3" style="color: #212121;padding: 15px 15px;font-size: 14px;border-bottom: 1px solid #ccc;font-weight: 600;">Pickup Address <p style="font-size: 14px;margin: 8px 0 0;font-weight: 500;color: #4a4a4a;">1 Redwood Court, Soldotna,ak, 99669, USA</p></td>
-                          </tr>
-                          <tr>
-                             
-                              <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
-                                  <p style="margin: 0 0 8px;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Contact:</p>
-                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">Weclea</p>
-                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">hello@weclea.com</p>
-                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">(123) 456-7890</p>
-                              </th>
-                              <th scope="col" style="padding: 0px 0px 0px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;"><img src="Qr.png" style="width: 80%;"> </th>
-                          </tr>
-                      </thead>
-                  </table>
-              </div>
-          </body>
-          
-      </html>`, 
-      data: {
-        qrCodeImage: 'data:image/png;base64,' + qrCodeImageData,
-      },
-      path: `uploads/${uuidv4()}.pdf`, // Use a unique file name
+     const document = {
+        html: `<!DOCTYPE html>
+            <head>
+            <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;700&display=swap" rel="stylesheet">
+            </head>
+            <html>
+                <body style="background: #dfdfdf;">
+                    <div style="margin:0 auto;font-family: 'Lexend Deca', sans-serif;width: 375px;background: #ffffff;padding: 0px;display: flex;align-items: start;justify-content: space-between;flex-wrap:wrap;">
+                        <table class="table" style="border-collapse: collapse;width:100%;display: table;">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="padding: 15px 5px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;"><img src="https://api.weclea.com/uploads/logo.png" style="width: 70%;"> </th>
+                                    <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
+                                        <p style="margin: 0 0 8px;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Invoice # <span>${order_id}</span></p>
+                                        <p style="margin: 0;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Issue Date <span>${date}</span></p>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                        <table class="table" style="border-collapse: collapse;width:100%;display: table;">
+                            <thead>
+                                <tr>
+                                    <td colspan="3" style="color: #212121;padding: 15px 15px;font-size: 14px;border-bottom: 1px solid #ccc;font-weight: 600;">Pickup Address <p style="font-size: 14px;margin: 8px 0 0;font-weight: 500;color: #4a4a4a;">${address}</p></td>
+                                </tr>
+                                <tr>
+                                    <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
+                                        <p style="margin: 0 0 8px;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Contact:</p>
+                                        <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">Weclea</p>
+                                        <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">hello@weclea.com</p>
+                                        <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">(123) 456-7890</p>
+                                    </th>
+                                    <th scope="col" style="padding: 0px 0px 0px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;"><img src="data:image/png;base64, ${qrCodeImageData}" style="width: 80%;"> </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </body>
+
+            </html>`,
+        data: {
+            qrCodeImage: 'data:image/png;base64,' + qrCodeImageData,
+        },
+        path: `uploads/${uuidv4()}.pdf`,
     };
   
     const pdfPromise = new Promise((resolve, reject) => {

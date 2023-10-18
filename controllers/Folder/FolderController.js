@@ -102,7 +102,7 @@ export const customer_list_wash = (req, res) => {
         return res.json({ status: false, message: "User has no bookings" });
       }
       const booking_id = userIdResult.map((row) => row.id);
-      const query = `SELECT b.user_id AS Customer_Id, b.date, b.time, b.order_status, bi.pickup_images
+      const query = `SELECT b.id AS Booking_id, b.user_id AS Customer_Id, b.date, b.time, b.order_status, bi.pickup_images
                       FROM bookings AS b
                       JOIN booking_images AS bi ON b.id = bi.booking_id
                       WHERE b.id IN (?)`;
@@ -115,7 +115,7 @@ export const customer_list_wash = (req, res) => {
           const resData = [];
           if (data?.length > 0) {
             for (const elem of data) {
-              const { Customer_Id, date, time, order_status, pickup_images } = elem;
+              const {Booking_id, Customer_Id, date, time, order_status, pickup_images } = elem;
 
               console.log('images',pickup_images)
               const separatedStrings = pickup_images.split(", ")
@@ -124,6 +124,7 @@ export const customer_list_wash = (req, res) => {
               });
 
               resData.push({
+                Booking_id,
                 Customer_Id,
                 date,
                 time,
