@@ -202,7 +202,7 @@ export const delete_faq = async(req,res)=>{
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
-			    var updateContnetQry = "delete from wc_faq id=? ";
+			    var updateContnetQry = "delete from wc_faq where id=? ";
 			    dbConnection.query(updateContnetQry,[reqData.id], function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":"FAQ has been deleted successfully",'data':data});
