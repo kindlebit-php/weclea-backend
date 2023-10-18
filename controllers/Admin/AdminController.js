@@ -1,7 +1,6 @@
 import dbConnection from'../../config/db.js';
 
 //get loads API
-//
 
 export const get_dashboard_content = async(req,res)=>{
     try { 
@@ -15,7 +14,7 @@ export const get_dashboard_content = async(req,res)=>{
 					throw error;
 				}else{
 					data[0]['users']=users;
-					res.json({'status':true,"message":"Success",'data':data});
+					res.json({'status':true,"message":"Success",'data':{data,users}});
 				}
 			})
 
