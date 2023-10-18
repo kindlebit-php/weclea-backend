@@ -5,12 +5,12 @@ import dbConnection from'../../config/db.js';
 
 export const get_dashboard_content = async(req,res)=>{
     try { 
-    	const loads = "SELECT COUNT(id),sum(total_loads)  FROM `bookings` WHERE status=1 and bookings.order_type!=3";
+    	const loads = "SELECT COUNT(id) total_order,sum(total_loads) total_load  FROM `bookings` WHERE status=1 and bookings.order_type!=3";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
 			res.json({'status':true,"message":"Success",'data':data});
-			const loads = "SELECT count(id) total_users, users.role FROM `users` WHERE status=1 GROUP by role";
-			dbConnection.query(loads, function (error, users) {
+			const qry = "SELECT count(id) total_users, users.role FROM `users` WHERE status=1 GROUP by role";
+			dbConnection.query(qry, function (error, users) {
 				if (error){ 
 					throw error;
 				}else{
