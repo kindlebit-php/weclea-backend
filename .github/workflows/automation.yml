@@ -12,6 +12,10 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+        env:
+          GIT_MAX_INPUT: 10000000 # Set a larger value for maxBuffer (in bytes)
 
       - name: Copy uploads folder
         run: |
@@ -24,16 +28,16 @@ jobs:
       - name: Build and Test
         run: |
           docker build . -t kindlebit143/weclea_backend:v0.2
-      
+
       - name: Login to DockerHub
         run: |
           echo 'Pushing code to DockerHub'
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-          docker push kindlebit143/weclea_backend:v0.2  
+          docker push kindlebit143/weclea_backend:v0.2
 
       - name: Deploy on server
         run: |
           # Perform cleanup steps here (e.g., deleting temporary files)
           docker-compose down
           docker-compose up -d
-          # Add your cleanup commands here
+          # Add your cleanup commands heree

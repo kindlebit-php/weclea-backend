@@ -1,6 +1,28 @@
 import dbConnection from'../../config/db.js';
 
 //get loads API
+
+export const get_dashboard_content = async(req,res)=>{
+    try { 
+    	const loads = "SELECT COUNT(id) total_order,sum(total_loads) total_load  FROM `bookings` WHERE status=1 and bookings.order_type!=3";
+		dbConnection.query(loads, function (error, data) {
+		if (error) throw error;
+			//res.json({'status':true,"message":"Success",'data':data});
+			const qry = "SELECT count(id) total_users, users.role FROM `users` WHERE status=1 GROUP by role";
+			dbConnection.query(qry, function (error, users) {
+				if (error){ 
+					throw error;
+				}else{
+					data[0]['users']=users;
+					res.json({'status':true,"message":"Success",'data':data});
+				}
+			})
+
+		})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
 export const get_page_content = async(req,res)=>{
       try { 
         	const loads = "select `user_id`, `section`, content from wc_page_content";
@@ -53,7 +75,7 @@ export const update_faq = async(req,res)=>{
 		dbConnection.query(qrySelect,[reqData.section,reqData.faq_id], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) {
-			    var updateContnetQry = "update wc_page_content set title = '"+reqData.title+"',content = '"+reqData.content+"' where id = "+reqData.faq_id+" ";
+			    var updateContnetQry = "update wc_page_content set faq_type='"+reqData.faq_type+"', title = '"+reqData.title+"',content = '"+reqData.content+"' where id = "+reqData.faq_id+" ";
 			    dbConnection.query(updateContnetQry, function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":"FAQ has been updated successfully",'data':data});
@@ -113,5 +135,6 @@ export default {
 	update_page_content,
 	create_faq,
 	update_faq,
-	delete_faq
+	delete_faq,
+	get_dashboard_content
 }
