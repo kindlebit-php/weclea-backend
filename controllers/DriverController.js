@@ -50,7 +50,7 @@ export const get_order_detail = async (req, res) => {
           return res.json({ status: false, message: "data Not found" });
         }
 
-        const {name, profile_image, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads} = data[0];
+        const {name, profile_image,mobile, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads} = data[0];
         const resData = {
           name, profile_image:`${profile_image === 'null' ? "" : profile_image}`,mobile, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads
         }
