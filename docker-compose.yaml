@@ -14,7 +14,7 @@ services:
       - DB_DATABASE=${DB_DATABASE}
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
       - MAX_FILE_SIZE=500mb 
-      - max_execution_time = 300
+      - max_execution_time=300
       - post_max_size=50M
       - upload_max_filesize=50M
     networks:
