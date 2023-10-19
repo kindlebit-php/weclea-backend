@@ -36,7 +36,7 @@ export const get_order_detail = async (req, res) => {
 
       const userIds = userIdResult.map((row) => row.user_id);
       const query = `
-                SELECT u.name,u.profile_image, bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
+                SELECT u.name,u.profile_image,u.mobile, bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
                 FROM bookings AS b
                 JOIN customer_address AS ca ON b.user_id = ca.user_id
                 JOIN users AS u ON b.user_id = u.id
@@ -50,9 +50,9 @@ export const get_order_detail = async (req, res) => {
           return res.json({ status: false, message: "data Not found" });
         }
 
-        const {name, profile_image, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads} = data[0];
+        const {name, profile_image,mobile, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads} = data[0];
         const resData = {
-          name, profile_image:`${profile_image === 'null' ? "" : profile_image}`, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads
+          name, profile_image:`${profile_image === 'null' ? "" : profile_image}`,mobile, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads
         }
         res.json({status: true,message: "Order details retrieved successfully!",data: resData});
       });
@@ -62,20 +62,24 @@ export const get_order_detail = async (req, res) => {
   }
 };
 
-
-
 export const print_All_QrCode = async (req, res) => {
   try {
     const userData = res.user;
     const booking_id=req.body.booking_id
-    const data = `SELECT id AS qr_codeID, qr_code,driver_pickup_status FROM booking_qr WHERE driver_pickup_status = 0 AND booking_id = ${booking_id}`;
+    const data = `SELECT id AS qr_codeID, qr_code,driver_pickup_status FROM booking_qr WHERE booking_id = ${booking_id}`;
     dbConnection.query(data, function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
-      }else{
-        res.json({status: true,message: "Data retrieved successfully!", data: data });
-      }
-    });
+      } else {
+                let count = 0;
+                for (let i = 0; i < data.length; i++) {
+                  if (data[i].driver_pickup_status === 1) {
+                    count++;
+                  }
+                }
+                return res.json({status: true,  message: 'Data retrieved successfully!',load_scanned: count, data: data,});
+              }
+            });
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
@@ -90,7 +94,13 @@ export const print_All_Drop_QrCode = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }else{
-      res.json({status: true,message: "Data retrieved successfully!", data: data });
+        let count = 0;
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].driver_drop_status === 1) {
+            count++;
+          }
+        }
+      res.json({status: true,message: "Data retrieved successfully!",load_scanned: count, data: data });
       }
     });
   } catch (error) {

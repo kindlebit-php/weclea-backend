@@ -1,5 +1,6 @@
 import dbConnection from "../../config/db.js";
 import { date, time } from "../../helpers/date.js";
+import path from "path";
 import { fcm_notification } from "../../helpers/fcm.js";
 export const Scan_received_loads = (req, res) => {
   const userData = res.user;
@@ -122,8 +123,7 @@ export const customer_list_wash = (req, res) => {
                const imagesUrl=separatedStrings.map((val) => {
                return `${process.env.BASE_URL}/${val}`;
               });
-
-              resData.push({
+                 resData.push({
                 Booking_id,
                 Customer_Id,
                 date,
@@ -188,7 +188,11 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
               const imagesUrl = separatedStrings.map((val) => {
                 return `${process.env.BASE_URL}/${val}`;
               });
-
+                const imageList = imagesUrl.map(imagePath => ({
+                  path: imagePath,
+                  type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                })
+                )
               resData.push({
                 Booking_id,
                 Customer_Id,
@@ -196,7 +200,7 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
                 date,
                 time,
                 order_status,
-                imagesUrl,
+                imageList,
               });
             }
           }
