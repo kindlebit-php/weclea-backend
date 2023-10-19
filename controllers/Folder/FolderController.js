@@ -160,13 +160,21 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
       if (userIdResult.length === 0) {
         return res.json({ status: false, message: "User has no bookings" });
       }
+
       const booking_id = userIdResult.map((row) => row.id);
-      const query = `SELECT b.id AS Booking_id, b.user_id AS Customer_Id, bin.pickup_instruction AS comment, b.date, b.time, b.order_status, bi.pickup_images
+      console.log(booking_id,folder_id)
+      let query = `SELECT b.id AS Booking_id, b.user_id AS Customer_Id, bin.pickup_instruction AS comment, b.date, b.time, b.order_status, bi.pickup_images
                         FROM bookings AS b
                         JOIN booking_images AS bi ON b.id = bi.booking_id
                         JOIN booking_instructions AS bin ON b.user_id = bin.user_id
-                        WHERE b.user_id = ? AND b.id IN (?)`;
-      dbConnection.query(query, [customer_id, booking_id], (error, data) => {
+                        WHERE b.id IN (?)`;
+
+      if (customer_id) {
+        
+        query += ' AND b.user_id = ?';
+      }
+
+      dbConnection.query(query, customer_id ? [booking_id, customer_id] : [booking_id], (error, data) => {
         if (error) {
           return res.json({ status: false, message: error.message });
         } else if (data.length === 0) {
@@ -175,11 +183,10 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
           const resData = [];
           if (data?.length > 0) {
             for (const elem of data) {
-              const { Booking_id,Customer_Id,comment, date, time, order_status, pickup_images } =
-                elem;
+              const { Booking_id, Customer_Id, comment, date, time, order_status, pickup_images } = elem;
               const separatedStrings = pickup_images.split(", ")
-               const imagesUrl=separatedStrings.map((val) => {
-               return `${process.env.BASE_URL}/${val}`;
+              const imagesUrl = separatedStrings.map((val) => {
+                return `${process.env.BASE_URL}/${val}`;
               });
 
               resData.push({
@@ -196,7 +203,7 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
           return res.json({
             status: true,
             message: "Updated successfully!",
-            data: resData[0],
+            data: resData,
           });
         }
       });
