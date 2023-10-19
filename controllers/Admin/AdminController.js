@@ -105,7 +105,7 @@ export const create_packages = async(req,res)=>{
 }
 
 export const delete_packages = async(req,res)=>{
-	const reqData = req.params;
+	const reqData = req.body;
     try { 
     	const qrySelect = "select id from admin_packages where id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
@@ -129,7 +129,7 @@ export const delete_packages = async(req,res)=>{
     }
 }
 export const get_package_details = async(req,res)=>{
-	const reqData = req.body;
+	const reqData = req.params;
     try { 
     	const qrySelect = "select id from admin_packages where id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
