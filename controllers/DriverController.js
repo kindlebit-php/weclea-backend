@@ -36,7 +36,7 @@ export const get_order_detail = async (req, res) => {
 
       const userIds = userIdResult.map((row) => row.user_id);
       const query = `
-                SELECT u.name,u.profile_image, bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
+                SELECT u.name,u.profile_image,u.mobile, bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
                 FROM bookings AS b
                 JOIN customer_address AS ca ON b.user_id = ca.user_id
                 JOIN users AS u ON b.user_id = u.id
@@ -52,7 +52,7 @@ export const get_order_detail = async (req, res) => {
 
         const {name, profile_image, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads} = data[0];
         const resData = {
-          name, profile_image:`${profile_image === 'null' ? "" : profile_image}`, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads
+          name, profile_image:`${profile_image === 'null' ? "" : profile_image}`,mobile, comment, address, appartment, city,state,zip,latitude,longitude,booking_id,total_loads
         }
         res.json({status: true,message: "Order details retrieved successfully!",data: resData});
       });
