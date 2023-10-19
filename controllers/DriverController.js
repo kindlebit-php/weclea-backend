@@ -62,20 +62,24 @@ export const get_order_detail = async (req, res) => {
   }
 };
 
-
-
 export const print_All_QrCode = async (req, res) => {
   try {
     const userData = res.user;
     const booking_id=req.body.booking_id
-    const data = `SELECT id AS qr_codeID, qr_code,driver_pickup_status FROM booking_qr WHERE driver_pickup_status = 0 AND booking_id = ${booking_id}`;
+    const data = `SELECT id AS qr_codeID, qr_code,driver_pickup_status FROM booking_qr WHERE booking_id = ${booking_id}`;
     dbConnection.query(data, function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
-      }else{
-        res.json({status: true,message: "Data retrieved successfully!", data: data });
-      }
-    });
+      } else {
+                let count = 0;
+                for (let i = 0; i < data.length; i++) {
+                  if (data[i].driver_pickup_status === 1) {
+                    count++;
+                  }
+                }
+                return res.json({status: true,  message: 'Data retrieved successfully!',load_scanned: count, data: data,});
+              }
+            });
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
@@ -90,7 +94,13 @@ export const print_All_Drop_QrCode = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }else{
-      res.json({status: true,message: "Data retrieved successfully!", data: data });
+        let count = 0;
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].driver_drop_status === 1) {
+            count++;
+          }
+        }
+      res.json({status: true,message: "Data retrieved successfully!",load_scanned: count, data: data });
       }
     });
   } catch (error) {
