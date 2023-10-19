@@ -6,10 +6,16 @@ import http from 'http';
 import "./config/db.js";
 
 var app = express();
-//Configuring express server
-app.use(bodyparser.json());
-app.use(bodyparser.urlencoded({ extended: false }));
 
+app.use(bodyParser.json({limit: '100mb'}));
+
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+    limit: '100mb',
+    parameterLimit: 50000,
+  }),
+);
 // enabled cors 
 app.use(cors());
 
