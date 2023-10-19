@@ -7,10 +7,10 @@ import "./config/db.js";
 
 var app = express();
 
-app.use(bodyParser.json({limit: '100mb'}));
+app.use(bodyparser.json({limit: '100mb'}));
 
 app.use(
-  bodyParser.urlencoded({
+  bodyparser.urlencoded({
     extended: true,
     limit: '100mb',
     parameterLimit: 50000,
