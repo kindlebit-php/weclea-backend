@@ -119,6 +119,7 @@ router.post("/update_packages",AdminController.update_packages)
 router.post("/create_packages",AdminController.create_packages)
 router.post("/delete_packages",AdminController.delete_packages)
 router.get("/get_package_details/:id?",AdminController.get_package_details)
+router.get("/get_userList/:category_id?",AdminController.get_userList)
 
 
 
