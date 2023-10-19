@@ -28,13 +28,15 @@ export const get_userList = async(req,res)=>{
 	var reqData= req.params;
     try { 
     	var usrLoads = "select sum(commercial+residential+yeshiba) as total_loads from customer_loads_availabilty where user_id =users.id";
-    	if(reqData.category_id == 1){
-            usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = users.id";
-        }else if(reqData.category_id == 2){
-            usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = users.id";
-        }else if(reqData.category_id == 3){
-            usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = users.id";
-        }
+    	if(reqData.category_id){
+	    	if(reqData.category_id == 1){
+	            usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = users.id";
+	        }else if(reqData.category_id == 2){
+	            usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = users.id";
+	        }else if(reqData.category_id == 3){
+	            usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = users.id";
+	        }
+	    }
     	const loads = "select users.*, ("+usrLoads+") total_load from users";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
