@@ -115,6 +115,12 @@ router.post("/create_faq",AdminController.create_faq)
 router.post("/update_faq",AdminController.update_faq)
 router.post("/delete_faq",AdminController.delete_faq)
 router.get("/get_dashboard_content",AdminController.get_dashboard_content)
+router.get("/get_packagesList",AdminController.get_packagesList)
+router.post("/update_packages",AdminController.update_packages)
+router.post("/create_packages",AdminController.create_packages)
+router.post("/delete_packages",AdminController.delete_packages)
+router.get("/get_package_details/:id?",AdminController.get_package_details)
+
 
 
 /**********************/
