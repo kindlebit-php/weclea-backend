@@ -124,6 +124,10 @@ router.post("/delete_packages",AdminController.delete_packages)
 router.get("/get_package_details/:id?",AdminController.get_package_details)
 router.get("/get_userList/:category_id?",AdminController.get_userList)
 router.post("/update_package_status",AdminController.update_package_status)
+router.post("/update_drycleaning_service",AdminController.update_drycleaning_service)
+router.post("/add_drycleaning_service",AdminController.add_drycleaning_service)
+
+
 
 
 /**********************/
