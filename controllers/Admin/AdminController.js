@@ -139,7 +139,7 @@ export const add_drycleaning_service = async(req,res)=>{
     }
 }
 export const update_drycleaning_service = async(req,res)=>{
-	try { 
+	/*try { 
 		var reqData=req.body;
 		console.log('files',req.files);
 		if(!reqData['id'] || reqData['id']==""  ) {
@@ -198,8 +198,10 @@ export const update_drycleaning_service = async(req,res)=>{
 		});	
     }catch (error) {
         res.json({'status':false,"message":error.message});  
-    }
+    }*/
 }
+
+
  /************ end Dry Cleaning*************/
 /******** Admin Dashboard Data API *********/
 export const get_dashboard_content = async(req,res)=>{
