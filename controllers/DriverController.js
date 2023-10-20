@@ -415,51 +415,50 @@ export const get_drop_order_detail = async (req, res) => {
             }
           };
           
-
-export const drop_loads = async (req, res) => {
-  try {
-    const userData = res.user;
-    const driverId = userData[0].id;
-    const {qr_code,qr_codeID} = req.body;
-    const bookingDataQuery = "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
-
-    dbConnection.query(bookingDataQuery, [qr_code,qr_codeID], function (error, data) {
-      if (error) {
-        return res.json({ status: false, message: error.message });
-      }
-      
-      if (data.length > 0 && data[0].driver_drop_status === 0) {
-        const updateStatusQuery = "UPDATE booking_qr SET driver_drop_status = '1' WHERE id = ?";
-        const booking_id = data[0].booking_id;
-
-        dbConnection.query(updateStatusQuery, [data[0].id], function (updateerror, updateResult) {
-          if (updateerror) {
-            return res.json({ status: false, message: updateerror.message });
-          }
-
-          const updateOrderStatusQuery = "UPDATE bookings SET order_status = '5' WHERE id = ?";
-          dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateError, updateResult) {
-            if (updateError) {
-              return res.json({ status: false, message: updateError.message });
+          export const drop_loads = async (req, res) => {
+            try {
+              const userData = res.user;
+              const driverId = userData[0].id;
+              const { qr_code, qr_codeID } = req.body;
+              const bookingDataQuery = "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
+          
+              dbConnection.query(bookingDataQuery, [qr_code, qr_codeID], function (error, data) {
+                if (error) {
+                  return res.json({ status: false, message: error.message });
+                }
+          
+                if (data.length > 0 && data[0].driver_drop_status === 0) {
+                  const updateStatusQuery = "UPDATE booking_qr SET driver_drop_status = '1' WHERE id = ?";
+                  const booking_id = data[0].booking_id;
+          
+                  dbConnection.query(updateStatusQuery, [data[0].id], function (updateerror, updateResult) {
+                    if (updateerror) {
+                      return res.json({ status: false, message: updateerror.message });
+                    }
+          
+                    const updateOrderStatusQuery = "UPDATE bookings SET order_status = '5' WHERE id = ?";
+                    dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateError, updateResult) {
+                      if (updateError) {
+                        return res.json({ status: false, message: updateError.message });
+                      }
+          
+                      res.json({
+                        status: true,
+                        message: "Data retrieved and updated successfully!",
+                        booking_id: booking_id,
+                        qrCode_id: data[0].id,
+                      });
+                    });
+                  });
+                } else {
+                  res.json({ status: false, message: "Invalid QR code" });
+                }
+              });
+            } catch (error) {
+              res.json({ status: false, message: error.message });
             }
-
-            res.json({
-              status: true,
-              message: "Data retrieved and updated successfully!",
-              booking_id: booking_id,
-              qrCode_id:data[0].id,
-            });
-          });
-        });
-      } else {
-        res.json({ status: false, message: "Invalid QR code" });
-      }
-    });
-  } catch (error) {
-    res.json({ status: false, message: error.message });
-  }
-};
-
+          };
+          
 
 
 
