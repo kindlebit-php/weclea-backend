@@ -480,21 +480,61 @@ export const driver_list = async (req, res) => {
 	}   
   };  
 
-  export const customer_list = async (req, res) => {
+
+export const customer_list = async (req, res) => {
 	try {
-	  const list = "SELECT id, name, email, mobile , dob  FROM users WHERE role = 1";
-	  dbConnection.query(list, function (error, data) {
+	  const list = "SELECT u.id, u.customer_id, u.name, u.mobile, ca.address FROM users AS u JOIN customer_address AS ca ON u.id = ca.user_id WHERE u.role = 1";
+  
+	  dbConnection.query(list, async function (error, data) {
 		if (error) {
-            return res.json({ status: false, message: error.message });
-          }else{
-			const list = "SELECT id, name, email, mobile , dob  FROM customer_address WHERE role = 1";
+		  return res.json({ status: false, message: error.message });
+		} else {
+		  const userData = data;
+			
+		  const customerIds = data.map((row) => row.customer_id);
+		  const mappedPaymentMethods = [];
+  
+		  for (const customerId of customerIds) {
+			const paymentMethods = await stripe.paymentMethods.list({
+			  customer: customerId,
+			  type: "card",
+			});
+  
+			const mappedMethods = paymentMethods.data.map((paymentMethod) => ({
+			  cardId: paymentMethod.id,
+			  customer_id:paymentMethod.customer,
+			  brand: paymentMethod.card.brand,
+			  last4: paymentMethod.card.last4,
+			}));
+  
+			mappedPaymentMethods.push(...mappedMethods);
 		  }
-		res.json({status: true, message: "List retrived succesfully", data: data});           
+		  const combinedData = userData.map((user) => {
+			const userPaymentMethods = mappedPaymentMethods.filter(
+			  (method) => method.customer_id === user.customer_id
+			);
+			return {
+				id:user.id,
+				name:user.name,
+				mobile:user.mobile,
+				address:user.address,
+			  cardDetails: userPaymentMethods,
+			};
+		  });
+  
+		  res.json({
+			status: true,
+			message: "Details retrieved successfully!",
+			data: combinedData,
+		  });
+		}
 	  });
-	} catch (error) {   
-	  res.json({ status: false, message: error.message });   
-	}   
-  };  
+	} catch (error) {
+	  res.json({ status: false, message: error.message });
+	}
+  };
+  
+
 
 export default {
 	user_registered_address,
