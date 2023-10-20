@@ -470,7 +470,7 @@ export const  user_registered_address = async(req,res)=>{
 
 export const driver_list = async (req, res) => {
 	try {
-	  const list = "SELECT name, email, mobile FROM users WHERE role = 2";
+	  const list = "SELECT name, email, mobile,status FROM users WHERE role = 2";
 	  dbConnection.query(list, function (error, data) {
 		if (error) throw error;
 		res.json({status: true, message: "List retrived succesfully", data: data});           
@@ -480,10 +480,21 @@ export const driver_list = async (req, res) => {
 	}   
   };  
 
+  export const folder_list = async (req, res) => {
+	try {
+	  const list = "SELECT name, email, mobile,status FROM users WHERE role = 3";
+	  dbConnection.query(list, function (error, data) {
+		if (error) throw error;
+		res.json({status: true, message: "List retrived succesfully", data: data});           
+	  });
+	} catch (error) {   
+	  res.json({ status: false, message: error.message });   
+	}   
+  };  
 
 export const customer_list = async (req, res) => {
 	try {
-	  const list = "SELECT u.id, u.customer_id, u.name, u.mobile,u.dob,u.email, ca.address FROM users AS u JOIN customer_address AS ca ON u.id = ca.user_id WHERE u.role = 1";
+	  const list = "SELECT u.id, u.customer_id, u.name, u.mobile,u.dob,u.email,u.status, ca.address FROM users AS u JOIN customer_address AS ca ON u.id = ca.user_id WHERE u.role = 1";
   
 	  dbConnection.query(list, async function (error, data) {
 		if (error) {
@@ -519,6 +530,7 @@ export const customer_list = async (req, res) => {
 				mobile:user.mobile,
 				email:user.email,
 				Dob:user.dob,
+				Status:user.status,
 				address:user.address,
 			  cardDetails: userPaymentMethods,
 			};
@@ -552,5 +564,6 @@ export default {
 	update_password,
 	get_user_profile,
 	driver_list,
-	customer_list
+	customer_list,
+	folder_list
 }
