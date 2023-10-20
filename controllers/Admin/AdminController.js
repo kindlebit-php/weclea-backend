@@ -78,7 +78,7 @@ const BUCKET_NAME = 'weclea-bucket';
 export const add_drycleaning_service = async(req,res)=>{
 	try { 
 		var reqData=req.body;
-		console.log('reqData body',reqData,'files',req);
+		console.log('reqData body',reqData,'files',req.file);
 		if(!reqData['title'] || reqData['title']==""  ) {
 		  return res.json({
 		     "success":false,
@@ -126,8 +126,8 @@ export const add_drycleaning_service = async(req,res)=>{
 					*/	
 		    	}else{
 					
-				   	var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?";
-				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, ""], function (error, data) {
+				   	var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?";
+				    dbConnection.query(addContnetQry,[reqData.title, reqData.price], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 					});
@@ -191,8 +191,8 @@ export const update_drycleaning_service = async(req,res)=>{
 
 		    	}else{
 					
-				   	var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, `image`=? where id=?";
-				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, "",reqData.id], function (error, data) {
+				   	var addContnetQry = "update dry_clean_services set `title`=?, `price`=? where id=?";
+				    dbConnection.query(addContnetQry,[reqData.title, reqData.price,reqData.id], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 					});
