@@ -424,7 +424,7 @@ export const drop_loads = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
-
+      
       if (data.length > 0 && data[0].driver_drop_status === 0) {
         const updateStatusQuery = "UPDATE booking_qr SET driver_drop_status = '1' WHERE id = ?";
         const booking_id = data[0].booking_id;
@@ -655,7 +655,7 @@ export const order_histroy = async (req, res) => {
 };
 
 
-
+4
 export const order_histroy_byOrderId=async(req,res)=>{
   try {
     const userData = res.user;
@@ -671,7 +671,7 @@ export const order_histroy_byOrderId=async(req,res)=>{
         return res.json({ status: false, message: error.message });
       }
       const userIds = userIdResult.map((row) => row.user_id);
-      const query = `
+     const query = `
       SELECT
         u.mobile,
         CONCAT(ca.address, ', ', ca.appartment, ', ', ca.city, ', ', ca.state, ', ', ca.zip) AS address,

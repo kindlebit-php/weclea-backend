@@ -467,6 +467,35 @@ export const  user_registered_address = async(req,res)=>{
 		res.json({'status':false,"message":error.message});  
 	}
 }
+
+export const driver_list = async (req, res) => {
+	try {
+	  const list = "SELECT name, email, mobile FROM users WHERE role = 2";
+	  dbConnection.query(list, function (error, data) {
+		if (error) throw error;
+		res.json({status: true, message: "List retrived succesfully", data: data});           
+	  });
+	} catch (error) {   
+	  res.json({ status: false, message: error.message });   
+	}   
+  };  
+
+  export const customer_list = async (req, res) => {
+	try {
+	  const list = "SELECT id, name, email, mobile , dob  FROM users WHERE role = 1";
+	  dbConnection.query(list, function (error, data) {
+		if (error) {
+            return res.json({ status: false, message: error.message });
+          }else{
+			const list = "SELECT id, name, email, mobile , dob  FROM customer_address WHERE role = 1";
+		  }
+		res.json({status: true, message: "List retrived succesfully", data: data});           
+	  });
+	} catch (error) {   
+	  res.json({ status: false, message: error.message });   
+	}   
+  };  
+
 export default {
 	user_registered_address,
 	customer_register,
@@ -479,5 +508,7 @@ export default {
 	change_password,
 	edit_user_profile,
 	update_password,
-	get_user_profile
+	get_user_profile,
+	driver_list,
+	customer_list
 }

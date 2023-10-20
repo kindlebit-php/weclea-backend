@@ -34,6 +34,8 @@ router.get('/user-registered-address',CheckAuth ,userController.user_registered_
 router.get('/get-notification',CheckAuth ,userController.get_notification);
 router.post('/update-password',CheckAuth ,userController.update_password);
 router.post('/edit-user-profile',CheckAuth,profileUpload.single('profile_image') ,userController.edit_user_profile);
+router.get("/driver-list",userController.driver_list)
+router.get("/customer-list",userController.customer_list)
 
 router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
