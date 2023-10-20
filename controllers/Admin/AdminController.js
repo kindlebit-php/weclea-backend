@@ -318,7 +318,7 @@ export const get_user_history = async(req,res)=>{
 /******** Package Listing************/
 export const get_packagesList = async(req,res)=>{
       try { 
-        	const loads = "select * from admin_packages where isDelete=0 order by updated_at desc";
+        	const loads = "select * from admin_packages where isDelete=0 order by created_at desc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
