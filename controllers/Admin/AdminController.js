@@ -79,11 +79,11 @@ export const add_drycleaning_service = async(req,res)=>{
 	try { 
 		var reqData=req.body;
 		console.log('files',req.files);
-		if(!reqData['user_id'] || reqData['user_id']==""  ) {
+		if(!reqData['title'] || reqData['title']==""  ) {
 		  return res.json({
 		     "success":false,
 		     "data":"",
-		     "message":"user_id is required"
+		     "message":"title is required"
 		  });
 		}
 		const qrySelect = "select id from dry_clean_services where `title`=? and `price`=? and `isDelete`=0";
@@ -94,7 +94,7 @@ export const add_drycleaning_service = async(req,res)=>{
 		      	if (req.files) {
 			        let getFile = req.files.service_pic;//mimetype
 			        var ext=path.extname(getFile['name']);
-			        var filename= Date.now()+'_'+reqData.user_id+ext;
+			        var filename= Date.now()+'_'+reqData.price+ext;
 			        var fileData =getFile['data']; 
 			        s3bucket.createBucket(function () {
 			             var params = {
@@ -156,7 +156,7 @@ export const update_drycleaning_service = async(req,res)=>{
 		      	if (req.files) {
 			        let getFile = req.files.service_pic;//mimetype
 			        var ext=path.extname(getFile['name']);
-			        var filename= Date.now()+'_'+reqData.user_id+ext;
+			        var filename= Date.now()+'_'+reqData.price+ext;
 			        var fileData =getFile['data']; 
 			        s3bucket.createBucket(function () {
 			             var params = {
