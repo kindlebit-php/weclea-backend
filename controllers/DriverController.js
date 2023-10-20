@@ -426,8 +426,10 @@ export const get_drop_order_detail = async (req, res) => {
                 if (error) {
                   return res.json({ status: false, message: error.message });
                 }
+                console.log("data",data)
           
-                if (data.length > 0 && data[0].driver_drop_status === 0) {
+                if (data.length > 0 && data[0].driver_drop_status == 0) {
+                  console.log("drop_status",data[0].driver_drop_status)
                   const updateStatusQuery = "UPDATE booking_qr SET driver_drop_status = '1' WHERE id = ?";
                   const booking_id = data[0].booking_id;
           
