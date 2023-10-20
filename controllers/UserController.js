@@ -467,6 +467,89 @@ export const  user_registered_address = async(req,res)=>{
 		res.json({'status':false,"message":error.message});  
 	}
 }
+
+export const driver_list = async (req, res) => {
+	try {
+	  const list = "SELECT name, email, mobile,status FROM users WHERE role = 2";
+	  dbConnection.query(list, function (error, data) {
+		if (error) throw error;
+		res.json({status: true, message: "List retrived succesfully", data: data});           
+	  });
+	} catch (error) {   
+	  res.json({ status: false, message: error.message });   
+	}   
+  };  
+
+  export const folder_list = async (req, res) => {
+	try {
+	  const list = "SELECT name, email, mobile,status FROM users WHERE role = 3";
+	  dbConnection.query(list, function (error, data) {
+		if (error) throw error;
+		res.json({status: true, message: "List retrived succesfully", data: data});           
+	  });
+	} catch (error) {   
+	  res.json({ status: false, message: error.message });   
+	}   
+  };  
+
+export const customer_list = async (req, res) => {
+	try {
+	  const list = "SELECT u.id, u.customer_id, u.name, u.mobile,u.dob,u.email,u.status, ca.address FROM users AS u JOIN customer_address AS ca ON u.id = ca.user_id WHERE u.role = 1";
+  
+	  dbConnection.query(list, async function (error, data) {
+		if (error) {
+		  return res.json({ status: false, message: error.message });
+		} else {
+		  const userData = data;
+			
+		  const customerIds = data.map((row) => row.customer_id);
+		  const mappedPaymentMethods = [];
+  
+		  for (const customerId of customerIds) {
+			const paymentMethods = await stripe.paymentMethods.list({
+			  customer: customerId,
+			  type: "card",
+			});
+  
+			const mappedMethods = paymentMethods.data.map((paymentMethod) => ({
+			  cardId: paymentMethod.id,
+			  customer_id:paymentMethod.customer,
+			  brand: paymentMethod.card.brand,
+			  last4: paymentMethod.card.last4,
+			}));
+  
+			mappedPaymentMethods.push(...mappedMethods);
+		  }
+		  const combinedData = userData.map((user) => {
+			const userPaymentMethods = mappedPaymentMethods.filter(
+			  (method) => method.customer_id === user.customer_id
+			);
+			return {
+				id:user.id,
+				name:user.name,
+				mobile:user.mobile,
+				email:user.email,
+				Dob:user.dob,
+				Status:user.status,
+				address:user.address,
+			  cardDetails: userPaymentMethods,
+			};
+		  });
+  
+		  res.json({
+			status: true,
+			message: "Details retrieved successfully!",
+			data: combinedData,
+		  });
+		}
+	  });
+	} catch (error) {
+	  res.json({ status: false, message: error.message });
+	}
+  };
+  
+
+
 export default {
 	user_registered_address,
 	customer_register,
@@ -479,5 +562,8 @@ export default {
 	change_password,
 	edit_user_profile,
 	update_password,
-	get_user_profile
+	get_user_profile,
+	driver_list,
+	customer_list,
+	folder_list
 }

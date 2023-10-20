@@ -1,5 +1,206 @@
 import dbConnection from'../../config/db.js';
 
+const AWS = require('aws-sdk');
+const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
+const USER_SECRET = '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';
+const BUCKET_NAME = 'weclea-bucket';
+
+ let s3bucket = new AWS.S3({
+       accessKeyId: USER_KEY,
+       secretAccessKey: USER_SECRET,
+       Bucket: BUCKET_NAME,
+     });
+
+
+/************* Dry cleaning services  ****************/ 
+/*
+  var postdata=req.body;
+  //console.log('body',postdata);
+  //console.log('files',req.files);
+  //Validating the input entity
+   if(!postdata['user_id'] || postdata['user_id']==""  ) {
+      //return res.status(422).send(json_format.errorMessage);
+      return res.json({
+         "success":false,
+         "data":"",
+         "message":"user_id is required"
+      });
+   }
+      postdata.profile_pic='';
+      if (req.files) {
+        let getFile = req.files.profile_pic;//mimetype
+        var ext=path.extname(getFile['name']);
+        var filename= Date.now()+'_'+postdata.user_id+ext;
+        var fileData =getFile['data']; 
+        s3bucket.createBucket(function () {
+             var params = {
+              Bucket: BUCKET_NAME+"/sixprofit/uploaded_media/"+postdata.user_id,
+              Key: filename,
+              ACL: 'public-read',
+              Body:fileData,
+
+             };
+            s3bucket.upload(params, function (err, data) {
+                if (err) {
+                 console.log('error in callback');
+                 console.log(err);
+                }
+              postdata.profile_pic=data.Location;
+              userService.changeProfilePic(postdata).then((data) => {
+                if(data) {
+                  res.json(data);
+                }
+              }).catch((err) => {
+                //mail.mail(err);
+                res.json(err);
+              });  
+            });
+       });
+    }else{
+      return res.json({
+       "success":false,
+       "data":"",
+       "message":"Please upload the profie picture"
+      });  
+    }
+
+*/
+ export const get_drycleaning_itemlist = async(req,res)=>{
+      try { 
+        	const loads = "select * from dry_clean_services where isDelete=0 order by updated_at desc";
+			dbConnection.query(loads, function (error, data) {
+			if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});
+			})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const add_drycleaning_service = async(req,res)=>{
+	try { 
+		var reqData=req.body;
+		console.log('files',req.files);
+		if(!reqData['user_id'] || reqData['user_id']==""  ) {
+		  return res.json({
+		     "success":false,
+		     "data":"",
+		     "message":"user_id is required"
+		  });
+		}
+		const qrySelect = "select id from admin_packages where `title`=? and `price`=? and `isDelete`=0";
+		dbConnection.query(qrySelect,[reqData.title, reqData.price], function (error, data) {
+			if (error) throw error;
+			if (data.length<=0) {
+				var product_image='';
+		      	if (req.files) {
+			        let getFile = req.files.service_pic;//mimetype
+			        var ext=path.extname(getFile['name']);
+			        var filename= Date.now()+'_'+reqData.user_id+ext;
+			        var fileData =getFile['data']; 
+			        s3bucket.createBucket(function () {
+			             var params = {
+			              Bucket: BUCKET_NAME+"/dry_clean_services",
+			              Key: filename,
+			              ACL: 'public-read',
+			              Body:fileData,
+
+			             };
+			            s3bucket.upload(params, function (err, data) {
+			                if (err) {
+			                 console.log('error in callback');
+			                 console.log(err);
+			                }
+			                console.log("S3 AWS res==>",data)
+			              	product_image=data.Location;
+							//`title`, `price`, `image`,
+							var addContnetQry = "insert admin_packages set `title`=?, `price`=?, `image`=?";
+						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image], function (error, data) {
+							if (error) throw error;
+								res.json({'status':true,"message":"Package has been saved successfully",'data':data});
+							});	              
+
+			            });
+			       	});
+
+		    	}else{
+					
+				   	var addContnetQry = "insert admin_packages set `title`=?, `price`=?, `image`=?";
+				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, ""], function (error, data) {
+					if (error) throw error;
+						res.json({'status':true,"message":"Package has been saved successfully",'data':data});
+					});
+				}	
+			}else{
+				res.json({'status':false,"message":"Same service already exist"});
+			}
+		});	
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const update_drycleaning_service = async(req,res)=>{
+	try { 
+		var reqData=req.body;
+		console.log('files',req.files);
+		if(!reqData['id'] || reqData['id']==""  ) {
+		  return res.json({
+		     "success":false,
+		     "data":"",
+		     "message":" service id is required"
+		  });
+		}
+		const qrySelect = "select id from admin_packages where `title`=? and `price`=? and `isDelete`=0 and id!=?";
+		dbConnection.query(qrySelect,[reqData.title, reqData.price, reqData.id], function (error, data) {
+			if (error) throw error;
+			if (data.length<=0) {
+				var product_image='';
+		      	if (req.files) {
+			        let getFile = req.files.service_pic;//mimetype
+			        var ext=path.extname(getFile['name']);
+			        var filename= Date.now()+'_'+reqData.user_id+ext;
+			        var fileData =getFile['data']; 
+			        s3bucket.createBucket(function () {
+			             var params = {
+			              Bucket: BUCKET_NAME+"/dry_clean_services",
+			              Key: filename,
+			              ACL: 'public-read',
+			              Body:fileData,
+
+			             };
+			            s3bucket.upload(params, function (err, data) {
+			                if (err) {
+			                 console.log('error in callback');
+			                 console.log(err);
+			                }
+			                console.log("S3 AWS res==>",data)
+			              	product_image=data.Location;
+							//`title`, `price`, `image`,
+							var addContnetQry = "update admin_packages set `title`=?, `price`=?, `image`=? where id=?";
+						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image, reqData.id], function (error, data) {
+							if (error) throw error;
+								res.json({'status':true,"message":"Service has been saved successfully",'data':data});
+							});	              
+
+			            });
+			       	});
+
+		    	}else{
+					
+				   	var addContnetQry = "update admin_packages set `title`=?, `price`=?, `image`=? where id=?";
+				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, "",reqData.id], function (error, data) {
+					if (error) throw error;
+						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
+					});
+				}	
+			}else{
+				res.json({'status':false,"message":"Same service already exist"});
+			}
+		});	
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+ /************ end Dry Cleaning*************/
 /******** Admin Dashboard Data API *********/
 export const get_dashboard_content = async(req,res)=>{
     try { 
@@ -14,9 +215,9 @@ export const get_dashboard_content = async(req,res)=>{
 					data[0]['users']=users;
 					res.json({'status':true,"message":"Success",'data':data});
 				}
-			})
+			});
 
-		})
+		});
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
@@ -47,13 +248,26 @@ export const get_userList = async(req,res)=>{
     }
 }
 
+export const get_user_history = async(req,res)=>{
+	var reqData= req.params;
+    try { 
+    	
+    	const qry = "SELECT * FROM `bookings` WHERE user_id=?";
+		dbConnection.query(qry,[reqData.user_id], function (error, data) {
+		if (error) throw error;
+			res.json({'status':true,"message":"Success",'data':data});
+		})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
 /*********** User Listing End ************/
 
 
 /******** Package Listing************/
 export const get_packagesList = async(req,res)=>{
       try { 
-        	const loads = "select * from admin_packages";
+        	const loads = "select * from admin_packages where isDelete=0 order by updated_at desc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
@@ -105,7 +319,32 @@ export const create_packages = async(req,res)=>{
 }
 
 export const delete_packages = async(req,res)=>{
-	const reqData = req.params;
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from admin_packages where id=?";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "Package has been activated successfully"
+				if (reqData.isDelete==1) {
+					msg= "Package has been deleted successfully"
+				}
+			    var updateContnetQry = "update admin_packages set isDelete=? where id=? ";
+			    dbConnection.query(updateContnetQry,[reqData.isDelete,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+export const update_package_status = async(req,res)=>{
+	const reqData = req.body;
     try { 
     	const qrySelect = "select id from admin_packages where id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
@@ -128,8 +367,9 @@ export const delete_packages = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+
 export const get_package_details = async(req,res)=>{
-	const reqData = req.body;
+	const reqData = req.params;
     try { 
     	const qrySelect = "select id from admin_packages where id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
@@ -289,5 +529,8 @@ export default {
 	create_packages,
 	delete_packages,
 	get_package_details,
-	get_userList
+	get_userList,
+	update_package_status,
+	add_drycleaning_service,
+	update_drycleaning_service
 }

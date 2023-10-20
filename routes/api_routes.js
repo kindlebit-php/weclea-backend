@@ -34,6 +34,9 @@ router.get('/user-registered-address',CheckAuth ,userController.user_registered_
 router.get('/get-notification',CheckAuth ,userController.get_notification);
 router.post('/update-password',CheckAuth ,userController.update_password);
 router.post('/edit-user-profile',CheckAuth,profileUpload.single('profile_image') ,userController.edit_user_profile);
+router.get("/driver-list",userController.driver_list)
+router.get("/customer-list",userController.customer_list)
+router.get("/folder-list",userController.folder_list)
 
 router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
@@ -120,5 +123,12 @@ router.post("/create_packages",AdminController.create_packages)
 router.post("/delete_packages",AdminController.delete_packages)
 router.get("/get_package_details/:id?",AdminController.get_package_details)
 router.get("/get_userList/:category_id?",AdminController.get_userList)
+router.post("/update_package_status",AdminController.update_package_status)
+router.post("/update_drycleaning_service",AdminController.update_drycleaning_service)
+router.post("/add_drycleaning_service",AdminController.add_drycleaning_service)
+
+
+
+
 /**********************/
 export default router;
