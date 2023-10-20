@@ -78,7 +78,7 @@ const BUCKET_NAME = 'weclea-bucket';
 export const add_drycleaning_service = async(req,res)=>{
 	try { 
 		var reqData=req.body;
-		console.log('reqData body',reqData,'files',req.file);
+		console.log('reqData body',reqData,'files',req);
 		if(!reqData['title'] || reqData['title']==""  ) {
 		  return res.json({
 		     "success":false,
@@ -92,7 +92,12 @@ export const add_drycleaning_service = async(req,res)=>{
 			if (data.length<=0) {
 				var product_image='';
 		      	if (req.file) {
-			        let getFile = req.file.service_pic;//mimetype
+		      		if(req.file){
+						var product_image = req.file.originalname;
+					}else{
+					var product_image = userData[0].profile_image;
+					}
+			        /*let getFile = req.file.service_pic;//mimetype
 			        var ext=path.extname(getFile['name']);
 			        var filename= Date.now()+'_'+reqData.price+ext;
 			        var fileData =getFile['data']; 
@@ -111,16 +116,16 @@ export const add_drycleaning_service = async(req,res)=>{
 			                }
 			                console.log("S3 AWS res==>",data)
 			              	product_image=data.Location;
-							//`title`, `price`, `image`,
+							//`title`, `price`, `image`,*/
 							var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?";
 						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image], function (error, data) {
 							if (error) throw error;
 								res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 							});	              
 
-			            });
+			          /*  });
 			       	});
-
+					*/	
 		    	}else{
 					
 				   	var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?";

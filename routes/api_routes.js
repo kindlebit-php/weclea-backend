@@ -14,6 +14,7 @@ import DrycleanController from "../controllers/DrycleanController.js";
 import FolderController from "../controllers/Folder/FolderController.js";
 import { qr_slip } from "../helpers/qr_slip.js";
 
+
 const storage = multer.diskStorage({
     destination: function(req, file, cb)
     {
@@ -125,8 +126,8 @@ router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
 
 /*dry cleaning*/
-router.post("/update_drycleaning_service",AdminController.update_drycleaning_service)
-router.post("/add_drycleaning_service",AdminController.add_drycleaning_service)
+router.post("/update_drycleaning_service",profileUpload.single('service_pic'),AdminController.update_drycleaning_service)
+router.post("/add_drycleaning_service",profileUpload.single('service_pic'),AdminController.add_drycleaning_service)
 router.post("/update_service_status",CheckAuth,AdminController.update_service_status)
 router.post("/delete_service",CheckAuth,AdminController.delete_service)
 router.get("/get_drycleaning_itemlist",CheckAuth,AdminController.get_drycleaning_itemlist)
