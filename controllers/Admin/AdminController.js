@@ -78,7 +78,7 @@ const BUCKET_NAME = 'weclea-bucket';
 export const add_drycleaning_service = async(req,res)=>{
 	try { 
 		var reqData=req.body;
-		console.log('reqData body',reqData,'files',req);
+		console.log('reqData body',reqData,'files',req.file);
 		if(!reqData['title'] || reqData['title']==""  ) {
 		  return res.json({
 		     "success":false,
