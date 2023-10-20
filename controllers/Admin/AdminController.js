@@ -1,7 +1,5 @@
 import dbConnection from'../../config/db.js';
 import AWS from 'aws-sdk';
-import S3 from 'aws-sdk/clients/s3';
-
 const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
 const USER_SECRET = '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';
 const BUCKET_NAME = 'weclea-bucket';
