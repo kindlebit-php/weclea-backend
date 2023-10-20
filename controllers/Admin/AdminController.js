@@ -78,7 +78,7 @@ const BUCKET_NAME = 'weclea-bucket';
 export const add_drycleaning_service = async(req,res)=>{
 	try { 
 		var reqData=req.body;
-		console.log('reqData body',reqData,'files',req.files);
+		console.log('reqData body',reqData,'files',req.file);
 		if(!reqData['title'] || reqData['title']==""  ) {
 		  return res.json({
 		     "success":false,
@@ -91,8 +91,8 @@ export const add_drycleaning_service = async(req,res)=>{
 			if (error) throw error;
 			if (data.length<=0) {
 				var product_image='';
-		      	if (req.files) {
-			        let getFile = req.files.service_pic;//mimetype
+		      	if (req.file) {
+			        let getFile = req.file.service_pic;//mimetype
 			        var ext=path.extname(getFile['name']);
 			        var filename= Date.now()+'_'+reqData.price+ext;
 			        var fileData =getFile['data']; 
@@ -140,7 +140,7 @@ export const add_drycleaning_service = async(req,res)=>{
 export const update_drycleaning_service = async(req,res)=>{
 	try { 
 		var reqData=req.body;
-		console.log('files',req.files);
+		console.log('files',req.file);
 		if(!reqData['id'] || reqData['id']==""  ) {
 		  return res.json({
 		     "success":false,
@@ -153,8 +153,8 @@ export const update_drycleaning_service = async(req,res)=>{
 			if (error) throw error;
 			if (data.length<=0) {
 				var product_image='';
-		      	if (req.files) {
-			        let getFile = req.files.service_pic;//mimetype
+		      	if (req.file) {
+			        let getFile = req.file.service_pic;//mimetype
 			        var ext=path.extname(getFile['name']);
 			        var filename= Date.now()+'_'+reqData.price+ext;
 			        var fileData =getFile['data']; 
