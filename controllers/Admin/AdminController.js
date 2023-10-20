@@ -14,9 +14,9 @@ export const get_dashboard_content = async(req,res)=>{
 					data[0]['users']=users;
 					res.json({'status':true,"message":"Success",'data':data});
 				}
-			})
+			});
 
-		})
+		});
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
@@ -47,6 +47,19 @@ export const get_userList = async(req,res)=>{
     }
 }
 
+export const get_user_history = async(req,res)=>{
+	var reqData= req.params;
+    try { 
+    	
+    	const qry = "SELECT * FROM `bookings` WHERE user_id=?";
+		dbConnection.query(qry,[reqData.user_id], function (error, data) {
+		if (error) throw error;
+			res.json({'status':true,"message":"Success",'data':data});
+		})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
 /*********** User Listing End ************/
 
 
@@ -111,6 +124,31 @@ export const delete_packages = async(req,res)=>{
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
+				var msg= "Package has been activated successfully"
+				if (reqData.isDelete==1) {
+					msg= "Package has been deleted successfully"
+				}
+			    var updateContnetQry = "update admin_packages set isDelete=? where id=? ";
+			    dbConnection.query(updateContnetQry,[reqData.isDelete,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+export const update_package_status = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from admin_packages where id=?";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
 				var msg= "Package has been deactivated successfully"
 				if (reqData.status==1) {
 					msg= "Package has been activated successfully"
@@ -128,6 +166,7 @@ export const delete_packages = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+
 export const get_package_details = async(req,res)=>{
 	const reqData = req.params;
     try { 
