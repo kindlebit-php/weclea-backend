@@ -585,5 +585,6 @@ export default {
 	add_drycleaning_service,
 	update_drycleaning_service,
 	update_service_status,
-	delete_service
+	delete_service,
+	get_drycleaning_itemlist
 }

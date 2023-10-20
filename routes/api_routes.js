@@ -109,25 +109,28 @@ router.post("/dry-clean-booking",CheckAuth,DrycleanController.dry_clean_booking)
 
 /***********Admin panel***************/
 
-router.get("/get_content",AdminController.get_page_content)
-router.get("/get_faq",AdminController.get_faq_content)
-router.post("/update_page_content",AdminController.update_page_content)
-router.post("/create_faq",AdminController.create_faq)
-router.post("/update_faq",AdminController.update_faq)
-router.post("/delete_faq",AdminController.delete_faq)
-router.get("/get_dashboard_content",AdminController.get_dashboard_content)
-router.get("/get_packagesList",AdminController.get_packagesList)
-router.post("/update_packages",AdminController.update_packages)
-router.post("/create_packages",AdminController.create_packages)
-router.post("/delete_packages",AdminController.delete_packages)
-router.get("/get_package_details/:id?",AdminController.get_package_details)
-router.get("/get_userList/:category_id?",AdminController.get_userList)
-router.post("/update_package_status",AdminController.update_package_status)
+router.get("/get_content",CheckAuth,AdminController.get_page_content)
+router.get("/get_faq",CheckAuth,AdminController.get_faq_content)
+router.post("/update_page_content",CheckAuth,AdminController.update_page_content)
+router.post("/create_faq",CheckAuth,AdminController.create_faq)
+router.post("/update_faq",CheckAuth,AdminController.update_faq)
+router.post("/delete_faq",CheckAuth,AdminController.delete_faq)
+router.get("/get_dashboard_content",CheckAuth,AdminController.get_dashboard_content)
+router.get("/get_packagesList",CheckAuth,AdminController.get_packagesList)
+router.post("/update_packages",CheckAuth,AdminController.update_packages)
+router.post("/create_packages",CheckAuth,AdminController.create_packages)
+router.post("/delete_packages",CheckAuth,AdminController.delete_packages)
+router.get("/get_package_details/:id?",CheckAuth,AdminController.get_package_details)
+router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
+router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
+
+/*dry cleaning*/
 router.post("/update_drycleaning_service",AdminController.update_drycleaning_service)
 router.post("/add_drycleaning_service",AdminController.add_drycleaning_service)
+router.post("/update_service_status",CheckAuth,AdminController.update_service_status)
+router.post("/delete_service",CheckAuth,AdminController.delete_service)
+router.get("/get_drycleaning_itemlist",CheckAuth,AdminController.get_drycleaning_itemlist)
 
-router.post("/update_service_status",AdminController.update_service_status)
-router.post("/delete_service",AdminController.delete_service)
 
 
 /**********************/
