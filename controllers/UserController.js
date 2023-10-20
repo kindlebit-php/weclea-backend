@@ -483,7 +483,7 @@ export const driver_list = async (req, res) => {
 
 export const customer_list = async (req, res) => {
 	try {
-	  const list = "SELECT u.id, u.customer_id, u.name, u.mobile, ca.address FROM users AS u JOIN customer_address AS ca ON u.id = ca.user_id WHERE u.role = 1";
+	  const list = "SELECT u.id, u.customer_id, u.name, u.mobile,u.dob,u.email, ca.address FROM users AS u JOIN customer_address AS ca ON u.id = ca.user_id WHERE u.role = 1";
   
 	  dbConnection.query(list, async function (error, data) {
 		if (error) {
@@ -517,6 +517,8 @@ export const customer_list = async (req, res) => {
 				id:user.id,
 				name:user.name,
 				mobile:user.mobile,
+				email:user.email,
+				Dob:user.dob,
 				address:user.address,
 			  cardDetails: userPaymentMethods,
 			};
