@@ -127,7 +127,8 @@ router.post("/update_package_status",AdminController.update_package_status)
 router.post("/update_drycleaning_service",AdminController.update_drycleaning_service)
 router.post("/add_drycleaning_service",AdminController.add_drycleaning_service)
 
-
+router.post("/update_service_status",AdminController.update_service_status)
+router.post("/delete_service",AdminController.delete_service)
 
 
 /**********************/

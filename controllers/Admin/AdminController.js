@@ -87,7 +87,7 @@ export const add_drycleaning_service = async(req,res)=>{
 		     "message":"user_id is required"
 		  });
 		}
-		const qrySelect = "select id from admin_packages where `title`=? and `price`=? and `isDelete`=0";
+		const qrySelect = "select id from dry_clean_services where `title`=? and `price`=? and `isDelete`=0";
 		dbConnection.query(qrySelect,[reqData.title, reqData.price], function (error, data) {
 			if (error) throw error;
 			if (data.length<=0) {
@@ -113,10 +113,10 @@ export const add_drycleaning_service = async(req,res)=>{
 			                console.log("S3 AWS res==>",data)
 			              	product_image=data.Location;
 							//`title`, `price`, `image`,
-							var addContnetQry = "insert admin_packages set `title`=?, `price`=?, `image`=?";
+							var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?";
 						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image], function (error, data) {
 							if (error) throw error;
-								res.json({'status':true,"message":"Package has been saved successfully",'data':data});
+								res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 							});	              
 
 			            });
@@ -124,10 +124,10 @@ export const add_drycleaning_service = async(req,res)=>{
 
 		    	}else{
 					
-				   	var addContnetQry = "insert admin_packages set `title`=?, `price`=?, `image`=?";
+				   	var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?";
 				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, ""], function (error, data) {
 					if (error) throw error;
-						res.json({'status':true,"message":"Package has been saved successfully",'data':data});
+						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 					});
 				}	
 			}else{
@@ -149,7 +149,7 @@ export const update_drycleaning_service = async(req,res)=>{
 		     "message":" service id is required"
 		  });
 		}
-		const qrySelect = "select id from admin_packages where `title`=? and `price`=? and `isDelete`=0 and id!=?";
+		const qrySelect = "select id from dry_clean_services where `title`=? and `price`=? and `isDelete`=0 and id!=?";
 		dbConnection.query(qrySelect,[reqData.title, reqData.price, reqData.id], function (error, data) {
 			if (error) throw error;
 			if (data.length<=0) {
@@ -175,7 +175,7 @@ export const update_drycleaning_service = async(req,res)=>{
 			                console.log("S3 AWS res==>",data)
 			              	product_image=data.Location;
 							//`title`, `price`, `image`,
-							var addContnetQry = "update admin_packages set `title`=?, `price`=?, `image`=? where id=?";
+							var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, `image`=? where id=?";
 						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image, reqData.id], function (error, data) {
 							if (error) throw error;
 								res.json({'status':true,"message":"Service has been saved successfully",'data':data});
@@ -186,7 +186,7 @@ export const update_drycleaning_service = async(req,res)=>{
 
 		    	}else{
 					
-				   	var addContnetQry = "update admin_packages set `title`=?, `price`=?, `image`=? where id=?";
+				   	var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, `image`=? where id=?";
 				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, "",reqData.id], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
@@ -200,6 +200,58 @@ export const update_drycleaning_service = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+
+export const delete_service = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from dry_clean_services where id=?";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "Service has been activated successfully"
+				if (reqData.isDelete==1) {
+					msg= "Service has been deleted successfully"
+				}
+			    var updateContnetQry = "update dry_clean_services set isDelete=? where id=? ";
+			    dbConnection.query(updateContnetQry,[reqData.isDelete,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+export const update_service_status = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from dry_clean_services where id=?";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "Service has been deactivated successfully"
+				if (reqData.status==1) {
+					msg= "Service has been activated successfully"
+				}
+			    var updateContnetQry = "update dry_clean_services set status=? where id=? ";
+			    dbConnection.query(updateContnetQry,[reqData.status,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+
  /************ end Dry Cleaning*************/
 /******** Admin Dashboard Data API *********/
 export const get_dashboard_content = async(req,res)=>{
@@ -532,5 +584,7 @@ export default {
 	get_userList,
 	update_package_status,
 	add_drycleaning_service,
-	update_drycleaning_service
+	update_drycleaning_service,
+	update_service_status,
+	delete_service
 }
