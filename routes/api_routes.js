@@ -37,6 +37,7 @@ router.post('/edit-user-profile',CheckAuth,profileUpload.single('profile_image')
 router.get("/driver-list",userController.driver_list)
 router.get("/customer-list",userController.customer_list)
 router.get("/folder-list",userController.folder_list)
+router.get("/order-list",userController.order_list)
 
 router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
