@@ -328,5 +328,6 @@ export default {
 	create_packages,
 	delete_packages,
 	get_package_details,
-	get_userList
+	get_userList,
+	update_package_status
 }
