@@ -92,17 +92,12 @@ export const customer_address = async(req,res)=>{
     		var instruction = 'NULL';
     	}
     	const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
-	       console.log('delieverySql',delieverySql)
 	        dbConnection.query(delieverySql, function (error, delieveryresult) {
-	        	console.log('delieveryresult',delieveryresult)
 	        if(delieveryresult[0].delieveryCount == 0){
-	        	console.log('asdsa')
 				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
-				console.log('booking_instructions',sql)
 				dbConnection.query(sql, function (error, result) {
 				});
 	        }else{
-	        	console.log('sdsd')
 	        	var sql = "update booking_instructions set delievery_instruction='"+instruction+"' where  user_id ='"+userData[0].id+"'";
 				dbConnection.query(sql, function (error, result) {
 				});
@@ -173,7 +168,16 @@ export const customer_login = async(req,res)=>{
 								const initi = {
 									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,'token': generateToken({ userId: id, type: type }),
 								}
-								res.json({'status':true,"message":"Logged in successfully!",'data': initi});
+								const get_address_count = "select count(id)  as total from customer_address where user_id = '"+id+"'";
+								dbConnection.query(get_address_count, function (error, addressresult) {
+								if(addressresult[0].total > 0){
+									var addresscount = 1
+								}else{
+									var addresscount = 0
+								}
+								res.json({'status':true,"message":"Logged in successfully!",'data': initi,'address_count':addresscount});
+							
+							});
 							});
 						}else{
 							res.json({'status':false,"message":"Incorrect password!"});
