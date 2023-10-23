@@ -92,12 +92,17 @@ export const customer_address = async(req,res)=>{
     		var instruction = 'NULL';
     	}
     	const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
+	       console.log('delieverySql',delieverySql)
 	        dbConnection.query(delieverySql, function (error, delieveryresult) {
+	        	console.log('delieveryresult',delieveryresult)
 	        if(delieveryresult[0].delieveryCount == 0){
+	        	console.log('asdsa')
 				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
+				console.log('booking_instructions',sql)
 				dbConnection.query(sql, function (error, result) {
 				});
 	        }else{
+	        	console.log('sdsd')
 	        	var sql = "update booking_instructions set delievery_instruction='"+instruction+"' where  user_id ='"+userData[0].id+"'";
 				dbConnection.query(sql, function (error, result) {
 				});
