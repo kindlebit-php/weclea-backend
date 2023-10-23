@@ -86,12 +86,8 @@ export const customer_address = async(req,res)=>{
 	        dbConnection.query(sql, function (error, result) {
 	        });
     	}
-    	if(typeof delievery_instruction != 'undefined'){
-    		var instruction = delievery_instruction;
-    	}else{
-    		var instruction = 'NULL';
-    	}
-    	const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
+    	if(delievery_instruction){
+    		const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
 	        dbConnection.query(delieverySql, function (error, delieveryresult) {
 	        if(delieveryresult[0].delieveryCount == 0){
 				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
@@ -103,6 +99,7 @@ export const customer_address = async(req,res)=>{
 				});
 	        }
 	        })
+	    }
 
 	        res.json({'status':true,"message":"Address added successfully!"});
 	}else{
