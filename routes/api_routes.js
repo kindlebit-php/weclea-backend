@@ -14,18 +14,7 @@ import DrycleanController from "../controllers/DrycleanController.js";
 import FolderController from "../controllers/Folder/FolderController.js";
 import { qr_slip } from "../helpers/qr_slip.js";
 
-const storage = multer.diskStorage({
-    destination: function(req, file, cb)
-    {
-        cb(null, 'uploads');
-    },   
-    filename: function (req, file, cb) 
-    {
-      cb(null,file.originalname)
-    }
-});
 
-const profileUpload = multer({storage:storage})
 
 router.post('/customer-register',userController.customer_register);
 router.post('/newsletter',userController.newsletter);
@@ -33,7 +22,7 @@ router.post('/customer-address',CheckAuth ,userController.customer_address);
 router.get('/user-registered-address',CheckAuth ,userController.user_registered_address);
 router.get('/get-notification',CheckAuth ,userController.get_notification);
 router.post('/update-password',CheckAuth ,userController.update_password);
-router.post('/edit-user-profile',CheckAuth,profileUpload.single('profile_image') ,userController.edit_user_profile);
+router.post('/edit-user-profile',CheckAuth,upload.single('profile_image') ,userController.edit_user_profile);
 router.get("/driver-list",userController.driver_list)
 router.get("/customer-list",userController.customer_list)
 router.get("/folder-list",userController.folder_list)
