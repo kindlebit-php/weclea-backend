@@ -86,19 +86,23 @@ export const customer_address = async(req,res)=>{
 	        dbConnection.query(sql, function (error, result) {
 	        });
     	}
-    	if(delievery_instruction){
+    	if(delievery_instruction != ''){
     		const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
 	        dbConnection.query(delieverySql, function (error, delieveryresult) {
 	        if(delieveryresult[0].delieveryCount == 0){
-				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
+				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+delievery_instruction+"')";
 				dbConnection.query(sql, function (error, result) {
 				});
 	        }else{
-	        	var sql = "update booking_instructions set delievery_instruction='"+instruction+"' where  user_id ='"+userData[0].id+"'";
+	        	var sql = "update booking_instructions set delievery_instruction='"+delievery_instruction+"' where  user_id ='"+userData[0].id+"'";
 				dbConnection.query(sql, function (error, result) {
 				});
 	        }
 	        })
+	    }else{
+	    	var sql = "INSERT INTO booking_instructions (user_id) VALUES ('"+userData[0].id+"')";
+				dbConnection.query(sql, function (error, result) {
+				});
 	    }
 
 	        res.json({'status':true,"message":"Address added successfully!"});
@@ -118,23 +122,24 @@ export const customer_address = async(req,res)=>{
 			dbConnection.query(sql, function (error, result) {
 			});
 		}
-		  	if(typeof delievery_instruction != 'undefined'){
-    		var instruction = delievery_instruction;
-    	}else{
-    		var instruction = 'NULL';
-    	}
-    	const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
+		if(delievery_instruction !=''){
+    		const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
 	        dbConnection.query(delieverySql, function (error, delieveryresult) {
 	        if(delieveryresult[0].delieveryCount == 0){
-				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+instruction+"')";
+				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+delievery_instruction+"')";
 				dbConnection.query(sql, function (error, result) {
 				});
 	        }else{
-	        	var sql = "update booking_instructions set delievery_instruction='"+instruction+"' where  user_id ='"+userData[0].id+"'";
+	        	var sql = "update booking_instructions set delievery_instruction='"+delievery_instruction+"' where  user_id ='"+userData[0].id+"'";
 				dbConnection.query(sql, function (error, result) {
 				});
 	        }
 	        })
+	    }else{
+	    	var sql = "INSERT INTO booking_instructions (user_id) VALUES ('"+userData[0].id+"')";
+				dbConnection.query(sql, function (error, result) {
+				});
+	    }
 	    res.json({'status':true,"message":"Address updated successfully!"});
 
 	}
