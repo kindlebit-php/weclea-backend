@@ -468,6 +468,71 @@ export const  user_registered_address = async(req,res)=>{
 	}
 }
 
+export const order_list = async (req, res) => {
+	try {
+	  const list =
+		"SELECT b.order_id, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_Status, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b JOIN customer_drop_address AS cda ON b.user_id = cda.user_id JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE cron_status = 1";
+	  dbConnection.query(list, function (error, data) {
+		if (error) {
+		  return res.json({ status: false, message: error.message });
+		}
+  
+		data.forEach((item) => {
+		  if (item.delievery_day === 0) {
+			item.delievery_day = "same_day";
+		  } else if (item.delievery_day === 1) {
+			item.delievery_day = "next_day";
+		  }
+  
+		  if (item.status === 0) {
+			item.status = "inactive";
+		  } else if (item.status === 1) {
+			item.status = "active";
+		  }
+  
+		  if (item.order_status === 0) {
+			item.order_status = "blank_order";
+		  } else if (item.order_status === 1) {
+			item.order_status = "wash";
+		  } else if (item.order_status === 2) {
+			item.order_status = "dry";
+		  } else if (item.order_status === 3) {
+			item.order_status = "fold";
+		  } else if (item.order_status === 4) {
+			item.order_status = "pack";
+		  } else if (item.order_status === 5) {
+			item.order_status = "way-to-drop";
+		  } else if (item.order_status === 6) {
+			item.order_status = "completed";
+		  } else if (item.order_status === 7) {
+			item.order_status = "not_found";
+		  } else if (item.order_status === 8) {
+			item.order_status = "pickup";
+		  }
+  
+		  if (item.order_type === 1) {
+			item.order_type = "one time";
+		  } else if (item.order_type === 2) {
+			item.order_type = "subscription";
+		  } else if (item.order_type === 3) {
+			item.order_type = "dry_clean";
+		  }
+  
+		  if (item.delievery_instruction) {
+			item.delievery_instruction = 1;
+		  } else {
+			item.delievery_instruction = 0;
+		  }
+		});
+  
+		res.json({ status: true, message: "List retrieved successfully", data });
+	  });
+	} catch (error) {
+	  res.json({ status: false, message: error.message });
+	}
+  };
+  
+
 export const driver_list = async (req, res) => {
 	try {
 	  const list = "SELECT name, email, mobile,status FROM users WHERE role = 2";
@@ -565,5 +630,6 @@ export default {
 	get_user_profile,
 	driver_list,
 	customer_list,
-	folder_list
+	folder_list,
+	order_list
 }

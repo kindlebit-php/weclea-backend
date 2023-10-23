@@ -78,12 +78,12 @@ const BUCKET_NAME = 'weclea-bucket';
 export const add_drycleaning_service = async(req,res)=>{
 	try { 
 		var reqData=req.body;
-		console.log('files',req.files);
-		if(!reqData['user_id'] || reqData['user_id']==""  ) {
+		console.log('reqData body',reqData,'files',req.file);
+		if(!reqData['title'] || reqData['title']==""  ) {
 		  return res.json({
 		     "success":false,
 		     "data":"",
-		     "message":"user_id is required"
+		     "message":"title is required"
 		  });
 		}
 		const qrySelect = "select id from dry_clean_services where `title`=? and `price`=? and `isDelete`=0";
@@ -91,10 +91,13 @@ export const add_drycleaning_service = async(req,res)=>{
 			if (error) throw error;
 			if (data.length<=0) {
 				var product_image='';
-		      	if (req.files) {
-			        let getFile = req.files.service_pic;//mimetype
+		      	if (req.file) {
+		      		if(req.file){
+						var product_image = req.file.originalname;
+					}
+			        /*let getFile = req.file.service_pic;//mimetype
 			        var ext=path.extname(getFile['name']);
-			        var filename= Date.now()+'_'+reqData.user_id+ext;
+			        var filename= Date.now()+'_'+reqData.price+ext;
 			        var fileData =getFile['data']; 
 			        s3bucket.createBucket(function () {
 			             var params = {
@@ -111,20 +114,20 @@ export const add_drycleaning_service = async(req,res)=>{
 			                }
 			                console.log("S3 AWS res==>",data)
 			              	product_image=data.Location;
-							//`title`, `price`, `image`,
+							//`title`, `price`, `image`,*/
 							var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?";
 						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image], function (error, data) {
 							if (error) throw error;
 								res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 							});	              
 
-			            });
+			          /*  });
 			       	});
-
+					*/	
 		    	}else{
 					
-				   	var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?";
-				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, ""], function (error, data) {
+				   	var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?";
+				    dbConnection.query(addContnetQry,[reqData.title, reqData.price], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 					});
@@ -140,7 +143,7 @@ export const add_drycleaning_service = async(req,res)=>{
 export const update_drycleaning_service = async(req,res)=>{
 	try { 
 		var reqData=req.body;
-		console.log('files',req.files);
+		console.log('files',req.file);
 		if(!reqData['id'] || reqData['id']==""  ) {
 		  return res.json({
 		     "success":false,
@@ -153,10 +156,13 @@ export const update_drycleaning_service = async(req,res)=>{
 			if (error) throw error;
 			if (data.length<=0) {
 				var product_image='';
-		      	if (req.files) {
-			        let getFile = req.files.service_pic;//mimetype
+		      	if (req.file) {
+		      		if(req.file){
+						var product_image = req.file.originalname;
+					}
+			        /*let getFile = req.file.service_pic;//mimetype
 			        var ext=path.extname(getFile['name']);
-			        var filename= Date.now()+'_'+reqData.user_id+ext;
+			        var filename= Date.now()+'_'+reqData.price+ext;
 			        var fileData =getFile['data']; 
 			        s3bucket.createBucket(function () {
 			             var params = {
@@ -172,7 +178,7 @@ export const update_drycleaning_service = async(req,res)=>{
 			                 console.log(err);
 			                }
 			                console.log("S3 AWS res==>",data)
-			              	product_image=data.Location;
+			              	product_image=data.Location;*/
 							//`title`, `price`, `image`,
 							var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, `image`=? where id=?";
 						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image, reqData.id], function (error, data) {
@@ -180,13 +186,13 @@ export const update_drycleaning_service = async(req,res)=>{
 								res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 							});	              
 
-			            });
-			       	});
+			            /*});
+			       	});*/
 
 		    	}else{
 					
-				   	var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, `image`=? where id=?";
-				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, "",reqData.id], function (error, data) {
+				   	var addContnetQry = "update dry_clean_services set `title`=?, `price`=? where id=?";
+				    dbConnection.query(addContnetQry,[reqData.title, reqData.price,reqData.id], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 					});
@@ -318,7 +324,7 @@ export const get_user_history = async(req,res)=>{
 /******** Package Listing************/
 export const get_packagesList = async(req,res)=>{
       try { 
-        	const loads = "select * from admin_packages where isDelete=0 order by updated_at desc";
+        	const loads = "select * from admin_packages where isDelete=0 order by created_at desc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
@@ -585,5 +591,6 @@ export default {
 	add_drycleaning_service,
 	update_drycleaning_service,
 	update_service_status,
-	delete_service
+	delete_service,
+	get_drycleaning_itemlist
 }
