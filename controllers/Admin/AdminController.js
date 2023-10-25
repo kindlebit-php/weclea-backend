@@ -579,14 +579,16 @@ export const update_faq_index = async(req,res)=>{
   	console.log('update_faq_index',position);
     try { 
     	for (var i = 0; i < position.length; i++) {
-    		console.log(position[i]);
-    		var updateContnetQry = "update wc_faq set index_id="+position[i]['index_id']+" where id = "+position[i]['id']+" ";
+    		console.log("update wc_faq set index_id='"+position[i]['index_id']+"' where id = "+position[i]['id']+" ");
+    		var updateContnetQry = "update wc_faq set index_id='"+position[i]['index_id']+"' where id = '"+position[i]['id']+"' ";
+    		var k=0;
     		dbConnection.query(updateContnetQry, function (error, data) {
 				if (error) throw error;
-				console.log(i+"=="+position.length-1);
-				if (i>=position.length-1) {
+				console.log(k+"=="+position.length-1);
+				if (k>=position.length-1) {
 					res.json({'status':true,"message":"FAQ has been updated successfully",'data':data});
 				}
+				k++;
 			});
     	}
     	//res.json({'status':false,"message":"Same FAQ already exist",data:reqData});
