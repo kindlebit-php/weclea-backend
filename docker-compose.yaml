@@ -13,6 +13,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_DATABASE=${DB_DATABASE}
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - file_uploads=On
       - MAX_FILE_SIZE=500MB
       - max_execution_time=300
       - post_max_size=500M # Increased post_max_size to 100MB
