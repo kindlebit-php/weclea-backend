@@ -554,7 +554,7 @@ export const create_faq = async(req,res)=>{
 export const delete_faq = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	if (data.length>0) {
+    	if (reqData.length>0) {
 	    	for (var i = 0; i < reqData.length; i++) {
 				var updateContnetQry = "delete from wc_faq where id=? ";
 				var k=0
