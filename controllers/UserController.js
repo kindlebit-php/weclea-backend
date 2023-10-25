@@ -65,7 +65,7 @@ export const customer_address = async(req,res)=>{
      try { 
      	const userData = res.user;
         const {delievery_instruction,pickup_address,pickup_appartment,pickup_city,pickup_state,pickup_zipcode,pickup_lat,pickup_long,drop_address,drop_appartment,drop_city,drop_state,drop_zipcode,drop_lat,drop_long,billing_address,billing_appartment,billing_city,billing_state,billing_zipcode,billing_lat,billing_long} = req.body;
-        if(pickup_address && pickup_appartment && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long && drop_address && drop_appartment && drop_city && drop_state && drop_zipcode && drop_lat && drop_long && billing_address && billing_appartment && billing_city && billing_state && billing_zipcode && billing_lat && billing_long){
+        if(pickup_address && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long && drop_address && drop_city && drop_state && drop_zipcode && drop_lat && drop_long && billing_address && billing_city && billing_state && billing_zipcode && billing_lat && billing_long){
         const checkIfAddressExist = "select count(id) as total from customer_address where user_id = '"+userData[0].id+"'";
         dbConnection.query(checkIfAddressExist, function (error, resultAddress) {
         	if(resultAddress[0].total == 0){
