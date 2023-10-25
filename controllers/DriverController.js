@@ -203,11 +203,12 @@ export const pickup_loads_detail = async (req, res) => {
 };
 
 export const submit_pickup_details = async (req, res) => {
+    console.log('filelog',req.files)
+  
   try {
     const { booking_id } = req.body;
     const userData = res.user;
     const driverId = userData[0].id;
-    console.log('filelog',req.files)
     const userId = `SELECT user_id FROM bookings WHERE id = ?`;
 
     dbConnection.query(userId, [booking_id], function (error, data) {
