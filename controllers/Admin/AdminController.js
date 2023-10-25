@@ -620,5 +620,6 @@ export default {
 	update_drycleaning_service,
 	update_service_status,
 	delete_service,
-	get_drycleaning_itemlist
+	get_drycleaning_itemlist,
+	update_faq_index
 }
