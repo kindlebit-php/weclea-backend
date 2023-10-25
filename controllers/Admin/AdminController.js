@@ -554,7 +554,22 @@ export const create_faq = async(req,res)=>{
 export const delete_faq = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	const qrySelect = "select id from wc_faq where id=?";
+    	if (data.length>0) {
+	    	for (var i = 0; i < reqData.length; i++) {
+				var updateContnetQry = "delete from wc_faq where id=? ";
+				var k=0
+				dbConnection.query(updateContnetQry,[reqData[i].id], function (error, data) {
+				if (error) throw error;
+					if (k>=reqData.length-1) {
+						res.json({'status':true,"message":"FAQ has been deleted successfully",'data':data});
+					}
+					k++;
+				});	
+	    	}
+    	}else{
+			res.json({'status':false,"message":"Record not found"});
+		}
+    	/*const qrySelect = "select id from wc_faq where id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
@@ -566,7 +581,7 @@ export const delete_faq = async(req,res)=>{
 			}else{
 				res.json({'status':false,"message":"Record not found"});
 			}
-		});
+		});*/
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
