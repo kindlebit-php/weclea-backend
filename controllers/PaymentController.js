@@ -861,7 +861,7 @@ export const customer_extra_payment = async (req, res) => {
   const userId = userData[0].id;
   const customerId = userData[0].customer_id;
   console.log(customerId)
-  const { cardNumber, expMonth, expYear, amount, cvc, card_status } = req.body;
+  const { cardNumber, expMonth, expYear, amount, cvc, card_status,date1 } = req.body;
   try {
     if (cardNumber && expMonth && expYear && cvc && amount && card_status !== undefined) {
       if ((cvc.length !== 3 && cvc.length !== 4) || cvc === "000" || cvc === "0000") {
@@ -870,7 +870,13 @@ export const customer_extra_payment = async (req, res) => {
           message: "Your card security code is invalid",
         });
       }
-
+      const order = `SELECT date FROM bookings WHERE user_id = ${userData[0].id}`;
+      dbConnection.query(order, function (error, datas) {
+        const dates = datas.map((row) => row.date);
+        if (dates.includes(date1)) {
+          res.json({ status: false, message: "This date is already exists" });
+        }
+      });
       // Create a token
       const createCard = await stripes.tokens.create({
         card: {
@@ -977,7 +983,15 @@ export const customer_extra_payment_cardId = async (req, res) => {
     const userData = res.user;
     const userId = userData[0].id;
     const customerId = userData[0].customer_id;
-    const { cardId, amount } = req.body;
+    const { cardId, amount,date1 } = req.body;
+
+    const order = `SELECT date FROM bookings WHERE user_id = ${userData[0].id}`;
+    dbConnection.query(order, function (error, datas) {
+      const dates = datas.map((row) => row.date);
+      if (dates.includes(date1)) {
+        res.json({ status: false, message: "This date is already exists" });
+      }
+    });
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount * 100,

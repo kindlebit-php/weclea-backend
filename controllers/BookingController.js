@@ -40,7 +40,9 @@ export const customer_booking = async(req,res)=>{
                     // return false;
                     if(locationResult.length > 0){
                         var driver_id = locationResult[0].id
-                    }else{
+                    }
+                    else
+                    {
                         var driver_id = 0
                     }
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+category_id+"',1)";
@@ -54,12 +56,10 @@ export const customer_booking = async(req,res)=>{
                         var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
                     }
                     dbConnection.query(usrLoadsup, function (error, resulst) {
-                    })
-                    
+                    })                    
                     if(typeof payment_id != 'undefined'){
                         var paymentsql = "update payment set booking_id = '"+result.insertId+"'where id = '"+payment_id+"'";
                         dbConnection.query(paymentsql, function (err,paymentResult ) {
-
                         });
                     }
                         for (var i = 0; total_loads > i; i++) {
@@ -67,29 +67,24 @@ export const customer_booking = async(req,res)=>{
                         dbConnection.query(sql, function (err, results) {
                         });     
                         }
-
                         var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+result.insertId+"')";
-                        dbConnection.query(bookingsql, function (err, bookingresult) {
-                        
+                        dbConnection.query(bookingsql, function (err, bookingresult) {                        
                         });
 
                         var bookingsql = "INSERT INTO booking_timing (booking_id) VALUES ('"+result.insertId+"')";
                         dbConnection.query(bookingsql, function (err, bookingresult) {
-
                         });
 
                         var order_id = '1001'+result.insertId;
                         var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
                         dbConnection.query(sql, function (err, resultss) {
-                        res.json({'status':true,"message":"Booking added successfully!"});
-                        
+                        res.json({'status':true,"message":"Booking added successfully!"});                        
                         });
                     });
                     });  
                 }); 
                        }else{
                         res.json({'status':false,"message":"Booking already added for "+date+" date!"});
-
                        }
                     })
                 }
@@ -106,13 +101,19 @@ export const customer_booking = async(req,res)=>{
                 var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }else if(category_id == 2){
                 var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
-            }else{
+            }
+            else
+            {
                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }
-            dbConnection.query(usrLoads, function (error, resultss) {
-                if(total_loads > resultss[0].total_loads){
+            dbConnection.query(usrLoads, function (error, resultss) 
+            {
+                if(total_loads > resultss[0].total_loads)
+                {
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
-                }else{
+                }
+                else
+                {
                     var resData = [];
                     allDates.forEach(function callback(element, key)
                     {
@@ -120,8 +121,10 @@ export const customer_booking = async(req,res)=>{
                         const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
                         
                     const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"'";
-                    dbConnection.query(checkIfDateExist, function (error, checkIfresults) {
-                        if(checkIfresults[0].tpyedate == 0){
+                    dbConnection.query(checkIfDateExist, function (error, checkIfresults) 
+                    {
+                        if(checkIfresults[0].tpyedate == 0)
+                        {
 
                     
 
