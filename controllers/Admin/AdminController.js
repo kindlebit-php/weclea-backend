@@ -143,7 +143,7 @@ export const add_drycleaning_service = async(req,res)=>{
 export const update_drycleaning_service = async(req,res)=>{
 	try { 
 		var reqData=req.body;
-		console.log('files',req.file);
+		console.log("reqData",reqData,'files',req.file);
 		if(!reqData['id'] || reqData['id']==""  ) {
 		  return res.json({
 		     "success":false,
@@ -567,6 +567,34 @@ export const delete_faq = async(req,res)=>{
 				res.json({'status':false,"message":"Record not found"});
 			}
 		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+export const update_faq_index = async(req,res)=>{
+	const reqData = req.body;
+	const position = reqData.position;
+  	const index_id =1;
+  	console.log('update_faq_index',position);
+    try { 
+    	for (var i = 0; i < position.length; i++) {
+    		console.log(position[i]);
+    	}
+    	res.json({'status':false,"message":"Same FAQ already exist",data:reqData});
+    	/*const qrySelect = "select id from wc_faq where title=? and id!=?";
+		dbConnection.query(qrySelect,[reqData.section,reqData.faq_id], function (error, data) {
+		if (error) throw error;
+			if (data.length<=0) {
+			    var updateContnetQry = "update wc_faq set index_id='"+index_id+"' where id = "+reqData.faq_id+" ";
+			    dbConnection.query(updateContnetQry, function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":"FAQ has been updated successfully",'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Same FAQ already exist"});
+			}
+		})*/
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }

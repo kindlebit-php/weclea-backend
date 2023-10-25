@@ -115,6 +115,8 @@ router.post("/delete_packages",CheckAuth,AdminController.delete_packages)
 router.get("/get_package_details/:id?",CheckAuth,AdminController.get_package_details)
 router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
+router.post("/update_faq_index",CheckAuth,AdminController.update_faq_index)
+
 
 /*dry cleaning*/
 router.post("/update_drycleaning_service",upload.single('service_pic'),AdminController.update_drycleaning_service)
