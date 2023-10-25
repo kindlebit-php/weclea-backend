@@ -69,8 +69,6 @@ export const customer_address = async(req,res)=>{
         const checkIfAddressExist = "select count(id) as total from customer_address where user_id = '"+userData[0].id+"'";
         dbConnection.query(checkIfAddressExist, function (error, resultAddress) {
         	if(resultAddress[0].total == 0){
-
-        	
         if(pickup_address && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long){
 	        var sql = "INSERT INTO customer_address (user_id,address, appartment,city,state,zip,latitude,longitude) VALUES ('"+userData[0].id+"','"+pickup_address+"', '"+pickup_appartment+"','"+pickup_city+"','"+pickup_state+"','"+pickup_zipcode+"','"+pickup_lat+"','"+pickup_long+"')";
 	        dbConnection.query(sql, function (error, result) {

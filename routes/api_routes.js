@@ -47,6 +47,7 @@ router.post("/ss", qr_slip);
 router.get('/get-orders',CheckAuth,driverController.get_orders);
 router.post("/get-order-detail",CheckAuth,driverController.get_order_detail);
 router.post("/print-All-QrCode",CheckAuth,driverController.print_All_QrCode)
+router.get("/get-dry-clean-orders",CheckAuth,driverController.get_dry_clean_orders)
 router.post("/print-All-Drop-QrCode",CheckAuth,driverController.print_All_Drop_QrCode)
 router.post("/pickup-loads",CheckAuth,driverController.pickup_loads)
 router.post("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
