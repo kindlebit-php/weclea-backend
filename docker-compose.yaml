@@ -13,10 +13,10 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_DATABASE=${DB_DATABASE}
       - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
-      - MAX_FILE_SIZE=500mb 
+      - MAX_FILE_SIZE=500mb
       - max_execution_time=300
-      - post_max_size=50M
-      - upload_max_filesize=50M
+      - post_max_size=100M # Increased post_max_size to 100MB
+      - upload_max_filesize=100M # Increased upload_max_filesize to 100MB
     networks:
       - myconnection
     volumes:
@@ -32,7 +32,7 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_BIND_ADDRESS: "0.0.0.0"
     volumes:
-     - db_backup:/var/lib/mysql  # Define the volume for MySQL data #db pass change
+     - db_backup:/var/lib/mysql
     networks:
       - myconnection
 
@@ -44,7 +44,7 @@ services:
     environment:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      UPLOAD_LIMIT: 500M
+      UPLOAD_LIMIT: 500M # You can also adjust the PHPMyAdmin upload limit here
     depends_on:
       - mysql
     networks:
@@ -54,6 +54,5 @@ networks:
   myconnection:
     driver: bridge
 
-# Define volumes
 volumes:
-  db_backup:  # Define the MySQL data volume
+  db_backup:
