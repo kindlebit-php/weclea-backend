@@ -15,26 +15,13 @@ import FolderController from "../controllers/Folder/FolderController.js";
 import { qr_slip } from "../helpers/qr_slip.js";
 
 
-const storage = multer.diskStorage({
-    destination: function(req, file, cb)
-    {
-        cb(null, 'uploads');
-    },   
-    filename: function (req, file, cb) 
-    {
-      cb(null,file.originalname)
-    }
-});
-
-const profileUpload = multer({storage:storage})
-
 router.post('/customer-register',userController.customer_register);
 router.post('/newsletter',userController.newsletter);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
 router.get('/user-registered-address',CheckAuth ,userController.user_registered_address);
 router.get('/get-notification',CheckAuth ,userController.get_notification);
 router.post('/update-password',CheckAuth ,userController.update_password);
-router.post('/edit-user-profile',CheckAuth,profileUpload.single('profile_image') ,userController.edit_user_profile);
+router.post('/edit-user-profile',CheckAuth,upload.single('profile_image') ,userController.edit_user_profile);
 router.get("/driver-list",userController.driver_list)
 router.get("/customer-list",userController.customer_list)
 router.get("/folder-list",userController.folder_list)
@@ -60,6 +47,7 @@ router.post("/ss", qr_slip);
 router.get('/get-orders',CheckAuth,driverController.get_orders);
 router.post("/get-order-detail",CheckAuth,driverController.get_order_detail);
 router.post("/print-All-QrCode",CheckAuth,driverController.print_All_QrCode)
+router.get("/get-dry-clean-orders",CheckAuth,driverController.get_dry_clean_orders)
 router.post("/print-All-Drop-QrCode",CheckAuth,driverController.print_All_Drop_QrCode)
 router.post("/pickup-loads",CheckAuth,driverController.pickup_loads)
 router.post("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
@@ -112,8 +100,8 @@ router.post("/dry-clean-booking",CheckAuth,DrycleanController.dry_clean_booking)
 
 /***********Admin panel***************/
 
-router.get("/get_content",CheckAuth,AdminController.get_page_content)
-router.get("/get_faq",CheckAuth,AdminController.get_faq_content)
+router.get("/get_content",AdminController.get_page_content)
+router.get("/get_faq",AdminController.get_faq_content)
 router.post("/update_page_content",CheckAuth,AdminController.update_page_content)
 router.post("/create_faq",CheckAuth,AdminController.create_faq)
 router.post("/update_faq",CheckAuth,AdminController.update_faq)
@@ -128,8 +116,8 @@ router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
 
 /*dry cleaning*/
-router.post("/update_drycleaning_service",profileUpload.single('service_pic'),AdminController.update_drycleaning_service)
-router.post("/add_drycleaning_service",profileUpload.single('service_pic'),AdminController.add_drycleaning_service)
+router.post("/update_drycleaning_service",upload.single('service_pic'),AdminController.update_drycleaning_service)
+router.post("/add_drycleaning_service",upload.single('service_pic'),AdminController.add_drycleaning_service)
 router.post("/update_service_status",CheckAuth,AdminController.update_service_status)
 router.post("/delete_service",CheckAuth,AdminController.delete_service)
 router.get("/get_drycleaning_itemlist",CheckAuth,AdminController.get_drycleaning_itemlist)
