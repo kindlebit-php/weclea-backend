@@ -552,7 +552,8 @@ export const create_faq = async(req,res)=>{
     }
 }
 export const delete_faq = async(req,res)=>{
-	const reqData = req.body;
+	var reqData = req.body;
+	reqData = reqData.id;
     try { 
     	if (reqData.length>0) {
 	    	for (var i = 0; i < reqData.length; i++) {
