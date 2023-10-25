@@ -494,7 +494,7 @@ export const update_page_content = async(req,res)=>{
 /********** Start FAQ API ****************/
 export const get_faq_content = async(req,res)=>{
       try { 
-        	const loads = "select * from wc_faq";
+        	const loads = "select * from wc_faq order by index_id asc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
@@ -580,8 +580,15 @@ export const update_faq_index = async(req,res)=>{
     try { 
     	for (var i = 0; i < position.length; i++) {
     		console.log(position[i]);
+    		var updateContnetQry = "update wc_faq set index_id="+position[i]['index_id']+" where id = "+position[i]['id']+" ";
+    		dbConnection.query(updateContnetQry, function (error, data) {
+				if (error) throw error;
+				if (i==position.length-1) {
+					res.json({'status':true,"message":"FAQ has been updated successfully",'data':data});
+				}
+			});
     	}
-    	res.json({'status':false,"message":"Same FAQ already exist",data:reqData});
+    	//res.json({'status':false,"message":"Same FAQ already exist",data:reqData});
     	/*const qrySelect = "select id from wc_faq where title=? and id!=?";
 		dbConnection.query(qrySelect,[reqData.section,reqData.faq_id], function (error, data) {
 		if (error) throw error;
