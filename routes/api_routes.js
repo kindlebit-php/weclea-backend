@@ -48,6 +48,7 @@ router.get('/get-orders',CheckAuth,driverController.get_orders);
 router.post("/get-order-detail",CheckAuth,driverController.get_order_detail);
 router.post("/print-All-QrCode",CheckAuth,driverController.print_All_QrCode)
 router.get("/get-dry-clean-orders",CheckAuth,driverController.get_dry_clean_orders)
+router.get("/get-dry-clean-drop-orders",CheckAuth,driverController.get_dry_clean_drop_orders)
 router.post("/print-All-Drop-QrCode",CheckAuth,driverController.print_All_Drop_QrCode)
 router.post("/pickup-loads",CheckAuth,driverController.pickup_loads)
 router.post("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
@@ -114,6 +115,8 @@ router.post("/delete_packages",CheckAuth,AdminController.delete_packages)
 router.get("/get_package_details/:id?",CheckAuth,AdminController.get_package_details)
 router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
+router.post("/update_faq_index",CheckAuth,AdminController.update_faq_index)
+
 
 /*dry cleaning*/
 router.post("/update_drycleaning_service",upload.single('service_pic'),AdminController.update_drycleaning_service)

@@ -143,7 +143,7 @@ export const add_drycleaning_service = async(req,res)=>{
 export const update_drycleaning_service = async(req,res)=>{
 	try { 
 		var reqData=req.body;
-		console.log('files',req.file);
+		console.log("reqData",reqData,'files',req.file);
 		if(!reqData['id'] || reqData['id']==""  ) {
 		  return res.json({
 		     "success":false,
@@ -494,7 +494,7 @@ export const update_page_content = async(req,res)=>{
 /********** Start FAQ API ****************/
 export const get_faq_content = async(req,res)=>{
       try { 
-        	const loads = "select * from wc_faq";
+        	const loads = "select * from wc_faq order by index_id asc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
@@ -552,9 +552,25 @@ export const create_faq = async(req,res)=>{
     }
 }
 export const delete_faq = async(req,res)=>{
-	const reqData = req.body;
+	var reqData = req.body;
+	reqData = reqData.id;
     try { 
-    	const qrySelect = "select id from wc_faq where id=?";
+    	if (reqData.length>0) {
+	    	for (var i = 0; i < reqData.length; i++) {
+				var updateContnetQry = "delete from wc_faq where id=? ";
+				var k=0
+				dbConnection.query(updateContnetQry,[reqData[i].id], function (error, data) {
+				if (error) throw error;
+					if (k>=reqData.length-1) {
+						res.json({'status':true,"message":"FAQ has been deleted successfully",'data':data});
+					}
+					k++;
+				});	
+	    	}
+    	}else{
+			res.json({'status':false,"message":"Record not found"});
+		}
+    	/*const qrySelect = "select id from wc_faq where id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
@@ -566,7 +582,45 @@ export const delete_faq = async(req,res)=>{
 			}else{
 				res.json({'status':false,"message":"Record not found"});
 			}
-		});
+		});*/
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+export const update_faq_index = async(req,res)=>{
+	const reqData = req.body;
+	const position = reqData.position;
+  	const index_id =1;
+  	console.log('update_faq_index',position);
+    try { 
+    	for (var i = 0; i < position.length; i++) {
+    		console.log("update wc_faq set index_id='"+i+"' where id = "+position[i]['id']+" ");
+    		var updateContnetQry = "update wc_faq set index_id="+i+" where id = "+position[i]['id']+" ";
+    		var k=0;
+    		dbConnection.query(updateContnetQry, function (error, data) {
+				if (error) throw error;
+				console.log(k+"=="+position.length-1);
+				if (k>=position.length-1) {
+					res.json({'status':true,"message":"FAQ has been updated successfully",'data':data});
+				}
+				k++;
+			});
+    	}
+    	//res.json({'status':false,"message":"Same FAQ already exist",data:reqData});
+    	/*const qrySelect = "select id from wc_faq where title=? and id!=?";
+		dbConnection.query(qrySelect,[reqData.section,reqData.faq_id], function (error, data) {
+		if (error) throw error;
+			if (data.length<=0) {
+			    var updateContnetQry = "update wc_faq set index_id='"+index_id+"' where id = "+reqData.faq_id+" ";
+			    dbConnection.query(updateContnetQry, function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":"FAQ has been updated successfully",'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Same FAQ already exist"});
+			}
+		})*/
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
@@ -592,5 +646,6 @@ export default {
 	update_drycleaning_service,
 	update_service_status,
 	delete_service,
-	get_drycleaning_itemlist
+	get_drycleaning_itemlist,
+	update_faq_index
 }

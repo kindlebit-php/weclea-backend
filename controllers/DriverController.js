@@ -203,11 +203,12 @@ export const pickup_loads_detail = async (req, res) => {
 };
 
 export const submit_pickup_details = async (req, res) => {
+    console.log('filelog',req.files)
+  
   try {
     const { booking_id } = req.body;
     const userData = res.user;
     const driverId = userData[0].id;
-
     const userId = `SELECT user_id FROM bookings WHERE id = ?`;
 
     dbConnection.query(userId, [booking_id], function (error, data) {
@@ -376,7 +377,29 @@ export const get_drop_orders = async (req, res) => {
         var datetime = new Date();
     const currentDate = dateFormat.format(datetime,'YYYY-MM-DD'); 
     // const order = `SELECT order_id FROM bookings WHERE order_status = '4' AND driver_id = ${userData[0].id}`;
-    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status = '4' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status = '4' and bookings.order_type != '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    dbConnection.query(order, function (error, data) {
+      if (error) throw error;
+      res.json({
+        status: true,
+        message: "Data retrieved successfully!",
+        data: data,
+      });
+    });
+  } catch (error) {
+    res.json({ status: false, message: error.message });
+  }
+};
+
+// Driver drop order api
+
+export const get_dry_clean_drop_orders = async (req, res) => {
+  try {
+    const userData = res.user;
+        var datetime = new Date();
+    const currentDate = dateFormat.format(datetime,'YYYY-MM-DD'); 
+    // const order = `SELECT order_id FROM bookings WHERE order_status = '4' AND driver_id = ${userData[0].id}`;
+    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status = '4' and bookings.order_type = '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
     dbConnection.query(order, function (error, data) {
       if (error) throw error;
       res.json({
@@ -774,6 +797,7 @@ export default {
   laundry_NotFound,
   get_drop_orders,
   get_drop_order_detail,
+  get_dry_clean_drop_orders,
   drop_loads,
   drop_loads_detail,
   submit_drop_details,
