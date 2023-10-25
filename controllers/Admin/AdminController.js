@@ -583,7 +583,8 @@ export const update_faq_index = async(req,res)=>{
     		var updateContnetQry = "update wc_faq set index_id="+position[i]['index_id']+" where id = "+position[i]['id']+" ";
     		dbConnection.query(updateContnetQry, function (error, data) {
 				if (error) throw error;
-				if (i==position.length-1) {
+				console.log(i+"=="+position.length-1);
+				if (i>=position.length-1) {
 					res.json({'status':true,"message":"FAQ has been updated successfully",'data':data});
 				}
 			});
