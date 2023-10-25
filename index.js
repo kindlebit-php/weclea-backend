@@ -7,15 +7,8 @@ import "./config/db.js";
 
 var app = express();
 
-app.use(bodyparser.json({limit: '500mb'}));
-
-app.use(
-  bodyparser.urlencoded({
-    extended: true,
-    limit: '500mb',
-    parameterLimit: 50000,
-  }),
-);
+app.use(bodyparser.json({limit:'500mb'})); 
+app.use(bodyparser.urlencoded({extended:true, limit:'500mb'})); 
 // enabled cors 
 app.use(cors());
 
