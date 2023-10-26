@@ -480,7 +480,7 @@ export const update_employee = async(req,res)=>{
 		var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,address) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+address+"')";
 		dbConnection.query(sql, function (error, result) {
 				if (error) throw error;
-					res.json({'status':true,"message":"registered successfully!"});
+					res.json({'status':true,"message":"updated successfully!"});
 				}); 
 		});		
 		}else{
