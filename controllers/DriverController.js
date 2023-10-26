@@ -203,8 +203,8 @@ export const pickup_loads_detail = async (req, res) => {
 };
 
 export const submit_pickup_details = async (req, res) => {
-    console.log('filelog',req.files)
-  
+  console.log('filelog', req.files);
+
   try {
     const { booking_id } = req.body;
     const userData = res.user;
@@ -231,46 +231,48 @@ export const submit_pickup_details = async (req, res) => {
           }
           const currentTime = time();
           const currentDate = date();
-          const update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id
-            = ${booking_id}`;
-          const result=data[0]
-          dbConnection.query(
-            update_Date_Time,
-            function (updateTimeErr, updateTimeResult) {
-              if (updateTimeErr) {
-                return res.json({status: false, message: updateTimeErr.message});
-              } else {
-                const imageArray = [];
-                req.files.forEach((e, i) => {
-                  imageArray.push(e.path);
-                });
-                if (req.files.length > 5) {
-                  return res.json({status: false, message: "only 5 images are allowed"});
-                }
-                const pickupImagesJSON =  imageArray.join(', ');
-               
-                const update_pickupimages =
-                  "UPDATE booking_images SET pickup_images = ? WHERE booking_id = ?";
-                dbConnection.query(update_pickupimages, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
-                    if (updateImagesErr) {
-                      return res.json({ status: false,  message: updateImagesErr.message});
+          const update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+          const result = data[0];
+          dbConnection.query(update_Date_Time, function (updateTimeErr, updateTimeResult) {
+            if (updateTimeErr) {
+              return res.json({ status: false, message: updateTimeErr.message });
+            } else {
+              const imageArray = [];
+              req.files.forEach((e, i) => {
+                imageArray.push(e.path);
+              });
+              if (req.files.length > 5) {
+                return res.json({ status: false, message: "only 5 images are allowed" });
+              }
+              const pickupImagesJSON = imageArray.join(', ');
+
+              const update_pickupimages =
+                "UPDATE booking_images SET pickup_images = ? WHERE booking_id = ?";
+              dbConnection.query(update_pickupimages, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
+                if (updateImagesErr) {
+                  return res.json({ status: false, message: updateImagesErr.message });
+                } else {
+                  const update_orderStatus =
+                    "UPDATE bookings SET order_status = '8' WHERE id = ?";
+                  dbConnection.query(update_orderStatus, [booking_id], function (updateStatusErr, updateStatusResult) {
+                    if (updateStatusErr) {
+                      return res.json({ status: false, message: updateStatusErr.message });
                     } else {
-                      const title="Loads pickup";
-                      const body="Your loads pickup successfully";
-                      fcm_notification(title, body, userId, "Pickup")
+                      const title = "Loads pickup";
+                      const body = "Your loads pickup successfully";
+                      fcm_notification(title, body, userId, "Pickup");
                       const responseData = {
                         status: true,
-                        message: "Submitted successfully!"
-                    };
-                      
+                        message: "Submitted successfully!",
+                      };
+
                       return res.json(responseData);
-                    
                     }
-                  }
-                );
-              }
+                  });
+                }
+              });
             }
-          );
+          });
         });
       }
     });
@@ -278,6 +280,7 @@ export const submit_pickup_details = async (req, res) => {
     res.json({ status: false, message: error.message });
   }
 };
+
 
 
 
