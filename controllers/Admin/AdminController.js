@@ -678,8 +678,92 @@ export const get_all_order = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
-
+export const get_order_detail = async(req,res)=>{
+	var reqData= req.params
+	if (reqData.booking_id && reqData.booking_id!='') {
+	    try { 
+	    	const loads = "SELECT * FROM `booking_timing` LEFT JOIN booking_images on booking_images.booking_id=booking_timing.booking_id WHERE booking_timing.booking_id=?";
+			dbConnection.query(loads,[reqData.booking_id], function (error, data) {
+			if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});
+			});
+	    }catch (error) {
+	        res.json({'status':false,"message":error.message});  
+	    }
+	}else{
+		res.json({'status':false,"message":"No record found"});
+	}
+}
 /*******************/
+/********* Driver listing************/
+export const get_all_driver = async(req,res)=>{
+	var reqData= req.params
+	try { 
+		var LimitNum = 25
+        var startNum = 0;
+        var currentPage=25;
+        if(reqData.start == '' || reqData.limit == ''){
+              startNum = 0;
+              LimitNum = 25;
+        }else{
+             //parse int Convert String to number 
+              startNum = parseInt(reqData.start);
+              LimitNum = parseInt(reqData.limit); 
+              currentPage=currentPage+startNum;
+        }
+        var query=""
+        var queryType=""
+		if (reqData.searchStr  && reqData.searchStr!='all') {
+		  query=" and ( users.name like '%"+reqData.searchStr+"%' or users.email like '%"+reqData.searchStr+"%') ";          
+		}
+		// if (reqData.type  && reqData.type!='9') {
+		//   	queryType=" and users.order_status like '%"+reqData.type+"%' ";          
+		// }
+        dbConnection.query("SELECT * FROM `users` WHERE users.role=2 "+query+" order by order_id desc", (error, rows) => {
+            if (error) {
+                reject(error);
+            } else {
+
+                if (rows.length>0) {
+                    var totalRecords=rows.length
+                    if (totalRecords>currentPage) {
+                        totalRecords=true;
+                    }else{
+                        totalRecords=false;
+                    }
+                }else{
+                    var totalRecords=false;
+                }
+				const loads = "SELECT * FROM `users` WHERE users.role=2 "+query+" limit ? offset ?";
+				dbConnection.query(loads,[LimitNum,startNum],function (error, rows) {
+				if (error) throw error;
+					res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});
+				});
+			}
+		});		
+
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const get_driver_detail = async(req,res)=>{
+	var reqData= req.params
+	if (reqData.user_id && reqData.user_id!='') {
+	    try { 
+	    	const loads = "SELECT * FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id WHERE users.role=2 and users.id=? ";
+			dbConnection.query(loads,[reqData.user_id], function (error, data) {
+			if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});
+			});
+	    }catch (error) {
+	        res.json({'status':false,"message":error.message});  
+	    }
+	}else{
+		res.json({'status':false,"message":"No record found"});
+	}
+}
+/*******************/
+
 export default {
 	get_page_content,
 	get_faq_content,
@@ -701,5 +785,9 @@ export default {
 	delete_service,
 	get_drycleaning_itemlist,
 	update_faq_index,
-	get_all_order
+	get_all_order,
+	get_order_detail,
+	get_all_driver,
+	get_driver_detail
+
 }

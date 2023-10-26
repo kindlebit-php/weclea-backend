@@ -1,6 +1,6 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
-import { getDates,randomNumber } from "../helpers/date.js";
+import { getDates,randomNumber,setDateForNotification } from "../helpers/date.js";
 //customer booking API
 
 export const booking_subscription_cron = async(req,res)=>{
@@ -88,7 +88,35 @@ export const booking_subscription_cron = async(req,res)=>{
         res.json({'status':false,"message":error});  
     }
 }
+export const booking_load_alert = async(req,res)=>{
+     try { 
+         var datetime = new Date();
+        const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+        const lastdate = dateFormat.addDays(datetime, 3); 
+        const endFinalDate = dateFormat.format(lastdate,'YYYY-MM-DD');
+        let allDates =   setDateForNotification(new Date(currentFinalDate), new Date(endFinalDate));
+        // console.log('allDates',allDates)
+        allDates.forEach(function callback(element, key)
+        {
+            var frequencyDate = new Date(allDates[key]);
+            const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
+            // console.log('frequencyDBDate',frequencyDBDate)
+            const checkIfDateExist = "select * from bookings where date = '"+frequencyDBDate+"' and cron_status = 0";
+            dbConnection.query(checkIfDateExist, function (error, checkIfresults) 
+            {
+                checkIfresults.forEach(ele =>{
+                    const checkIfDateExist = "select * from bookings where date = '"+frequencyDBDate+"' and cron_status = 0";
+                        dbConnection.query(checkIfDateExist, function (error, checkIfresults){
 
+                        })
+                })
+            })
+        })
+     }catch (error) {
+        res.json({'status':false,"message":error});  
+    }
+}
 export default {
-	booking_subscription_cron
+	booking_subscription_cron,
+    booking_load_alert
 }

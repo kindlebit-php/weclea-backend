@@ -31,6 +31,24 @@ export const getDates = (startDate,endDate,frequency, data, res) => {
 };
 
 
+// fetch data response 
+export const setDateForNotification = (startDate,endDate, data, res) => {
+	const currentDate = new Date(startDate.getTime());
+	const dates = [];
+	var i = 0;
+	while (currentDate <= endDate) {
+		
+		if(i != 0){
+			dates.push(new Date(currentDate));
+		}
+		
+		currentDate.setDate(currentDate.getDate() + 1);
+		i++;
+	}
+	return dates;
+};
+
+
 export const randomNumber = (booking_id) => {
 	  const currentDate = new Date();
      // return  Math.random().toString(36).slice(2)+'.'+booking_id;

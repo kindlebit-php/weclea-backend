@@ -84,6 +84,7 @@ router.get("/profile",CheckAuth,driverController.profile)
 
 //**********************************************************************************//
 router.get("/booking-subscription-cron",cronController.booking_subscription_cron);
+router.get("/booking-load-alert",cronController.booking_load_alert);
 //*********************************PAYMENT******************************************//
 router.post("/attach-card",CheckAuth,paymentController.Attach_Card);
 router.get("/get-all-cards",CheckAuth,paymentController.get_all_cards);
@@ -121,8 +122,11 @@ router.get("/get_package_details/:id?",CheckAuth,AdminController.get_package_det
 router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
 router.post("/update_faq_index",CheckAuth,AdminController.update_faq_index)
-router.get("/get_all_order/:type?/:searchStr?/:start?/:limit?",AdminController.get_all_order)
+router.get("/get_all_order/:type?/:searchStr?/:start?/:limit?",CheckAuth,AdminController.get_all_order)
+router.get("/get_order_detail/:booking_id?",CheckAuth,AdminController.get_order_detail)
 
+router.get("/get_all_driver/:searchStr?/:start?/:limit?",CheckAuth,AdminController.get_all_driver)
+router.get("/get_driver_detail/:user_id?",CheckAuth,AdminController.get_driver_detail)
 
 
 /*dry cleaning*/
