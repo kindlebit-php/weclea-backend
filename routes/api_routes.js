@@ -17,6 +17,9 @@ import { qr_slip } from "../helpers/qr_slip.js";
 
 router.post('/customer-register',userController.customer_register);
 router.post('/newsletter',userController.newsletter);
+router.post('/register-employee',userController.register_employee);
+router.post('/update-employee',userController.update_employee);
+router.post('/update-user-status',userController.update_user_status);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
 router.get('/user-registered-address',CheckAuth ,userController.user_registered_address);
 router.get('/get-notification',CheckAuth ,userController.get_notification);
@@ -34,6 +37,8 @@ router.post('/get-user-home-data',CheckAuth ,loadController.get_user_home_data);
 router.get('/get-user-subscription',CheckAuth ,loadController.get_user_subscription);
 router.post('/customer-loads-subscription',CheckAuth ,loadController.customer_loads_subscription);
 router.post('/customer-booking',CheckAuth ,bookingController.customer_booking);
+router.post('/assign-driver' ,bookingController.assign_driver);
+router.post('/assign-folder' ,bookingController.assign_folder);
 router.post('/delete-booking-date',CheckAuth ,bookingController.delete_booking_date);
 router.get('/user-subscription-dates',CheckAuth ,bookingController.subscription_dates);
 router.get('/booking-tracking-status',CheckAuth ,bookingController.booking_tracking_status);
@@ -116,6 +121,8 @@ router.get("/get_package_details/:id?",CheckAuth,AdminController.get_package_det
 router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
 router.post("/update_faq_index",CheckAuth,AdminController.update_faq_index)
+router.get("/get_all_order/:type?/:searchStr?/:start?/:limit?",AdminController.get_all_order)
+
 
 
 /*dry cleaning*/

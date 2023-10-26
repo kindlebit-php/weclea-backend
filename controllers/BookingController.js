@@ -470,6 +470,43 @@ export const booking_tracking_status = async(req,res)=>{
     }
 
 }
+
+export const assign_driver = async(req,res)=>{
+     try {
+        const {booking_id,driver_id} = req.body;
+        if(booking_id  && driver_id ){
+                var sql = "update bookings set driver_id = '"+driver_id+"' where id = '"+booking_id+"'";
+                dbConnection.query(sql, function (error, result) {
+                if (error) throw error;
+                    res.json({'status':true,"message":"Employee profile has been updated!"});
+                }); 
+        }else{
+            res.json({'status':false,"message":"All fields are required"});
+        }
+      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+export const assign_folder = async(req,res)=>{
+     try {
+        const {booking_id,folder_id} = req.body;
+        if(booking_id  && folder_id ){
+                var sql = "update bookings set folder_id = '"+folder_id+"' where id = '"+booking_id+"'";
+                dbConnection.query(sql, function (error, result) {
+                if (error) throw error;
+                    res.json({'status':true,"message":"Employee profile has been updated!"});
+                }); 
+        }else{
+            res.json({'status':false,"message":"All fields are required"});
+        }
+      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
 export const booking_pickup_instruction = async(req,res)=>{
 
         try { 
@@ -518,5 +555,7 @@ export default {
     subscription_dates,
     booking_tracking_status,
     booking_pickup_instruction,
-    booking_delievery_instruction
+    booking_delievery_instruction,
+    assign_driver,
+    assign_folder
 }

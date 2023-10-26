@@ -627,6 +627,59 @@ export const update_faq_index = async(req,res)=>{
 }
 /********* End FAQ API ************/
 
+/********* Order listing************/
+export const get_all_order = async(req,res)=>{
+	var reqData= req.params
+	try { 
+		var LimitNum = 25
+        var startNum = 0;
+        var currentPage=25;
+        if(reqData.start == '' || reqData.limit == ''){
+              startNum = 0;
+              LimitNum = 25;
+        }else{
+             //parse int Convert String to number 
+              startNum = parseInt(reqData.start);
+              LimitNum = parseInt(reqData.limit); 
+              currentPage=currentPage+startNum;
+        }
+        var query=""
+        var queryType=""
+		if (reqData.searchStr  && reqData.searchStr!='all') {
+		  query=" and ( users.name like '%"+reqData.searchStr+"%' or users.email like '%"+reqData.searchStr+"%') ";          
+		}
+		if (reqData.type  && reqData.type!='9') {
+		  	queryType=" and bookings.order_status like '%"+reqData.type+"%' ";          
+		}
+        dbConnection.query("SELECT bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,users.profile_image customer_pic FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1 "+queryType+" "+query+" order by order_id desc", (error, rows) => {
+            if (error) {
+                reject(error);
+            } else {
+
+                if (rows.length>0) {
+                    var totalRecords=rows.length
+                    if (totalRecords>currentPage) {
+                        totalRecords=true;
+                    }else{
+                        totalRecords=false;
+                    }
+                }else{
+                    var totalRecords=false;
+                }
+				const loads = "SELECT bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,users.profile_image customer_pic FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1   "+queryType+" "+query+" limit ? offset ?";
+				dbConnection.query(loads,[LimitNum,startNum],function (error, rows) {
+				if (error) throw error;
+					res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});
+				});
+			}
+		});		
+
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+/*******************/
 export default {
 	get_page_content,
 	get_faq_content,
@@ -647,5 +700,6 @@ export default {
 	update_service_status,
 	delete_service,
 	get_drycleaning_itemlist,
-	update_faq_index
+	update_faq_index,
+	get_all_order
 }
