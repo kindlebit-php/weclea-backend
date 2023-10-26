@@ -552,9 +552,25 @@ export const create_faq = async(req,res)=>{
     }
 }
 export const delete_faq = async(req,res)=>{
-	const reqData = req.body;
+	var reqData = req.body;
+	reqData = reqData.id;
     try { 
-    	const qrySelect = "select id from wc_faq where id=?";
+    	if (reqData.length>0) {
+	    	for (var i = 0; i < reqData.length; i++) {
+				var updateContnetQry = "delete from wc_faq where id=? ";
+				var k=0
+				dbConnection.query(updateContnetQry,[reqData[i].id], function (error, data) {
+				if (error) throw error;
+					if (k>=reqData.length-1) {
+						res.json({'status':true,"message":"FAQ has been deleted successfully",'data':data});
+					}
+					k++;
+				});	
+	    	}
+    	}else{
+			res.json({'status':false,"message":"Record not found"});
+		}
+    	/*const qrySelect = "select id from wc_faq where id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
@@ -566,7 +582,7 @@ export const delete_faq = async(req,res)=>{
 			}else{
 				res.json({'status':false,"message":"Record not found"});
 			}
-		});
+		});*/
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
@@ -579,8 +595,8 @@ export const update_faq_index = async(req,res)=>{
   	console.log('update_faq_index',position);
     try { 
     	for (var i = 0; i < position.length; i++) {
-    		console.log("update wc_faq set index_id='"+position[i]['index_id']+"' where id = "+position[i]['id']+" ");
-    		var updateContnetQry = "update wc_faq set index_id='"+position[i]['index_id']+"' where id = '"+position[i]['id']+"' ";
+    		console.log("update wc_faq set index_id='"+i+"' where id = "+position[i]['id']+" ");
+    		var updateContnetQry = "update wc_faq set index_id="+i+" where id = "+position[i]['id']+" ";
     		var k=0;
     		dbConnection.query(updateContnetQry, function (error, data) {
 				if (error) throw error;

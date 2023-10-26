@@ -5,7 +5,7 @@ import transport from "../helpers/mail.js";
 import dotenv from "dotenv";
 dotenv.config();
 import Stripe from "stripe";
-import Path from 'path'
+import path from "path";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
@@ -524,62 +524,266 @@ export const  user_registered_address = async(req,res)=>{
 export const order_list = async (req, res) => {
 	try {
 	  const list =
-		"SELECT b.order_id, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_Status, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b JOIN customer_drop_address AS cda ON b.user_id = cda.user_id JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE cron_status = 1";
-	  dbConnection.query(list, function (error, data) {
-		if (error) {
-		  return res.json({ status: false, message: error.message });
-		}
-  
-		data.forEach((item) => {
-		  if (item.delievery_day === 0) {
-			item.delievery_day = "same_day";
-		  } else if (item.delievery_day === 1) {
-			item.delievery_day = "next_day";
-		  }
-  
-		  if (item.status === 0) {
-			item.status = "inactive";
-		  } else if (item.status === 1) {
-			item.status = "active";
-		  }
-  
-		  if (item.order_status === 0) {
-			item.order_status = "blank_order";
-		  } else if (item.order_status === 1) {
-			item.order_status = "wash";
-		  } else if (item.order_status === 2) {
-			item.order_status = "dry";
-		  } else if (item.order_status === 3) {
-			item.order_status = "fold";
-		  } else if (item.order_status === 4) {
-			item.order_status = "pack";
-		  } else if (item.order_status === 5) {
-			item.order_status = "way-to-drop";
-		  } else if (item.order_status === 6) {
-			item.order_status = "completed";
-		  } else if (item.order_status === 7) {
-			item.order_status = "not_found";
-		  } else if (item.order_status === 8) {
-			item.order_status = "pickup";
-		  }
-  
-		  if (item.order_type === 1) {
-			item.order_type = "one time";
-		  } else if (item.order_type === 2) {
-			item.order_type = "subscription";
-		  } else if (item.order_type === 3) {
-			item.order_type = "dry_clean";
-		  }
-  
-		  if (item.delievery_instruction) {
-			item.delievery_instruction = 1;
+		"SELECT b.id, b.order_id, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_Status, b.order_Status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b JOIN customer_drop_address AS cda ON b.user_id = cda.user_id JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE cron_status = 1 ";
+	  
+	  const data = await new Promise((resolve, reject) => {
+		dbConnection.query(list, (error, data) => {
+		  if (error) {reject(error);
 		  } else {
-			item.delievery_instruction = 0;
+			resolve(data);
 		  }
 		});
-  
-		res.json({ status: true, message: "List retrieved successfully", data });
 	  });
+  
+	  const driverData = [];
+	  const imagesData = [];
+  
+	  for (const item of data) {
+		if (item.Nearby_driver) {
+		  const driver_list = `SELECT id, name, SQRT(POW(69.1 * (30.7320 - latitude), 2) + POW(69.1 * ((longitude - 76.7726) * COS(30.7320 / 57.3)), 2)) AS distance FROM users   WHERE role = 2 ORDER BY distance ASC`;
+  
+		  const driverResults = await new Promise((resolve, reject) => {
+			dbConnection.query(driver_list, (error, Data) => {
+			  if (error) {
+				reject(error);
+			  } else {
+				resolve(Data);
+			  }
+			});
+		  });
+  
+		  driverData.push(driverResults);
+		  item.Nearby_driver = driverResults;
+		}
+  
+		if (item.delievery_day === 0) {
+		  item.delievery_day = "same_day";
+		} else if (item.delievery_day === 1) {
+		  item.delievery_day = "next_day";
+		}
+  
+		if (item.status === 0) {
+		  item.status = "inactive";
+		} else if (item.status === 1) {
+		  item.status = "active";
+		}
+  
+		
+  
+		if (item.order_Status === 1) {
+		  item.order_Status = "wash";
+		} else if (item.order_Status === 2) {
+		  item.order_Status = "dry";
+		} else if (item.order_Status === 3) {
+		  item.order_Status = "fold";
+		} else if (item.order_Status === 4) {
+		  item.order_Status = "pack";
+		} else if (item.order_Status === 5) {
+		  item.order_Status = "way-to-drop";
+		} else if (item.order_Status === 6) {
+		  item.order_Status = "completed";
+		} else if (item.order_Status === 7) {
+		  item.order_Status = "not_found";
+		} else if (item.order_Status === 8) {
+		  item.order_Status = "pickup";
+		} else {
+		  item.order_Status = "blank_images";
+		}
+		const imagesQuery= `SELECT pickup_images,wash_images,dry_images,fold_images,pack_images,drop_image,extra_load_images FROM booking_images AS bi JOIN bookings AS b ON bi.booking_id = b.id WHERE b.id = ${item.id} `
+		if (item.order_images === 1) {
+			const imagesResults = await new Promise((resolve, reject) => {
+			  dbConnection.query(imagesQuery, (error, Data) => {
+				if (error) {
+				  reject(error);
+				} else {
+				  const separatedStrings = Data[0].wash_images.split(", ");
+				  const imageList = [];
+		  
+				  separatedStrings.forEach(val => {
+					const subImages = val.split(',').map(subVal => {
+					  return `${process.env.BASE_URL}/${subVal.trim()}`;
+					});
+					const subImageObjects = subImages.map(subImagePath => ({
+					  path: subImagePath,
+					  type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					}));
+		  
+					imageList.push(subImageObjects);
+				  });
+				  const flattenedImageList = [].concat(...imageList);
+		  
+				  resolve(flattenedImageList);
+				}
+			  });
+			});
+		  
+			imagesData.push(imagesResults);
+			item.order_images = imagesResults;
+		  } else if (item.order_images === 2) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const separatedStrings = Data[0].dry_images.split(", ");
+					const imageList = [];
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.BASE_URL}/${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		} else if (item.order_images === 3) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const separatedStrings = Data[0].fold_images.split(", ");
+					const imageList = [];
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.BASE_URL}/${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		} else if (item.order_images === 4) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const separatedStrings = Data[0].pack_images.split(", ");
+					const imageList = [];
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.BASE_URL}/${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		} else if (item.order_images === 6) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const separatedStrings = Data[0].drop_image.split(", ");
+					const imageList = [];
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.BASE_URL}/${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		}else if (item.order_images === 8) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const separatedStrings = Data[0].pickup_images.split(", ");
+					const imageList = [];
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.BASE_URL}/${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		} else {
+		  item.order_images = "No_images";
+		}
+  
+		if (item.order_type === 1) {
+		  item.order_type = "one time";
+		} else if (item.order_type === 2) {
+		  item.order_type = "subscription";
+		} else if (item.order_type === 3) {
+		  item.order_type = "dry_clean";
+		}
+  
+		if (item.delievery_instruction) {
+		  item.delievery_instruction = 1;
+		} else {
+		  item.delievery_instruction = 0;
+		}
+	  }
+  
+	  res.json({ status: true, message: "List retrieved successfully", data });
 	} catch (error) {
 	  res.json({ status: false, message: error.message });
 	}
