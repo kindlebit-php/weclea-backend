@@ -121,6 +121,8 @@ router.get("/get_package_details/:id?",CheckAuth,AdminController.get_package_det
 router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
 router.post("/update_faq_index",CheckAuth,AdminController.update_faq_index)
+router.get("/get_all_order/:type?/:searchStr?/:start?/:limit?",CheckAuth,AdminController.get_all_order)
+
 
 
 /*dry cleaning*/
