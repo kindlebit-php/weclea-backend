@@ -2,6 +2,8 @@ import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
 import dateFormatFinalDate from 'date-and-time';
 import { getDates,randomNumber } from "../helpers/date.js";
+import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
+
 //customer booking API
 
 export const customer_booking = async(req,res)=>{
@@ -44,7 +46,7 @@ export const customer_booking = async(req,res)=>{
                         var driver_id = 1
                     }
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+category_id+"',1)";
-                    dbConnection.query(sql, function (err, result) {
+                    dbConnection.query(sql, async function (err, result) {
                     var updateLoads = (results[0].total_loads - total_loads);
                     if(category_id == 1){
                         var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
@@ -63,8 +65,27 @@ export const customer_booking = async(req,res)=>{
                         for (var i = 0; total_loads > i; i++) {
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
                         dbConnection.query(sql, function (err, results) {
+                           // console.log(results,"qrresults")
+                           if(results){
+                            var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
+                           dbConnection.query(sql2, async function (err, result1) {
+                            const qr_codes = result1.map((row) => row.qr_code);
+                                const getAll_qrCode= await generateQRCode(qr_codes)
+                                const userData1 = await getUserData (result.insertId);
+                                const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                                const match = pdfBytes.match(/uploads\\(.+)/);
+                                const newPath = 'uploads//' +match[1];
+  
+
+                                const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                dbConnection.query(updatePdf, async function (err, result2) {
+                                    console.log(result2)
+                                })
+                        });
+                           }
                         });     
                         }
+                        
                         var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+result.insertId+"')";
                         dbConnection.query(bookingsql, function (err, bookingresult) {                        
                         });
@@ -133,6 +154,7 @@ export const customer_booking = async(req,res)=>{
                         const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
 
                         if(frequencyDBDate == currentBookingDate ){
+                           
                             const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
                             dbConnection.query(custmer_address, function (error, custmeraddressResult) {
                             var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
@@ -149,6 +171,25 @@ export const customer_booking = async(req,res)=>{
                                 for (var i = 0; total_loads > i; i++) {
                                     var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
                                     dbConnection.query(sql, function (err, results) {
+                                        if(results){
+                                            var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
+                                           dbConnection.query(sql2, async function (err, result1) {
+                                            const qr_codes = result1.map((row) => row.qr_code);
+                                                const getAll_qrCode= await generateQRCode(qr_codes)
+                                                console.log(getAll_qrCode)
+                                                const userData1 = await getUserData (result.insertId);
+                                                const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                                                const match = pdfBytes.match(/uploads\\(.+)/);
+                                                const newPath = 'uploads//' +match[1];
+                                                
+                  
+                
+                                                const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                                dbConnection.query(updatePdf, async function (err, result2) {
+                                                    console.log(result2)
+                                                })
+                                        });
+                                           }
                                     });     
                                 }
                                 var updateLoads = (resultss[0].total_loads - total_loads);
@@ -245,6 +286,23 @@ export const customer_booking = async(req,res)=>{
                                 for (var i = 0; total_loads > i; i++) {
                                     var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
                                     dbConnection.query(sql, function (err, results) {
+                                        if(results){
+                                            var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
+                                           dbConnection.query(sql2, async function (err, result1) {
+                                            const qr_codes = result1.map((row) => row.qr_code);
+                                                const getAll_qrCode= await generateQRCode(qr_codes)
+                                                const userData1 = await getUserData (result.insertId);
+                                                const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                                                const match = pdfBytes.match(/uploads\\(.+)/);
+                                                const newPath = 'uploads//' +match[1];
+                  
+                
+                                                const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                                dbConnection.query(updatePdf, async function (err, result2) {
+                                                    console.log(result2)
+                                                })
+                                        });
+                                           }
                                     });     
                                 }
                                 var updateLoads = (resultss[0].total_loads - total_loads);
