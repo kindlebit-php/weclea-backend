@@ -429,6 +429,25 @@ export const edit_user_profile = async(req,res)=>{
     }
 }
 
+//update customer profile API
+export const update_user_status = async(req,res)=>{
+     try {
+        const {status,user_id} = req.body;
+        if(status  && user_id ){
+				var sql = "update users set status = '"+status+"' where id = '"+user_id+"'";
+				dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+					res.json({'status':true,"message":"Employee profile has been updated!"});
+				}); 
+		}else{
+            res.json({'status':false,"message":"All fields are required"});
+		}
+      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
 //update user profile API
 export const register_employee = async(req,res)=>{
      try {
@@ -792,7 +811,7 @@ export const order_list = async (req, res) => {
 
 export const driver_list = async (req, res) => {
 	try {
-	  const list = "SELECT name, email, mobile,status FROM users WHERE role = 2";
+	  const list = "SELECT id, name, email, mobile,status,address FROM users WHERE role = 2";
 	  dbConnection.query(list, function (error, data) {
 		if (error) throw error;
 		res.json({status: true, message: "List retrived succesfully", data: data});           
@@ -804,7 +823,7 @@ export const driver_list = async (req, res) => {
 
   export const folder_list = async (req, res) => {
 	try {
-	  const list = "SELECT name, email, mobile,status FROM users WHERE role = 3";
+	  const list = "SELECT id,name, email, mobile,status,address FROM users WHERE role = 3";
 	  dbConnection.query(list, function (error, data) {
 		if (error) throw error;
 		res.json({status: true, message: "List retrived succesfully", data: data});           
@@ -890,5 +909,6 @@ export default {
 	folder_list,
 	order_list,
 	register_employee,
-	update_employee
+	update_employee,
+	update_user_status
 }
