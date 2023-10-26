@@ -433,7 +433,7 @@ export const edit_user_profile = async(req,res)=>{
 export const update_user_status = async(req,res)=>{
      try {
         const {status,user_id} = req.body;
-        if(status  && user_id ){
+        if(status && user_id ){
 				var sql = "update users set status = '"+status+"' where id = '"+user_id+"'";
 				dbConnection.query(sql, function (error, result) {
 				if (error) throw error;

@@ -416,7 +416,7 @@ export const booking_tracking_status = async(req,res)=>{
 export const assign_driver = async(req,res)=>{
      try {
         const {booking_id,driver_id} = req.body;
-        if(status  && user_id ){
+        if(booking_id  && driver_id ){
                 var sql = "update bookings set driver_id = '"+driver_id+"' where id = '"+booking_id+"'";
                 dbConnection.query(sql, function (error, result) {
                 if (error) throw error;
@@ -434,7 +434,7 @@ export const assign_driver = async(req,res)=>{
 export const assign_folder = async(req,res)=>{
      try {
         const {booking_id,folder_id} = req.body;
-        if(status  && user_id ){
+        if(booking_id  && folder_id ){
                 var sql = "update bookings set folder_id = '"+folder_id+"' where id = '"+booking_id+"'";
                 dbConnection.query(sql, function (error, result) {
                 if (error) throw error;

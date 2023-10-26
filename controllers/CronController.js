@@ -46,7 +46,6 @@ export const booking_subscription_cron = async(req,res)=>{
                     }else{
                         var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+elem.user_id+"' ";
                     }
-                    console.log('usrLoadsup',usrLoadsup)
                     dbConnection.query(usrLoadsup, function (error, result) {
                     })
 
