@@ -667,9 +667,9 @@ export const get_all_order = async(req,res)=>{
                     var totalRecords=false;
                 }
 				const loads = "SELECT bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,users.profile_image customer_pic FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1   "+queryType+" "+query+" limit ? offset ?";
-				dbConnection.query(loads,[LimitNum,startNum],function (error, data) {
+				dbConnection.query(loads,[LimitNum,startNum],function (error, rows) {
 				if (error) throw error;
-					res.json({'status':true,"message":"Success",'data':{totalRecords,data}});
+					res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});
 				});
 			}
 		});		
