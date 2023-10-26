@@ -871,16 +871,15 @@ export const customer_extra_payment = async (req, res) => {
           message: "Your card security code is invalid",
         });
       }
-      console.log(date1)
       const currentBookingDate = dateFormat.format(new Date(date1), 'YYYY-MM-DD');
 
       const order = `SELECT count(id) FROM bookings WHERE user_id = ${userData[0].id} AND date = '${currentBookingDate}'`; 
-      dbConnection.query(order, function (error, datas) {
+      dbConnection.query(order, async function (error, datas) {
         
         if (datas[0]['count(id)'] > 0) {
           return res.json({ status: false, message: "This date is already booked" });
         }
-      });
+      
       // Create a token
       const createCard = await stripes.tokens.create({
         card: {
@@ -930,6 +929,7 @@ export const customer_extra_payment = async (req, res) => {
           }
         );
 
+
         // Update Customer
         await stripe.customers.update(customerId, {
           invoice_settings: {
@@ -973,6 +973,7 @@ export const customer_extra_payment = async (req, res) => {
           return res.json({ status: false, message: 'Payment failed' });
         }
       }
+    });
     } else {
       return res.json({ status: false, message: "All fields are required" });
     }
@@ -990,16 +991,14 @@ export const customer_extra_payment_cardId = async (req, res) => {
     const { cardId, amount,date1 } = req.body;
 
 
-    console.log(date1)
-    const currentBookingDate = dateFormat.format(date1,'YYYY-MM-DD');
-    console.log(currentBookingDate)
+    const currentBookingDate = dateFormat.format(new Date(date1), 'YYYY-MM-DD');
 
-    const order = `SELECT count(id) FROM bookings WHERE user_id = ${userData[0].id} AND date = '${currentBookingDate}'`; 
-    dbConnection.query(order, function (error, datas) {
-      if (datas[0].count == 0) {
-        return res.json({ status: false, message: "This date is already booked" });
-      }
-    });
+      const order = `SELECT count(id) FROM bookings WHERE user_id = ${userData[0].id} AND date = '${currentBookingDate}'`; 
+      dbConnection.query(order, async function (error, datas) {
+        
+        if (datas[0]['count(id)'] > 0) {
+          return res.json({ status: false, message: "This date is already booked" });
+        }
     const paymentIntent = await stripe.paymentIntents.create({
       amount: amount * 100,
       currency: 'usd',
@@ -1022,6 +1021,7 @@ export const customer_extra_payment_cardId = async (req, res) => {
     } else {
       return res.json({ status: false, message: 'Payment failed' });
     }
+  })
   } catch (error) {
     return res.json({ status: false, message: error.message });
   }
