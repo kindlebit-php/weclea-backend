@@ -84,6 +84,7 @@ router.get("/profile",CheckAuth,driverController.profile)
 
 //**********************************************************************************//
 router.get("/booking-subscription-cron",cronController.booking_subscription_cron);
+router.get("/booking-load-alert",cronController.booking_load_alert);
 //*********************************PAYMENT******************************************//
 router.post("/attach-card",CheckAuth,paymentController.Attach_Card);
 router.get("/get-all-cards",CheckAuth,paymentController.get_all_cards);

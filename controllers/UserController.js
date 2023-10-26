@@ -811,7 +811,7 @@ export const order_list = async (req, res) => {
 
 export const driver_list = async (req, res) => {
 	try {
-	  const list = "SELECT id, name, email, mobile,status,address FROM users WHERE role = 2";
+	  const list = "SELECT id, name, email, mobile,status,address,latitude,longitude FROM users WHERE role = 2";
 	  dbConnection.query(list, function (error, data) {
 		if (error) throw error;
 		res.json({status: true, message: "List retrived succesfully", data: data});           
@@ -823,7 +823,7 @@ export const driver_list = async (req, res) => {
 
   export const folder_list = async (req, res) => {
 	try {
-	  const list = "SELECT id,name, email, mobile,status,address FROM users WHERE role = 3";
+	  const list = "SELECT id,name, email, mobile,status,address,latitude,longitude FROM users WHERE role = 3";
 	  dbConnection.query(list, function (error, data) {
 		if (error) throw error;
 		res.json({status: true, message: "List retrived succesfully", data: data});           
