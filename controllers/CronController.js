@@ -32,6 +32,23 @@ export const booking_subscription_cron = async(req,res)=>{
                             for (var i = 0; elem.total_loads > i; i++) {
                                 var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+elem.id+"','"+randomNumber(elem.id)+"')";
                                 dbConnection.query(sql, function (err, results) {
+                                    if(results){
+                                        var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
+                                       dbConnection.query(sql2, async function (err, result1) {
+                                        const qr_codes = result1.map((row) => row.qr_code);
+                                            const getAll_qrCode= await generateQRCode(qr_codes)
+                                            const userData1 = await getUserData (result.insertId);
+                                            const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                                            const match = pdfBytes.match(/uploads\\(.+)/);
+                                            const newPath = 'uploads//' +match[1];
+              
+            
+                                            const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                            dbConnection.query(updatePdf, async function (err, result2) {
+                                                console.log(result2)
+                                            })
+                                    });
+                                       }
                                 });     
                             }
 

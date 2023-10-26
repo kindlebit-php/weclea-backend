@@ -31,7 +31,7 @@ export const qr_slip = async (req, res) => {
   };
 
 
-async function getUserData(booking_id) {
+export const getUserData=async(booking_id)=>{
   return new Promise((resolve, reject) => {
     const userIdQuery = `SELECT user_id, order_status FROM bookings WHERE id = ?`;
     dbConnection.query(userIdQuery, [booking_id], (error, data) => {
@@ -41,12 +41,11 @@ async function getUserData(booking_id) {
       if (data && data.length > 0) {
         const userId = data[0].user_id;
         const query = `
-          SELECT bq.qr_code AS QR_code, b.order_id, b.date,
+          SELECT  b.order_id, b.date,
           CONCAT(ca.address, ', ', ca.appartment, ', ', ca.city, ', ', ca.state, ', ', ca.zip) AS address
           FROM bookings AS b
           JOIN customer_address AS ca ON b.user_id = ca.user_id
           JOIN users AS u ON b.user_id = u.id
-          JOIN booking_qr AS bq ON b.id = bq.booking_id
           WHERE b.user_id = ? AND b.id = ? `;
         
         dbConnection.query(query, [userId, booking_id], (error, data2) => {
@@ -64,7 +63,7 @@ async function getUserData(booking_id) {
   });
 }
 
-async function generatePDF(data, qrCode) {
+export const generatePDF= async(data, qrCode)=> {
     const order_id=data.order_id;
     const date=data.date;
     const address=data.address;
@@ -140,7 +139,8 @@ async function generatePDF(data, qrCode) {
 }
 
 
-async function generateQRCode(qr_code) {
+export const generateQRCode= async(qr_code)=>
+{
   return new Promise((resolve, reject) => {
     qrcode.toDataURL(qr_code, (err, qrCode) => {
       if (err) {
