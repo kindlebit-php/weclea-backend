@@ -392,7 +392,7 @@ export const update_password = async(req,res)=>{
 
 }
 
-//get user profile API
+//update customer profile API
 export const edit_user_profile = async(req,res)=>{
      try { 
         const userData = res.user;
@@ -420,6 +420,50 @@ export const edit_user_profile = async(req,res)=>{
 				
 				
 		
+		}else{
+            res.json({'status':false,"message":"All fields are required"});
+		}
+      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+//update user profile API
+export const register_employee = async(req,res)=>{
+     try {
+     	const saltRounds = 10;
+        const {name,email,password,latitude,longitude,role,address,mobile} = req.body;
+        if(name  && email && password && latitude && mobile && longitude && role && address){		
+		bcrypt.hash(password, saltRounds, function(error, hash) {
+		var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,address) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+address+"')";
+		dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+					res.json({'status':true,"message":"registered successfully!"});
+				}); 
+		});		
+		}else{
+            res.json({'status':false,"message":"All fields are required"});
+		}
+      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+//update user profile API
+export const update_employee = async(req,res)=>{
+     try {
+     	const saltRounds = 10;
+        const {name,email,password,latitude,longitude,role,address,mobile} = req.body;
+        if(name  && email && password && latitude && mobile && longitude && role && address){		
+		bcrypt.hash(password, saltRounds, function(error, hash) {
+		var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,address) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+address+"')";
+		dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+					res.json({'status':true,"message":"registered successfully!"});
+				}); 
+		});		
 		}else{
             res.json({'status':false,"message":"All fields are required"});
 		}
@@ -640,5 +684,7 @@ export default {
 	driver_list,
 	customer_list,
 	folder_list,
-	order_list
+	order_list,
+	register_employee,
+	update_employee
 }

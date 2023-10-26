@@ -17,6 +17,8 @@ import { qr_slip } from "../helpers/qr_slip.js";
 
 router.post('/customer-register',userController.customer_register);
 router.post('/newsletter',userController.newsletter);
+router.post('/register-employee',userController.register_employee);
+router.post('/update-employee',userController.update_employee);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
 router.get('/user-registered-address',CheckAuth ,userController.user_registered_address);
 router.get('/get-notification',CheckAuth ,userController.get_notification);
