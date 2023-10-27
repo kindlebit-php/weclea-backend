@@ -1,7 +1,13 @@
 import dbConnection from "../../config/db.js";
-import { date, time } from "../../helpers/date.js";
+import { date, randomNumber, time } from "../../helpers/date.js";
 import path from "path";
 import { fcm_notification } from "../../helpers/fcm.js";
+import { generatePDF, generateQRCode, getUserData } from "../../helpers/qr_slip.js";
+
+import Stripe from "stripe";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripes = new Stripe(process.env.STRIPE_PUBLISH_KEY);
+
 export const Scan_received_loads = (req, res) => {
   const userData = res.user;
   const folder_id = userData[0].id;
@@ -230,7 +236,16 @@ export const submit_wash_detail = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
-
+      const customerId_Query = "SELECT customer_id FROM users WHERE id = ?";
+      dbConnection.query(customerId_Query, [data[0].user_id], function (error, data1) {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+        const loadPrice_query = "SELECT loads_price FROM settings WHERE id = 1";
+        dbConnection.query(loadPrice_query, function (error, data2) {
+          if (error) {
+            return res.json({ status: false, message: error.message });
+          }
       let updateDateTimeQuery;
       let updatePickupImagesQuery;
       let updateOrderStatusQuery;
@@ -252,7 +267,7 @@ export const submit_wash_detail = async (req, res) => {
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         if(extra_loads !=''){
-          var booking = "select user_id,category_id from bookings whrer id = '"+booking_id+"'";
+          var booking = "select user_id,category_id from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
             if(bookingdata[0].category_id == 1){
               var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
@@ -275,19 +290,20 @@ export const submit_wash_detail = async (req, res) => {
                       })
 
                       for (var i = 0; extra_loads > i; i++) {
-                        var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+booking_id+"','"+randomNumber(result.insertId)+"')";
+                        var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"')";
                         dbConnection.query(sql, function (err, results) {
                           if(results){
                             var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
                             dbConnection.query(sql2, async function (err, result1) {
                               const qr_codes = result1.map((row) => row.qr_code);
                               const getAll_qrCode= await generateQRCode(qr_codes)
-                              const userData1 = await getUserData (booking_id);
+                              const userData1 = await getUserData(booking_id);
                               const pdfBytes = await generatePDF(userData1, getAll_qrCode);
                               const match = pdfBytes.match(/uploads\\(.+)/);
                               const newPath = 'uploads//' +match[1];
                               const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
                               dbConnection.query(updatePdf, async function (err, result2) {
+                               
                               })
                             });
                           }
@@ -295,9 +311,71 @@ export const submit_wash_detail = async (req, res) => {
                       }
                     }else{
                       const users = "select card_status from users where id = '"+bookingdata[0].user_id+"'"
-                      dbConnection.query(users, function (error, usersresult) {
+                      dbConnection.query(users,async function (error, usersresult) {
                         if(usersresult[0].card_status == 1){
+                         const customerId=data1[0].customer_id;
+                         const paymentMethods = await stripe.paymentMethods.list({
+                          customer: customerId,
+                          type: "card",
+                        });
+                        const cards = paymentMethods.data.map((paymentMethod) => ({
+                          cardId: paymentMethod.id,
+                          brand: paymentMethod.card.brand,
+                          last4: paymentMethod.card.last4,
+                        }));
+                         const amount=data2[0].loads_price * extra_loads;
+                          const paymentIntent = await stripe.paymentIntents.create({
+                            amount: amount * 100,
+                            currency: 'usd',
+                            customer: customerId,
+                            payment_method: cards[0].cardId,
+                            off_session: true,
+                            confirm: true,
+                            description: 'Payment by client',
+                          });
+                         
+                          if (paymentIntent.status === 'succeeded') {
+                            const currentDate = date(); 
+                            const sql = `INSERT INTO payment (user_id,booking_id, amount, payment_id, date) VALUES ('${
+                              data[0].user_id}', '${booking_id}', '${amount}', '${paymentIntent.id}', '${currentDate}')`;
 
+                            dbConnection.query(sql, function (error, result) {
+                            if (error) {
+                               return res.json({ status: false, message: error.message });
+                                 }
+                                //  return res.json({ status: true, message: 'Payment successful' });
+                                  });
+                          }else{
+                            var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
+                          if(bookingdata[0].category_id == 1){
+                          var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
+                          }else if(bookingdata[0].category_id == 2){
+                          var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
+                          }else{
+                          var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"' ";
+                          }
+                          dbConnection.query(usrLoadsup, function (error, result) {
+                          })
+                        for (var i = 0; extra_loads > i; i++) {
+                            var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"')";
+                            dbConnection.query(sql, function (err, results) {
+                              if(results){
+                                var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
+                                dbConnection.query(sql2, async function (err, result1) {
+                                  const qr_codes = result1.map((row) => row.qr_code);
+                                  const getAll_qrCode= await generateQRCode(qr_codes)
+                                  const userData1 = await getUserData (booking_id);
+                                  const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                                  const match = pdfBytes.match(/uploads\\(.+)/);
+                                  const newPath = 'uploads//' +match[1];
+                                  const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                  dbConnection.query(updatePdf, async function (err, result2) {
+                                  })
+                                });
+                              }
+                            });     
+                        }
+                          }
 
                           //payment deduct if card exist
 
@@ -313,7 +391,7 @@ export const submit_wash_detail = async (req, res) => {
                           dbConnection.query(usrLoadsup, function (error, result) {
                           })
                         for (var i = 0; extra_loads > i; i++) {
-                            var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+booking_id+"','"+randomNumber(result.insertId)+"')";
+                            var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"')";
                             dbConnection.query(sql, function (err, results) {
                               if(results){
                                 var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
@@ -370,6 +448,7 @@ export const submit_wash_detail = async (req, res) => {
               1: "Wash process is completed! Please go to the next step",
               2: "Dry process is completed! Please go to the next step",
               3: "Fold process is completed! Please go to the next step",
+              4: "Pack process is completed order is ready to pickup"
             };
 
             const responseData = {
@@ -381,22 +460,27 @@ export const submit_wash_detail = async (req, res) => {
               1: "loads Washed",
               2: "loads Dry",
               3: "loads fold",
+              4: "loads Pack"
             }
             const body={
               1: "Wash process is completed!",
               2: "Dry process is completed! ",
               3: "Fold process is completed! ",
+              4: "Pack process is completed! "
             };
             const fold_type={
               1: "Wash",
               2: "Dry",
               3: "Fold",
+              4: "Pack",
             };
             fcm_notification(title[type], body[type], data[0].user_id, fold_type[type])
             return res.json(responseData);
           });
         });
       });
+    });
+    });
     });
   } catch (error) {
     res.json({ status: false, message: error.message });
@@ -411,7 +495,6 @@ export const Scan_loads_For_Dry = (req, res) => {
   try {
     const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ?";
     dbConnection.query(verifyQr, [qr_code], function (error, data) {
-      console.log("retyyyouiygtik", data[0].folder_recive_status);
       if (error) {
         return res.json({ status: false, message: error.message });
       } else if (data[0].folder_recive_status == "1") {
