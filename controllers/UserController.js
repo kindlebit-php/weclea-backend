@@ -473,16 +473,34 @@ export const register_employee = async(req,res)=>{
 //update user profile API
 export const update_employee = async(req,res)=>{
      try {
-     	const saltRounds = 10;
-        const {name,email,password,latitude,longitude,role,address,mobile} = req.body;
-        if(name  && email && password && latitude && mobile && longitude && role && address){		
-		bcrypt.hash(password, saltRounds, function(error, hash) {
-		var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,address) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+address+"')";
+        const {id,name,email,latitude,longitude,address,mobile} = req.body;
+        if(name && id && email && latitude && mobile && longitude && address){
+
+	    var sql = "update users set name='"+name+"',email='"+email+"',latitude='"+latitude+"',longitude='"+longitude+"',mobile='"+mobile+"',address='"+address+"' where  id ='"+id+"'";
 		dbConnection.query(sql, function (error, result) {
 				if (error) throw error;
 					res.json({'status':true,"message":"updated successfully!"});
-				}); 
-		});		
+				}); 	
+		}else{
+            res.json({'status':false,"message":"All fields are required"});
+		}
+      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+
+//DELETE user profile API
+export const delete_employee = async(req,res)=>{
+     try {
+        const {id} = req.body;
+        if(id){
+        var sql = "delete from users where id = '"+id+"'";		
+		dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+					res.json({'status':true,"message":"deleted successfully!"});
+				}); 	
 		}else{
             res.json({'status':false,"message":"All fields are required"});
 		}
@@ -910,5 +928,6 @@ export default {
 	order_list,
 	register_employee,
 	update_employee,
+	delete_employee,
 	update_user_status
 }
