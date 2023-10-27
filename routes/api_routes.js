@@ -119,7 +119,7 @@ router.get("/get_all_order/:type?/:searchStr?/:start?/:limit?",CheckAuth,AdminCo
 router.get("/get_order_detail/:booking_id?",CheckAuth,AdminController.get_order_detail)
 
 router.get("/get_all_driver/:searchStr?/:start?/:limit?",AdminController.get_all_driver)
-router.get("/get_driver_detail/:user_id?",CheckAuth,AdminController.get_driver_detail)
+router.get("/get_driver_detail/:user_id?/:searchStr?/:start?/:limit?",CheckAuth,AdminController.get_driver_detail)
 
 
 /*dry cleaning*/

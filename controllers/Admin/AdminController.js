@@ -698,7 +698,7 @@ export const get_order_detail = async(req,res)=>{
 /********* Driver listing************/
 export const get_all_driver = async(req,res)=>{
 	var reqData= req.params;
-	console.log("get_all_driver",reqData)
+	//console.log("get_all_driver",reqData)
 	try { 
 		var LimitNum = 25
         var startNum = 0;
@@ -724,9 +724,6 @@ export const get_all_driver = async(req,res)=>{
             if (error) {
                 res.json({'status':false,"message":error.message}); 
             } else {
-            		console.log("get_all_driver rows",rows.length)
-
-
                 if (rows.length>0) {
                     var totalRecords=rows.length
                     if (totalRecords>currentPage) {
@@ -753,11 +750,44 @@ export const get_driver_detail = async(req,res)=>{
 	var reqData= req.params
 	if (reqData.user_id && reqData.user_id!='') {
 	    try { 
-	    	const loads = "SELECT * FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id WHERE users.role=2 and users.id=? ";
+	    	var LimitNum = 25
+	        var startNum = 0;
+	        var currentPage=25;
+	        if(reqData.start == '' || reqData.limit == ''){
+	              startNum = 0;
+	              LimitNum = 25;
+	        }else{
+	             //parse int Convert String to number 
+	              startNum = parseInt(reqData.start);
+	              LimitNum = parseInt(reqData.limit); 
+	              currentPage=currentPage+startNum;
+	        }
+	        var query=""
+			if (reqData.searchStr  && reqData.searchStr!='all') {
+			  query=" and ( bookings.id like '%"+reqData.searchStr+"%' or bookings.date like '%"+reqData.searchStr+"%') ";          
+			}
+	        const loads = "SELECT *  FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc";
 			dbConnection.query(loads,[reqData.user_id], function (error, data) {
-			if (error) throw error;
-				res.json({'status':true,"message":"Success",'data':data});
-			});
+				if (error) {
+	                res.json({'status':false,"message":error.message}); 
+	            } else {
+	                if (rows.length>0) {
+	                    var totalRecords=rows.length
+	                    if (totalRecords>currentPage) {
+	                        totalRecords=true;
+	                    }else{
+	                        totalRecords=false;
+	                    }
+	                }else{
+	                    var totalRecords=false;
+	                }
+			    	const loads = "SELECT *,(SELECT users.name FROM users WHERE id=bookings.user_id LIMIT 1) customer_name,(SELECT users.profile_image FROM users WHERE id=bookings.user_id LIMIT 1) customer_pic FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc limit ? offset ?";
+					dbConnection.query(loads,[reqData.user_id, LimitNum,startNum], function (error, rows) {
+					if (error) throw error;
+						res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});
+					});
+				}	
+			});	
 	    }catch (error) {
 	        res.json({'status':false,"message":error.message});  
 	    }
