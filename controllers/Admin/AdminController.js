@@ -653,7 +653,7 @@ export const get_all_order = async(req,res)=>{
 		}
         dbConnection.query("SELECT bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,users.profile_image customer_pic FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1 "+queryType+" "+query+" order by order_id desc", (error, rows) => {
             if (error) {
-                reject(error);
+                 res.json({'status':false,"message":error.message}); 
             } else {
 
                 if (rows.length>0) {
@@ -666,7 +666,7 @@ export const get_all_order = async(req,res)=>{
                 }else{
                     var totalRecords=false;
                 }
-				const loads = "SELECT bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,users.profile_image customer_pic FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1   "+queryType+" "+query+" limit ? offset ?";
+				const loads = "SELECT bookings.total_amount,bookings.id, bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,users.profile_image customer_pic FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1   "+queryType+" "+query+" limit ? offset ?";
 				dbConnection.query(loads,[LimitNum,startNum],function (error, rows) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});
@@ -682,10 +682,10 @@ export const get_order_detail = async(req,res)=>{
 	var reqData= req.params
 	if (reqData.booking_id && reqData.booking_id!='') {
 	    try { 
-	    	const loads = "SELECT * FROM `booking_timing` LEFT JOIN booking_images on booking_images.booking_id=booking_timing.booking_id WHERE booking_timing.booking_id=?";
+	    	const loads = "SELECT booking_timing.*,booking_images.*,bookings.order_id as main_order_id FROM bookings left join `booking_timing` on booking_timing.booking_id=bookings.id LEFT JOIN booking_images on booking_images.booking_id=booking_timing.booking_id WHERE booking_timing.booking_id=?";
 			dbConnection.query(loads,[reqData.booking_id], function (error, data) {
 			if (error) throw error;
-				res.json({'status':true,"message":"Success",'data':data});
+				res.json({'status':true,"message":"Success",'data':data[0]});
 			});
 	    }catch (error) {
 	        res.json({'status':false,"message":error.message});  
@@ -719,9 +719,9 @@ export const get_all_driver = async(req,res)=>{
 		// if (reqData.type  && reqData.type!='9') {
 		//   	queryType=" and users.order_status like '%"+reqData.type+"%' ";          
 		// }
-        dbConnection.query("SELECT * FROM `users` WHERE users.role=2 "+query+" order by order_id desc", (error, rows) => {
+        dbConnection.query("SELECT * FROM `users` WHERE users.role=2 "+query+" order by id desc", (error, rows) => {
             if (error) {
-                reject(error);
+                res.json({'status':false,"message":error.message}); 
             } else {
 
                 if (rows.length>0) {

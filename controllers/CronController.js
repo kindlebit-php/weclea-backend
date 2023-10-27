@@ -1,5 +1,6 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
+import transport from "../helpers/mail.js";
 import { getDates,randomNumber,setDateForNotification } from "../helpers/date.js";
 //customer booking API
 
@@ -101,14 +102,56 @@ export const booking_load_alert = async(req,res)=>{
             var frequencyDate = new Date(allDates[key]);
             const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
             // console.log('frequencyDBDate',frequencyDBDate)
-            const checkIfDateExist = "select * from bookings where date = '"+frequencyDBDate+"' and cron_status = 0";
+            const checkIfDateExist = "select * from bookings where date = '"+frequencyDBDate+"' and cron_status = 0 and order_type != 3";
+            // console.log('checkIfDateExist',checkIfDateExist)
             dbConnection.query(checkIfDateExist, function (error, checkIfresults) 
             {
+                // console.log('checkIfresults',checkIfresults)
                 checkIfresults.forEach(ele =>{
-                    const checkIfDateExist = "select * from bookings where date = '"+frequencyDBDate+"' and cron_status = 0";
-                        dbConnection.query(checkIfDateExist, function (error, checkIfresults){
+                    if(ele.category_id == 1){
+                    var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+ele.user_id+"'";
+                    }else if(ele.category_id == 2){
+                    var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+ele.user_id+"'";
+                    }else{
+                    var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+ele.user_id+"'";
+                    }
+                    dbConnection.query(userLoads, function (error, userLoadsresults){
+                        console.log('userLoadsresults',userLoadsresults)
+                        console.log('ele.loads',ele.total_loads)
+                        if(userLoadsresults[0].totalCount < ele.total_loads){
 
-                        })
+                            const user = "select name, email from users where id = '"+ele.user_id+"'";
+                            dbConnection.query(user, function (error, userresults) 
+                            {
+                                        const mailOptions = 
+                    {
+                    from: 'ankuchauhan68@gmail.com',
+                    to: userresults[0].email,
+                    subject: "Weclea Load Alert",
+                    html: `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+                        <div style="margin:50px auto;width:70%;padding:20px 0">
+                        <div style="border-bottom:1px solid #eee">
+                        <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">WeClea</a>
+                        </div>
+                        <p style="font-size:1.1em">Hi ${userresults[0].name},</p>
+                        <p>You have an upcoming booking on ${ele.date} ,Please purchase loads..</p>
+                        <p style="font-size:0.9em;">Regards,<br />WeClea</p>
+                        <hr style="border:none;border-top:1px solid #eee" />
+                        <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+                        <p>WeClea Inc</p>
+                        <p>USA</p>
+                        </div>
+                        </div>
+                        </div>`,
+                    };
+
+                    transport.sendMail(mailOptions, function (error, info) 
+                    {
+
+                    })
+                            }) 
+                        }
+                    })
                 })
             })
         })

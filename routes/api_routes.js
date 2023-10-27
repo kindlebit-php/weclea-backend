@@ -16,6 +16,7 @@ import { qr_slip } from "../helpers/qr_slip.js";
 
 
 router.post('/customer-register',userController.customer_register);
+router.post('/delete-employee',userController.delete_employee);
 router.post('/newsletter',userController.newsletter);
 router.post('/register-employee',userController.register_employee);
 router.post('/update-employee',userController.update_employee);
@@ -50,7 +51,7 @@ router.post('/change-password',userController.change_password);
 router.get("/customer-order-histroy",CheckAuth,userController.customer_order_histroy)
 router.post("/ss", qr_slip);
 //********************************Driver Module**************************************//
-router.get('/get-orders',CheckAuth,driverController.get_orders);
+router.post('/get-orders',CheckAuth,driverController.get_orders);
 router.post("/get-order-detail",CheckAuth,driverController.get_order_detail);
 router.post("/print-All-QrCode",CheckAuth,driverController.print_All_QrCode)
 router.get("/get-dry-clean-orders",CheckAuth,driverController.get_dry_clean_orders)
@@ -63,7 +64,7 @@ router.post("/laundry-NotFound",CheckAuth,upload.array("images", 5),driverContro
 router.get("/order-histroy",CheckAuth,driverController.order_histroy);
 router.post("/order-histroy-byOrderId",CheckAuth,driverController.order_histroy_byOrderId);
 router.get("/profile",CheckAuth,driverController.profile)
-router.get("/get-drop-orders",CheckAuth,driverController.get_drop_orders);
+router.post("/get-drop-orders",CheckAuth,driverController.get_drop_orders);
 router.post("/get-drop-order-detail",CheckAuth,driverController.get_drop_order_detail);
 router.post("/drop-loads",CheckAuth,driverController.drop_loads);
 router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
@@ -126,7 +127,7 @@ router.post("/update_faq_index",CheckAuth,AdminController.update_faq_index)
 router.get("/get_all_order/:type?/:searchStr?/:start?/:limit?",CheckAuth,AdminController.get_all_order)
 router.get("/get_order_detail/:booking_id?",CheckAuth,AdminController.get_order_detail)
 
-router.get("/get_all_driver/:searchStr?/:start?/:limit?",CheckAuth,AdminController.get_all_driver)
+router.get("/get_all_driver/:searchStr?/:start?/:limit?",AdminController.get_all_driver)
 router.get("/get_driver_detail/:user_id?",CheckAuth,AdminController.get_driver_detail)
 
 
