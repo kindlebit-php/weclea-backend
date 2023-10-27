@@ -685,7 +685,7 @@ export const get_order_detail = async(req,res)=>{
 	    	const loads = "SELECT booking_timing.*,booking_images.*,bookings.order_id as main_order_id FROM bookings left join `booking_timing` on booking_timing.booking_id=bookings.id LEFT JOIN booking_images on booking_images.booking_id=booking_timing.booking_id WHERE booking_timing.booking_id=?";
 			dbConnection.query(loads,[reqData.booking_id], function (error, data) {
 			if (error) throw error;
-				res.json({'status':true,"message":"Success",'data':data});
+				res.json({'status':true,"message":"Success",'data':data[0]});
 			});
 	    }catch (error) {
 	        res.json({'status':false,"message":error.message});  
