@@ -697,7 +697,8 @@ export const get_order_detail = async(req,res)=>{
 /*******************/
 /********* Driver listing************/
 export const get_all_driver = async(req,res)=>{
-	var reqData= req.params
+	var reqData= req.params;
+	console.log("get_all_driver",reqData)
 	try { 
 		var LimitNum = 25
         var startNum = 0;
@@ -723,6 +724,8 @@ export const get_all_driver = async(req,res)=>{
             if (error) {
                 res.json({'status':false,"message":error.message}); 
             } else {
+            		console.log("get_all_driver rows",rows.length)
+
 
                 if (rows.length>0) {
                     var totalRecords=rows.length
@@ -734,7 +737,7 @@ export const get_all_driver = async(req,res)=>{
                 }else{
                     var totalRecords=false;
                 }
-				const loads = "SELECT users.*,(select count(id) from bookings where driver_id=users.id and cron_status=1), ,(select order_status from bookings where driver_id=users.id and cron_status=1 order by id desc limit 1) current_order_status FROM `users` WHERE users.role=2 "+query+" limit ? offset ?";
+				const loads = "SELECT users.*,(select count(id) from bookings where driver_id=users.id and cron_status=1) total_order, (select order_status from bookings where driver_id=users.id and cron_status=1 order by id desc limit 1) current_order_status FROM `users` WHERE users.role=2 "+query+"  order by users.id desc limit ? offset ?";
 				dbConnection.query(loads,[LimitNum,startNum],function (error, rows) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});
