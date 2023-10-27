@@ -48,6 +48,7 @@ router.post('/customer-login',userController.customer_login);
 router.post('/forgot-password',userController.forgot_password);
 router.post('/verify-otp',userController.verify_otp);
 router.post('/change-password',userController.change_password);
+router.get("/customer-order-histroy",CheckAuth,userController.customer_order_histroy)
 router.post("/ss", qr_slip);
 //********************************Driver Module**************************************//
 router.post('/get-orders',CheckAuth,driverController.get_orders);

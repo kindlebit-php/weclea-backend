@@ -734,7 +734,7 @@ export const get_all_driver = async(req,res)=>{
                 }else{
                     var totalRecords=false;
                 }
-				const loads = "SELECT * FROM `users` WHERE users.role=2 "+query+" limit ? offset ?";
+				const loads = "SELECT users.*,(select count(id) from bookings where driver_id=users.id and cron_status=1), ,(select order_status from bookings where driver_id=users.id and cron_status=1 order by id desc limit 1) current_order_status FROM `users` WHERE users.role=2 "+query+" limit ? offset ?";
 				dbConnection.query(loads,[LimitNum,startNum],function (error, rows) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});

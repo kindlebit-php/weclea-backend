@@ -908,6 +908,70 @@ export const customer_list = async (req, res) => {
   };
   
 
+  export const customer_order_histroy = async (req, res) => {
+	try {
+		const userData = res.user;
+		const user_id = userData[0].id;
+		const userIdQuery = `
+				SELECT  b1.id,b1.user_id FROM bookings AS b1
+				JOIN users AS u ON u.id = b1.user_id
+				WHERE u.id = ?`;
+		dbConnection.query(userIdQuery,[user_id],async (error, userIdResult) => {
+			if (error) {
+			  return res.json({ status: false, message: error.message });
+			}
+			const userIds = userIdResult.map((row) => row.user_id);
+			const bookingIds = userIdResult.map((row) => row.id);
+	
+			console.log(userIds, bookingIds);
+			const query = ` SELECT b.id AS booking_Id,b.total_loads,bt.deliever_date,bt.deliever_time ,bi.drop_image
+		  FROM bookings AS b
+		  JOIN users AS u ON b.user_id = u.id
+		  JOIN booking_images AS bi ON b.id = bi.booking_id
+		  JOIN booking_timing AS bt ON b.id = bt.booking_id
+		  WHERE  b.order_status = '6' AND b.user_id IN (?) AND b.id IN (?)
+			ORDER BY deliever_date DESC`;
+	
+			dbConnection.query(
+			  query,[ userIds, bookingIds],(error, data) => {
+				console.log(data);
+				if (error) {
+				  return res.json({ status: false, message: error.message });
+				} else if (data.length < 0) {
+				  return res.json({ status: false, message: "data not found" });
+				} else {
+				  const resData = [];
+				 // const imageArray = [];
+				  if (data?.length > 0) {
+					for (const elem of data) {
+					  const { booking_Id,total_loads,deliever_date,deliever_time,drop_image } = elem;
+					  const separatedStrings = drop_image.split(", ")
+					  const imagesUrl=separatedStrings.map((val) => {
+					  return `${process.env.BASE_URL}/${val}`;
+					 });
+					  resData.push({
+						booking_Id,
+						total_loads,
+						deliever_date,
+						deliever_time,
+						imagesUrl,
+					  });
+					}
+				  }
+				  return res.json({
+					status: true,
+					message: "Updated successfully!",
+					data: resData,
+				  });
+				}
+			  }
+			);
+		  }
+		);
+	  } catch (error) {
+	  res.json({ status: false, message: error.message });
+	}
+  };
 
 export default {
 	user_registered_address,
@@ -929,5 +993,6 @@ export default {
 	register_employee,
 	update_employee,
 	delete_employee,
-	update_user_status
+	update_user_status,
+	customer_order_histroy
 }
