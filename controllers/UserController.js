@@ -560,8 +560,10 @@ export const  user_registered_address = async(req,res)=>{
 
 export const order_list = async (req, res) => {
 	try {
-	  const list =
-		"SELECT b.id, b.order_id, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_Status, b.order_Status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b JOIN customer_drop_address AS cda ON b.user_id = cda.user_id JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE cron_status = 1 ";
+	var datetime = new Date();
+    const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+	const list =
+		"SELECT b.id, b.order_id, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_Status, b.order_Status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b JOIN customer_drop_address AS cda ON b.user_id = cda.user_id JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
 	  
 	  const data = await new Promise((resolve, reject) => {
 		dbConnection.query(list, (error, data) => {
