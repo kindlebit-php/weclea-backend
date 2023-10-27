@@ -627,7 +627,7 @@ export const order_list = async (req, res) => {
 		} else if (item.order_Status === 8) {
 		  item.order_Status = "pickup";
 		} else {
-		  item.order_Status = "blank_images";
+		  item.order_Status = "NA";
 		}
 		const imagesQuery= `SELECT pickup_images,wash_images,dry_images,fold_images,pack_images,drop_image,extra_load_images FROM booking_images AS bi JOIN bookings AS b ON bi.booking_id = b.id WHERE b.id = ${item.id} `
 		if (item.order_images === 1) {
