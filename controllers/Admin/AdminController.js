@@ -754,19 +754,19 @@ export const get_driver_detail = async(req,res)=>{
 	        var startNum = 0;
 	        var currentPage=25;
 	        if(reqData.start == '' || reqData.limit == ''){
-	              startNum = 0;
-	              LimitNum = 25;
+	            startNum = 0;
+	            LimitNum = 25;
 	        }else{
-	             //parse int Convert String to number 
-	              startNum = parseInt(reqData.start);
-	              LimitNum = parseInt(reqData.limit); 
-	              currentPage=currentPage+startNum;
+	            //parse int Convert String to number 
+	            startNum = parseInt(reqData.start);
+	            LimitNum = parseInt(reqData.limit); 
+	            currentPage=currentPage+startNum;
 	        }
-	        var query=""
+	        var query="";
 			if (reqData.searchStr  && reqData.searchStr!='all') {
-			  query=" and ( bookings.id like '%"+reqData.searchStr+"%' or bookings.date like '%"+reqData.searchStr+"%') ";          
+			  	query=" and ( bookings.id like '%"+reqData.searchStr+"%' or bookings.date like '%"+reqData.searchStr+"%') ";          
 			}
-	        const loads = "SELECT *  FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc";
+	        const loads = "SELECT * FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc";
 			dbConnection.query(loads,[reqData.user_id], function (error, data) {
 				if (error) {
 	                res.json({'status':false,"message":error.message}); 
