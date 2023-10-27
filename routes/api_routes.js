@@ -49,7 +49,7 @@ router.post('/verify-otp',userController.verify_otp);
 router.post('/change-password',userController.change_password);
 router.post("/ss", qr_slip);
 //********************************Driver Module**************************************//
-router.get('/get-orders',CheckAuth,driverController.get_orders);
+router.post('/get-orders',CheckAuth,driverController.get_orders);
 router.post("/get-order-detail",CheckAuth,driverController.get_order_detail);
 router.post("/print-All-QrCode",CheckAuth,driverController.print_All_QrCode)
 router.get("/get-dry-clean-orders",CheckAuth,driverController.get_dry_clean_orders)
@@ -62,7 +62,7 @@ router.post("/laundry-NotFound",CheckAuth,upload.array("images", 5),driverContro
 router.get("/order-histroy",CheckAuth,driverController.order_histroy);
 router.post("/order-histroy-byOrderId",CheckAuth,driverController.order_histroy_byOrderId);
 router.get("/profile",CheckAuth,driverController.profile)
-router.get("/get-drop-orders",CheckAuth,driverController.get_drop_orders);
+router.post("/get-drop-orders",CheckAuth,driverController.get_drop_orders);
 router.post("/get-drop-order-detail",CheckAuth,driverController.get_drop_order_detail);
 router.post("/drop-loads",CheckAuth,driverController.drop_loads);
 router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
