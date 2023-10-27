@@ -38,6 +38,7 @@ router.post('/get-user-home-data',CheckAuth ,loadController.get_user_home_data);
 router.get('/get-user-subscription',CheckAuth ,loadController.get_user_subscription);
 router.post('/customer-loads-subscription',CheckAuth ,loadController.customer_loads_subscription);
 router.post('/customer-booking',CheckAuth ,bookingController.customer_booking);
+router.post('/booking-rating',CheckAuth ,upload.array("images", 5),bookingController.booking_rating);
 router.post('/assign-driver' ,bookingController.assign_driver);
 router.post('/assign-folder' ,bookingController.assign_folder);
 router.post('/delete-booking-date',CheckAuth ,bookingController.delete_booking_date);
@@ -128,7 +129,7 @@ router.get("/get_all_order/:type?/:searchStr?/:start?/:limit?",CheckAuth,AdminCo
 router.get("/get_order_detail/:booking_id?",CheckAuth,AdminController.get_order_detail)
 
 router.get("/get_all_driver/:searchStr?/:start?/:limit?",AdminController.get_all_driver)
-router.get("/get_driver_detail/:user_id?",CheckAuth,AdminController.get_driver_detail)
+router.get("/get_driver_detail/:user_id?/:searchStr?/:start?/:limit?",AdminController.get_driver_detail)
 
 
 /*dry cleaning*/
