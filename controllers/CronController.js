@@ -111,9 +111,9 @@ export const booking_load_alert = async(req,res)=>{
                     if(ele.category_id == 1){
                     var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+ele.user_id+"'";
                     }else if(ele.category_id == 2){
-                    var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+ele.user_id+"'";
+                    var userLoads = "select residential as totalCount from customer_loads_availabilty where user_id = '"+ele.user_id+"'";
                     }else{
-                    var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+ele.user_id+"'";
+                    var userLoads = "select yeshiba as totalCount from customer_loads_availabilty where user_id = '"+ele.user_id+"'";
                     }
                     dbConnection.query(userLoads, function (error, userLoadsresults){
                         console.log('userLoadsresults',userLoadsresults)
