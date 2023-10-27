@@ -771,8 +771,8 @@ export const get_driver_detail = async(req,res)=>{
 				if (error) {
 	                res.json({'status':false,"message":error.message}); 
 	            } else {
-	                if (rows.length>0) {
-	                    var totalRecords=rows.length
+	                if (data.length>0) {
+	                    var totalRecords=data.length;
 	                    if (totalRecords>currentPage) {
 	                        totalRecords=true;
 	                    }else{
