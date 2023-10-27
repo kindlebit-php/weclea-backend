@@ -38,6 +38,7 @@ router.post('/get-user-home-data',CheckAuth ,loadController.get_user_home_data);
 router.get('/get-user-subscription',CheckAuth ,loadController.get_user_subscription);
 router.post('/customer-loads-subscription',CheckAuth ,loadController.customer_loads_subscription);
 router.post('/customer-booking',CheckAuth ,bookingController.customer_booking);
+router.post('/booking-rating',CheckAuth ,upload.array("images", 5),bookingController.booking_rating);
 router.post('/assign-driver' ,bookingController.assign_driver);
 router.post('/assign-folder' ,bookingController.assign_folder);
 router.post('/delete-booking-date',CheckAuth ,bookingController.delete_booking_date);

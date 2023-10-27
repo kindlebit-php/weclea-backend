@@ -549,6 +549,37 @@ export const delete_booking_date = async(req,res)=>{
         }
 }
 
+
+export const booking_rating = async(req,res)=>{
+
+    try { 
+        const userData = res.user;
+        const { booking_id,title,body,rating,images} = req.body;
+        if(booking_id  && rating ){
+             const imageArray = [];
+             var pickupImagesJSON ='';
+                if(req.files){
+                    req.files.forEach((e, i) => {
+                        imageArray.push(e.path);
+                    });
+                if (imageArray.length > 5) {
+                    return res.json({ status: false, message: "Only 5 images are allowed" });
+                }
+                    var pickupImagesJSON = imageArray.join(", ");
+                }
+            var sql = "INSERT INTO ratings (booking_id,user_id,rating,title,body,images) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating+"', '"+title+"', '"+body+"','"+pickupImagesJSON+"')";
+            console.log('sql',sql)
+            dbConnection.query(sql, function (err, results) {
+                res.json({'status':true,"message":"Rating submitted"});
+            }); 
+        }else{
+            res.json({'status':false,"message":"All fields are required"});
+        }
+     }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
 export default {
 	customer_booking,
     delete_booking_date,
@@ -557,5 +588,6 @@ export default {
     booking_pickup_instruction,
     booking_delievery_instruction,
     assign_driver,
-    assign_folder
+    assign_folder,
+    booking_rating
 }
