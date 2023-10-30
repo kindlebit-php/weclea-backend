@@ -454,7 +454,7 @@ export const submit_wash_detail = async (req, res) => {
             const responseData = {
               status: true,
               message: processMessages[type],
-              data: { customer_id: data[0].user_id , Note_From_Delivery:data[1].delievery_instruction },
+              data: { customer_id: data[0].user_id , Note_From_Delivery:data1[0].delievery_instruction },
             };
             const title={
               1: "loads Washed",
