@@ -103,7 +103,7 @@ export const customer_booking = async(req,res)=>{
                     });  
                 }); 
                        }else{
-                        res.json({'status':false,"message":"Booking already added for "+date+" date!"});
+                        res.json({'status':false,"message":"Booking already added for selected date!"});
                        }
                     })
                 }
@@ -580,6 +580,34 @@ export const booking_rating = async(req,res)=>{
     }
 }
 
+export const booking_history = async(req,res)=>{
+    try {   
+            const userData = res.user;
+            var resData = []
+            const sql = "select bookings.date ,bookings.id ,bookings.time, bookings.total_loads,booking_images.drop_image,booking_timing.deliever_date,booking_timing.deliever_time from bookings left join booking_timing on booking_timing.booking_id = bookings.id left join booking_images on booking_images.booking_id = bookings.id where bookings.order_status = 6 and user_id = '"+userData[0].id+"'";
+            dbConnection.query(sql, function (err, results) {
+                results.forEach(ele => {
+                    const {id,date,time,total_loads,drop_image,deliever_date,deliever_time} = ele;
+                    var dropFinalImages = [];
+                    if(drop_image){
+                        var finalDropImg = drop_image.split(',');
+                        finalDropImg.forEach(function callback(element, key) {
+                            dropFinalImages[key] = process.env.BASE_URL+'/'+element
+                        })
+                    }
+
+                    const init = {
+                        'id':id,'date':date,'time':time,'total_loads':total_loads,'deliever_date':deliever_date,'deliever_time':deliever_time,'images':dropFinalImages
+                    }
+                    resData.push(init)
+                })
+                res.json({'status':true,"message":"Order history",'data':resData});
+            });
+     }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
 export default {
 	customer_booking,
     delete_booking_date,
@@ -589,5 +617,6 @@ export default {
     booking_delievery_instruction,
     assign_driver,
     assign_folder,
+    booking_history,
     booking_rating
 }

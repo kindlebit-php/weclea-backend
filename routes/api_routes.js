@@ -43,6 +43,7 @@ router.post('/assign-driver' ,bookingController.assign_driver);
 router.post('/assign-folder' ,bookingController.assign_folder);
 router.post('/delete-booking-date',CheckAuth ,bookingController.delete_booking_date);
 router.get('/user-subscription-dates',CheckAuth ,bookingController.subscription_dates);
+router.get('/booking-history',CheckAuth ,bookingController.booking_history);
 router.get('/booking-tracking-status',CheckAuth ,bookingController.booking_tracking_status);
 router.get('/get-load-price',CheckAuth ,loadController.get_load_price);
 router.post('/customer-login',userController.customer_login);
