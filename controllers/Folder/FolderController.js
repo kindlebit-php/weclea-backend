@@ -266,7 +266,7 @@ export const submit_wash_detail = async (req, res) => {
       } else if(type == 4){
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
-        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        //updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         if(extra_loads !=''){
           var booking = "select user_id,category_id from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
