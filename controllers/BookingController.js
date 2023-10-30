@@ -1,8 +1,8 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
 import dateFormatFinalDate from 'date-and-time';
-import { getDates,randomNumber } from "../helpers/date.js";
 import path from "path";
+import { getDates,randomNumber } from "../helpers/date.js";
 import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
 
 //customer booking API
@@ -42,7 +42,8 @@ export const customer_booking = async(req,res)=>{
                     dbConnection.query(sqlDistance, function (error, locationResult) {
                     // return false;
                     if(locationResult.length > 0){
-                        var driver_id = locationResult[0].id
+                        // var driver_id = locationResult[0].id
+                        var driver_id = 1
                     }else{
                         var driver_id = 1
                     }
@@ -162,7 +163,9 @@ export const customer_booking = async(req,res)=>{
                             dbConnection.query(sqlDistance, function (error, locationResult) {
                             // return false;
                             if(locationResult.length > 0){
-                                var driver_id = locationResult[0].id
+                                // var driver_id = locationResult[0].id
+                                var driver_id = 1
+
                             }else{
                                 var driver_id = 1
                             }
@@ -277,7 +280,9 @@ export const customer_booking = async(req,res)=>{
                             dbConnection.query(sqlDistance, function (error, locationResult) {
                             // return false;
                             if(locationResult.length > 0){
-                                var driver_id = locationResult[0].id
+                                // var driver_id = locationResult[0].id
+                                var driver_id = 1
+
                             }else{
                                 var driver_id = 1
                             }
@@ -586,22 +591,23 @@ export const booking_history = async(req,res)=>{
             const userData = res.user;
             var resData = []
             const sql = "select bookings.date ,bookings.id ,bookings.time, bookings.total_loads,booking_images.drop_image,booking_timing.deliever_date,booking_timing.deliever_time from bookings left join booking_timing on booking_timing.booking_id = bookings.id left join booking_images on booking_images.booking_id = bookings.id where bookings.order_status = 6 and user_id = '"+userData[0].id+"'";
+            console.log('sql',sql)
             dbConnection.query(sql, function (err, results) {
                 results.forEach(ele => {
-                    const {id,date,time,total_loads,drop_image,deliever_date,deliever_time} = ele;
-                   console.log(drop_image)
-                        const separatedStrings = drop_image.split(",");
-                        console.log(separatedStrings);
-              const imagesUrl = separatedStrings.map((val) => {
-                return `${process.env.BASE_URL}/${val}`;
-              });
-                const imageList = imagesUrl.map(imagePath => ({
-                  path: imagePath,
-                  type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
-                })
-                )
-                    
-
+                const {id,date,time,total_loads,drop_image,deliever_date,deliever_time} = ele;
+                if(drop_image){
+                    const separatedStrings = drop_image.split(", ")
+                    const imagesUrl = separatedStrings.map((val) => {
+                        return `${process.env.BASE_URL}/${val}`;
+                    });
+                    var imageList = imagesUrl.map(imagePath => ({
+                        path: imagePath,
+                        type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                }else{
+                    var imageList = [];
+                }
                     const init = {
                         'id':id,'date':date,'time':time,'total_loads':total_loads,'deliever_date':deliever_date,'deliever_time':deliever_time,'images':imageList
                     }
