@@ -2,6 +2,7 @@ import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
 import dateFormatFinalDate from 'date-and-time';
 import { getDates,randomNumber } from "../helpers/date.js";
+import path from "path";
 import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
 
 //customer booking API
@@ -588,8 +589,9 @@ export const booking_history = async(req,res)=>{
             dbConnection.query(sql, function (err, results) {
                 results.forEach(ele => {
                     const {id,date,time,total_loads,drop_image,deliever_date,deliever_time} = ele;
-                   
+                   console.log(drop_image)
                         const separatedStrings = drop_image.split(", ")
+                        console.log(separatedStrings);
               const imagesUrl = separatedStrings.map((val) => {
                 return `${process.env.BASE_URL}/${val}`;
               });
