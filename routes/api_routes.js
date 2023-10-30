@@ -133,6 +133,13 @@ router.get("/get_all_driver/:searchStr?/:start?/:limit?",AdminController.get_all
 router.get("/get_driver_detail/:user_id?/:searchStr?/:start?/:limit?",AdminController.get_driver_detail)
 
 
+router.get("/get_ratingList",CheckAuth,AdminController.get_ratingList)
+router.get("/get_feedbackQesList",CheckAuth,AdminController.get_feedbackQesList)
+router.post("/update_feedbackQes",CheckAuth,AdminController.update_feedbackQes)
+router.post("/create_feedbackQes",CheckAuth,AdminController.create_feedbackQes)
+router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
+router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
+
 /*dry cleaning*/
 router.post("/update_drycleaning_service",upload.single('service_pic'),AdminController.update_drycleaning_service)
 router.post("/add_drycleaning_service",upload.single('service_pic'),AdminController.add_drycleaning_service)

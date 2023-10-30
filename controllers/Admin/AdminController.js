@@ -804,10 +804,21 @@ export const get_driver_detail = async(req,res)=>{
 }
 /*******************/
 
-/********  Rating feedback queston ***********/
-export const get_feedbaclQesList = async(req,res)=>{
+/********  Rating feedback suggesstion  ***********/
+export const get_ratingList = async(req,res)=>{
       try { 
-        	const loads = "select * from ratings left join wc_rating_feeback on wc_rating_feeback.id=rating.id where status=0 order by created_at desc";
+        	const loads = "select * from wc_rating order by id desc";
+			dbConnection.query(loads, function (error, data) {
+			if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});
+			})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const get_feedbackQesList = async(req,res)=>{
+      try { 
+        	const loads = "select * from wc_rating left join wc_rating_feeback on wc_rating_feeback.rating_id=wc_rating.id where isDelete=0 order by created_at desc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
@@ -818,39 +829,39 @@ export const get_feedbaclQesList = async(req,res)=>{
 }
 export const update_feedbackQes = async(req,res)=>{
 	const reqData = req.body;
+	//`rating_id`, `feedback`
     try { 
-    	const qrySelect = "select id from wc_rating_feeback where `category_id`=? and `type`=? and `loads`=? and `min_load_per_day`=? and `price`=? and status=1 and id!=?";
-		dbConnection.query(qrySelect,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price , reqData.id], function (error, data) {
+    	const qrySelect = "select id from wc_rating_feeback where `rating_id`=? and `feedback`=? and status=1 and id!=?";
+		dbConnection.query(qrySelect,[reqData.rating_id, reqData.feedback, reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) { ///`category_id`, `type`, `loads`, `min_load_per_day`, `price`,
-			    var updateContnetQry = "update admin_packages set `category_id`=?, `type`=?, `loads`=?, `min_load_per_day`=?, `price`=? where id = ? ";
-			    dbConnection.query(updateContnetQry,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price,reqData.id], function (error, data) {
+			    var updateContnetQry = "update wc_rating_feeback set `rating_id`=?, `feedback`=? where id = ? ";
+			    dbConnection.query(updateContnetQry,[reqData.rating_id, reqData.feedback,reqData.id], function (error, data) {
 				if (error) throw error;
-					res.json({'status':true,"message":"Package has been updated successfully",'data':data});
+					res.json({'status':true,"message":"Feedback Suggestion has been updated successfully",'data':data});
 				});
 			}else{
-				res.json({'status':false,"message":"Same Package already exist"});
+				res.json({'status':false,"message":"Same Suggestion already exist"});
 			}
 		})
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
 }
-
 export const create_feedbackQes = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	const qrySelect = "select id from admin_packages where `category_id`=? and `type`=? and `loads`=? and `min_load_per_day`=? and `price`=? and status=1";
+    	const qrySelect = "select id from wc_rating_feeback where `rating_id`=? and `feedback`=? and status=1";
 		dbConnection.query(qrySelect,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) {
-			    var addContnetQry = "insert admin_packages set `category_id`=?, `type`=?, `loads`=?, `min_load_per_day`=?, `price`=? ";
-			    dbConnection.query(addContnetQry,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price], function (error, data) {
+			    var addContnetQry = "insert wc_rating_feeback set `rating_id`=?, `feedback`=? ";
+			    dbConnection.query(addContnetQry,[reqData.rating_id, reqData.feedback], function (error, data) {
 				if (error) throw error;
-					res.json({'status':true,"message":"Package has been saved successfully",'data':data});
+					res.json({'status':true,"message":"Feedback Suggestion has been saved successfully",'data':data});
 				});
 			}else{
-				res.json({'status':false,"message":"Same Package already exist"});
+				res.json({'status':false,"message":"Same Suggestion already exist"});
 			}
 		});
     }catch (error) {
@@ -861,15 +872,15 @@ export const create_feedbackQes = async(req,res)=>{
 export const delete_feedbackQes = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	const qrySelect = "select id from admin_packages where id=?";
+    	const qrySelect = "select id from wc_rating_feeback where id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
-				var msg= "Package has been activated successfully"
+				var msg= "Feedback Suggestion has been activated successfully"
 				if (reqData.isDelete==1) {
-					msg= "Package has been deleted successfully"
+					msg= "Feedback Suggestion has been deleted successfully"
 				}
-			    var updateContnetQry = "update admin_packages set isDelete=? where id=? ";
+			    var updateContnetQry = "update wc_rating_feeback set isDelete=? where id=? ";
 			    dbConnection.query(updateContnetQry,[reqData.isDelete,reqData.id], function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":msg,'data':data});
@@ -886,15 +897,15 @@ export const delete_feedbackQes = async(req,res)=>{
 export const update_feedbackQes_status = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	const qrySelect = "select id from admin_packages where id=?";
+    	const qrySelect = "select id from wc_rating_feeback where id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
-				var msg= "Package has been deactivated successfully"
+				var msg= "Feedback Suggestion has been deactivated successfully"
 				if (reqData.status==1) {
-					msg= "Package has been activated successfully"
+					msg= "Feedback Suggestion has been activated successfully"
 				}
-			    var updateContnetQry = "update admin_packages set status=? where id=? ";
+			    var updateContnetQry = "update wc_rating_feeback set status=? where id=? ";
 			    dbConnection.query(updateContnetQry,[reqData.status,reqData.id], function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":msg,'data':data});
@@ -933,6 +944,13 @@ export default {
 	get_all_order,
 	get_order_detail,
 	get_all_driver,
-	get_driver_detail
+	get_driver_detail,
+	get_ratingList,
+	get_feedbackQesList,
+	update_feedbackQes,
+	create_feedbackQes,
+	delete_feedbackQes,
+	update_feedbackQes_status
+
 
 }
