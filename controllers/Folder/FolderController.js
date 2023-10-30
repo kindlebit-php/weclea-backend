@@ -236,7 +236,7 @@ export const submit_wash_detail = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
-      const customerId_Query = "SELECT customer_id FROM users WHERE id = ?";
+      const customerId_Query = "SELECT u.customer_id,bins.delievery_instruction FROM users AS U JOIN booking_instructions AS bin ON u.id = bin.user_id WHERE u.id = ?";
       dbConnection.query(customerId_Query, [data[0].user_id], function (error, data1) {
         if (error) {
           return res.json({ status: false, message: error.message });
@@ -454,7 +454,7 @@ export const submit_wash_detail = async (req, res) => {
             const responseData = {
               status: true,
               message: processMessages[type],
-              data: { customer_id: data[0].user_id },
+              data: { customer_id: data[0].user_id , Note_From_Delivery:data[1].delievery_instruction },
             };
             const title={
               1: "loads Washed",
