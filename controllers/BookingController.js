@@ -588,7 +588,7 @@ export const booking_history = async(req,res)=>{
             dbConnection.query(sql, function (err, results) {
                 results.forEach(ele => {
                     const {id,date,time,total_loads,drop_image,deliever_date,deliever_time} = ele;
-                    if(drop_image){
+                   
                         const separatedStrings = drop_image.split(", ")
               const imagesUrl = separatedStrings.map((val) => {
                 return `${process.env.BASE_URL}/${val}`;
@@ -598,7 +598,7 @@ export const booking_history = async(req,res)=>{
                   type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
                 })
                 )
-                    }
+                    
 
                     const init = {
                         'id':id,'date':date,'time':time,'total_loads':total_loads,'deliever_date':deliever_date,'deliever_time':deliever_time,'images':imageList
