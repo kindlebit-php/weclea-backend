@@ -109,7 +109,7 @@ export const customer_list_wash = (req, res) => {
         return res.json({ status: false, message: "User has no bookings" });
       }
       const booking_id = userIdResult.map((row) => row.id);
-      const query = `SELECT b.id AS Booking_id, b.user_id AS Customer_Id, b.date, b.time, b.order_status, bi.pickup_images
+      const query = `SELECT b.id AS Booking_id,b.total_loads, b.user_id AS Customer_Id, b.date, b.time, b.order_status, bi.pickup_images
                       FROM bookings AS b
                       JOIN booking_images AS bi ON b.id = bi.booking_id
                       WHERE b.id IN (?)`;
@@ -122,7 +122,7 @@ export const customer_list_wash = (req, res) => {
           const resData = [];
           if (data?.length > 0) {
             for (const elem of data) {
-              const {Booking_id, Customer_Id, date, time, order_status, pickup_images } = elem;
+              const {Booking_id,total_loads, Customer_Id, date, time, order_status, pickup_images } = elem;
 
               console.log('images',pickup_images)
               const separatedStrings = pickup_images.split(", ")
@@ -133,6 +133,7 @@ export const customer_list_wash = (req, res) => {
                 Booking_id,
                 Customer_Id,
                 date,
+                total_loads,
                 time,
                 order_status,
                 imagesUrl,
@@ -277,6 +278,20 @@ export const submit_wash_detail = async (req, res) => {
               var userLoads = "select yeshiba as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
             }
                  dbConnection.query(userLoads, function (error, userLoadsresults){
+
+              const imageArray = [];
+              req.files.extra_loads.forEach((e, i) => {
+              imageArray.push(e.path);
+              });
+              if (imageArray.length > 5) {
+              return res.json({ status: false, message: "Only 5 images are allowed" });
+              }
+              const pickupImagesJSON = imageArray.join(", ");
+
+              var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                 dbConnection.query(extraSQL, function (error, userLoadsresults){
+                        })
+
                     if(userLoadsresults[0].totalCount >= extra_loads ){
                       var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
                       if(bookingdata[0].category_id == 1){
@@ -415,6 +430,10 @@ export const submit_wash_detail = async (req, res) => {
                     }
                  })
           })
+        }else{
+        updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
+        updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         }
       }
 
@@ -422,9 +441,9 @@ export const submit_wash_detail = async (req, res) => {
         if (updateTimeErr) {
           return res.json({ status: false, message: updateTimeErr.message });
         }
-
+// console.log('req.files',req.files)
         const imageArray = [];
-        req.files.forEach((e, i) => {
+        req.files.images.forEach((e, i) => {
           imageArray.push(e.path);
         });
         console.log(imageArray)
