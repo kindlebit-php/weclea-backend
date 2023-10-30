@@ -236,7 +236,7 @@ export const submit_wash_detail = async (req, res) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
-      const customerId_Query = "SELECT u.customer_id,bins.delievery_instruction FROM users AS u JOIN booking_instructions AS bins ON u.id = bins.user_id WHERE u.id = ?";
+      const customerId_Query = "SELECT u.customer_id,bin.delievery_instruction FROM users AS u JOIN booking_instructions AS bin ON b.user_id = bin.user_id WHERE u.id = ?";
       dbConnection.query(customerId_Query, [data[0].user_id], function (error, data1) {
         if (error) {
           return res.json({ status: false, message: error.message });
