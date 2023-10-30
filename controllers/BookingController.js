@@ -608,8 +608,7 @@ export const booking_history = async(req,res)=>{
                 }else{
                     var imageList = [];
                 }
-              
-              const init = {
+                    const init = {
                         'id':id,'date':date,'time':time,'total_loads':total_loads,'deliever_date':deliever_date,'deliever_time':deliever_time,'images':imageList
                     }
                     resData.push(init)

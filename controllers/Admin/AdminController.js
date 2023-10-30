@@ -295,7 +295,7 @@ export const get_userList = async(req,res)=>{
 	            usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = users.id";
 	        }
 	    }
-    	const loads = "select users.*, ("+usrLoads+") total_load from users";
+    	const loads = "select users.*, ("+usrLoads+") total_load from users where role=1";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
 			res.json({'status':true,"message":"Success",'data':data});
@@ -764,14 +764,15 @@ export const get_driver_detail = async(req,res)=>{
 	            currentPage=currentPage+startNum;
 	        }
 	        var query="";
-			if (reqData.searchStr  && reqData.searchStr!='all') {
-			  	query=" and ( bookings.id like '%"+reqData.searchStr+"%' or bookings.date like '%"+reqData.searchStr+"%') ";          
+			if(reqData.searchStr  && reqData.searchStr!='all') {
+			  	//query=" and ( bookings.id like '%"+reqData.searchStr+"%' or bookings.date like '%"+reqData.searchStr+"%')";          
 			}
 	        const loads = "SELECT * FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc";
 			dbConnection.query(loads,[reqData.user_id], function (error, data) {
 				if (error) {
 	                res.json({'status':false,"message":error.message}); 
 	            } else {
+	            	var userinfo= [];
 	                if (data.length>0) {
 	                    var totalRecords=data.length;
 	                    if (totalRecords>currentPage) {
@@ -782,10 +783,15 @@ export const get_driver_detail = async(req,res)=>{
 	                }else{
 	                    var totalRecords=false;
 	                }
-			    	const loads = "SELECT *,(SELECT users.name FROM users WHERE id=bookings.user_id LIMIT 1) customer_name,(SELECT users.profile_image FROM users WHERE id=bookings.user_id LIMIT 1) customer_pic FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc limit ? offset ?";
+
+			    	const loads = "SELECT *,(SELECT users.email FROM users WHERE id=bookings.user_id LIMIT 1) customer_email,(SELECT users.name FROM users WHERE id=bookings.user_id LIMIT 1) customer_name,(SELECT users.profile_image FROM users WHERE id=bookings.user_id LIMIT 1) customer_pic FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc limit ? offset ?";
 					dbConnection.query(loads,[reqData.user_id,LimitNum,startNum], function (error, rows) {
 					if (error) throw error;
-						res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});
+
+						if (rows.length>0) {
+	                		userinfo=rows[0];
+	                	}
+						res.json({'status':true,"message":"Success",'data':{totalRecords,userinfo:userinfo,order:rows}});
 					});
 				}	
 			});	
@@ -798,6 +804,122 @@ export const get_driver_detail = async(req,res)=>{
 }
 /*******************/
 
+/********  Rating feedback suggesstion  ***********/
+export const get_ratingList = async(req,res)=>{
+      try { 
+        	const loads = "select * from wc_rating order by id desc";
+			dbConnection.query(loads, function (error, data) {
+			if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});
+			})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const get_feedbackQesList = async(req,res)=>{
+      try { 
+        	const loads = "select * from wc_rating left join wc_rating_feeback on wc_rating_feeback.rating_id=wc_rating.id where isDelete=0 order by created_at desc";
+			dbConnection.query(loads, function (error, data) {
+			if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});
+			})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const update_feedbackQes = async(req,res)=>{
+	const reqData = req.body;
+	//`rating_id`, `feedback`
+    try { 
+    	const qrySelect = "select id from wc_rating_feeback where `rating_id`=? and `feedback`=? and status=1 and id!=?";
+		dbConnection.query(qrySelect,[reqData.rating_id, reqData.feedback, reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length<=0) { ///`category_id`, `type`, `loads`, `min_load_per_day`, `price`,
+			    var updateContnetQry = "update wc_rating_feeback set `rating_id`=?, `feedback`=? where id = ? ";
+			    dbConnection.query(updateContnetQry,[reqData.rating_id, reqData.feedback,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":"Feedback Suggestion has been updated successfully",'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Same Suggestion already exist"});
+			}
+		})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const create_feedbackQes = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from wc_rating_feeback where `rating_id`=? and `feedback`=? and status=1";
+		dbConnection.query(qrySelect,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price], function (error, data) {
+		if (error) throw error;
+			if (data.length<=0) {
+			    var addContnetQry = "insert wc_rating_feeback set `rating_id`=?, `feedback`=? ";
+			    dbConnection.query(addContnetQry,[reqData.rating_id, reqData.feedback], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":"Feedback Suggestion has been saved successfully",'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Same Suggestion already exist"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+export const delete_feedbackQes = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from wc_rating_feeback where id=?";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "Feedback Suggestion has been activated successfully"
+				if (reqData.isDelete==1) {
+					msg= "Feedback Suggestion has been deleted successfully"
+				}
+			    var updateContnetQry = "update wc_rating_feeback set isDelete=? where id=? ";
+			    dbConnection.query(updateContnetQry,[reqData.isDelete,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+export const update_feedbackQes_status = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from wc_rating_feeback where id=?";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "Feedback Suggestion has been deactivated successfully"
+				if (reqData.status==1) {
+					msg= "Feedback Suggestion has been activated successfully"
+				}
+			    var updateContnetQry = "update wc_rating_feeback set status=? where id=? ";
+			    dbConnection.query(updateContnetQry,[reqData.status,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+/****** end feedback section*******/
 export default {
 	get_page_content,
 	get_faq_content,
@@ -822,6 +944,13 @@ export default {
 	get_all_order,
 	get_order_detail,
 	get_all_driver,
-	get_driver_detail
+	get_driver_detail,
+	get_ratingList,
+	get_feedbackQesList,
+	update_feedbackQes,
+	create_feedbackQes,
+	delete_feedbackQes,
+	update_feedbackQes_status
+
 
 }

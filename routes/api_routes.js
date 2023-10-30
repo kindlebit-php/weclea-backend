@@ -73,7 +73,7 @@ router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
 router.post("/submit_drop_details",CheckAuth,upload.array("images", 5),driverController.submit_drop_details);
 //********************************Folder Module**************************************//
 router.post("/Scan-received-loads",CheckAuth,FolderController.Scan_received_loads)
-router.get("/customer-list-wash",CheckAuth,FolderController.customer_list_wash)
+router.post("/customer-list-wash",CheckAuth,FolderController.customer_list_wash)
 router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id)
 router.post("/submit-wash-detail",CheckAuth,upload.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads", maxCount: 5 },]),FolderController.submit_wash_detail)
 router.post("/Scan-loads-For-Dry",CheckAuth,FolderController.Scan_loads_For_Dry)
@@ -132,6 +132,13 @@ router.get("/get_order_detail/:booking_id?",CheckAuth,AdminController.get_order_
 router.get("/get_all_driver/:searchStr?/:start?/:limit?",AdminController.get_all_driver)
 router.get("/get_driver_detail/:user_id?/:searchStr?/:start?/:limit?",AdminController.get_driver_detail)
 
+
+router.get("/get_ratingList",CheckAuth,AdminController.get_ratingList)
+router.get("/get_feedbackQesList",CheckAuth,AdminController.get_feedbackQesList)
+router.post("/update_feedbackQes",CheckAuth,AdminController.update_feedbackQes)
+router.post("/create_feedbackQes",CheckAuth,AdminController.create_feedbackQes)
+router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
+router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
 
 /*dry cleaning*/
 router.post("/update_drycleaning_service",upload.single('service_pic'),AdminController.update_drycleaning_service)
