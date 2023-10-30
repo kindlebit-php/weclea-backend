@@ -75,7 +75,7 @@ router.post("/submit_drop_details",CheckAuth,upload.array("images", 5),driverCon
 router.post("/Scan-received-loads",CheckAuth,FolderController.Scan_received_loads)
 router.post("/customer-list-wash",CheckAuth,FolderController.customer_list_wash)
 router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id)
-router.post("/submit-wash-detail",CheckAuth,upload.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads", maxCount: 5 },]),FolderController.submit_wash_detail)
+router.post("/submit-wash-detail",CheckAuth,upload.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads_images", maxCount: 5 },]),FolderController.submit_wash_detail)
 router.post("/Scan-loads-For-Dry",CheckAuth,FolderController.Scan_loads_For_Dry)
 //router.post("/submit-dry-detail",CheckAuth,upload.array("images", 5),FolderController.submit_dry_detail)
 router.post("/booking-pickup-instruction",CheckAuth,bookingController.booking_pickup_instruction)

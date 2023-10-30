@@ -280,7 +280,7 @@ export const submit_wash_detail = async (req, res) => {
                  dbConnection.query(userLoads, function (error, userLoadsresults){
 
               const imageArray = [];
-              req.files.extra_loads.forEach((e, i) => {
+              req.files.extra_loads_images.forEach((e, i) => {
               imageArray.push(e.path);
               });
               if (imageArray.length > 5) {
