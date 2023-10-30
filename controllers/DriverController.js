@@ -862,8 +862,7 @@ export const order_histroy = async (req, res) => {
       FROM bookings AS b
       JOIN customer_address AS ca ON b.user_id = ca.user_id
       JOIN users AS u ON b.user_id = u.id
-      WHERE b.order_status = '6' AND b.driver_id = ? AND b.user_id IN (?)
-        ORDER BY DATE DESC, PickUp_date_time DESC`;
+      WHERE b.order_status = '6' AND b.driver_id = ? AND b.user_id IN (?) ORDER BY DATE DESC`;
       dbConnection.query(query, [driverId, userIds], (error, data) => {
         if (error) {
           return res.json({ status: false, message: error.message });
