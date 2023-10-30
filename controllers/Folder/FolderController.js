@@ -99,7 +99,7 @@ export const customer_list_wash = (req, res) => {
   const customer_id = req.body.customer_id;
 
   try {
-    const bookingIdQuery = `SELECT id FROM bookings WHERE folder_id = ?`;
+    const bookingIdQuery = `SELECT id FROM bookings WHERE order_status NOT BETWEEN 4 AND 7 AND order_type != 3 AND  folder_id = ?`;
     dbConnection.query(bookingIdQuery, [folder_id], (error, userIdResult) => {
       if (error) {
         return res.json({ status: false, message: error.message });
