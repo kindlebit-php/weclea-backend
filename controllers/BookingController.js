@@ -590,7 +590,7 @@ export const booking_history = async(req,res)=>{
                 results.forEach(ele => {
                     const {id,date,time,total_loads,drop_image,deliever_date,deliever_time} = ele;
                    console.log(drop_image)
-                        const separatedStrings = drop_image.split(", ")
+                        const separatedStrings = drop_image.split(",");
                         console.log(separatedStrings);
               const imagesUrl = separatedStrings.map((val) => {
                 return `${process.env.BASE_URL}/${val}`;
