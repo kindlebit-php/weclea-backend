@@ -308,12 +308,20 @@ export const get_userList = async(req,res)=>{
 export const get_user_history = async(req,res)=>{
 	var reqData= req.params;
     try { 
-    	
-    	const qry = "SELECT * FROM `bookings` WHERE user_id=?";
-		dbConnection.query(qry,[reqData.user_id], function (error, data) {
-		if (error) throw error;
-			res.json({'status':true,"message":"Success",'data':data});
-		})
+    	const loads = "select users.* from users where id=?";
+		dbConnection.query(loads,[reqData.user_id], function (error, rows) {
+			if (error) throw error;
+			if (rows.length>0) {
+	    		const qry = "SELECT * FROM `bookings`  WHERE user_id=?";
+				dbConnection.query(qry,[reqData.user_id], function (error, data) {
+					if (error) throw error;
+					rows[0]['orders']=data
+					res.json({'status':true,"message":"Success",'data':rows[0]});
+				})
+			}else{
+				res.json({'status':true,"message":"Success",'data':rows});
+			}	
+		});	
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
@@ -934,6 +942,7 @@ export default {
 	delete_packages,
 	get_package_details,
 	get_userList,
+	get_user_history,
 	update_package_status,
 	add_drycleaning_service,
 	update_drycleaning_service,
