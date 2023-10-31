@@ -818,7 +818,7 @@ export const get_ratingList = async(req,res)=>{
 }
 export const get_feedbackQesList = async(req,res)=>{
       try { 
-        	const loads = "select * from wc_rating left join wc_rating_feeback on wc_rating_feeback.rating_id=wc_rating.id where isDelete=0 order by created_at desc";
+        	const loads = "select * from wc_rating left join wc_rating_feeback on wc_rating_feeback.rating_id=wc_rating.id where wc_rating_feeback.isDelete=0 order by wc_rating_feeback.create_date desc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});

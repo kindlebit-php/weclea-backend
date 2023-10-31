@@ -6,7 +6,6 @@ import { getDates,randomNumber,setDateForNotification } from "../helpers/date.js
 
 export const booking_subscription_cron = async(req,res)=>{
      try { 
-
         var datetime = new Date();
         const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
      	const bookingsql = "select id,cron_status,user_id,category_id,total_loads from bookings where date = '"+currentFinalDate+"' and order_type = '2' and cron_status = '0'";

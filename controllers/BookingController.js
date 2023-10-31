@@ -585,7 +585,7 @@ export const booking_rating = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
-
+ 
 export const booking_history = async(req,res)=>{
     try {   
             const userData = res.user;
