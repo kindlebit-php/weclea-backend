@@ -559,7 +559,7 @@ export const order_list = async (req, res) => {
 	var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
 	const list =
-		"SELECT b.id, b.order_id,b.driver_id, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_Status, b.order_Status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b JOIN customer_drop_address AS cda ON b.user_id = cda.user_id JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
+		"SELECT b.id, b.order_id,b.driver_id, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b JOIN customer_drop_address AS cda ON b.user_id = cda.user_id JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
 	  
 	  const data = await new Promise((resolve, reject) => {
 		dbConnection.query(list, (error, data) => {
@@ -569,7 +569,6 @@ export const order_list = async (req, res) => {
 		  }
 		});
 	  });
-  
 	  const driverData = [];
 	  const imagesData = [];
   
@@ -605,24 +604,24 @@ export const order_list = async (req, res) => {
   
 		
   
-		if (item.order_Status === 1) {
-		  item.order_Status = "wash";
-		} else if (item.order_Status === 2) {
-		  item.order_Status = "dry";
-		} else if (item.order_Status === 3) {
-		  item.order_Status = "fold";
-		} else if (item.order_Status === 4) {
-		  item.order_Status = "pack";
-		} else if (item.order_Status === 5) {
-		  item.order_Status = "way-to-drop";
-		} else if (item.order_Status === 6) {
-		  item.order_Status = "completed";
-		} else if (item.order_Status === 7) {
-		  item.order_Status = "not_found";
-		} else if (item.order_Status === 8) {
-		  item.order_Status = "pickup";
+		if (item.order_status === 1) {
+		  item.order_status = "wash";
+		} else if (item.order_status === 2) {
+		  item.order_status = "dry";
+		} else if (item.order_status === 3) {
+		  item.order_status = "fold";
+		} else if (item.order_status === 4) {
+		  item.order_status = "pack";
+		} else if (item.order_status === 5) {
+		  item.order_status = "way-to-drop";
+		} else if (item.order_status === 6) {
+		  item.order_status = "completed";
+		} else if (item.order_status === 7) {
+		  item.order_status = "not_found";
+		} else if (item.order_status === 8) {
+		  item.order_status = "pickup";
 		} else {
-		  item.order_Status = "NA";
+		  item.order_status = "NA";
 		}
 		const imagesQuery= `SELECT pickup_images,wash_images,dry_images,fold_images,pack_images,drop_image,extra_load_images FROM booking_images AS bi JOIN bookings AS b ON bi.booking_id = b.id WHERE b.id = ${item.id} `
 		if (item.order_images === 1) {
