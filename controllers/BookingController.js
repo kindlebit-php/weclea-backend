@@ -272,7 +272,7 @@ export const customer_booking = async(req,res)=>{
                         let hours = dateObject.getHours();
                         let minutes = dateObject.getMinutes();
                         const current_time = hours + ":" + minutes;
-                        const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
+                        // const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
 
                             const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
                             dbConnection.query(custmer_address, function (error, custmeraddressResult) {
@@ -286,7 +286,8 @@ export const customer_booking = async(req,res)=>{
                             }else{
                                 var driver_id = 1
                             }
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
+                            // console.log('currentBookingDate',currentBookingDate)
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
                            
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
@@ -311,8 +312,20 @@ export const customer_booking = async(req,res)=>{
                                            }
                                     });     
                                 }
-                                var updateLoads = (resultss[0].total_loads - total_loads);
-console.log('updateLoads',updateLoads)
+
+                                if(category_id == 1){
+                                var usrLoadsD = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+                                }else if(category_id == 2){
+                                var usrLoadsD = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+                                }else{
+                                var usrLoadsD = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+                                }
+                                dbConnection.query(usrLoadsD, function (error, resultssD) {
+
+                                
+
+                                var updateLoads = (resultssD[0].total_loads - total_loads);
+
                                 if(category_id == 1){
                                     var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
                                 }else if(category_id == 2){
@@ -320,9 +333,11 @@ console.log('updateLoads',updateLoads)
                                 }else{
                                     var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
                                 }
-                                console.log('usrLoadsup',usrLoadsup)
+                                // console.log('usrLoadsup',usrLoadsup)
                                 dbConnection.query(usrLoadsup, function (error, result) {
                                 })
+
+                            })
                                 var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+result.insertId+"')";
                                 dbConnection.query(bookingsql, function (err, bookingresult) {
 
