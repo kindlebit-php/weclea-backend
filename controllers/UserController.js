@@ -569,6 +569,7 @@ export const order_list = async (req, res) => {
 		  }
 		});
 	  });
+	  console.log(data,"data1")
 	  const driverData = [];
 	  const imagesData = [];
   
@@ -585,7 +586,7 @@ export const order_list = async (req, res) => {
 			  }
 			});
 		  });
-  
+		  console.log(driverResults,"data2")
 		  driverData.push(driverResults);
 		  item.Nearby_driver = driverResults;
 		}
