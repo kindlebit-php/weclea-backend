@@ -919,7 +919,7 @@ export const order_histroy = async (req, res) => {
               const imageArray = [];
               if (data?.length > 0) {
                 for (const elem of data) {
-                  const {name,order_status, Customer_Id, PickUp_date_time, pack_images } = elem;
+                  let {name,order_status, Customer_Id, PickUp_date_time, pack_images } = elem;
                   const separatedStrings = pack_images.split(",")
                   const imagesUrl = separatedStrings.map((val) => {
                     return `${process.env.BASE_URL}/${val}`;
