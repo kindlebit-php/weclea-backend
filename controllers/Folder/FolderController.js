@@ -125,7 +125,7 @@ export const customer_list_wash = (req, res) => {
               const {Booking_id,total_loads, Customer_Id, date, time, order_status, pickup_images } = elem;
 
               console.log('images',pickup_images)
-              const separatedStrings = pickup_images.split(", ")
+              const separatedStrings = pickup_images.split(",")
                const imagesUrl=separatedStrings.map((val) => {
                return `${process.env.BASE_URL}/${val}`;
               });
@@ -191,7 +191,7 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
           if (data?.length > 0) {
             for (const elem of data) {
               const { Booking_id, Customer_Id, comment, date, time, order_status, pickup_images } = elem;
-              const separatedStrings = pickup_images.split(", ")
+              const separatedStrings = pickup_images.split(",")
               const imagesUrl = separatedStrings.map((val) => {
                 return `${process.env.BASE_URL}/${val}`;
               });
