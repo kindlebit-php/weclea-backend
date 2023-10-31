@@ -506,6 +506,54 @@ export const submit_wash_detail = async (req, res) => {
   }
 };
 
+
+
+export const print_extra_loads_QrCode = async (req, res) => {
+  try {
+    const userData = res.user;
+    const booking_id = req.body.booking_id;
+    const data = `SELECT id AS qr_codeID, qr_code, folder_pack_status FROM booking_qr WHERE driver_pickup_status = '1' AND folder_recive_status = '1' AND folder_dry_status = '1' AND folder_fold_status = '1' AND booking_id = ?`;
+
+    dbConnection.query(data, [booking_id], function (error, data) {
+      if (error) {
+        return res.status(500).json({ status: false, message: error.message });
+      } else {
+        let count = 0;
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].folder_pack_status === 1) {
+            count++;
+          }
+        }
+
+        if (data.length > 0 && data[0].qr_code.length === count) {
+          let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
+          dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
+            if (updateOrderStatusErr) {
+              return res.status(500).json({ status: false, message: updateOrderStatusErr.message });
+            }
+
+            return res.json({
+              status: true,
+              message: "Data retrieved and order status updated successfully!",
+              load_scanned: count,
+              data: data,
+            });
+          });
+        } else {
+          return res.json({
+            status: true,
+            message: "Data retrieved successfully!",
+            load_scanned: count,
+            data: data,
+          });
+        }
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ status: false, message: error.message });
+  }
+};
+
 export const Scan_loads_For_Dry = (req, res) => {
   const userData = res.user;
   const folder_id = userData[0].id;
@@ -839,7 +887,7 @@ export const order_histroy = async (req, res) => {
         }
         const userIds = userIdResult.map((row) => row.user_id);
         const bookingIds = userIdResult.map((row) => row.id);
-        let query = `SELECT u.name, b.order_id, b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time, b.date, bi.pack_images
+        let query = `SELECT u.name,b.order_status, b.order_id, b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time, b.date, bi.pack_images
           FROM bookings AS b
           JOIN users AS u ON b.user_id = u.id
           JOIN booking_images AS bi ON b.id = bi.booking_id 
@@ -871,7 +919,7 @@ export const order_histroy = async (req, res) => {
               const imageArray = [];
               if (data?.length > 0) {
                 for (const elem of data) {
-                  const {name, Customer_Id, PickUp_date_time, pack_images } = elem;
+                  const {name,order_status, Customer_Id, PickUp_date_time, pack_images } = elem;
                   const separatedStrings = pack_images.split(",")
                   const imagesUrl = separatedStrings.map((val) => {
                     return `${process.env.BASE_URL}/${val}`;
@@ -881,8 +929,21 @@ export const order_histroy = async (req, res) => {
                       type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
                     })
                     )
+                    if (order_status === 1) {
+                      order_status = "wash";
+                    } else if (order_status === 2) {
+                      order_status = "dry";
+                    } else if (order_status === 3) {
+                      order_status = "fold";
+                    } else if (order_status === 4) {
+                      order_status = "pack";
+                    } else {
+                      order_status = "NA";
+                    }
+      
                   resData.push({
                     name,
+                    order_status,
                     Customer_Id,
                     PickUp_date_time,
                     imageList,
@@ -977,11 +1038,13 @@ export const order_histroy_detail= async(req,res)=>{
   }
 }
 
+
 export default {
   Scan_received_loads,
   customer_list_wash,
   wash_detail_ByCustomer_id,
   submit_wash_detail,
+  print_extra_loads_QrCode,
   Scan_loads_For_Dry,
  // submit_dry_detail,
   Scan_loads_For_Fold,
