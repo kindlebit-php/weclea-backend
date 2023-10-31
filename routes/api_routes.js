@@ -8,6 +8,8 @@ import driverController from "../controllers/DriverController.js";
 import paymentController from "../controllers/PaymentController.js";
 import cronController from "../controllers/CronController.js";
 import AdminController from "../controllers/Admin/AdminController.js";
+import emailController from "../controllers/Admin/EamilController.js";
+
 import multer from 'multer';
 import { upload } from "../utils/multer.js";
 import DrycleanController from "../controllers/DrycleanController.js";
@@ -140,6 +142,14 @@ router.post("/update_feedbackQes",CheckAuth,AdminController.update_feedbackQes)
 router.post("/create_feedbackQes",CheckAuth,AdminController.create_feedbackQes)
 router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
 router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
+
+router.get("/get_emailTemplate",CheckAuth,emailController.get_emailTemplate)
+router.get("/get_emailTemplate_detail",CheckAuth,emailController.get_emailTemplate_detail)
+router.post("/update_emailTemplate",CheckAuth,emailController.update_emailTemplate)
+router.post("/create_emailTemplate",CheckAuth,emailController.create_emailTemplate)
+router.post("/delete_emailTemplate",CheckAuth,emailController.delete_emailTemplate)
+router.post("/update_emailTemplate_status",CheckAuth,emailController.update_emailTemplate_status)
+
 
 /*dry cleaning*/
 router.post("/update_drycleaning_service",upload.single('service_pic'),AdminController.update_drycleaning_service)

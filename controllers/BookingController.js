@@ -535,21 +535,31 @@ export const booking_tracking_details = async(req,res)=>{
                         resPackImg[key] = process.env.BASE_URL+'/uploads/'+img;
                     })
                 }
-                if(order_status == 1){
-                    var wash_status = 1;
-                }else if(order_status == 2){
-                    var dry_status = 1;
-                }else if(order_status == 3){
-                    var fold_status = 1;
-                }else if(order_status == 4){
-                    var pack_status = 1;
-                }else{
-                    var pack_status = 0;
-                    var dry_status = 0;
-                    var fold_status = 0;
-                    var wash_status = 0;
-
-                }
+        if(order_status == 1){
+            var wash_status = 1;
+        }else if(order_status == 2){
+            var dry_status = 1;
+            var wash_status = 1;
+        }else if(order_status == 3){
+            var fold_status = 1;
+            var dry_status = 1;
+            var wash_status = 1;
+        }else if(order_status == 4){
+            var pack_status = 1;
+            var fold_status = 1;
+            var dry_status = 1;
+            var wash_status = 1;
+        }else if(order_status == 6){
+            var pack_status = 1;
+            var dry_status = 1;
+            var fold_status = 1;
+            var wash_status = 1;
+        }else{
+            var pack_status = 0;
+            var dry_status = 0;
+            var fold_status = 0;
+            var wash_status = 0;
+        }
                 const initi = {
                     "id":id,"order_type":order_type,"request_confirm_date":request_confirm_date,"request_confirm_status":status,'pickup_confirm_date':pickup_confirm_date,'pickup_confirm_status':1,'pickup_img':resPickImg,'wash_date':wash_date,'wash_status':wash_status,'wash_images':resWashImg,'dry_date':dry_date,'dry_status':dry_status,'dry_images':resDryImg,'fold_date':fold_date,'fold_status':fold_status,'fold_images':resFoldImg,'pack_date':pack_date,'pack_status':pack_status,'pack_images':resPackImg
                 }
