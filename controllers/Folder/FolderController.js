@@ -516,7 +516,7 @@ export const print_extra_loads_QrCode = async (req, res) => {
 
     dbConnection.query(data, [booking_id], function (error, data) {
       if (error) {
-        return res.status(500).json({ status: false, message: error.message });
+        return res.json({ status: false, message: error.message });
       } else {
         let count = 0;
         for (let i = 0; i < data.length; i++) {
@@ -529,7 +529,7 @@ export const print_extra_loads_QrCode = async (req, res) => {
           let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
           dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
             if (updateOrderStatusErr) {
-              return res.status(500).json({ status: false, message: updateOrderStatusErr.message });
+              return res.json({ status: false, message: updateOrderStatusErr.message });
             }
 
             return res.json({
@@ -550,7 +550,7 @@ export const print_extra_loads_QrCode = async (req, res) => {
       }
     });
   } catch (error) {
-    return res.status(500).json({ status: false, message: error.message });
+    return res.json({ status: false, message: error.message });
   }
 };
 
