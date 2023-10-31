@@ -97,7 +97,6 @@ export const Scan_received_loads = (req, res) => {
 export const customer_list_wash = (req, res) => {
   const userData = res.user;
   const folder_id = userData[0].id;
-
   try {
     const bookingIdQuery = `SELECT id FROM bookings WHERE folder_id = ?`;
     dbConnection.query(bookingIdQuery, [folder_id], (error, userIdResult) => {
@@ -825,7 +824,7 @@ export const order_histroy = async (req, res) => {
   try {
     const userData = res.user;
     const folder_id = userData[0].id;
-    const date= req.body.date;
+    const {date,orderId}= req.body
     const userIdQuery = `
             SELECT  b1.id,b1.user_id FROM bookings AS b1
             JOIN users AS u ON u.id = b1.folder_id
@@ -839,25 +838,29 @@ export const order_histroy = async (req, res) => {
         }
         const userIds = userIdResult.map((row) => row.user_id);
         const bookingIds = userIdResult.map((row) => row.id);
+        let query = `SELECT b.order_id, b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time, b.date, bi.pack_images
+          FROM bookings AS b
+          JOIN users AS u ON b.user_id = u.id
+          JOIN booking_images AS bi ON b.id = bi.booking_id 
+          WHERE b.order_status = '4' AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)`;
 
-
-
-        console.log(userIds, bookingIds, folder_id);
-        const query = ` SELECT b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time , b.date,bi.pack_images
-      FROM bookings AS b
-      JOIN users AS u ON b.user_id = u.id
-      JOIN booking_images AS bi ON b.id = bi.booking_id 
-      WHERE  b.order_status = '4' AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)
-        ORDER BY PickUp_date_time DESC`;
+        const queryParams = [folder_id, userIds, bookingIds];
 
         if (date) {
           query += ' AND b.date = ?';
+          queryParams.push(date);
         }
-        dbConnection.query(
-          query,date?
-          [folder_id, userIds, bookingIds,date]:[folder_id, userIds, bookingIds],
-          (error, data) => {
-            console.log(data);
+
+        if (orderId) {
+          query += ' AND b.order_id = ?';
+          queryParams.push(orderId);
+        }
+
+        query += ' ORDER BY PickUp_date_time DESC';
+      
+  
+        dbConnection.query(query,queryParams,(error, data) => {
+          console.log(data)
             if (error) {
               return res.json({ status: false, message: error.message });
             } else if (data.length < 0) {
@@ -868,15 +871,19 @@ export const order_histroy = async (req, res) => {
               if (data?.length > 0) {
                 for (const elem of data) {
                   const { Customer_Id, PickUp_date_time, pack_images } = elem;
-                  for (const image of pack_images) {
-                    imageArray.push({
-                      img_path: image ? `${process.env.HTTPURL}${image}` : "",
-                    });
-                  }
+                  const separatedStrings = pack_images.split(",")
+                  const imagesUrl = separatedStrings.map((val) => {
+                    return `${process.env.BASE_URL}/${val}`;
+                  });
+                    const imageList = imagesUrl.map(imagePath => ({
+                      path: imagePath,
+                      type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
                   resData.push({
                     Customer_Id,
                     PickUp_date_time,
-                    imageArray,
+                    imageList,
                   });
                 }
               }
