@@ -456,7 +456,7 @@ export const submit_wash_detail = async (req, res) => {
           if (updateImagesErr) {
             return res.json({ status: false, message: updateImagesErr.message });
           }
-          if(type != 4)
+          if(type != 4){
           dbConnection.query(updateOrderStatusQuery, [type, booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
             if (updateOrderStatusErr) {
               return res.json({ status: false, message: updateOrderStatusErr.message });
