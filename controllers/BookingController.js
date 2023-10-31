@@ -539,10 +539,16 @@ export const booking_tracking_details = async(req,res)=>{
                     var wash_status = 1;
                 }else if(order_status == 2){
                     var dry_status = 1;
+                    var wash_status = 1;
                 }else if(order_status == 3){
                     var fold_status = 1;
+                    var dry_status = 1;
+                    var wash_status = 1;
                 }else if(order_status == 4){
                     var pack_status = 1;
+                     var fold_status = 1;
+                    var dry_status = 1;
+                    var wash_status = 1;
                 }else{
                     var pack_status = 0;
                     var dry_status = 0;
