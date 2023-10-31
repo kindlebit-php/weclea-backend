@@ -42,8 +42,8 @@ export const customer_booking = async(req,res)=>{
                     dbConnection.query(sqlDistance, function (error, locationResult) {
                     // return false;
                     if(locationResult.length > 0){
-                        // var driver_id = locationResult[0].id
-                        var driver_id = 1
+                        var driver_id = locationResult[0].id
+                        // var driver_id = 1
                     }else{
                         var driver_id = 1
                     }
