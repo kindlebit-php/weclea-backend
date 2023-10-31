@@ -434,16 +434,11 @@ export const edit_user_profile = async(req,res)=>{
 export const update_user_status = async(req,res)=>{
      try {
         const {status,user_id} = req.body;
-        if(status && user_id ){
 				var sql = "update users set status = '"+status+"' where id = '"+user_id+"'";
 				dbConnection.query(sql, function (error, result) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Employee profile has been updated!"});
 				}); 
-		}else{
-            res.json({'status':false,"message":"All fields are required"});
-		}
-      
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
