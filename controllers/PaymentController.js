@@ -880,10 +880,10 @@ export const customer_extra_payment = async (req, res) => {
         var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
     }
   }
-    dbConnection.query(usrLoads,async function (error, results) {
-        if(total_loads > results[0].total_loads){
-            res.json({'status':false,"message":'Insufficient loads,Please buy loads'}); 
-        } else{
+    // dbConnection.query(usrLoads,async function (error, results) {
+    //     if(total_loads > results[0].total_loads){
+    //         res.json({'status':false,"message":'Insufficient loads,Please buy loads'}); 
+    //     } else{
        
 
       const currentBookingDate = dateFormat.format(new Date(date1), 'YYYY-MM-DD');
@@ -987,8 +987,8 @@ export const customer_extra_payment = async (req, res) => {
         } else {
           return res.json({ status: false, message: 'Payment failed' });
         }
-      }
-    });
+     // }
+    // });
   }
   })
     } else {
@@ -1016,10 +1016,10 @@ export const customer_extra_payment_cardId = async (req, res) => {
         var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
     }
   }
-    dbConnection.query(usrLoads,async function (error, results) {
-        if(total_loads > results[0].total_loads){
-            res.json({'status':false,"message":'Insufficient loads,Please buy loads'}); 
-        } else{
+    // dbConnection.query(usrLoads,async function (error, results) {
+    //     if(total_loads > results[0].total_loads){
+    //         res.json({'status':false,"message":'Insufficient loads,Please buy loads'}); 
+    //     } else{
        
 
     const currentBookingDate = dateFormat.format(new Date(date1), 'YYYY-MM-DD');
@@ -1053,8 +1053,8 @@ export const customer_extra_payment_cardId = async (req, res) => {
       return res.json({ status: false, message: 'Payment failed' });
     }
   })
-}
-})
+// }
+// })
   } catch (error) {
     return res.json({ status: false, message: error.message });
   }
