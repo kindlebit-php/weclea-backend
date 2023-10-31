@@ -1,8 +1,8 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
 import dateFormatFinalDate from 'date-and-time';
-import { getDates,randomNumber } from "../helpers/date.js";
 import path from "path";
+import { getDates,randomNumber } from "../helpers/date.js";
 import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
 
 //customer booking API
@@ -42,7 +42,8 @@ export const customer_booking = async(req,res)=>{
                     dbConnection.query(sqlDistance, function (error, locationResult) {
                     // return false;
                     if(locationResult.length > 0){
-                        var driver_id = locationResult[0].id
+                        // var driver_id = locationResult[0].id
+                        var driver_id = 1
                     }else{
                         var driver_id = 1
                     }
@@ -162,7 +163,9 @@ export const customer_booking = async(req,res)=>{
                             dbConnection.query(sqlDistance, function (error, locationResult) {
                             // return false;
                             if(locationResult.length > 0){
-                                var driver_id = locationResult[0].id
+                                // var driver_id = locationResult[0].id
+                                var driver_id = 1
+
                             }else{
                                 var driver_id = 1
                             }
@@ -277,7 +280,9 @@ export const customer_booking = async(req,res)=>{
                             dbConnection.query(sqlDistance, function (error, locationResult) {
                             // return false;
                             if(locationResult.length > 0){
-                                var driver_id = locationResult[0].id
+                                // var driver_id = locationResult[0].id
+                                var driver_id = 1
+
                             }else{
                                 var driver_id = 1
                             }
@@ -472,6 +477,106 @@ export const booking_tracking_status = async(req,res)=>{
 
 }
 
+export const booking_tracking_details = async(req,res)=>{
+
+        const {booking_id} = req.body;
+        try { 
+            var resData = [];
+            var resPickImg = [];
+            var resWashImg = [];
+            var resDryImg = [];
+            var resPackImg = [];
+            var resFoldImg = [];
+            const userData = res.user;
+            var datetime = new Date();
+            const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+            var sql = "select bookings.id,booking_images.wash_images,booking_images.dry_images,booking_images.fold_images,booking_images.pack_images,booking_images.drop_image,bookings.order_status,bookings.order_type,booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.customer_pick_date, ' ', booking_timing.customer_pick_time) AS pickup_confirm_date ,CONCAT(booking_timing.wash_date, ' ', booking_timing.wash_time) AS wash_date,CONCAT(booking_timing.dry_date, ' ', booking_timing.dry_time) AS dry_date,CONCAT(booking_timing.fold_date, ' ', booking_timing.fold_time) AS fold_date,CONCAT(booking_timing.pack_date, ' ', booking_timing.pack_time) AS pack_date from bookings left join booking_timing on bookings.id = booking_timing.booking_id left join booking_images on booking_images.booking_id = bookings.id where bookings.id = '"+booking_id+"' and booking_timing.customer_pick_time IS NOT NULL";
+            dbConnection.query(sql, function (err, resultss) {
+            if(resultss){
+            resultss.forEach(element =>
+            {
+                const {id,order_type,dry_images,wash_images,fold_images,pack_images,dry_date,fold_date,pack_date,order_status,pickup_images,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status} = element;
+                if(pickup_images){
+                    const pickup_images_array = pickup_images.split(',');
+                    pickup_images_array.forEach(function callback(img, key)
+                    {
+                        resPickImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                if(wash_images){
+                    const wash_images_array = wash_images.split(',');
+                    wash_images_array.forEach(function callback(img, key)
+                    {
+                        resWashImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                if(dry_images){
+                    const dry_images_array = dry_images.split(',');
+                    dry_images_array.forEach(function callback(img, key)
+                    {
+                        resDryImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                if(fold_images){
+                    const fold_images_array = fold_images.split(',');
+                    fold_images_array.forEach(function callback(img, key)
+                    {
+                        resFoldImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                if(pack_images){
+                    const pack_images_array = pack_images.split(',');
+                    pack_images_array.forEach(function callback(img, key)
+                    {
+                        resPackImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+        if(order_status == 1){
+            var wash_status = 1;
+        }else if(order_status == 2){
+            var dry_status = 1;
+            var wash_status = 1;
+        }else if(order_status == 3){
+            var fold_status = 1;
+            var dry_status = 1;
+            var wash_status = 1;
+        }else if(order_status == 4){
+            var pack_status = 1;
+            var fold_status = 1;
+            var dry_status = 1;
+            var wash_status = 1;
+        }else if(order_status == 6){
+            var pack_status = 1;
+            var dry_status = 1;
+            var fold_status = 1;
+            var wash_status = 1;
+        }else{
+            var pack_status = 0;
+            var dry_status = 0;
+            var fold_status = 0;
+            var wash_status = 0;
+        }
+                const initi = {
+                    "id":id,"order_type":order_type,"request_confirm_date":request_confirm_date,"request_confirm_status":status,'pickup_confirm_date':pickup_confirm_date,'pickup_confirm_status':1,'pickup_img':resPickImg,'wash_date':wash_date,'wash_status':wash_status,'wash_images':resWashImg,'dry_date':dry_date,'dry_status':dry_status,'dry_images':resDryImg,'fold_date':fold_date,'fold_status':fold_status,'fold_images':resFoldImg,'pack_date':pack_date,'pack_status':pack_status,'pack_images':resPackImg
+                }
+                resData.push(initi);
+            })
+                res.json({'status':true,"message":"user order list",'data':resData});
+            }else{
+                res.json({'status':false,"message":"Not found"});
+
+            }
+            });
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
+}
+
 export const assign_driver = async(req,res)=>{
      try {
         const {booking_id,driver_id} = req.body;
@@ -580,28 +685,29 @@ export const booking_rating = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
-
+ 
 export const booking_history = async(req,res)=>{
     try {   
             const userData = res.user;
             var resData = []
             const sql = "select bookings.date ,bookings.id ,bookings.time, bookings.total_loads,booking_images.drop_image,booking_timing.deliever_date,booking_timing.deliever_time from bookings left join booking_timing on booking_timing.booking_id = bookings.id left join booking_images on booking_images.booking_id = bookings.id where bookings.order_status = 6 and user_id = '"+userData[0].id+"'";
+            console.log('sql',sql)
             dbConnection.query(sql, function (err, results) {
                 results.forEach(ele => {
-                    const {id,date,time,total_loads,drop_image,deliever_date,deliever_time} = ele;
-                   console.log(drop_image)
-                        const separatedStrings = drop_image.split(",");
-                        console.log(separatedStrings);
-              const imagesUrl = separatedStrings.map((val) => {
-                return `${process.env.BASE_URL}/${val}`;
-              });
-                const imageList = imagesUrl.map(imagePath => ({
-                  path: imagePath,
-                  type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
-                })
-                )
-                    
-
+                const {id,date,time,total_loads,drop_image,deliever_date,deliever_time} = ele;
+                if(drop_image){
+                    const separatedStrings = drop_image.split(", ")
+                    const imagesUrl = separatedStrings.map((val) => {
+                        return `${process.env.BASE_URL}/${val}`;
+                    });
+                    var imageList = imagesUrl.map(imagePath => ({
+                        path: imagePath,
+                        type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                }else{
+                    var imageList = [];
+                }
                     const init = {
                         'id':id,'date':date,'time':time,'total_loads':total_loads,'deliever_date':deliever_date,'deliever_time':deliever_time,'images':imageList
                     }
@@ -616,6 +722,7 @@ export const booking_history = async(req,res)=>{
 
 export default {
 	customer_booking,
+    booking_tracking_details,
     delete_booking_date,
     subscription_dates,
     booking_tracking_status,

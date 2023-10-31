@@ -47,6 +47,7 @@ router.post('/delete-booking-date',CheckAuth ,bookingController.delete_booking_d
 router.get('/user-subscription-dates',CheckAuth ,bookingController.subscription_dates);
 router.get('/booking-history',CheckAuth ,bookingController.booking_history);
 router.get('/booking-tracking-status',CheckAuth ,bookingController.booking_tracking_status);
+router.post('/booking-tracking-details',CheckAuth ,bookingController.booking_tracking_details);
 router.get('/get-load-price',CheckAuth ,loadController.get_load_price);
 router.post('/customer-login',userController.customer_login);
 router.post('/forgot-password',userController.forgot_password);
@@ -77,7 +78,7 @@ router.post("/submit_drop_details",CheckAuth,upload.array("images", 5),driverCon
 router.post("/Scan-received-loads",CheckAuth,FolderController.Scan_received_loads)
 router.post("/customer-list-wash",CheckAuth,FolderController.customer_list_wash)
 router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id)
-router.post("/submit-wash-detail",CheckAuth,upload.array("images", 5),FolderController.submit_wash_detail)
+router.post("/submit-wash-detail",CheckAuth,upload.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads_images", maxCount: 5 },]),FolderController.submit_wash_detail)
 router.post("/Scan-loads-For-Dry",CheckAuth,FolderController.Scan_loads_For_Dry)
 //router.post("/submit-dry-detail",CheckAuth,upload.array("images", 5),FolderController.submit_dry_detail)
 router.post("/booking-pickup-instruction",CheckAuth,bookingController.booking_pickup_instruction)

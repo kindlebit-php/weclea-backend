@@ -93,13 +93,13 @@ export const Scan_received_loads = (req, res) => {
 };
 
 
+
 export const customer_list_wash = (req, res) => {
   const userData = res.user;
   const folder_id = userData[0].id;
-  const customer_id = req.body.customer_id;
 
   try {
-    const bookingIdQuery = `SELECT id FROM bookings WHERE order_status NOT BETWEEN 4 AND 7 AND order_type != 3 AND  folder_id = ?`;
+    const bookingIdQuery = `SELECT id FROM bookings WHERE folder_id = ?`;
     dbConnection.query(bookingIdQuery, [folder_id], (error, userIdResult) => {
       if (error) {
         return res.json({ status: false, message: error.message });
@@ -109,46 +109,37 @@ export const customer_list_wash = (req, res) => {
         return res.json({ status: false, message: "User has no bookings" });
       }
       const booking_id = userIdResult.map((row) => row.id);
-      console.log(booking_id, folder_id);
-      let query = `SELECT b.id AS Booking_id, b.user_id AS Customer_Id, bin.pickup_instruction AS comment, b.date, b.time, b.order_status, bi.pickup_images
-                        FROM bookings AS b
-                        JOIN booking_images AS bi ON b.id = bi.booking_id
-                        JOIN booking_instructions AS bin ON b.user_id = bin.user_id
-                        WHERE b.id IN (?)`;
-
-      if (customer_id) {
-        query += ' AND b.user_id = ?';
-      }
-
-      const queryArgs = customer_id ? [booking_id, customer_id] : [booking_id];
-
-      dbConnection.query(query, queryArgs, (error, data) => {
+      const query = `SELECT b.id AS Booking_id,b.total_loads, b.user_id AS Customer_Id, b.date, b.time, b.order_status, bi.pickup_images
+                      FROM bookings AS b
+                      JOIN booking_images AS bi ON b.id = bi.booking_id
+                      WHERE b.id IN (?)`;
+      dbConnection.query(query, [booking_id], (error, data) => {
         if (error) {
           return res.json({ status: false, message: error.message });
-        } else if (data.length === 0) {
+        } else if (data.length == 0) {
           return res.json({ status: false, message: "Data not found" });
         } else {
-          const resData = data.map((elem) => {
-            const { Booking_id, Customer_Id, comment, date, time, order_status, pickup_images } = elem;
-            const separatedStrings = pickup_images.split(",");
-            const imagesUrl = separatedStrings.map((val) => {
-              return `${process.env.BASE_URL}/${val}`;
-            });
-            const imageList = imagesUrl.map((imagePath) => ({
-              path: imagePath,
-              type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
-            }));
-            return {
-              Booking_id,
-              Customer_Id,
-              comment,
-              date,
-              time,
-              order_status,
-              imageList,
-            };
-          });
+          const resData = [];
+          if (data?.length > 0) {
+            for (const elem of data) {
+              const {Booking_id,total_loads, Customer_Id, date, time, order_status, pickup_images } = elem;
 
+              console.log('images',pickup_images)
+              const separatedStrings = pickup_images.split(",")
+               const imagesUrl=separatedStrings.map((val) => {
+               return `${process.env.BASE_URL}/${val}`;
+              });
+                 resData.push({
+                Booking_id,
+                Customer_Id,
+                date,
+                total_loads,
+                time,
+                order_status,
+                imagesUrl,
+              });
+            }
+          }
           return res.json({
             status: true,
             message: "Updated successfully!",
@@ -200,7 +191,7 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
           if (data?.length > 0) {
             for (const elem of data) {
               const { Booking_id, Customer_Id, comment, date, time, order_status, pickup_images } = elem;
-              const separatedStrings = pickup_images.split(",");
+              const separatedStrings = pickup_images.split(",")
               const imagesUrl = separatedStrings.map((val) => {
                 return `${process.env.BASE_URL}/${val}`;
               });
@@ -287,6 +278,20 @@ export const submit_wash_detail = async (req, res) => {
               var userLoads = "select yeshiba as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
             }
                  dbConnection.query(userLoads, function (error, userLoadsresults){
+
+              const imageArray = [];
+              req.files.extra_loads_images.forEach((e, i) => {
+              imageArray.push(e.path);
+              });
+              if (imageArray.length > 5) {
+              return res.json({ status: false, message: "Only 5 images are allowed" });
+              }
+              const pickupImagesJSON = imageArray.join(", ");
+
+              var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                 dbConnection.query(extraSQL, function (error, userLoadsresults){
+                        })
+
                     if(userLoadsresults[0].totalCount >= extra_loads ){
                       var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
                       if(bookingdata[0].category_id == 1){
@@ -425,6 +430,10 @@ export const submit_wash_detail = async (req, res) => {
                     }
                  })
           })
+        }else{
+        updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
+        updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         }
       }
 
@@ -432,9 +441,9 @@ export const submit_wash_detail = async (req, res) => {
         if (updateTimeErr) {
           return res.json({ status: false, message: updateTimeErr.message });
         }
-
+// console.log('req.files',req.files)
         const imageArray = [];
-        req.files.forEach((e, i) => {
+        req.files.images.forEach((e, i) => {
           imageArray.push(e.path);
         });
         console.log(imageArray)
