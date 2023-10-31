@@ -862,7 +862,7 @@ export const customer_extra_payment = async (req, res) => {
   const userId = userData[0].id;
   const customerId = userData[0].customer_id;
   console.log(customerId)
-  const { cardNumber, expMonth, expYear, amount, cvc, card_status,date1 } = req.body;
+  const { cardNumber, expMonth, expYear, amount, cvc, card_status,date1,category_id,total_loads } = req.body;
   try {
     if (cardNumber && expMonth && expYear && cvc && amount && card_status !== undefined) {
       if ((cvc.length !== 3 && cvc.length !== 4) || cvc === "000" || cvc === "0000") {
@@ -871,6 +871,21 @@ export const customer_extra_payment = async (req, res) => {
           message: "Your card security code is invalid",
         });
       }
+      if(category_id){
+      if(category_id == 1){
+        var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+    }else if(category_id == 2){
+        var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+    }else{
+        var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+    }
+  }
+    dbConnection.query(usrLoads,async function (error, results) {
+        if(total_loads > results[0].total_loads){
+            res.json({'status':false,"message":'Insufficient loads,Please buy loads'}); 
+        } else{
+       
+
       const currentBookingDate = dateFormat.format(new Date(date1), 'YYYY-MM-DD');
 
       const order = `SELECT count(id) FROM bookings WHERE user_id = ${userData[0].id} AND date = '${currentBookingDate}'`; 
@@ -974,6 +989,8 @@ export const customer_extra_payment = async (req, res) => {
         }
       }
     });
+  }
+  })
     } else {
       return res.json({ status: false, message: "All fields are required" });
     }
@@ -988,8 +1005,22 @@ export const customer_extra_payment_cardId = async (req, res) => {
     const userData = res.user;
     const userId = userData[0].id;
     const customerId = userData[0].customer_id;
-    const { cardId, amount,date1 } = req.body;
+    const { cardId, amount,date1,category_id,total_loads } = req.body;
 
+    if(category_id){
+      if(category_id == 1){
+        var usrLoads = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+    }else if(category_id == 2){
+        var usrLoads = "select residential as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+    }else{
+        var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
+    }
+  }
+    dbConnection.query(usrLoads,async function (error, results) {
+        if(total_loads > results[0].total_loads){
+            res.json({'status':false,"message":'Insufficient loads,Please buy loads'}); 
+        } else{
+       
 
     const currentBookingDate = dateFormat.format(new Date(date1), 'YYYY-MM-DD');
 
@@ -1022,6 +1053,8 @@ export const customer_extra_payment_cardId = async (req, res) => {
       return res.json({ status: false, message: 'Payment failed' });
     }
   })
+}
+})
   } catch (error) {
     return res.json({ status: false, message: error.message });
   }
