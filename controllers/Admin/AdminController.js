@@ -1,4 +1,6 @@
 import dbConnection from'../../config/db.js';
+import transport from "../../helpers/mail.js";
+
 import AWS from 'aws-sdk';
 const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
 const USER_SECRET = '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';
@@ -308,7 +310,7 @@ export const get_userList = async(req,res)=>{
 export const get_user_history = async(req,res)=>{
 	var reqData= req.params;
     try { 
-    	const loads = "select users.* from users where id=?";
+    	const loads = "select users.*,customer_address.`address`, customer_address.`appartment`, customer_address.`city`, customer_address.`state`, customer_address.`zip`,customer_address.`latitude`, customer_address.`longitude` from users left join customer_address on customer_address.user_id=users.id where id=?";
 		dbConnection.query(loads,[reqData.user_id], function (error, rows) {
 			if (error) throw error;
 			if (rows.length>0) {
@@ -326,6 +328,56 @@ export const get_user_history = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+export const sendNotification=async(req,res)=>{
+	var reqData=req.body;
+	/*try{
+		const loads = "select wc_email_template.* from wc_email_template where id=12";
+		dbConnection.query(loads,[reqData.user_id], function (error, rows) {
+			if (error) throw error;
+			if (rows.length>0) {
+	    
+
+				message =message.replace('[username]',argument.username );
+		        message =message.replace('[channel_name]',argument.title );
+		        message =message.replace( '[subject]',argument.seller_name);
+		        message =message.replace( '[channel_id]',argument.id);
+		        message =message.replace('[message]',argument.title );
+		        message =message.replace('[seller_name]',argument.seller_name );
+		        subject =subject.replace( '[subject]',argument.seller_name);
+				const mailOptions = 
+		     	{
+			        from: 'ankuchauhan68@gmail.com',
+			        to: reqData.emails,
+			        subject: reqData.subject,
+			        html: `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
+			            <div style="margin:50px auto;width:70%;padding:20px 0">
+			            <div style="border-bottom:1px solid #eee">
+			            <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">WeClea</a>
+			            </div>
+			            <p style="font-size:1.1em">Hi ,</p>
+			            <p>You have an upcoming booking on ${ele.date} ,Please purchase loads..</p>
+			            <p style="font-size:0.9em;">Regards,<br />WeClea</p>
+			            <hr style="border:none;border-top:1px solid #eee" />
+			            <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
+			            <p>WeClea Inc</p>
+			            <p>USA</p>
+			            </div>
+			            </div>
+			            </div>`,
+		        };
+
+		        transport.sendMail(mailOptions, function (error, info) 
+		        {
+
+
+		        })
+    		}
+		})
+	}catch(error){
+
+	}*/
+}
+
 /*********** User Listing End ************/
 
 
