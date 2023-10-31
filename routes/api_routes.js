@@ -66,7 +66,7 @@ router.post("/pickup-loads",CheckAuth,driverController.pickup_loads)
 router.post("/pickup-loads-detail",CheckAuth,driverController.pickup_loads_detail);
 router.post("/submit_pickup_details",CheckAuth,upload.array("images", 5),driverController.submit_pickup_details);
 router.post("/laundry-NotFound",CheckAuth,upload.array("images", 5),driverController.laundry_NotFound);
-router.get("/order-histroy",CheckAuth,driverController.order_histroy);
+router.post("/order-histroy",CheckAuth,driverController.order_histroy);
 router.post("/order-histroy-byOrderId",CheckAuth,driverController.order_histroy_byOrderId);
 router.get("/profile",CheckAuth,driverController.profile)
 router.post("/get-drop-orders",CheckAuth,driverController.get_drop_orders);
@@ -86,7 +86,7 @@ router.post("/booking-delievery-instruction",CheckAuth,bookingController.booking
 router.post("/Scan-loads-For-Fold",CheckAuth,FolderController.Scan_loads_For_Fold)
 //router.post("/submit-fold-detail",CheckAuth,upload.array("images", 5),FolderController.submit_fold_detail)
 router.post("/Scan-loads-For-Pack",CheckAuth,FolderController.Scan_loads_For_Pack)
-router.get("/folder-order-histroy",CheckAuth,FolderController.order_histroy);
+router.post("/folder-order-histroy",CheckAuth,FolderController.order_histroy);
 router.get("/profile",CheckAuth,driverController.profile)
 
 //**********************************************************************************//
