@@ -143,12 +143,14 @@ router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
 router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
 
 /**** Email template****/
+
 router.get("/get_emailTemplate",CheckAuth,emailController.get_emailTemplate)
 router.get("/get_emailTemplate_detail",CheckAuth,emailController.get_emailTemplate_detail)
 router.post("/update_emailTemplate",CheckAuth,emailController.update_emailTemplate)
 router.post("/create_emailTemplate",CheckAuth,emailController.create_emailTemplate)
 router.post("/delete_emailTemplate",CheckAuth,emailController.delete_emailTemplate)
 router.post("/update_emailTemplate_status",CheckAuth,emailController.update_emailTemplate_status)
+
 
 /*dry cleaning*/
 router.post("/update_drycleaning_service",upload.single('service_pic'),AdminController.update_drycleaning_service)
