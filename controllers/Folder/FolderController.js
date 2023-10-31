@@ -839,7 +839,7 @@ export const order_histroy = async (req, res) => {
         }
         const userIds = userIdResult.map((row) => row.user_id);
         const bookingIds = userIdResult.map((row) => row.id);
-        let query = `SELECT b.order_id, b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time, b.date, bi.pack_images
+        let query = `SELECT u.name, b.order_id, b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time, b.date, bi.pack_images
           FROM bookings AS b
           JOIN users AS u ON b.user_id = u.id
           JOIN booking_images AS bi ON b.id = bi.booking_id 
@@ -871,7 +871,7 @@ export const order_histroy = async (req, res) => {
               const imageArray = [];
               if (data?.length > 0) {
                 for (const elem of data) {
-                  const { Customer_Id, PickUp_date_time, pack_images } = elem;
+                  const {name, Customer_Id, PickUp_date_time, pack_images } = elem;
                   const separatedStrings = pack_images.split(",")
                   const imagesUrl = separatedStrings.map((val) => {
                     return `${process.env.BASE_URL}/${val}`;
@@ -882,6 +882,7 @@ export const order_histroy = async (req, res) => {
                     })
                     )
                   resData.push({
+                    name,
                     Customer_Id,
                     PickUp_date_time,
                     imageList,
