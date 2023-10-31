@@ -8,7 +8,7 @@ import driverController from "../controllers/DriverController.js";
 import paymentController from "../controllers/PaymentController.js";
 import cronController from "../controllers/CronController.js";
 import AdminController from "../controllers/Admin/AdminController.js";
-import emailController from "../controllers/Admin/EamilController.js";
+import emailController from "../controllers/Admin/EmailController.js";
 
 import multer from 'multer';
 import { upload } from "../utils/multer.js";
