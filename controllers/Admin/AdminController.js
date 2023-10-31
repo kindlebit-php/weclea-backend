@@ -310,7 +310,7 @@ export const get_userList = async(req,res)=>{
 export const get_user_history = async(req,res)=>{
 	var reqData= req.params;
     try { 
-    	const loads = "select users.*,customer_address.`address`, customer_address.`appartment`, customer_address.`city`, customer_address.`state`, customer_address.`zip`,customer_address.`latitude`, customer_address.`longitude` from users left join customer_address on customer_address.user_id=users.id where id=?";
+    	const loads = "select users.*,customer_address.`address`, customer_address.`appartment`, customer_address.`city`, customer_address.`state`, customer_address.`zip`,customer_address.`latitude`, customer_address.`longitude` from users left join customer_address on customer_address.user_id=users.id where users.id=?";
 		dbConnection.query(loads,[reqData.user_id], function (error, rows) {
 			if (error) throw error;
 			if (rows.length>0) {
