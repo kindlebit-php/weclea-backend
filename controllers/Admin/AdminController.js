@@ -942,6 +942,7 @@ export default {
 	delete_packages,
 	get_package_details,
 	get_userList,
+	get_user_history,
 	update_package_status,
 	add_drycleaning_service,
 	update_drycleaning_service,

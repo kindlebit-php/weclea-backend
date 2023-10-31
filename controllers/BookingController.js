@@ -257,11 +257,12 @@ export const customer_booking = async(req,res)=>{
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
                     var resData = [];
+                    // console.log('allDates',allDates)
                     allDates.forEach(function callback(element, key)
                     {
                         var frequencyDate = new Date(allDates[key]);
                         const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
-                        
+                        console.log('frequencyDBDate',frequencyDBDate)
                         const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"'";
                         dbConnection.query(checkIfDateExist, function (error, checkIfresults) {
                         if(checkIfresults[0].tpyedate == 0){
@@ -273,7 +274,6 @@ export const customer_booking = async(req,res)=>{
                         const current_time = hours + ":" + minutes;
                         const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
 
-                        if(frequencyDBDate == currentBookingDate ){
                             const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
                             dbConnection.query(custmer_address, function (error, custmeraddressResult) {
                             var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
@@ -305,14 +305,14 @@ export const customer_booking = async(req,res)=>{
                 
                                                 const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
                                                 dbConnection.query(updatePdf, async function (err, result2) {
-                                                    console.log(result2)
+                                                    // console.log('result2',result2)
                                                 })
                                         });
                                            }
                                     });     
                                 }
                                 var updateLoads = (resultss[0].total_loads - total_loads);
-
+console.log('updateLoads',updateLoads)
                                 if(category_id == 1){
                                     var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
                                 }else if(category_id == 2){
@@ -320,6 +320,7 @@ export const customer_booking = async(req,res)=>{
                                 }else{
                                     var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
                                 }
+                                console.log('usrLoadsup',usrLoadsup)
                                 dbConnection.query(usrLoadsup, function (error, result) {
                                 })
                                 var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+result.insertId+"')";
@@ -338,16 +339,6 @@ export const customer_booking = async(req,res)=>{
                             }); 
                             }); 
                             }); 
-                        }else{
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+category_id+"')";
-                      
-                            dbConnection.query(sql, function (err, resultsub) {
-                                var order_id = '1001'+resultsub.insertId;
-                                var sql = "update bookings set order_id = '"+order_id+"'where id = '"+resultsub.insertId+"'";
-                                dbConnection.query(sql, function (err, resultss) {
-                                });
-                            });
-                        }
                           }
                         })
                     }) 

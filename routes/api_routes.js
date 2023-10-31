@@ -8,7 +8,7 @@ import driverController from "../controllers/DriverController.js";
 import paymentController from "../controllers/PaymentController.js";
 import cronController from "../controllers/CronController.js";
 import AdminController from "../controllers/Admin/AdminController.js";
-import emailController from "../controllers/Admin/EamilController.js";
+import emailController from "../controllers/Admin/EmailController.js";
 
 import multer from 'multer';
 import { upload } from "../utils/multer.js";
@@ -127,21 +127,22 @@ router.post("/create_packages",CheckAuth,AdminController.create_packages)
 router.post("/delete_packages",CheckAuth,AdminController.delete_packages)
 router.get("/get_package_details/:id?",CheckAuth,AdminController.get_package_details)
 router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
+router.get("/get_user_history/:user_id?",CheckAuth,AdminController.get_user_history)
+
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
 router.post("/update_faq_index",CheckAuth,AdminController.update_faq_index)
 router.get("/get_all_order/:type?/:searchStr?/:start?/:limit?",CheckAuth,AdminController.get_all_order)
 router.get("/get_order_detail/:booking_id?",CheckAuth,AdminController.get_order_detail)
-
 router.get("/get_all_driver/:searchStr?/:start?/:limit?",AdminController.get_all_driver)
 router.get("/get_driver_detail/:user_id?/:searchStr?/:start?/:limit?",AdminController.get_driver_detail)
-
-
 router.get("/get_ratingList",CheckAuth,AdminController.get_ratingList)
 router.get("/get_feedbackQesList",CheckAuth,AdminController.get_feedbackQesList)
 router.post("/update_feedbackQes",CheckAuth,AdminController.update_feedbackQes)
 router.post("/create_feedbackQes",CheckAuth,AdminController.create_feedbackQes)
 router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
 router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
+
+/**** Email template****/
 
 router.get("/get_emailTemplate",CheckAuth,emailController.get_emailTemplate)
 router.get("/get_emailTemplate_detail",CheckAuth,emailController.get_emailTemplate_detail)
