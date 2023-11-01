@@ -410,7 +410,7 @@ export const submit_wash_detail = async (req, res) => {
                              return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
-                            console.log('payemnt failled')
+                            console.log('payemnt failled kailash')
 
                             var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
                           if(bookingdata[0].category_id == 1){
