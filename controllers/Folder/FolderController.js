@@ -361,6 +361,7 @@ export const submit_wash_detail = async (req, res) => {
                       const users = "select card_status from users where id = '"+bookingdata[0].user_id+"'"
                       dbConnection.query(users,async function (error, usersresult) {
                         if(usersresult[0].card_status == 1){
+                          console.log('enter card status')
                          const customerId=data1[0].customer_id;
                          const paymentMethods = await stripe.paymentMethods.list({
                           customer: customerId,
@@ -383,6 +384,7 @@ export const submit_wash_detail = async (req, res) => {
                           });
                          
                           if (paymentIntent.status === 'succeeded') {
+                            console.log('payemnt success')
                             const currentDate = date(); 
                             const sql = `INSERT INTO payment (user_id,booking_id, amount, payment_id, date) VALUES ('${
                               data[0].user_id}', '${booking_id}', '${amount}', '${paymentIntent.id}', '${currentDate}')`;
@@ -408,6 +410,8 @@ export const submit_wash_detail = async (req, res) => {
                              return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
+                            console.log('payemnt failled')
+
                             var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
                           if(bookingdata[0].category_id == 1){
                           var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
