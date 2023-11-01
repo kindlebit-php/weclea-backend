@@ -1086,7 +1086,6 @@ export const order_histroy = async (req, res) => {
                     } else {
                       order_status = "NA";
                     }
-      
                   resData.push({
                     BookingId,
                     name,
