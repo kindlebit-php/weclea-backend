@@ -656,8 +656,8 @@ export const update_faq_index = async(req,res)=>{
   	console.log('update_faq_index',position);
     try { 
     	for (var i = 0; i < position.length; i++) {
-    		console.log("update wc_faq set index_id='"+i+"' where id = "+position[i]['id']+"  and faq_type = "+faq_type+" ");
-    		var updateContnetQry = "update wc_faq set index_id="+i+" where id = "+position[i]['id']+" and faq_type = "+faq_type+"";
+    		console.log("update wc_faq set index_id='"+i+"' where id = "+position[i]['id']+"  and faq_type = '"+faq_type+"' ");
+    		var updateContnetQry = "update wc_faq set index_id="+i+" where id = "+position[i]['id']+" and faq_type = '"+faq_type+"'";
     		var k=0;
     		dbConnection.query(updateContnetQry, function (error, data) {
 				if (error) throw error;
