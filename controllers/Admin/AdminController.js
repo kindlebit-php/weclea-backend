@@ -651,12 +651,13 @@ export const delete_faq = async(req,res)=>{
 export const update_faq_index = async(req,res)=>{
 	const reqData = req.body;
 	const position = reqData.position;
+	const faq_type = reqData.faq_type;
   	const index_id =1;
   	console.log('update_faq_index',position);
     try { 
     	for (var i = 0; i < position.length; i++) {
-    		console.log("update wc_faq set index_id='"+i+"' where id = "+position[i]['id']+"  and faq_type = "+position[i]['faq_type']+" ");
-    		var updateContnetQry = "update wc_faq set index_id="+i+" where id = "+position[i]['id']+" and faq_type = "+position[i]['faq_type']+"";
+    		console.log("update wc_faq set index_id='"+i+"' where id = "+position[i]['id']+"  and faq_type = "+faq_type+" ");
+    		var updateContnetQry = "update wc_faq set index_id="+i+" where id = "+position[i]['id']+" and faq_type = "+faq_type+"";
     		var k=0;
     		dbConnection.query(updateContnetQry, function (error, data) {
 				if (error) throw error;
