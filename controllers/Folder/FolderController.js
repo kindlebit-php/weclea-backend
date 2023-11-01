@@ -1086,21 +1086,23 @@ export const order_histroy = async (req, res) => {
                     } else {
                       order_status = "NA";
                     }
-                  resData.push({
+
+                  const responseData={
                     BookingId,
                     name,
                     order_status,
                     Customer_Id,
                     PickUp_date_time,
                     imageList,
+                  }
+                  return res.json({
+                    status: true,
+                    message: "Data retrieved successfully!",
+                    data: responseData,
                   });
                 }
               }
-              return res.json({
-                status: true,
-                message: "Data retrieved successfully!",
-                data: resData,
-              });
+             
             }
           }
         );
@@ -1219,13 +1221,14 @@ export const order_histroy_detail= async(req,res)=>{
                       PickUp_date_time,
                       laundry_detail
                     }
+                    return res.json({
+                      status: true,
+                      message: "Data retrieved successfully!!",
+                      data: responseData,
+                    });
                 }
               }
-              return res.json({
-                status: true,
-                message: "Data retrieved successfully!!",
-                data: responseData,
-              });
+             
             }
           }
         );
