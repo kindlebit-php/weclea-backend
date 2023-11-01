@@ -292,22 +292,12 @@ export const submit_wash_detail = async (req, res) => {
             }else{
               var userLoads = "select yeshiba as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
             }
+            console.log('userloads at first check',userLoads)
                  dbConnection.query(userLoads, function (error, userLoadsresults){
-
-              const imageArray = [];
-              req.files.extra_loads_images.forEach((e, i) => {
-              imageArray.push(e.path);
-              });
-              if (imageArray.length > 5) {
-              return res.json({ status: false, message: "Only 5 images are allowed" });
-              }
-              const pickupImagesJSON = imageArray.join(", ");
-
-              var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
-                 dbConnection.query(extraSQL, function (error, userLoadsresultss){
-                        })
+                      console.log('reached at extra load loop',userLoadsresults)
 
                     if(userLoadsresults[0].totalCount >= extra_loads ){
+                      console.log('reached at extra load check',userLoadsresults[0].totalCount )
                       var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
                       if(bookingdata[0].category_id == 1){
                       var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
@@ -316,10 +306,13 @@ export const submit_wash_detail = async (req, res) => {
                       }else{
                       var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"' ";
                       }
+
+                      console.log('updated logs',usrLoadsup)
                       dbConnection.query(usrLoadsup, function (error, result) {
                       })
 
                       for (var i = 0; extra_loads > i; i++) {
+                        console.log('reached at qr code')
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
                         dbConnection.query(sql, function (err, results) {
                           if(results){
@@ -339,6 +332,20 @@ export const submit_wash_detail = async (req, res) => {
                           }
                         });     
                       }
+
+                const imageArray = [];
+                req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                });
+                if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                }
+                const pickupImagesJSON = imageArray.join(", ");
+
+                var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                })
+
                   const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
@@ -377,6 +384,19 @@ export const submit_wash_detail = async (req, res) => {
 
                             dbConnection.query(sql, function (error, result) {
                                   });
+                  const imageArray = [];
+                  req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                  });
+                  if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                  }
+                  const pickupImagesJSON = imageArray.join(", ");
+
+                  var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                  dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                  })
+
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
@@ -414,6 +434,20 @@ export const submit_wash_detail = async (req, res) => {
                               }
                             });     
                         }
+
+                          const imageArray = [];
+                req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                });
+                if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                }
+                const pickupImagesJSON = imageArray.join(", ");
+
+                var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                })
+
                         const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
@@ -453,6 +487,18 @@ export const submit_wash_detail = async (req, res) => {
                               }
                             });     
                         }
+                          const imageArray = [];
+                req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                });
+                if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                }
+                const pickupImagesJSON = imageArray.join(", ");
+
+                var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                })
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                         dbConnection.query(updateBooking, function (err, results) {
                         })
