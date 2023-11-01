@@ -97,22 +97,30 @@ export const Scan_received_loads = (req, res) => {
 export const customer_list_wash = (req, res) => {
   const userData = res.user;
   const folder_id = userData[0].id;
+  const customer_id = req.body.customer_id;
   try {
     const bookingIdQuery = `SELECT id FROM bookings WHERE folder_id = ?`;
     dbConnection.query(bookingIdQuery, [folder_id], (error, userIdResult) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
-
+console.log(userIdResult)
       if (userIdResult.length === 0) {
         return res.json({ status: false, message: "User has no bookings" });
       }
       const booking_id = userIdResult.map((row) => row.id);
-      const query = `SELECT b.id AS Booking_id,b.total_loads, b.user_id AS Customer_Id, b.date, b.time, b.order_status, bi.pickup_images
+      const query = `SELECT b.id AS Booking_id,b.total_loads,bin.delievery_instruction AS Note_From_Delivery, b.user_id AS Customer_Id, b.date, b.time, b.order_status, bi.pickup_images
                       FROM bookings AS b
                       JOIN booking_images AS bi ON b.id = bi.booking_id
+                      JOIN booking_instructions AS bin ON b.user_id = bin.user_id
                       WHERE b.id IN (?)`;
-      dbConnection.query(query, [booking_id], (error, data) => {
+                      if (customer_id) {
+        
+                        query += ' AND b.user_id = ?';
+                      }
+                
+                      dbConnection.query(query, customer_id ? [booking_id, customer_id] : [booking_id], (error, data) => {
+                        console.log(data)
         if (error) {
           return res.json({ status: false, message: error.message });
         } else if (data.length == 0) {
@@ -121,7 +129,7 @@ export const customer_list_wash = (req, res) => {
           const resData = [];
           if (data?.length > 0) {
             for (const elem of data) {
-              const {Booking_id,total_loads, Customer_Id, date, time, order_status, pickup_images } = elem;
+              const {Booking_id,total_loads, Customer_Id,Note_From_Delivery, date, time, order_status, pickup_images } = elem;
 
               console.log('images',pickup_images)
               const separatedStrings = pickup_images.split(",")
@@ -131,6 +139,7 @@ export const customer_list_wash = (req, res) => {
                  resData.push({
                 Booking_id,
                 Customer_Id,
+                Note_From_Delivery,
                 date,
                 total_loads,
                 time,
@@ -535,13 +544,23 @@ export const print_extra_loads_QrCode = async (req, res) => {
             if (updateOrderStatusErr) {
               return res.json({ status: false, message: updateOrderStatusErr.message });
             }
+            const customerId_Query = "SELECT b.user_id AS customer_id,bin.delievery_instruction AS Note_From_Delivery FROM bookings AS b JOIN booking_instructions AS bin ON b.user_id = bin.user_id WHERE b.id = ?";
+      dbConnection.query(customerId_Query, [booking_id], function (error, data1) {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+        const combinedResponse = {
+          status: true,
+          message: "Data retrieved and order status updated successfully!",
+          load_scanned: count,
+          data: dataResult,
+          data1: data1,
+        };
 
-            return res.json({
-              status: true,
-              message: "Data retrieved and order status updated successfully!",
-              load_scanned: count,
-              data: data,
-            });
+        return res.json(combinedResponse);
+
+      })
+            
           });
         } else {
           return res.json({
