@@ -1,6 +1,8 @@
 import dbConnection from "../../config/db.js";
 import { date, randomNumber, time } from "../../helpers/date.js";
 import path from "path";
+import dateFormat from 'date-and-time';
+
 import { fcm_notification } from "../../helpers/fcm.js";
 import { generatePDF, generateQRCode, getUserData } from "../../helpers/qr_slip.js";
 
@@ -99,12 +101,13 @@ export const customer_list_wash = (req, res) => {
   const folder_id = userData[0].id;
   const customer_id = req.body.customer_id;
   try {
-    const bookingIdQuery = `SELECT id FROM bookings WHERE folder_id = ?`;
-    dbConnection.query(bookingIdQuery, [folder_id], (error, userIdResult) => {
+    var datetime = new Date();
+    const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+    const bookingIdQuery = "SELECT bookings.id FROM bookings left join booking_qr on booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and date = '"+currentFinalDate+"'";
+    dbConnection.query(bookingIdQuery, (error, userIdResult) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
-console.log(userIdResult)
       if (userIdResult.length === 0) {
         return res.json({ status: false, message: "User has no bookings" });
       }
