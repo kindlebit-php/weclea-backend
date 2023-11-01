@@ -304,7 +304,7 @@ export const submit_wash_detail = async (req, res) => {
               const pickupImagesJSON = imageArray.join(", ");
 
               var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
-                 dbConnection.query(extraSQL, function (error, userLoadsresults){
+                 dbConnection.query(extraSQL, function (error, userLoadsresultss){
                         })
 
                     if(userLoadsresults[0].totalCount >= extra_loads ){
