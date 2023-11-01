@@ -373,8 +373,7 @@ export const submit_wash_detail = async (req, res) => {
 
                             dbConnection.query(sql, function (error, result) {
                                   });
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id },
-            });
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
                             var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
@@ -409,9 +408,8 @@ export const submit_wash_detail = async (req, res) => {
                             });     
                         }
                           }
-                        res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
-
-                          //payment deduct if card exist
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+                      
 
                         }else{
                           var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
@@ -445,8 +443,8 @@ export const submit_wash_detail = async (req, res) => {
                               }
                             });     
                         }
-                        res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
-
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+                       
                         }
 
                       })
