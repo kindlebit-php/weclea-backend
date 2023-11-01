@@ -372,11 +372,10 @@ export const submit_wash_detail = async (req, res) => {
                               data[0].user_id}', '${booking_id}', '${amount}', '${paymentIntent.id}', '${currentDate}')`;
 
                             dbConnection.query(sql, function (error, result) {
-                          
-                            res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
-
-                                //  return res.json({ status: true, message: 'Payment successful' });
                                   });
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id },
+            });
+                            // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
                             var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
                           if(bookingdata[0].category_id == 1){
