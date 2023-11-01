@@ -135,6 +135,8 @@ export const customer_list_wash = (req, res) => {
               const {Booking_id,total_loads, Customer_Id,Note_From_Delivery, date, time, orderStatus, pickup_images } = elem;
               if(orderStatus == 8){
                 var order_status = 0
+              }else{
+                var order_status = orderStatus
               }
               console.log('images',pickup_images)
               const separatedStrings = pickup_images.split(",")
