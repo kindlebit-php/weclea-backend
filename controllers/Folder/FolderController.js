@@ -340,7 +340,7 @@ export const submit_wash_detail = async (req, res) => {
                         });     
                       }
                         res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
-                      
+
                     }else{
                       const users = "select card_status from users where id = '"+bookingdata[0].user_id+"'"
                       dbConnection.query(users,async function (error, usersresult) {
@@ -372,10 +372,8 @@ export const submit_wash_detail = async (req, res) => {
                               data[0].user_id}', '${booking_id}', '${amount}', '${paymentIntent.id}', '${currentDate}')`;
 
                             dbConnection.query(sql, function (error, result) {
-                            if (error) {
-                               return res.json({ status: false, message: error.message });
-                                 }
-                        res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
+                          
+                            res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
 
                                 //  return res.json({ status: true, message: 'Payment successful' });
                                   });
