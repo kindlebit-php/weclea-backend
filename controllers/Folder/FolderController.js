@@ -385,6 +385,30 @@ export const submit_wash_detail = async (req, res) => {
                          
                           if (paymentIntent.status === 'succeeded') {
                             console.log('payemnt success')
+
+
+                            for (var i = 0; extra_loads > i; i++) {
+                        console.log('reached at qr code')
+                        var sql = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
+                        dbConnection.query(sql, function (err, results) {
+                          if(results){
+                            var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
+                            dbConnection.query(sql2, async function (err, result1) {
+                              const qr_codes = result1.map((row) => row.qr_code);
+                              const getAll_qrCode= await generateQRCode(qr_codes)
+                              const userData1 = await getUserData(booking_id);
+                              const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                              const match = pdfBytes.match(/uploads\\(.+)/);
+                              const newPath = 'uploads//' +match[1];
+                              const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                              dbConnection.query(updatePdf, async function (err, result2) {
+                               
+                              })
+                            });
+                          }
+                        });     
+                      }
+
                             const currentDate = date(); 
                             const sql = `INSERT INTO payment (user_id,booking_id, amount, payment_id, date) VALUES ('${
                               data[0].user_id}', '${booking_id}', '${amount}', '${paymentIntent.id}', '${currentDate}')`;
