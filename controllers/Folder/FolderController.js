@@ -373,6 +373,8 @@ export const submit_wash_detail = async (req, res) => {
                             if (error) {
                                return res.json({ status: false, message: error.message });
                                  }
+                        res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
+                                 
                                 //  return res.json({ status: true, message: 'Payment successful' });
                                   });
                           }else{
@@ -408,6 +410,7 @@ export const submit_wash_detail = async (req, res) => {
                             });     
                         }
                           }
+                        res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
 
                           //payment deduct if card exist
 
@@ -443,6 +446,8 @@ export const submit_wash_detail = async (req, res) => {
                               }
                             });     
                         }
+                        res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
+
                         }
 
                       })
