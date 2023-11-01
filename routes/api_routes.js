@@ -21,6 +21,7 @@ router.post('/customer-register',userController.customer_register);
 router.post('/delete-employee',userController.delete_employee);
 router.post('/newsletter',userController.newsletter);
 router.post('/register-employee',userController.register_employee);
+router.post('/contact-us',userController.contact_us);
 router.post('/update-employee',userController.update_employee);
 router.post('/update-user-status',userController.update_user_status);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
