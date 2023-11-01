@@ -294,8 +294,8 @@ export const submit_wash_detail = async (req, res) => {
             }
             console.log('userloads at first check',userLoads)
                  dbConnection.query(userLoads, function (error, userLoadsresults){
-                      console.log('reached at extra load loop',userLoadsresults)
-
+                      console.log('reached at extra load loop',userLoadsresults[0].totalCount)
+                      console.log('extra_loads',extra_loads)
                     if(userLoadsresults[0].totalCount >= extra_loads ){
                       console.log('reached at extra load check',userLoadsresults[0].totalCount )
                       var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
