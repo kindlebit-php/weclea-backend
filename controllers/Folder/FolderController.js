@@ -283,7 +283,7 @@ export const submit_wash_detail = async (req, res) => {
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         if(extra_loads !=''){
-          var booking = "select user_id,category_id from bookings where id = '"+booking_id+"'";
+          var booking = "select user_id,category_id ,extra_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
             if(bookingdata[0].category_id == 1){
               var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
@@ -339,8 +339,11 @@ export const submit_wash_detail = async (req, res) => {
                           }
                         });     
                       }
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
-                      
+                  const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                  dbConnection.query(updateBooking, function (err, results) {
+                  })
+                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+
 
                     }else{
                       const users = "select card_status from users where id = '"+bookingdata[0].user_id+"'"
@@ -374,6 +377,9 @@ export const submit_wash_detail = async (req, res) => {
 
                             dbConnection.query(sql, function (error, result) {
                                   });
+                            const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                  dbConnection.query(updateBooking, function (err, results) {
+                  })
                              return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
@@ -408,6 +414,9 @@ export const submit_wash_detail = async (req, res) => {
                               }
                             });     
                         }
+                        const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                  dbConnection.query(updateBooking, function (err, results) {
+                  })
                           }
                              return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
                       
@@ -444,6 +453,9 @@ export const submit_wash_detail = async (req, res) => {
                               }
                             });     
                         }
+                            const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                        dbConnection.query(updateBooking, function (err, results) {
+                        })
                              return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
                        
                         }
