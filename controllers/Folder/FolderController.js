@@ -339,6 +339,8 @@ export const submit_wash_detail = async (req, res) => {
                           }
                         });     
                       }
+                        res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
+                      
                     }else{
                       const users = "select card_status from users where id = '"+bookingdata[0].user_id+"'"
                       dbConnection.query(users,async function (error, usersresult) {
@@ -374,7 +376,7 @@ export const submit_wash_detail = async (req, res) => {
                                return res.json({ status: false, message: error.message });
                                  }
                         res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
-                                 
+
                                 //  return res.json({ status: true, message: 'Payment successful' });
                                   });
                           }else{
@@ -457,7 +459,7 @@ export const submit_wash_detail = async (req, res) => {
         }else{
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
-        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         }
       }
 
