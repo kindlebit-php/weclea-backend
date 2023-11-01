@@ -349,10 +349,13 @@ export const submit_wash_detail = async (req, res) => {
                   const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
+                      console.log('extra first case')
+
                   return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
 
 
                     }else{
+                      console.log('extra secnd case')
                       const users = "select card_status from users where id = '"+bookingdata[0].user_id+"'"
                       dbConnection.query(users,async function (error, usersresult) {
                         if(usersresult[0].card_status == 1){
