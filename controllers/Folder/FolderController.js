@@ -109,7 +109,7 @@ console.log(userIdResult)
         return res.json({ status: false, message: "User has no bookings" });
       }
       const booking_id = userIdResult.map((row) => row.id);
-      const query = `SELECT b.id AS Booking_id,b.total_loads,bin.delievery_instruction AS Note_From_Delivery, b.user_id AS Customer_Id, b.date, b.time, b.order_status, bi.pickup_images
+      let query = `SELECT b.id AS Booking_id,b.total_loads,bin.delievery_instruction AS Note_From_Delivery, b.user_id AS Customer_Id, b.date, b.time, b.order_status, bi.pickup_images
                       FROM bookings AS b
                       JOIN booking_images AS bi ON b.id = bi.booking_id
                       JOIN booking_instructions AS bin ON b.user_id = bin.user_id
