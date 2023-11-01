@@ -654,6 +654,52 @@ export const print_extra_loads_QrCode = async (req, res) => {
   }
 };
 
+
+export const scanning_extra_loads = async (req, res) => {
+  try {
+    const userData = res.user;
+    const driverId = userData[0].id;
+    const { qr_code, qr_codeID } = req.body;
+
+    const bookingDataQuery =
+      "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
+    dbConnection.query(
+      bookingDataQuery,
+      [qr_code, qr_codeID],
+      function (error, data) {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+
+        if (data.length > 0 && data[0].folder_fold_status === 1) {
+          const updateStatus = `UPDATE booking_qr SET folder_pack_status = '1' WHERE id = ${data[0].id}`;
+
+          dbConnection.query(updateStatus,function (updateerror, updateResult) {
+              if (updateerror) {
+                return res.json({status: false,message: updateerror.message,});
+              }
+              const result = {
+                booking_id: data[0].booking_id,
+                qrCode_id: data[0].id,
+                folder_pack_status: 1,
+              };
+              res.json({
+                status: true,
+                message: "Data scanned and updated successfully!",
+                data: result,
+              });
+            }
+          );
+        } else {
+          res.json({ status: false, message: "data not processed" });
+        }
+      }
+    );
+  } catch (error) {
+    res.json({ status: false, message: error.message });
+  }
+};
+
 export const Scan_loads_For_Dry = (req, res) => {
   const userData = res.user;
   const folder_id = userData[0].id;
@@ -987,7 +1033,7 @@ export const order_histroy = async (req, res) => {
         }
         const userIds = userIdResult.map((row) => row.user_id);
         const bookingIds = userIdResult.map((row) => row.id);
-        let query = `SELECT u.name,b.order_status, b.order_id, b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time, b.date, bi.pack_images
+        let query = `SELECT b.id AS BookingId, u.name,b.order_status, b.order_id, b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time, b.date, bi.pack_images
           FROM bookings AS b
           JOIN users AS u ON b.user_id = u.id
           JOIN booking_images AS bi ON b.id = bi.booking_id 
@@ -1019,7 +1065,7 @@ export const order_histroy = async (req, res) => {
               const imageArray = [];
               if (data?.length > 0) {
                 for (const elem of data) {
-                  let {name,order_status, Customer_Id, PickUp_date_time, pack_images } = elem;
+                  let {BookingId,name,order_status, Customer_Id, PickUp_date_time, pack_images } = elem;
                   const separatedStrings = pack_images.split(",")
                   const imagesUrl = separatedStrings.map((val) => {
                     return `${process.env.BASE_URL}/${val}`;
@@ -1040,8 +1086,8 @@ export const order_histroy = async (req, res) => {
                     } else {
                       order_status = "NA";
                     }
-      
                   resData.push({
+                    BookingId,
                     name,
                     order_status,
                     Customer_Id,
@@ -1072,33 +1118,26 @@ export const order_histroy_detail= async(req,res)=>{
   try {
     const userData = res.user;
     const folder_id = userData[0].id;
-    const order_id=req.body.order_id;
-    const userIdQuery = `
-            SELECT  b1.id,b1.user_id FROM bookings AS b1
-            JOIN users AS u ON u.id = b1.folder_id
-            WHERE u.id = ?`;
-    dbConnection.query(
-      userIdQuery,
-      [folder_id],
-      async (error, userIdResult) => {
-        if (error) {
-          return res.json({ status: false, message: error.message });
-        }
-        const userIds = userIdResult.map((row) => row.user_id);
-        const bookingIds = userIdResult.map((row) => row.id);
-
-        console.log(userIds, bookingIds, folder_id);
-        const query = ` SELECT  b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time ,bi.pack_images
+    const BookingId=req.body.BookingId;
+    // const userIdQuery = `
+    //         SELECT  b1.id,b1.user_id FROM bookings AS b1
+    //         JOIN users AS u ON u.id = b1.folder_id
+    //         WHERE u.id = ?`;
+    // dbConnection.query(userIdQuery,[folder_id],async (error, userIdResult) => {
+    //     if (error) {
+    //       return res.json({ status: false, message: error.message });
+    //     }
+        // const userIds = userIdResult.map((row) => row.user_id);
+        // const bookingIds = userIdResult.map((row) => row.id);
+        const query = `SELECT  b.user_id AS Customer_Id,cda.address,cda.zip AS Zip_Code,u.mobile,CONCAT(b.date, ' ', b.time) AS PickUp_date_time ,bi.wash_images,bi.dry_images,bi.fold_images,bi.pack_images,bt.wash_date,bt.wash_time,bt.dry_date,bt.dry_time,bt.fold_date,bt.fold_time,bt.pack_date,bt.pack_time
       FROM bookings AS b
+      JOIN customer_drop_address AS cda ON b.user_id = cda.user_id
       JOIN users AS u ON b.user_id = u.id
-      JOIN booking_images AS bi ON b.id = bi.booking_id 
-      WHERE  b.order_status = '4' AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)
-        ORDER BY PickUp_date_time DESC`;
+      JOIN booking_timing AS bt ON b.id = bt.booking_id
+      JOIN booking_images AS bi ON b.id = bi.booking_id
+      WHERE  b.id = ? ORDER BY PickUp_date_time DESC`;
 
-        dbConnection.query(
-          query,
-          [folder_id, userIds, bookingIds],
-          (error, data) => {
+        dbConnection.query(query,[BookingId],(error, data) => {
             console.log(data);
             if (error) {
               return res.json({ status: false, message: error.message });
@@ -1109,16 +1148,78 @@ export const order_histroy_detail= async(req,res)=>{
               const imageArray = [];
               if (data?.length > 0) {
                 for (const elem of data) {
-                  const { Customer_Id, PickUp_date_time, pack_images } = elem;
-                  for (const image of pack_images) {
-                    imageArray.push({
-                      img_path: image ? `${process.env.HTTPURL}${image}` : "",
-                    });
-                  }
+                  const { Customer_Id,address,Zip_Code,mobile,PickUp_date_time,wash_images,dry_images,fold_images, pack_images,wash_date,wash_time,dry_date,dry_time,fold_date,fold_time,pack_date,pack_time } = elem;
+                  const separatedStrings1 = wash_images.split(",")
+                  const imagesUrl1 = separatedStrings1.map((val) => {
+                    return `${process.env.BASE_URL}/${val}`;
+                  });
+                    const imageList1 = imagesUrl1.map(imagePath => ({
+                      path: imagePath,
+                      type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                    const separatedStrings2 = dry_images.split(",")
+                  const imagesUrl2 = separatedStrings2.map((val) => {
+                    return `${process.env.BASE_URL}/${val}`;
+                  });
+                    const imageList2 = imagesUrl2.map(imagePath => ({
+                      path: imagePath,
+                      type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                    const separatedStrings3 = fold_images.split(",")
+                  const imagesUrl3 = separatedStrings3.map((val) => {
+                    return `${process.env.BASE_URL}/${val}`;
+                  });
+                    const imageList3 = imagesUrl3.map(imagePath => ({
+                      path: imagePath,
+                      type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                    const separatedStrings4 = pack_images.split(",")
+                  const imagesUrl4 = separatedStrings4.map((val) => {
+                    return `${process.env.BASE_URL}/${val}`;
+                  });
+                    const imageList4 = imagesUrl4.map(imagePath => ({
+                      path: imagePath,
+                      type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                    const laundry_detail = [
+                      {
+                        title: "Wash",
+                        imageList: imageList1,
+                        wash_date: wash_date,
+                        wash_time: wash_time
+                      },
+                      {
+                        title: "Dry",
+                        imageList: imageList2,
+                        dry_date: dry_date,
+                        dry_time: dry_time
+                      },
+                      {
+                        title: "Fold",
+                        imageList: imageList3,
+                        fold_date: fold_date,
+                        fold_time: fold_time
+                      },
+                      {
+                        title: "Pack",
+                        imageList: imageList4,
+                        pack_date: pack_date,
+                        pack_time: pack_time
+                      }
+                    ];
+                    
+
                   resData.push({
                     Customer_Id,
+                    address,
+                    Zip_Code,
+                    mobile,
                     PickUp_date_time,
-                    imageArray,
+                    laundry_detail
                   });
                 }
               }
@@ -1130,8 +1231,8 @@ export const order_histroy_detail= async(req,res)=>{
             }
           }
         );
-      }
-    );
+    //   }
+    // );
   }  catch (error) {
     console.log(error.message);
     res.json({ status: false, message: error.message });
@@ -1151,4 +1252,5 @@ export default {
 //  submit_fold_detail,
   Scan_loads_For_Pack,
   order_histroy,
+  order_histroy_detail
 };

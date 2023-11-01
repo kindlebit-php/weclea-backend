@@ -89,6 +89,7 @@ router.post("/Scan-loads-For-Fold",CheckAuth,FolderController.Scan_loads_For_Fol
 //router.post("/submit-fold-detail",CheckAuth,upload.array("images", 5),FolderController.submit_fold_detail)
 router.post("/Scan-loads-For-Pack",CheckAuth,FolderController.Scan_loads_For_Pack)
 router.post("/folder-order-histroy",CheckAuth,FolderController.order_histroy);
+router.post("/order_histroy_detail",CheckAuth,FolderController.order_histroy_detail)
 router.get("/profile",CheckAuth,driverController.profile)
 
 //**********************************************************************************//
