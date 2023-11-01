@@ -1087,22 +1087,21 @@ export const order_histroy = async (req, res) => {
                       order_status = "NA";
                     }
 
-                  const responseData={
+                  resData.push({
                     BookingId,
                     name,
                     order_status,
                     Customer_Id,
                     PickUp_date_time,
                     imageList,
-                  }
-                  return res.json({
-                    status: true,
-                    message: "Data retrieved successfully!",
-                    data: responseData,
                   });
                 }
               }
-             
+              return res.json({
+                status: true,
+                message: "Data retrieved successfully!",
+                data: resData,
+              });
             }
           }
         );
