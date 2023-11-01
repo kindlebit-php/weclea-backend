@@ -1,6 +1,8 @@
 import dbConnection from "../../config/db.js";
 import { date, randomNumber, time } from "../../helpers/date.js";
 import path from "path";
+import dateFormat from 'date-and-time';
+
 import { fcm_notification } from "../../helpers/fcm.js";
 import { generatePDF, generateQRCode, getUserData } from "../../helpers/qr_slip.js";
 
@@ -99,17 +101,18 @@ export const customer_list_wash = (req, res) => {
   const folder_id = userData[0].id;
   const customer_id = req.body.customer_id;
   try {
-    const bookingIdQuery = `SELECT id FROM bookings WHERE folder_id = ?`;
-    dbConnection.query(bookingIdQuery, [folder_id], (error, userIdResult) => {
+    var datetime = new Date();
+    const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+    const bookingIdQuery = "SELECT bookings.id FROM bookings left join booking_qr on booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"'";
+    dbConnection.query(bookingIdQuery, (error, userIdResult) => {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
-console.log(userIdResult)
       if (userIdResult.length === 0) {
         return res.json({ status: false, message: "User has no bookings" });
       }
       const booking_id = userIdResult.map((row) => row.id);
-      let query = `SELECT b.id AS Booking_id,b.total_loads,bin.delievery_instruction AS Note_From_Delivery, b.user_id AS Customer_Id, b.date, b.time, b.order_status, bi.pickup_images
+      let query = `SELECT b.id AS Booking_id,b.total_loads,bin.delievery_instruction AS Note_From_Delivery, b.user_id AS Customer_Id, b.date, b.time, b.order_status as orderStatus, bi.pickup_images
                       FROM bookings AS b
                       JOIN booking_images AS bi ON b.id = bi.booking_id
                       JOIN booking_instructions AS bin ON b.user_id = bin.user_id
@@ -129,8 +132,12 @@ console.log(userIdResult)
           const resData = [];
           if (data?.length > 0) {
             for (const elem of data) {
-              const {Booking_id,total_loads, Customer_Id,Note_From_Delivery, date, time, order_status, pickup_images } = elem;
-
+              const {Booking_id,total_loads, Customer_Id,Note_From_Delivery, date, time, orderStatus, pickup_images } = elem;
+              if(orderStatus == 8){
+                var order_status = 0
+              }else{
+                var order_status = orderStatus
+              }
               console.log('images',pickup_images)
               const separatedStrings = pickup_images.split(",")
                const imagesUrl=separatedStrings.map((val) => {
@@ -276,8 +283,10 @@ export const submit_wash_detail = async (req, res) => {
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         if(extra_loads !=''){
-          var booking = "select user_id,category_id from bookings where id = '"+booking_id+"'";
+          var booking = "select user_id,category_id ,extra_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
+
+            console.log('bookingdata',booking)
             if(bookingdata[0].category_id == 1){
               var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
             }else if(bookingdata[0].category_id == 2){
@@ -285,22 +294,12 @@ export const submit_wash_detail = async (req, res) => {
             }else{
               var userLoads = "select yeshiba as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
             }
+            console.log('userloads at first check',userLoads)
                  dbConnection.query(userLoads, function (error, userLoadsresults){
-
-              const imageArray = [];
-              req.files.extra_loads_images.forEach((e, i) => {
-              imageArray.push(e.path);
-              });
-              if (imageArray.length > 5) {
-              return res.json({ status: false, message: "Only 5 images are allowed" });
-              }
-              const pickupImagesJSON = imageArray.join(", ");
-
-              var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
-                 dbConnection.query(extraSQL, function (error, userLoadsresults){
-                        })
-
+                      console.log('reached at extra load loop',userLoadsresults[0].totalCount)
+                      console.log('extra_loads',extra_loads)
                     if(userLoadsresults[0].totalCount >= extra_loads ){
+                      console.log('reached at extra load check',userLoadsresults[0].totalCount )
                       var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
                       if(bookingdata[0].category_id == 1){
                       var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
@@ -309,10 +308,13 @@ export const submit_wash_detail = async (req, res) => {
                       }else{
                       var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"' ";
                       }
+
+                      console.log('updated logs',usrLoadsup)
                       dbConnection.query(usrLoadsup, function (error, result) {
                       })
 
                       for (var i = 0; extra_loads > i; i++) {
+                        console.log('reached at qr code')
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
                         dbConnection.query(sql, function (err, results) {
                           if(results){
@@ -332,10 +334,34 @@ export const submit_wash_detail = async (req, res) => {
                           }
                         });     
                       }
+
+                const imageArray = [];
+                req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                });
+                if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                }
+                const pickupImagesJSON = imageArray.join(", ");
+
+                var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                })
+
+                  const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                  dbConnection.query(updateBooking, function (err, results) {
+                  })
+                      console.log('extra first case')
+
+                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+
+
                     }else{
+                      console.log('extra secnd case')
                       const users = "select card_status from users where id = '"+bookingdata[0].user_id+"'"
                       dbConnection.query(users,async function (error, usersresult) {
                         if(usersresult[0].card_status == 1){
+                          console.log('enter card status')
                          const customerId=data1[0].customer_id;
                          const paymentMethods = await stripe.paymentMethods.list({
                           customer: customerId,
@@ -358,17 +384,34 @@ export const submit_wash_detail = async (req, res) => {
                           });
                          
                           if (paymentIntent.status === 'succeeded') {
+                            console.log('payemnt success')
                             const currentDate = date(); 
                             const sql = `INSERT INTO payment (user_id,booking_id, amount, payment_id, date) VALUES ('${
                               data[0].user_id}', '${booking_id}', '${amount}', '${paymentIntent.id}', '${currentDate}')`;
 
                             dbConnection.query(sql, function (error, result) {
-                            if (error) {
-                               return res.json({ status: false, message: error.message });
-                                 }
-                                //  return res.json({ status: true, message: 'Payment successful' });
                                   });
+                  const imageArray = [];
+                  req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                  });
+                  if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                  }
+                  const pickupImagesJSON = imageArray.join(", ");
+
+                  var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                  dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                  })
+
+                            const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                  dbConnection.query(updateBooking, function (err, results) {
+                  })
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+                            // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
+                            console.log('payemnt failled')
+
                             var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
                           if(bookingdata[0].category_id == 1){
                           var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
@@ -400,9 +443,26 @@ export const submit_wash_detail = async (req, res) => {
                               }
                             });     
                         }
-                          }
 
-                          //payment deduct if card exist
+                          const imageArray = [];
+                req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                });
+                if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                }
+                const pickupImagesJSON = imageArray.join(", ");
+
+                var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                })
+
+                        const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                  dbConnection.query(updateBooking, function (err, results) {
+                  })
+                          }
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+                      
 
                         }else{
                           var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
@@ -436,6 +496,23 @@ export const submit_wash_detail = async (req, res) => {
                               }
                             });     
                         }
+                          const imageArray = [];
+                req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                });
+                if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                }
+                const pickupImagesJSON = imageArray.join(", ");
+
+                var extraSQL = "UPDATE booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                })
+                            const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                        dbConnection.query(updateBooking, function (err, results) {
+                        })
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+                       
                         }
 
                       })
@@ -445,7 +522,7 @@ export const submit_wash_detail = async (req, res) => {
         }else{
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
-        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         }
       }
 
