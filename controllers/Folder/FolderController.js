@@ -1098,7 +1098,7 @@ export const order_histroy = async (req, res) => {
               }
               return res.json({
                 status: true,
-                message: "Updated successfully!",
+                message: "Data retrieved successfully!",
                 data: resData,
               });
             }
@@ -1225,7 +1225,7 @@ export const order_histroy_detail= async(req,res)=>{
               }
               return res.json({
                 status: true,
-                message: "Updated successfully!",
+                message: "Data retrieved successfully!",
                 data: resData,
               });
             }
