@@ -1223,7 +1223,7 @@ export const order_histroy_detail= async(req,res)=>{
               }
               return res.json({
                 status: true,
-                message: "Data retrieved successfully!",
+                message: "Data retrieved successfully!!",
                 data: responseData,
               });
             }
