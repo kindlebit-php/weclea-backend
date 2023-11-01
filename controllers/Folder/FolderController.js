@@ -285,6 +285,8 @@ export const submit_wash_detail = async (req, res) => {
         if(extra_loads !=''){
           var booking = "select user_id,category_id ,extra_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
+
+            console.log('bookingdata',booking)
             if(bookingdata[0].category_id == 1){
               var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
             }else if(bookingdata[0].category_id == 2){
