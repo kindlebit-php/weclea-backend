@@ -166,7 +166,7 @@ export const print_All_Drop_QrCode = async (req, res) => {
   try {
     const userData = res.user;
     const booking_id = req.body.booking_id;
-    const data = `SELECT id AS qr_codeID, qr_code,driver_drop_status FROM booking_qr WHERE booking_id  = ${booking_id}`;
+    const data = `SELECT id AS qr_codeID, qr_code,driver_drop_status FROM booking_qr WHERE folder_pack_status = 1 AND booking_id  = ${booking_id}`;
     dbConnection.query(data, function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });

@@ -970,10 +970,26 @@ export const customer_list = async (req, res) => {
 	  res.json({ status: false, message: error.message });
 	}
   };
-
+    export const contact_us = async (req, res) => {
+		try {
+			const {name,email,message} = req.body;
+			if(name  && email && message){
+				var sql = "INSERT INTO contact_us (name, email,message) VALUES ('"+name+"', '"+email+"','"+message+"')";
+				dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+					res.json({'status':true,"message":"We will connect you shortly!"});
+				});
+			}else{
+				res.json({'status':false,"message":"All fields are required"});
+			}
+		} catch (error) {
+		  	res.json({ status: false, message: error.message });
+		}
+	}
 export default {
 	user_registered_address,
 	customer_register,
+	contact_us,
 	get_notification,
 	customer_address,
 	customer_login,
