@@ -567,8 +567,8 @@ export const submit_wash_detail = async (req, res) => {
         })
         dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
         })
-      })
           return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+      })
 
         }
       }
