@@ -283,8 +283,20 @@ export const submit_wash_detail = async (req, res) => {
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         if(extra_loads !=''){
-          var booking = "select user_id,category_id ,extra_loads from bookings where id = '"+booking_id+"'";
+          var booking = "select user_id,category_id ,extra_loads,total_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
+
+          var  qrCountSql = "select count(id) as qrCount from booking_qr where booking_id = '"+booking_id+"' ";
+          dbConnection.query(qrCountSql, function (error, qrCountresults){
+            if(Number(qrCountresults[0].qrCount) > bookingdata[0].total_loads){
+              var deleteRecord = (Number(qrCountresults[0].qrCount) - bookingdata[0].total_loads)
+              var  qrCountSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
+              dbConnection.query(qrCountSql, function (error, qrCountresults){
+
+              })
+            }
+          })
+
             if(bookingdata[0].category_id == 1){
               var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
             }else if(bookingdata[0].category_id == 2){
