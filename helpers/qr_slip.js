@@ -2,7 +2,8 @@ import dbConnection from "../config/db.js";
 import qrcode from "qrcode";
 import { v4 as uuidv4 } from 'uuid'; 
 import pdf from "pdf-creator-node"; 
-import path from "path";
+
+
 
 export const qr_slip = async (req, res) => {
     try {
@@ -129,10 +130,8 @@ export const generatePDF= async(data, qrCode)=> {
       pdf.create(document, options)
         .then((res) => {
           resolve(res.filename);
-          console.log('filename',filename)
         })
         .catch((error) => {
-          console.log('error',error)
           reject(error);
         });
     });
