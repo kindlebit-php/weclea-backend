@@ -271,18 +271,18 @@ export const submit_wash_detail = async (req, res) => {
         updateDateTimeQuery = `UPDATE booking_timing SET wash_time = ?, wash_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET wash_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
-        updateQRtatusQuery = "UPDATE booking_qr SET folder_recive_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE booking_qr SET folder_recive_status = ? WHERE booking_id = ?";
       } else if (type == 2) {
         updateDateTimeQuery = `UPDATE booking_timing SET dry_time = ?, dry_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET dry_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
-        updateQRtatusQuery = "UPDATE booking_qr SET folder_dry_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE booking_qr SET folder_dry_status = ? WHERE booking_id = ?";
         
       } else if (type == 3) {
         updateDateTimeQuery = `UPDATE booking_timing SET fold_time = ?, fold_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET fold_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
-        updateQRtatusQuery = "UPDATE booking_qr SET folder_fold_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE booking_qr SET folder_fold_status = ? WHERE booking_id = ?";
         
       } else if(type == 4){
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
