@@ -658,38 +658,50 @@ export const print_extra_loads_QrCode = async (req, res) => {
             count++;
           }
         }
-
-        if (data.length > 0 && data[0].qr_code.length === count) {
+        const total_qr_code=data.map((row) => row.qr_code);
+        const customerId_Query = "SELECT b.user_id AS customer_id,bin.delievery_instruction AS Note_From_Delivery FROM bookings AS b JOIN booking_instructions AS bin ON b.user_id = bin.user_id WHERE b.id = ?";
+        if ( total_qr_code.length === count) {
           let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
           dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
             if (updateOrderStatusErr) {
               return res.json({ status: false, message: updateOrderStatusErr.message });
             }
-            const customerId_Query = "SELECT b.user_id AS customer_id,bin.delievery_instruction AS Note_From_Delivery FROM bookings AS b JOIN booking_instructions AS bin ON b.user_id = bin.user_id WHERE b.id = ?";
+           
       dbConnection.query(customerId_Query, [booking_id], function (error, data1) {
         if (error) {
           return res.json({ status: false, message: error.message });
         }
+        const Customer_Id=data1[0].customer_id;
+        const Note_From_Delivery=data1[0].Note_From_Delivery;
         const combinedResponse = {
           status: true,
           message: "Data retrieved and order status updated successfully!",
-          load_scanned: count,
-          data: dataResult,
-          data1: data1,
+          Customer_Id,Note_From_Delivery,
+          scanned_qr_code:count,
+          data
         };
-
         return res.json(combinedResponse);
 
       })
             
           });
         } else {
-          return res.json({
-            status: true,
-            message: "Data retrieved successfully!",
-            load_scanned: count,
-            data: data,
-          });
+          dbConnection.query(customerId_Query, [booking_id], function (error, data1) {
+            if (error) {
+              return res.json({ status: false, message: error.message });
+            }
+            const Customer_Id=data1[0].customer_id;
+            const Note_From_Delivery=data1[0].Note_From_Delivery;
+            const combinedResponse = {
+              status: true,
+              message: "Data retrieved successfully!",
+              Customer_Id,Note_From_Delivery,
+              scanned_qr_code:count,
+              data
+            };
+            return res.json(combinedResponse);
+    
+          })
         }
       }
     });
