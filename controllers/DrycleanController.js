@@ -110,7 +110,7 @@ export const get_category = async (req, res) => {
         const current_time = hours + ":" + minutes;
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
 
-        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,category_id,total_amount,cron_status) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,1,'"+userData[0].category_id+"','"+amount+"',1)";
+        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,category_id,total_amount) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,1,'"+userData[0].category_id+"','"+amount+"')";
 
         dbConnection.query(sql, function (err, result) {
         if(result){
