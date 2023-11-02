@@ -1143,16 +1143,7 @@ export const order_histroy_detail= async(req,res)=>{
     const userData = res.user;
     const folder_id = userData[0].id;
     const BookingId=req.body.BookingId;
-    // const userIdQuery = `
-    //         SELECT  b1.id,b1.user_id FROM bookings AS b1
-    //         JOIN users AS u ON u.id = b1.folder_id
-    //         WHERE u.id = ?`;
-    // dbConnection.query(userIdQuery,[folder_id],async (error, userIdResult) => {
-    //     if (error) {
-    //       return res.json({ status: false, message: error.message });
-    //     }
-        // const userIds = userIdResult.map((row) => row.user_id);
-        // const bookingIds = userIdResult.map((row) => row.id);
+   
         const query = `SELECT  b.user_id AS Customer_Id,cda.address,cda.zip AS Zip_Code,u.mobile,CONCAT(b.date, ' ', b.time) AS PickUp_date_time ,bi.wash_images,bi.dry_images,bi.fold_images,bi.pack_images,bt.wash_date,bt.wash_time,bt.dry_date,bt.dry_time,bt.fold_date,bt.fold_time,bt.pack_date,bt.pack_time
       FROM bookings AS b
       JOIN customer_drop_address AS cda ON b.user_id = cda.user_id
@@ -1168,7 +1159,6 @@ export const order_histroy_detail= async(req,res)=>{
             } else if (data.length < 0) {
               return res.json({ status: false, message: "data not found" });
             } else {
-              const resData = [];
               const imageArray = [];
               if (data?.length > 0) {
                 for (const elem of data) {
@@ -1237,26 +1227,22 @@ export const order_histroy_detail= async(req,res)=>{
                     ];
                     
 
-                  resData.push({
-                    Customer_Id,
+                  const resData={Customer_Id,
                     address,
                     Zip_Code,
                     mobile,
                     PickUp_date_time,
-                    laundry_detail
-                  });
+                    laundry_detail}
+                    return res.json({
+                      status: true,
+                      message: "Updated successfully!",
+                      data: resData,
+                    });
                 }
               }
-              return res.json({
-                status: true,
-                message: "Updated successfully!",
-                data: resData,
-              });
             }
           }
         );
-    //   }
-    // );
   }  catch (error) {
     console.log(error.message);
     res.json({ status: false, message: error.message });
