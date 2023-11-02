@@ -265,6 +265,7 @@ export const submit_wash_detail = async (req, res) => {
       let updateDateTimeQuery;
       let updatePickupImagesQuery;
       let updateOrderStatusQuery;
+      let updateQRtatusQuery;
 
       if (type == 1) {
         updateDateTimeQuery = `UPDATE booking_timing SET wash_time = ?, wash_date = ? WHERE booking_id = ?`;
