@@ -1,5 +1,5 @@
 ## Use a smaller base image
-FROM node:18.16.0-alpine
+FROM node:18.17.0-alpine
 
 WORKDIR /app
 
