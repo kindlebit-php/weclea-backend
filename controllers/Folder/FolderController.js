@@ -585,8 +585,9 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
      if(type != 4){
 
       
-
+console.log('updateQRtatusQueryss',updateQRtatusQuery)
       dbConnection.query(updateQRtatusQuery, [1, booking_id], function (updateQRErr, updateQRResult) {
+        console.log('updateQRResult',updateQRResult)
       })
       dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
         if (updateTimeErr) {
