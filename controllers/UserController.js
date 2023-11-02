@@ -986,6 +986,20 @@ export const customer_list = async (req, res) => {
 		  	res.json({ status: false, message: error.message });
 		}
 	}
+
+	export const get_deleivery_instruction = async (req, res) => {
+		try {
+				const userData = res.user;
+				var sql = "select delievery_instruction from booking_instructions where user_id = '"+userData[0].id+"'";
+				dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+					res.json({'status':true,"message":"Delievery instruction list",'data':result});
+				});
+			
+		} catch (error) {
+		  	res.json({ status: false, message: error.message });
+		}
+	}
 export default {
 	user_registered_address,
 	customer_register,
@@ -1008,5 +1022,6 @@ export default {
 	update_employee,
 	delete_employee,
 	update_user_status,
-	customer_order_histroy
+	customer_order_histroy,
+	get_deleivery_instruction
 }

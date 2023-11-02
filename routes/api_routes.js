@@ -36,6 +36,7 @@ router.get("/order-list",userController.order_list)
 
 router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
+router.get('/get-delivery-instruction' ,CheckAuth,userController.get_deleivery_instruction);
 router.post('/get-user-loads',CheckAuth ,loadController.get_user_loads);
 router.post('/get-user-home-data',CheckAuth ,loadController.get_user_home_data);
 router.get('/get-user-subscription',CheckAuth ,loadController.get_user_subscription);
