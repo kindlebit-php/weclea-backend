@@ -283,8 +283,21 @@ export const submit_wash_detail = async (req, res) => {
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         if(extra_loads !=''){
-          var booking = "select user_id,category_id ,extra_loads from bookings where id = '"+booking_id+"'";
+          var booking = "select user_id,category_id ,extra_loads,total_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
+
+          var  qrCountSql = "select count(id) as qrCount from booking_qr where booking_id = '"+booking_id+"' ";
+
+          dbConnection.query(qrCountSql, function (error, qrCountresults){
+
+          if(Number(qrCountresults[0].qrCount) > bookingdata[0].total_loads){
+              var deleteRecord = (Number(qrCountresults[0].qrCount) - bookingdata[0].total_loads)
+              var  qrdeleteSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
+              dbConnection.query(qrdeleteSql, function (error, qrdeleteresults){
+              })
+            }
+          })
+
             if(bookingdata[0].category_id == 1){
               var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
             }else if(bookingdata[0].category_id == 2){
@@ -398,10 +411,10 @@ export const submit_wash_detail = async (req, res) => {
                       }
 
                             const currentDate = date(); 
-                            const sql = `INSERT INTO payment (user_id,booking_id, amount, payment_id, date) VALUES ('${
+                            const sqls = `INSERT INTO payment (user_id,booking_id, amount, payment_id, date) VALUES ('${
                               data[0].user_id}', '${booking_id}', '${amount}', '${paymentIntent.id}', '${currentDate}')`;
 
-                            dbConnection.query(sql, function (error, result) {
+                            dbConnection.query(sqls, function (error, result) {
                                   });
                   const imageArray = [];
                   req.files.extra_loads_images.forEach((e, i) => {
@@ -422,8 +435,15 @@ export const submit_wash_detail = async (req, res) => {
                              return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
+                          if(userLoadsresults[0].totalCount > 0){
 
                             var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
+                          }else{
+                            var removeV = userLoadsresults[0].totalCount.replace("-","")
+                            var updateLoadsRe = (removeV + extra_loads);
+                            var updateLoads = '-'+updateLoadsRe
+
+                          }
                           if(bookingdata[0].category_id == 1){
                           var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
                           }else if(bookingdata[0].category_id == 2){

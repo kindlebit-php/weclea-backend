@@ -993,7 +993,13 @@ export const customer_list = async (req, res) => {
 				var sql = "select delievery_instruction from booking_instructions where user_id = '"+userData[0].id+"'";
 				dbConnection.query(sql, function (error, result) {
 				if (error) throw error;
-					res.json({'status':true,"message":"Delievery instruction list",'data':result});
+				if(result){
+					var finalResult = result[0]
+				}else{
+					var finalResult = result
+
+				}
+					res.json({'status':true,"message":"Delievery instruction list",'data':finalResult});
 				});
 			
 		} catch (error) {
