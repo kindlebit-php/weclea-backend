@@ -1159,7 +1159,6 @@ export const order_histroy_detail= async(req,res)=>{
             } else if (data.length < 0) {
               return res.json({ status: false, message: "data not found" });
             } else {
-              const resData = [];
               const imageArray = [];
               if (data?.length > 0) {
                 for (const elem of data) {
@@ -1228,21 +1227,19 @@ export const order_histroy_detail= async(req,res)=>{
                     ];
                     
 
-                  resData.push({
-                    Customer_Id,
+                  const resData={Customer_Id,
                     address,
                     Zip_Code,
                     mobile,
                     PickUp_date_time,
-                    laundry_detail
-                  });
+                    laundry_detail}
+                    return res.json({
+                      status: true,
+                      message: "Updated successfully!",
+                      data: resData,
+                    });
                 }
               }
-              return res.json({
-                status: true,
-                message: "Updated successfully!",
-                data: resData,
-              });
             }
           }
         );
