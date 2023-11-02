@@ -281,7 +281,8 @@ export const submit_wash_detail = async (req, res) => {
       } else if(type == 4){
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
-        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+       
         if(extra_loads !=''){
           var booking = "select user_id,category_id ,extra_loads,total_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
@@ -554,9 +555,20 @@ export const submit_wash_detail = async (req, res) => {
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
         // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        const imageArray = [];
+        req.files.images.forEach((e, i) => {
+        imageArray.push(e.path);
+        });
+        const pickupImagesJSON = imageArray.join(", ");
+        dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
+        })
+        dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
+        })
+          return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+
         }
       }
-
+     if(type != 4){
       dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
         if (updateTimeErr) {
           return res.json({ status: false, message: updateTimeErr.message });
@@ -577,7 +589,7 @@ export const submit_wash_detail = async (req, res) => {
           if (updateImagesErr) {
             return res.json({ status: false, message: updateImagesErr.message });
           }
-          if(type != 4){
+     
           dbConnection.query(updateOrderStatusQuery, [type, booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
             if (updateOrderStatusErr) {
               return res.json({ status: false, message: updateOrderStatusErr.message });
@@ -616,9 +628,10 @@ export const submit_wash_detail = async (req, res) => {
             fcm_notification(title[type], body[type], data[0].user_id, fold_type[type])
             return res.json(responseData);
           });
-        }
+        
         });
       });
+    }
     });
     });
     });
