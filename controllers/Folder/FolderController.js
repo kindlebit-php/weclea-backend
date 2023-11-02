@@ -270,14 +270,19 @@ export const submit_wash_detail = async (req, res) => {
         updateDateTimeQuery = `UPDATE booking_timing SET wash_time = ?, wash_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET wash_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE booking_qr SET folder_recive_status = ? WHERE id = ?";
       } else if (type == 2) {
         updateDateTimeQuery = `UPDATE booking_timing SET dry_time = ?, dry_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET dry_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE booking_qr SET folder_dry_status = ? WHERE id = ?";
+        
       } else if (type == 3) {
         updateDateTimeQuery = `UPDATE booking_timing SET fold_time = ?, fold_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET fold_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE booking_qr SET folder_fold_status = ? WHERE id = ?";
+        
       } else if(type == 4){
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
@@ -320,11 +325,9 @@ export const submit_wash_detail = async (req, res) => {
 
                       for (var i = 0; extra_loads > i; i++) {
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
-                        console.log('sqlfirs',sql)
                         dbConnection.query(sql, function (err, results) {
                           if(results){
                             var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
-                            console.log('sql2',sql2)
                             dbConnection.query(sql2, async function (err, result1) {
                               const qr_codes = result1.map((row) => row.qr_code);
                               const getAll_qrCode= await generateQRCode(qr_codes)
@@ -393,8 +396,6 @@ export const submit_wash_detail = async (req, res) => {
                             for (var i = 0; extra_loads > i; i++) {
                         console.log('reached at qr code')
                         var sqlQR = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
-                        console.log('sqlQR',sqlQR)
-
                         dbConnection.query(sqlQR, function (err, results) {
                           if(results){
                             var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
@@ -462,7 +463,6 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                         for (var i = 0; extra_loads > i; i++) {
                             // var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"')";
                             var sql = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
-                        console.log('sqlQRsd',sql)
                             
                             dbConnection.query(sql, function (err, results) {
                               if(results){
@@ -518,7 +518,7 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                         for (var i = 0; extra_loads > i; i++) {
                             // var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"')";
                             var sql = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
-                            console.log('lastsql',sql)
+                            
                             dbConnection.query(sql, function (err, results) {
                               if(results){
                                 var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
@@ -582,6 +582,11 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
         }
       }
      if(type != 4){
+
+      
+
+      dbConnection.query(updateQRtatusQuery, [1, booking_id], function (updateQRErr, updateQRResult) {
+      })
       dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
         if (updateTimeErr) {
           return res.json({ status: false, message: updateTimeErr.message });
