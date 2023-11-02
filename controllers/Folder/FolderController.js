@@ -296,10 +296,10 @@ export const submit_wash_detail = async (req, res) => {
             if(Number(qrCountresults[0].qrCount) > bookingdata[0].total_loads){
               console.log('enter in loads')
               var deleteRecord = (Number(qrCountresults[0].qrCount) - bookingdata[0].total_loads)
-              var  qrCountSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
-              console.log('qrCountSql',qrCountSql)
-              dbConnection.query(qrCountSql, function (error, qrCountresults){
-
+              var  qrdeleteSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
+              console.log('qrdeleteSql',qrdeleteSql)
+              dbConnection.query(qrdeleteSql, function (error, qrdeleteresults){
+                console.log('qrdeleteresults',qrdeleteresults)
               })
             }
           })
