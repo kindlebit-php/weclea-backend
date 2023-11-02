@@ -32,7 +32,7 @@ export const customer_booking = async(req,res)=>{
                     let minutes = dateObject.getMinutes();
                     const current_time = hours + ":" + minutes;
                     const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
-                      const checkIfDateExist = "select count(id) as total_date from bookings where date = '"+oneTimeDate+"' and user_id = '"+userData[0].id+"'";
+                      const checkIfDateExist = "select count(id) as total_date from bookings where date = '"+oneTimeDate+"' and user_id = '"+userData[0].id+"' and order_type = 1";
                     dbConnection.query(checkIfDateExist, function (error, checkIfresults) {
                         if(checkIfresults[0].total_date == 0){
 
@@ -141,7 +141,7 @@ export const customer_booking = async(req,res)=>{
                         var frequencyDate = new Date(allDates[key]);
                         const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
                         
-                    const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"'";
+                    const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"' and order_type = 2";
                     dbConnection.query(checkIfDateExist, function (error, checkIfresults) 
                     {
                         if(checkIfresults[0].tpyedate == 0)
@@ -263,7 +263,7 @@ export const customer_booking = async(req,res)=>{
                         var frequencyDate = new Date(allDates[key]);
                         const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
                         console.log('frequencyDBDate',frequencyDBDate)
-                        const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"'";
+                        const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"' and order_type = 3";
                         dbConnection.query(checkIfDateExist, function (error, checkIfresults) {
                         if(checkIfresults[0].tpyedate == 0){
 
