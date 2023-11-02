@@ -704,7 +704,7 @@ export const scanning_extra_loads = async (req, res) => {
         } else {
           res.json({ status: false, message: "data not processed" });
         }
-      }
+      } 
     );
   } catch (error) {
     res.json({ status: false, message: error.message });
