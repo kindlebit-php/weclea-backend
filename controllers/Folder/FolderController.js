@@ -716,7 +716,7 @@ export const scanning_extra_loads = async (req, res) => {
         } else {
           res.json({ status: false, message: "data not processed" });
         }
-      }
+      } 
     );
   } catch (error) {
     res.json({ status: false, message: error.message });
@@ -1255,6 +1255,7 @@ export default {
   wash_detail_ByCustomer_id,
   submit_wash_detail,
   print_extra_loads_QrCode,
+  scanning_extra_loads,
   Scan_loads_For_Dry,
  // submit_dry_detail,
   Scan_loads_For_Fold,
