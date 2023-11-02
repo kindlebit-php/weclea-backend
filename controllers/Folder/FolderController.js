@@ -552,6 +552,9 @@ export const submit_wash_detail = async (req, res) => {
                  })
           })
         }else{
+          console.log('asdsa')
+          var booking = "select user_id from bookings where id = '"+booking_id+"'";
+          dbConnection.query(booking, function (error, bookingdata) {
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
         // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
@@ -564,6 +567,7 @@ export const submit_wash_detail = async (req, res) => {
         })
         dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
         })
+      })
           return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
 
         }
