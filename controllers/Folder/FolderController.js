@@ -293,7 +293,7 @@ export const submit_wash_detail = async (req, res) => {
           console.log('qrCountresults',qrCountresults[0].qrCount)
           console.log('bookingdata[0].tota_loads',bookingdata[0].total_loads)
           if(qrCountresults[0].qrCount > bookingdata[0].total_loads){
-              var deleteRecord = (Number(qrCountresults[0].qrCount) - bookingdata[0].total_loads)
+              var deleteRecord = (qrCountresults[0].qrCount - bookingdata[0].total_loads)
               console.log('deleteRecord',deleteRecord)
               var  qrdeleteSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
               console.log('qrdeleteSql',qrdeleteSql)
