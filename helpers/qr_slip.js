@@ -129,8 +129,10 @@ export const generatePDF= async(data, qrCode)=> {
       pdf.create(document, options)
         .then((res) => {
           resolve(res.filename);
+          console.log('filename',filename)
         })
         .catch((error) => {
+          console.log('error',error)
           reject(error);
         });
     });
