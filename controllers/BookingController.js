@@ -71,7 +71,7 @@ export const customer_booking = async(req,res)=>{
                                 const getAll_qrCode= await generateQRCode(qr_codes)
                                 console.log('getAll_qrCode',getAll_qrCode)
                                 const userData1 = await getUserData (result.insertId);
-                                console.log('getAll_qrCode',getAll_qrCode)
+                                console.log('userData1',userData1)
                               
                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
                                 console.log('pdfBytes',pdfBytes)
