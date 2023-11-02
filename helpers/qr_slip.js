@@ -2,8 +2,7 @@ import dbConnection from "../config/db.js";
 import qrcode from "qrcode";
 import { v4 as uuidv4 } from 'uuid'; 
 import pdf from "pdf-creator-node"; 
-
-
+import path from "path";
 
 export const qr_slip = async (req, res) => {
     try {
