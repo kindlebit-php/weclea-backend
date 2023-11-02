@@ -37,7 +37,7 @@ export const get_orders = async (req, res) => {
 // Driver order api
 
 export const get_dry_clean_orders = async (req, res) => {
-  try {
+  try { 
     const userData = res.user;
     var datetime = new Date();
     const currentDate = dateFormat.format(datetime, "YYYY-MM-DD");
@@ -91,9 +91,7 @@ export const get_order_detail = async (req, res) => {
         } else if (data.length === 0) {
           return res.json({ status: false, message: "data Not found" });
         }
-         comment = data[0].comment !== undefined && data[0].comment !== null
-        ? data[0].comment
-        : "There are no instructions from the customer";
+
         const {
           name,
           profile_image,
