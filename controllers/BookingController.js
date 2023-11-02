@@ -45,7 +45,7 @@ export const customer_booking = async(req,res)=>{
                         var driver_id = locationResult[0].id
                         // var driver_id = 1
                     }else{
-                        var driver_id = 1
+                        var driver_id = 0
                     }
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+category_id+"',1)";
                     dbConnection.query(sql, async function (err, result) {
@@ -163,11 +163,11 @@ export const customer_booking = async(req,res)=>{
                             dbConnection.query(sqlDistance, function (error, locationResult) {
                             // return false;
                             if(locationResult.length > 0){
-                                // var driver_id = locationResult[0].id
-                                var driver_id = 1
+                                var driver_id = locationResult[0].id
+                                // var driver_id = 1
 
                             }else{
-                                var driver_id = 1
+                                var driver_id = 0
                             }
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
                        
@@ -280,11 +280,11 @@ export const customer_booking = async(req,res)=>{
                             dbConnection.query(sqlDistance, function (error, locationResult) {
                             // return false;
                             if(locationResult.length > 0){
-                                // var driver_id = locationResult[0].id
-                                var driver_id = 1
+                                var driver_id = locationResult[0].id
+                                // var driver_id = 1
 
                             }else{
-                                var driver_id = 1
+                                var driver_id = 0
                             }
                             // console.log('currentBookingDate',currentBookingDate)
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
