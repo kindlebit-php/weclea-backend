@@ -91,7 +91,9 @@ export const get_order_detail = async (req, res) => {
         } else if (data.length === 0) {
           return res.json({ status: false, message: "data Not found" });
         }
-
+         comment = data[0].comment !== undefined && data[0].comment !== null
+        ? data[0].comment
+        : "There are no instructions from the customer";
         const {
           name,
           profile_image,

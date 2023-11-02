@@ -24,9 +24,6 @@ export const customer_booking = async(req,res)=>{
                 if(total_loads > Number(results[0].total_loads)){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
-                  
-
-
                     let dateObject = new Date();
                     let hours = dateObject.getHours();
                     let minutes = dateObject.getMinutes();
@@ -67,7 +64,6 @@ export const customer_booking = async(req,res)=>{
                         for (var i = 0; total_loads > i; i++) {
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
                         dbConnection.query(sql, function (err, results) {
-                           // console.log(results,"qrresults")
                            if(results){
                             var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
                            dbConnection.query(sql2, async function (err, result1) {
@@ -75,6 +71,7 @@ export const customer_booking = async(req,res)=>{
                                 const getAll_qrCode= await generateQRCode(qr_codes)
                                 const userData1 = await getUserData (result.insertId);
                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                                console.log(pdfBytes,"skfjuhsdkj")
                                 const match = pdfBytes.match(/uploads\\(.+)/);
                                 const newPath = 'uploads//' +match[1];
   
