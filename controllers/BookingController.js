@@ -20,10 +20,7 @@ export const customer_booking = async(req,res)=>{
             }else{
                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }
-            console.log('usrLoadskail',usrLoads)
             dbConnection.query(usrLoads, function (error, results) {
-                console.log('total_loads',total_loads)
-                console.log('results[0].total_loads',Number(results[0].total_loads))
                 if(total_loads > Number(results[0].total_loads)){
                     console.log('hi')
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
