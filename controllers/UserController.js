@@ -592,15 +592,15 @@ export const order_list = async (req, res) => {
 		}
   
 		if (item.delievery_day === 0) {
-		  item.delievery_day = "same_day";
+		  item.delievery_day = "Same Day";
 		} else if (item.delievery_day === 1) {
-		  item.delievery_day = "next_day";
+		  item.delievery_day = "Next Day";
 		}
   
 		if (item.status === 0) {
-		  item.status = "inactive";
+		  item.status = "Anactive";
 		} else if (item.status === 1) {
-		  item.status = "active";
+		  item.status = "Active";
 		}
   
 		
