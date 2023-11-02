@@ -69,11 +69,14 @@ export const customer_booking = async(req,res)=>{
                            dbConnection.query(sql2, async function (err, result1) {
                             const qr_codes = result1.map((row) => row.qr_code);
                                 const getAll_qrCode= await generateQRCode(qr_codes)
+                                console.log('getAll_qrCode',getAll_qrCode)
                                 const userData1 = await getUserData (result.insertId);
+                                console.log('getAll_qrCode',getAll_qrCode)
+                              
                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                console.log(pdfBytes,"skfjuhsdkj")
+                                console.log('pdfBytes',pdfBytes)
                                 const match = pdfBytes.match(/uploads\\(.+)/);
-                                const newPath = 'uploads//' +match[1];
+                                const newPath = 'uploads/' +match[1];
   
 
                                 const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
