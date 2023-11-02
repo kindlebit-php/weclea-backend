@@ -281,7 +281,8 @@ export const submit_wash_detail = async (req, res) => {
       } else if(type == 4){
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
-        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+       
         if(extra_loads !=''){
           var booking = "select user_id,category_id ,extra_loads,total_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
@@ -289,9 +290,8 @@ export const submit_wash_detail = async (req, res) => {
           var  qrCountSql = "select count(id) as qrCount from booking_qr where booking_id = '"+booking_id+"' ";
 
           dbConnection.query(qrCountSql, function (error, qrCountresults){
-
-          if(Number(qrCountresults[0].qrCount) > bookingdata[0].total_loads){
-              var deleteRecord = (Number(qrCountresults[0].qrCount) - bookingdata[0].total_loads)
+          if(qrCountresults[0].qrCount > bookingdata[0].total_loads){
+              var deleteRecord = (qrCountresults[0].qrCount - bookingdata[0].total_loads)
               var  qrdeleteSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
               dbConnection.query(qrdeleteSql, function (error, qrdeleteresults){
               })
@@ -354,8 +354,8 @@ export const submit_wash_detail = async (req, res) => {
                   const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-
-                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: totalPrintLoads}});
 
 
                     }else{
@@ -432,7 +432,9 @@ export const submit_wash_detail = async (req, res) => {
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
                           if(userLoadsresults[0].totalCount > 0){
@@ -492,7 +494,9 @@ export const submit_wash_detail = async (req, res) => {
                   dbConnection.query(updateBooking, function (err, results) {
                   })
                           }
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
                       
 
                         }else{
@@ -542,7 +546,9 @@ export const submit_wash_detail = async (req, res) => {
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                         dbConnection.query(updateBooking, function (err, results) {
                         })
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+              var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
                        
                         }
 
@@ -551,12 +557,26 @@ export const submit_wash_detail = async (req, res) => {
                  })
           })
         }else{
+          var booking = "select user_id,total_loads from bookings where id = '"+booking_id+"'";
+          dbConnection.query(booking, function (error, bookingdata) {
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
         // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        const imageArray = [];
+        req.files.images.forEach((e, i) => {
+        imageArray.push(e.path);
+        });
+        const pickupImagesJSON = imageArray.join(", ");
+        dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
+        })
+        dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
+        })
+          return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: bookingdata[0].total_loads}});
+      })
+
         }
       }
-
+     if(type != 4){
       dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
         if (updateTimeErr) {
           return res.json({ status: false, message: updateTimeErr.message });
@@ -577,7 +597,7 @@ export const submit_wash_detail = async (req, res) => {
           if (updateImagesErr) {
             return res.json({ status: false, message: updateImagesErr.message });
           }
-          if(type != 4){
+     
           dbConnection.query(updateOrderStatusQuery, [type, booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
             if (updateOrderStatusErr) {
               return res.json({ status: false, message: updateOrderStatusErr.message });
@@ -616,9 +636,10 @@ export const submit_wash_detail = async (req, res) => {
             fcm_notification(title[type], body[type], data[0].user_id, fold_type[type])
             return res.json(responseData);
           });
-        }
+        
         });
       });
+    }
     });
     });
     });
