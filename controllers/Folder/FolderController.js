@@ -320,9 +320,11 @@ export const submit_wash_detail = async (req, res) => {
 
                       for (var i = 0; extra_loads > i; i++) {
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
+                        console.log('sqlfirs',sql)
                         dbConnection.query(sql, function (err, results) {
                           if(results){
                             var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
+                            console.log('sql2',sql2)
                             dbConnection.query(sql2, async function (err, result1) {
                               const qr_codes = result1.map((row) => row.qr_code);
                               const getAll_qrCode= await generateQRCode(qr_codes)
@@ -391,6 +393,8 @@ export const submit_wash_detail = async (req, res) => {
                             for (var i = 0; extra_loads > i; i++) {
                         console.log('reached at qr code')
                         var sqlQR = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
+                        console.log('sqlQR',sqlQR)
+
                         dbConnection.query(sqlQR, function (err, results) {
                           if(results){
                             var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
@@ -458,6 +462,7 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                         for (var i = 0; extra_loads > i; i++) {
                             // var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"')";
                             var sql = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
+                        console.log('sqlQRsd',sql)
                             
                             dbConnection.query(sql, function (err, results) {
                               if(results){
@@ -513,7 +518,7 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                         for (var i = 0; extra_loads > i; i++) {
                             // var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"')";
                             var sql = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
-                            
+                            console.log('lastsql',sql)
                             dbConnection.query(sql, function (err, results) {
                               if(results){
                                 var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
