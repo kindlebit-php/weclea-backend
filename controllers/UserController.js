@@ -560,7 +560,7 @@ export const order_list = async (req, res) => {
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
 	const list =
 		"SELECT b.id, b.order_id,b.driver_id, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
-	  console.log('order list kail',list)
+	  
 	  const data = await new Promise((resolve, reject) => {
 		dbConnection.query(list, (error, data) => {
 		  if (error) {reject(error);
