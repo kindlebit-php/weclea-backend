@@ -354,7 +354,7 @@ export const submit_wash_detail = async (req, res) => {
                   const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+                  var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                   return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: totalPrintLoads}});
 
 
