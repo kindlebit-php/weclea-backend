@@ -355,8 +355,8 @@ export const submit_wash_detail = async (req, res) => {
                   const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-
-                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: totalPrintLoads}});
 
 
                     }else{
@@ -433,7 +433,9 @@ export const submit_wash_detail = async (req, res) => {
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
                           if(userLoadsresults[0].totalCount > 0){
@@ -493,7 +495,9 @@ export const submit_wash_detail = async (req, res) => {
                   dbConnection.query(updateBooking, function (err, results) {
                   })
                           }
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
                       
 
                         }else{
@@ -543,7 +547,9 @@ export const submit_wash_detail = async (req, res) => {
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                         dbConnection.query(updateBooking, function (err, results) {
                         })
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+              var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+
+                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
                        
                         }
 
@@ -552,8 +558,7 @@ export const submit_wash_detail = async (req, res) => {
                  })
           })
         }else{
-          console.log('asdsa')
-          var booking = "select user_id from bookings where id = '"+booking_id+"'";
+          var booking = "select user_id,total_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
@@ -567,7 +572,7 @@ export const submit_wash_detail = async (req, res) => {
         })
         dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
         })
-          return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id }});
+          return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: bookingdata[0].total_loads}});
       })
 
         }
