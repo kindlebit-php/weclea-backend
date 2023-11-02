@@ -23,8 +23,8 @@ export const customer_booking = async(req,res)=>{
             console.log('usrLoadskail',usrLoads)
             dbConnection.query(usrLoads, function (error, results) {
                 console.log('total_loads',total_loads)
-                console.log('results[0].total_loads',number(results[0].total_loads))
-                if(total_loads > number(results[0].total_loads)){
+                console.log('results[0].total_loads',Number(results[0].total_loads))
+                if(total_loads > Number(results[0].total_loads)){
                     console.log('hi')
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
