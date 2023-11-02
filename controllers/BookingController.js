@@ -21,7 +21,7 @@ export const customer_booking = async(req,res)=>{
                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }
             dbConnection.query(usrLoads, function (error, results) {
-                if(total_loads > results[0].total_loads){
+                if(total_loads > Number(results[0].total_loads)){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
                   
@@ -129,7 +129,7 @@ export const customer_booking = async(req,res)=>{
             }
             dbConnection.query(usrLoads, function (error, resultss) 
             {
-                if(total_loads > resultss[0].total_loads)
+                if(total_loads > Number(resultss[0].total_loads))
                 {
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }
@@ -253,7 +253,7 @@ export const customer_booking = async(req,res)=>{
                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }
             dbConnection.query(usrLoads, function (error, resultss) {
-                if(total_loads > resultss[0].total_loads){
+                if(total_loads > Number(resultss[0].total_loads)){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
                     var resData = [];
