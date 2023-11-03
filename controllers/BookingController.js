@@ -633,7 +633,7 @@ export const assign_driver = async(req,res)=>{
                 var sql = "update bookings set driver_id = '"+driver_id+"' where id = '"+booking_id+"'";
                 dbConnection.query(sql, function (error, result) {
                 if (error) throw error;
-                    res.json({'status':true,"message":"Employee profile has been updated!"});
+                    res.json({'status':true,"message":"Driver has been assigned successfully!"});
                 }); 
         }else{
             res.json({'status':false,"message":"All fields are required"});
@@ -651,7 +651,7 @@ export const assign_folder = async(req,res)=>{
                 var sql = "update bookings set folder_id = '"+folder_id+"' where id = '"+booking_id+"'";
                 dbConnection.query(sql, function (error, result) {
                 if (error) throw error;
-                    res.json({'status':true,"message":"Employee profile has been updated!"});
+                    res.json({'status':true,"message":"Folder assigned successfully!"});
                 }); 
         }else{
             res.json({'status':false,"message":"All fields are required"});
