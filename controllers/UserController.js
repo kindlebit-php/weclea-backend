@@ -558,13 +558,8 @@ export const order_list = async (req, res) => {
 	try {
 	var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-	const usrs = "SELECT id FROM users WHERE role = 3";
-	dbConnection.query(usrs, async function (error, dataa) {
-		if (error) {
-			return res.json({ status: false, message: error.message });
-		  }
-		const userIds = dataa.map((row) => row.id);
-		const list = `SELECT b.id, b.order_id, b.driver_id, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b LEFT JOIN customer_drop_address AS cda ON b.user_id = cda.user_id LEFT JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.user_id IN (${userIds.join(',')}) AND b.cron_status = 1 AND b.date = '${currentFinalDate}'`
+	const list =
+		"SELECT b.id, b.order_id,b.driver_id, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
 	  
 	  const data = await new Promise((resolve, reject) => {
 		dbConnection.query(list, (error, data) => {
@@ -778,8 +773,7 @@ export const order_list = async (req, res) => {
 		}else if (item.order_images === 8) {
 			const imagesResults = await new Promise((resolve, reject) => {
 				dbConnection.query(imagesQuery, (error, Data) => {
-					console.log('finaldata',Data)
-					console.log('imagesQuery',imagesQuery)
+					console('finaldata',Data)
 				  if (error) {
 					reject(error);
 				  } else {
@@ -826,7 +820,6 @@ export const order_list = async (req, res) => {
 	  }
   
 	  res.json({ status: true, message: "List retrieved successfully", data });
-	})
 	} catch (error) {
 	  res.json({ status: false, message: error.message });
 	}
