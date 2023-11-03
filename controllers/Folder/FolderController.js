@@ -265,19 +265,25 @@ export const submit_wash_detail = async (req, res) => {
       let updateDateTimeQuery;
       let updatePickupImagesQuery;
       let updateOrderStatusQuery;
+      let updateQRtatusQuery;
 
       if (type == 1) {
         updateDateTimeQuery = `UPDATE booking_timing SET wash_time = ?, wash_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET wash_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE booking_qr SET folder_recive_status = ? WHERE booking_id = ?";
       } else if (type == 2) {
         updateDateTimeQuery = `UPDATE booking_timing SET dry_time = ?, dry_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET dry_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE booking_qr SET folder_dry_status = ? WHERE booking_id = ?";
+        
       } else if (type == 3) {
         updateDateTimeQuery = `UPDATE booking_timing SET fold_time = ?, fold_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET fold_images = ? WHERE booking_id = ?";
         updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE booking_qr SET folder_fold_status = ? WHERE booking_id = ?";
+        
       } else if(type == 4){
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
@@ -354,7 +360,7 @@ export const submit_wash_detail = async (req, res) => {
                   const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+                  var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                   return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: totalPrintLoads}});
 
 
@@ -577,6 +583,12 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
         }
       }
      if(type != 4){
+
+      
+console.log('updateQRtatusQueryss',updateQRtatusQuery)
+      dbConnection.query(updateQRtatusQuery, [1, booking_id], function (updateQRErr, updateQRResult) {
+        console.log('updateQRResult',updateQRResult)
+      })
       dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
         if (updateTimeErr) {
           return res.json({ status: false, message: updateTimeErr.message });
