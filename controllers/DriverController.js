@@ -12,12 +12,12 @@ export const get_orders = async (req, res) => {
     const {type} = req.body;
 
   const currentDate = dateFormat.format(datetime,'YYYY-MM-DD'); 
-    // const order = `SELECT id,order_id, date, time FROM bookings WHERE cron_status = 1 AND date >= '${currentDate}' AND driver_id = ${userData[0].id}`;
+   
     if(type == 1){
-    var order = "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '8' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type != '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance desc;";
+    var order = "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '8' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type != '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance desc;";
 
     }else{
-    var order = "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '8' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type = '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance desc;";
+    var order = "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '8' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type = '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance desc;";
 
     }
     console.log('order',order)
@@ -495,18 +495,17 @@ export const get_drop_orders = async (req, res) => {
   try {
     const userData = res.user;
     const { type } = req.body;
-
-        var datetime = new Date();
-    const currentDate = dateFormat.format(datetime,'YYYY-MM-DD'); 
-    // const order = `SELECT order_id FROM bookings WHERE order_status = '4' AND driver_id = ${userData[0].id}`;
+    // console.log('hi')
     if(type == 1){
-    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status = '4' and bookings.order_type != '3'and bookings.order_type != '8' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
 
     }else{
-    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status = '4' and bookings.order_type = '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
 
     }
+    console.log('order_type',order)
     dbConnection.query(order, function (error, data) {
+      console.log('kailashtest',data)
       if (error) throw error;
       res.json({
         status: true,

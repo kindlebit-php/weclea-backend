@@ -103,7 +103,8 @@ export const customer_list_wash = (req, res) => {
   try {
     var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-    const bookingIdQuery = "SELECT bookings.id FROM bookings left join booking_qr on booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"'";
+    const bookingIdQuery = "SELECT bookings.id FROM bookings left join booking_qr on booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 4";
+    console.log('bookingIdQuery',bookingIdQuery)
     dbConnection.query(bookingIdQuery, (error, userIdResult) => {
       if (error) {
         return res.json({ status: false, message: error.message });
@@ -114,14 +115,14 @@ export const customer_list_wash = (req, res) => {
       const booking_id = userIdResult.map((row) => row.id);
       let query = `SELECT b.id AS Booking_id,b.total_loads,bin.delievery_instruction AS Note_From_Delivery, b.user_id AS Customer_Id, b.date, b.time, b.order_status as orderStatus, bi.pickup_images
                       FROM bookings AS b
-                      JOIN booking_images AS bi ON b.id = bi.booking_id
-                      JOIN booking_instructions AS bin ON b.user_id = bin.user_id
-                      WHERE b.id IN (?)`;
+                      left JOIN booking_images AS bi ON b.id = bi.booking_id
+                      left JOIN booking_instructions AS bin ON b.user_id = bin.user_id
+                      WHERE bi.pickup_images IS NOT NULL and b.id IN (?)`;
                       if (customer_id) {
         
                         query += ' AND b.user_id = ?';
                       }
-                
+          console.log('querylist',query)
                       dbConnection.query(query, customer_id ? [booking_id, customer_id] : [booking_id], (error, data) => {
                         console.log(data)
         if (error) {
@@ -334,9 +335,9 @@ export const submit_wash_detail = async (req, res) => {
                               const getAll_qrCode= await generateQRCode(qr_codes)
                               const userData1 = await getUserData(booking_id);
                               const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                              const match = pdfBytes.match(/uploads\\(.+)/);
-                              const newPath = 'uploads//' +match[1];
-                              const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                              // const match = pdfBytes.match(/uploads\\(.+)/);
+                              // const newPath = 'uploads//' +match[1];
+                              const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
                               dbConnection.query(updatePdf, async function (err, result2) {
                                
                               })
@@ -405,9 +406,9 @@ export const submit_wash_detail = async (req, res) => {
                               const getAll_qrCode= await generateQRCode(qr_codes)
                               const userData1 = await getUserData(booking_id);
                               const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                              const match = pdfBytes.match(/uploads\\(.+)/);
-                              const newPath = 'uploads//' +match[1];
-                              const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                              // const match = pdfBytes.match(/uploads\\(.+)/);
+                              // const newPath = 'uploads//' +match[1];
+                              const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
                               dbConnection.query(updatePdf, async function (err, result2) {
                                
                               })
@@ -473,9 +474,9 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                                   const getAll_qrCode= await generateQRCode(qr_codes)
                                   const userData1 = await getUserData (booking_id);
                                   const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                  const match = pdfBytes.match(/uploads\\(.+)/);
-                                  const newPath = 'uploads//' +match[1];
-                                  const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                  // const match = pdfBytes.match(/uploads\\(.+)/);
+                                  // const newPath = 'uploads//' +match[1];
+                                  const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
                                   dbConnection.query(updatePdf, async function (err, result2) {
                                   })
                                 });
@@ -528,9 +529,9 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                                   const getAll_qrCode= await generateQRCode(qr_codes)
                                   const userData1 = await getUserData (booking_id);
                                   const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                  const match = pdfBytes.match(/uploads\\(.+)/);
-                                  const newPath = 'uploads//' +match[1];
-                                  const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                  // const match = pdfBytes.match(/uploads\\(.+)/);
+                                  // const newPath = 'uploads//' +match[1];
+                                  const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
                                   dbConnection.query(updatePdf, async function (err, result2) {
                                   })
                                 });
