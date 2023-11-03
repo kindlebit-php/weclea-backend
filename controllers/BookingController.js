@@ -461,10 +461,12 @@ export const booking_tracking_status = async(req,res)=>{
 
                 if(wash_images){
                     const wash_images_array = wash_images.split(',');
+                    console.log('wash_images_array',wash_images_array)
                     wash_images_array.forEach(function callback(img, key)
                     {
                         resWashImg[key] = process.env.BASE_URL+'/uploads/'+img;
                     })
+                    console.log('resWashImg',resWashImg)
                 }
 
                 if(dry_images){
