@@ -20,6 +20,7 @@ RUN apk update && \
     mv /tmp/phantomjs*/bin/phantomjs /usr/local/bin && \
     rm -rf /tmp/phantomjs*
 
+RUN npm install -g html-pdf
 # Copy the entire Node.js app to the container
 COPY . .
 
