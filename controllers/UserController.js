@@ -559,7 +559,7 @@ export const order_list = async (req, res) => {
 	var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
 	const list =
-		"SELECT b.id, b.order_id,b.driver_id, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
+		"SELECT b.id, b.order_id,b.driver_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
 	  
 	  const data = await new Promise((resolve, reject) => {
 		dbConnection.query(list, (error, data) => {
@@ -571,6 +571,7 @@ export const order_list = async (req, res) => {
 	  });
 	  console.log(data,"data1")
 	  const driverData = [];
+	  const folderData = [];
 	  const imagesData = [];
   
 	  for (const item of data) {
@@ -590,6 +591,22 @@ export const order_list = async (req, res) => {
 		  driverData.push(driverResults);
 		  item.Nearby_driver = driverResults;
 		}
+		if (item.Folder) {
+			const Folder_list = `SELECT id, name FROM users WHERE role = 3`;
+	
+			const folderResults = await new Promise((resolve, reject) => {
+			  dbConnection.query(Folder_list, (error, Dataa) => {
+				if (error) {
+				  reject(error);
+				} else {
+				  resolve(Dataa);
+				}
+			  });
+			});
+			console.log(folderResults,"data3")
+			folderData.push(folderResults);
+			item.Folder = folderResults;
+		  }
   
 		if (item.delievery_day === 0) {
 		  item.delievery_day = "Same Day";
