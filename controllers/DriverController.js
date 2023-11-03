@@ -166,7 +166,9 @@ export const print_All_Drop_QrCode = async (req, res) => {
   try {
     const userData = res.user;
     const booking_id = req.body.booking_id;
-    const data = `SELECT id AS qr_codeID, qr_code,driver_drop_status FROM booking_qr WHERE folder_pack_status = 1 AND booking_id  = ${booking_id}`;
+        const bookingSQL = "SELECT id FROM bookings WHERE order_id ='"+booking_id+"'";
+    dbConnection.query(bookingSQL, function (error, bookingResult) {
+          const data = `SELECT id AS qr_codeID, qr_code,driver_drop_status FROM booking_qr WHERE folder_pack_status = 1 AND booking_id  = ${bookingResult[0].id}`;
     dbConnection.query(data, function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
@@ -185,6 +187,8 @@ export const print_All_Drop_QrCode = async (req, res) => {
         });
       }
     });
+    })
+
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
@@ -497,13 +501,15 @@ export const get_drop_orders = async (req, res) => {
     const { type } = req.body;
     // console.log('hi')
     if(type == 1){
-    var order = "select * from (select bookings.order_id,bookings.id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
 
     }else{
-    var order = "select * from (select bookings.order_id,bookings.id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
 
     }
+    console.log('order_type',order)
     dbConnection.query(order, function (error, data) {
+      console.log('kailashtest',data)
       if (error) throw error;
       res.json({
         status: true,
