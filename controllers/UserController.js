@@ -631,7 +631,7 @@ export const order_list = async (req, res) => {
 		} else if (item.order_status === 4) {
 		  item.order_status = "Pack";
 		} else if (item.order_status === 5) {
-		  item.order_status = "Driver Collected The Order";
+		  item.order_status = "Order Collected";
 		} else if (item.order_status === 6) {
 		  item.order_status = "Completed";
 		} else if (item.order_status === 7) {
