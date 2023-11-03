@@ -774,6 +774,7 @@ export const order_list = async (req, res) => {
 			const imagesResults = await new Promise((resolve, reject) => {
 				dbConnection.query(imagesQuery, (error, Data) => {
 					console('finaldata',Data)
+					console('imagesQuery',imagesQuery)
 				  if (error) {
 					reject(error);
 				  } else {
