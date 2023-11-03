@@ -96,7 +96,6 @@ export const get_order_detail = async (req, res) => {
           name,
           profile_image,
           mobile,
-          comment,
           address,
           appartment,
           city,

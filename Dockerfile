@@ -1,4 +1,4 @@
-## Use a smaller base image
+# Use a smaller base image
 FROM node:18.17.0-alpine
 
 WORKDIR /app
