@@ -649,29 +649,31 @@ export const drop_loads = async (req, res) => {
                 });
               }
 
-              const updateOrderStatusQuery =
-                "UPDATE bookings SET order_status = '6' WHERE id = ?";
-                console.log('updateOrderStatusQuery',updateOrderStatusQuery)
-              dbConnection.query(
-                updateOrderStatusQuery,
-                [booking_id],
-                function (updateError, updateResult) {
-                  console.log('updateResult',updateResult)
-                  if (updateError) {
-                    return res.json({
-                      status: false,
-                      message: updateError.message,
-                    });
-                  }
-
-                  res.json({
+               res.json({
                     status: true,
                     message: "Data retrieved and updated successfully!",
                     booking_id: booking_id,
                     qrCode_id: data[0].id,
-                  });
-                }
-              );
+                });
+
+              // const updateOrderStatusQuery =
+              //   "UPDATE bookings SET order_status = '6' WHERE id = ?";
+              //   console.log('updateOrderStatusQuery',updateOrderStatusQuery)
+              // dbConnection.query(
+              //   updateOrderStatusQuery,
+              //   [booking_id],
+              //   function (updateError, updateResult) {
+              //     console.log('updateResult',updateResult)
+              //     if (updateError) {
+              //       return res.json({
+              //         status: false,
+              //         message: updateError.message,
+              //       });
+              //     }
+
+                 
+              //   }
+              // );
             }
           );
         } else {
