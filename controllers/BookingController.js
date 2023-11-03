@@ -68,10 +68,13 @@ export const customer_booking = async(req,res)=>{
                             var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
                            dbConnection.query(sql2, async function (err, result1) {
                             const qr_codes = result1.map((row) => row.qr_code);
+                            console.log("test1",qr_codes)
                                 const getAll_qrCode= await generateQRCode(qr_codes)
+                                console.log("test2",getAll_qrCode)
                                 const userData1 = await getUserData (result.insertId);
+                                console.log("test3",getAlluserData1_qrCode)
                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                console.log(pdfBytes,"skfjuhsdkj")
+                                console.log(test4,pdfBytes)
                                 const match = pdfBytes.match(/uploads\\(.+)/);
                                 const newPath = 'uploads//' +match[1];
   
@@ -145,7 +148,6 @@ export const customer_booking = async(req,res)=>{
                         {
 
                     
-
                         let dateObject = new Date();
                         let hours = dateObject.getHours();
                         let minutes = dateObject.getMinutes();
@@ -153,7 +155,7 @@ export const customer_booking = async(req,res)=>{
                         const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
 
                         if(frequencyDBDate == currentBookingDate ){
-                           
+                           console.log('asdsaasdsad')
                             const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
                             dbConnection.query(custmer_address, function (error, custmeraddressResult) {
                             var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
@@ -167,7 +169,7 @@ export const customer_booking = async(req,res)=>{
                                 var driver_id = 0
                             }
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
-                       
+                       console.log('sqlkailash',sql)
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
                                     var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
