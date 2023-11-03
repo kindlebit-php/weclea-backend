@@ -598,12 +598,12 @@ export const order_list = async (req, res) => {
 		}
   
 		if (item.status === 0) {
-		  item.status = "Anactive";
+		  item.status = "Inactive";
 		} else if (item.status === 1) {
 		  item.status = "Active";
 		}
   
-		
+		console.log(item.order_status)
   
 		if (item.order_status === 1) {
 		  item.order_status = "Wash";

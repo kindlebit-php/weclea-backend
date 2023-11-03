@@ -69,7 +69,7 @@ export const get_order_detail = async (req, res) => {
 
     const userIdQuery = `
             SELECT user_id FROM bookings AS b1
-            JOIN users AS u ON u.id = b1.driver_id
+            left JOIN users AS u ON u.id = b1.driver_id
             WHERE u.id = ?`;
     dbConnection.query(userIdQuery, [driverId], async (error, userIdResult) => {
       if (error) {
@@ -80,9 +80,9 @@ export const get_order_detail = async (req, res) => {
       const query = `
                 SELECT u.name,u.profile_image,u.mobile, bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
                 FROM bookings AS b
-                JOIN customer_address AS ca ON b.user_id = ca.user_id
-                JOIN users AS u ON b.user_id = u.id
-                JOIN booking_instructions AS bin ON b.user_id = bin.user_id
+                left JOIN customer_address AS ca ON b.user_id = ca.user_id
+                left JOIN users AS u ON b.user_id = u.id
+                left JOIN booking_instructions AS bin ON b.user_id = bin.user_id
                 WHERE b.order_id = ? AND b.user_id IN (?)`;
 
       dbConnection.query(query, [orderId, userIds], (error, data) => {
