@@ -650,7 +650,7 @@ export const drop_loads = async (req, res) => {
               }
 
               const updateOrderStatusQuery =
-                "UPDATE bookings SET order_status = '5' WHERE id = ?";
+                "UPDATE bookings SET order_status = '6' WHERE id = ?";
               dbConnection.query(
                 updateOrderStatusQuery,
                 [booking_id],
