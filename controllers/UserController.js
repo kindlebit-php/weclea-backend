@@ -773,6 +773,7 @@ export const order_list = async (req, res) => {
 		}else if (item.order_images === 8) {
 			const imagesResults = await new Promise((resolve, reject) => {
 				dbConnection.query(imagesQuery, (error, Data) => {
+					console('finaldata',Data)
 				  if (error) {
 					reject(error);
 				  } else {
