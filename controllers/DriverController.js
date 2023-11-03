@@ -101,6 +101,7 @@ console.log('queryorderList',query)
           city,
           state,
           zip,
+          comment,
           latitude,
           longitude,
           booking_id,
