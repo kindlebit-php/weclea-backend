@@ -72,7 +72,10 @@ export const generatePDF = async (data, qrCode) => {
 
   const qrCodeImageData = qrCode.split('data:image/png;base64,')[1];
   const executablePath = '/usr/bin/chromium-browser';
-  const browser = await puppeteer.launch({executablePath});
+  const browser = await puppeteer.launch({
+    executablePath: '/usr/bin/chromium-browser',
+    args: ['--no-sandbox'], 
+  });
   const page = await browser.newPage();
 
   const htmlContent = `<!DOCTYPE html>

@@ -3,6 +3,9 @@ FROM node:18.17.0-alpine
 
 WORKDIR /app
 
+# Create a non-root user and group
+RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
+
 # Copy only package files first to utilize caching
 COPY package*.json ./
 
@@ -20,6 +23,9 @@ ENV CHROME_BIN=/usr/bin/chromium-browser
 
 # Copy the entire Node.js app to the container
 COPY . .
+
+# Switch to the non-root user
+USER nodejs
 
 # Install PM2 globally
 RUN npm install -g pm2@latest
