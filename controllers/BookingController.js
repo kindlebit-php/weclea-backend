@@ -437,11 +437,7 @@ export const booking_tracking_status = async(req,res)=>{
 
         try { 
             var resData = [];
-            var resPickImg = [];
-            var resWashImg = [];
-            var resDryImg = [];
-            var resPackImg = [];
-            var resFoldImg = [];
+            
             const userData = res.user;
             var datetime = new Date();
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
@@ -450,6 +446,12 @@ export const booking_tracking_status = async(req,res)=>{
             if(resultss){
             resultss.forEach(element =>
             {
+
+                var resPickImg = [];
+                var resWashImg = [];
+                var resDryImg = [];
+                var resPackImg = [];
+                var resFoldImg = [];
                 const {id,order_type,dry_images,wash_images,fold_images,pack_images,dry_date,fold_date,pack_date,order_status,pickup_images,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status} = element;
                 if(pickup_images){
                     const pickup_images_array = pickup_images.split(',');
