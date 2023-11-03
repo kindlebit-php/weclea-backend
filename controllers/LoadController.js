@@ -176,14 +176,14 @@ export const get_user_subscription = async(req,res)=>{
                         
                     }else{
                         let initi = {
-                            "id":0,"package":'No Subscription Found',"price":0,"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
+                            "id":0,"package":'No Subscription Found',"price":'0',"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
                         }
                         res.json({'status':true,"message":"Subscription not found!",'data':initi});
                     }
                 })   
             }else{
                 let initi = {
-                    "id":0,"package":'No Subscription Found',"price":0,"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
+                    "id":0,"package":'No Subscription Found',"price":'0',"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
                 }
                 res.json({'status':true,"message":"Subscription not found!",'data':initi});
 
@@ -257,14 +257,14 @@ export const get_user_home_data = async(req,res)=>{
                         }) 
                     }else{
                         let initi = {
-                            "id":0,"package":'No Subscription Found',"price":0,"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
+                            "id":0,"package":'No Subscription Found',"price":'0',"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
                         }
                         res.json({'status':true,"message":"Subscription not found!",'data':initi});
                     }
                 })   
             }else{
                 let initi = {
-                    "id":0,"package":'No Subscription Found',"price":0,"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
+                    "id":0,"package":'No Subscription Found',"price":'0',"pending_loads":0,'commercial':0,'residential':0,'yeshiba':0,'next_pickup':'No pickup'
                 }
                 res.json({'status':true,"message":"Subscription not found!",'data':initi});
 
