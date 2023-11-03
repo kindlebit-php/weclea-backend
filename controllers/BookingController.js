@@ -379,7 +379,7 @@ export const subscription_dates = async(req,res)=>{
             var datetime = new Date();
             var resData = [];
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-            var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' order by date desc";
+            var sql = "select id ,date, order_type from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' order by date desc";
              dbConnection.query(sql, function (err, resultss) {
                 resultss.forEach(function callback(elem, key){
                 var resversDate = new Date(elem.date)
@@ -389,7 +389,7 @@ export const subscription_dates = async(req,res)=>{
                     }
                     resData.push(init)
                 })
-                res.json({'status':true,"message":"user subscriptions list",'data':resData});
+                res.json({'status':true,"message":"user subscriptions list",'data':resData,'order_type':order_type});
             });
     }catch (error) {
         res.json({'status':false,"message":error.message});  
