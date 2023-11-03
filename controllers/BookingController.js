@@ -372,6 +372,24 @@ export const customer_booking = async(req,res)=>{
     }
 }
 
+export const subscription_dates_fre = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            var datetime = new Date();
+            var resData = [];
+            const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+            var sql = "select id ,date, order_type from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' and order_type = 2 order by date desc";
+             dbConnection.query(sql, function (err, resultss) {
+            
+                res.json({'status':true,"message":"user subscriptions list",'data':resultss,'order_type':2});
+            });
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
+}
+
 export const subscription_dates = async(req,res)=>{
 
         try { 
@@ -379,7 +397,7 @@ export const subscription_dates = async(req,res)=>{
             var datetime = new Date();
             var resData = [];
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-            var sql = "select id ,date, order_type from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' order by date desc";
+            var sql = "select id ,date from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' order by date desc";
              dbConnection.query(sql, function (err, resultss) {
                 resultss.forEach(function callback(elem, key){
                 var resversDate = new Date(elem.date)
@@ -389,7 +407,25 @@ export const subscription_dates = async(req,res)=>{
                     }
                     resData.push(init)
                 })
-                res.json({'status':true,"message":"user subscriptions list",'data':resData,'order_type':order_type});
+                res.json({'status':true,"message":"user subscriptions list",'data':resData});
+            });
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
+}
+
+export const subscription_dates_custom = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            var datetime = new Date();
+            var resData = [];
+            const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+            var sql = "select id ,date, order_type from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' and order_type = 4 order by date desc";
+             dbConnection.query(sql, function (err, resultss) {
+            
+                res.json({'status':true,"message":"user subscriptions list",'data':resultss,'order_type': 4});
             });
     }catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -739,6 +775,8 @@ export default {
     booking_delievery_instruction,
     assign_driver,
     assign_folder,
+    subscription_dates_fre,
+    subscription_dates_custom,
     booking_history,
     booking_rating
 }

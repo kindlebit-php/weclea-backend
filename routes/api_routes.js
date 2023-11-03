@@ -47,6 +47,8 @@ router.post('/assign-driver' ,bookingController.assign_driver);
 router.post('/assign-folder' ,bookingController.assign_folder);
 router.post('/delete-booking-date',CheckAuth ,bookingController.delete_booking_date);
 router.get('/user-subscription-dates',CheckAuth ,bookingController.subscription_dates);
+router.get('/subscription-dates-fre',CheckAuth ,bookingController.subscription_dates_fre);
+router.get('/subscription-dates-custom',CheckAuth ,bookingController.subscription_dates_custom);
 router.get('/booking-history',CheckAuth ,bookingController.booking_history);
 router.get('/booking-tracking-status',CheckAuth ,bookingController.booking_tracking_status);
 router.post('/booking-tracking-details',CheckAuth ,bookingController.booking_tracking_details);
