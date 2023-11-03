@@ -12,6 +12,12 @@ RUN npm install -g npm@9.5.1 && \
     npm cache clean --force && \
     rm -rf /tmp/*
 
+# Install Chromium
+RUN apk add --no-cache chromium
+
+# Set the environment variable to avoid Chromium's sandbox
+ENV CHROME_BIN=/usr/bin/chromium-browser
+
 # Copy the entire Node.js app to the container
 COPY . .
 
