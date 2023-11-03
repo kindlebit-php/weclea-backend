@@ -379,7 +379,7 @@ export const subscription_dates_fre = async(req,res)=>{
             var datetime = new Date();
             var resData = [];
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-            var sql = "select id ,date, order_type from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' and order_type = 2 order by date desc";
+            var sql = "select id ,date, order_type,frequency from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' and order_type = 2 order by date desc";
              dbConnection.query(sql, function (err, resultss) {
             
                 res.json({'status':true,"message":"user subscriptions list",'data':resultss,'order_type':2});
