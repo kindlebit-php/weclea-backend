@@ -146,9 +146,9 @@ export const get_category = async (req, res) => {
           const getAll_qrCode= await generateQRCode(qr_codes)
           const userData1 = await getUserData (result.insertId);
           const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-          const match = pdfBytes.match(/uploads\\(.+)/);
-          const newPath = 'uploads//' +match[1];
-          const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+          // const match = pdfBytes.match(/uploads\\(.+)/);
+          // const newPath = 'uploads//' +match[1];
+          const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
           dbConnection.query(updatePdf, async function (err, result2) {
           })
           });

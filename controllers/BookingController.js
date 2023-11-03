@@ -185,12 +185,12 @@ export const customer_booking = async(req,res)=>{
                                                 console.log(getAll_qrCode)
                                                 const userData1 = await getUserData (result.insertId);
                                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                                const match = pdfBytes.match(/uploads\\(.+)/);
-                                                const newPath = 'uploads//' +match[1];
+                                                // const match = pdfBytes.match(/uploads\\(.+)/);
+                                                // const newPath = 'uploads//' +match[1];
                                                 
                   
                 
-                                                const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                                const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
                                                 dbConnection.query(updatePdf, async function (err, result2) {
                                                     console.log(result2)
                                                 })
@@ -303,11 +303,11 @@ export const customer_booking = async(req,res)=>{
                                                 const getAll_qrCode= await generateQRCode(qr_codes)
                                                 const userData1 = await getUserData (result.insertId);
                                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                                const match = pdfBytes.match(/uploads\\(.+)/);
-                                                const newPath = 'uploads//' +match[1];
+                                                // const match = pdfBytes.match(/uploads\\(.+)/);
+                                                // const newPath = 'uploads//' +match[1];
                   
                 
-                                                const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                                const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
                                                 dbConnection.query(updatePdf, async function (err, result2) {
                                                     // console.log('result2',result2)
                                                 })
