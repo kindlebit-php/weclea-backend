@@ -641,7 +641,7 @@ export const order_list = async (req, res) => {
 		} else {
 		  item.order_status = "NA";
 		}
-		const imagesQuery= `SELECT bi.pickup_images,bi.wash_images,bi.dry_images,bi.fold_images,bi.pack_images,bi.drop_image,bi.extra_load_images FROM booking_images AS bi left JOIN bookings AS b ON bi.booking_id = b.id WHERE b.id = ${item.id} `
+		const imagesQuery= `SELECT bi.pickup_images,bi.wash_images,bi.dry_images,bi.fold_images,bi.pack_images,bi.drop_image,bi.extra_load_images FROM booking_images AS bi left JOIN bookings AS b ON bi.booking_id = b.id WHERE bi.pickup_images IS NOT NULL and b.id = ${item.id} `
 		if (item.order_images === 1) {
 			const imagesResults = await new Promise((resolve, reject) => {
 			  dbConnection.query(imagesQuery, (error, Data) => {
