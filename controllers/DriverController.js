@@ -651,10 +651,12 @@ export const drop_loads = async (req, res) => {
 
               const updateOrderStatusQuery =
                 "UPDATE bookings SET order_status = '6' WHERE id = ?";
+                console.log('updateOrderStatusQuery',updateOrderStatusQuery)
               dbConnection.query(
                 updateOrderStatusQuery,
                 [booking_id],
                 function (updateError, updateResult) {
+                  console.log('updateResult',updateResult)
                   if (updateError) {
                     return res.json({
                       status: false,
