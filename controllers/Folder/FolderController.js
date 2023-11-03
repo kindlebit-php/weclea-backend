@@ -103,7 +103,8 @@ export const customer_list_wash = (req, res) => {
   try {
     var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-    const bookingIdQuery = "SELECT bookings.id FROM bookings left join booking_qr on booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"'";
+    const bookingIdQuery = "SELECT bookings.id FROM bookings left join booking_qr on booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' bookings.order_status != 4";
+    console.log('bookingIdQuery',bookingIdQuery)
     dbConnection.query(bookingIdQuery, (error, userIdResult) => {
       if (error) {
         return res.json({ status: false, message: error.message });
@@ -121,7 +122,7 @@ export const customer_list_wash = (req, res) => {
         
                         query += ' AND b.user_id = ?';
                       }
-                
+          console.log('querylist',query)
                       dbConnection.query(query, customer_id ? [booking_id, customer_id] : [booking_id], (error, data) => {
                         console.log(data)
         if (error) {
