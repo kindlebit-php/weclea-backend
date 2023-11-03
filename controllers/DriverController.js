@@ -497,10 +497,10 @@ export const get_drop_orders = async (req, res) => {
     const { type } = req.body;
     // console.log('hi')
     if(type == 1){
-    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
 
     }else{
-    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
 
     }
     console.log('order_type',order)
