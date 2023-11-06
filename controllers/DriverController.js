@@ -111,7 +111,7 @@ console.log('queryorderList',query)
           name,
           profile_image: `${profile_image === "null" ? "" : profile_image}`,
           mobile,
-          comment,
+          comment:`${comment == null || comment == undefined ? "There are no instructions from the customer" : comment}`,
           address,
           appartment,
           city,
@@ -605,7 +605,7 @@ export const get_drop_order_detail = async (req, res) => {
         const resData = {
           name,
           profile_image: `${profile_image === "null" ? "" : profile_image}`,
-          comment,
+          comment:`${comment == null || comment == undefined ? "There are no instructions from the customer" : comment}`,
           address,
           appartment,
           city,

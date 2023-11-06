@@ -11,13 +11,13 @@ const s3 = new S3Client({
         accessKeyId: USER_KEY, // store it in .env file to keep it safe
         secretAccessKey: USER_SECRET
     },
-    region: "ap-south-1" // this is the region that you select in AWS account
+    region: "us-east-2" // this is the region that you select in AWS account
 })
 
 export const uploadS3 = multer({
   storage: multerS3({
     s3: s3,
-    bucket: BUCKET_NAME+"/uploads",
+    bucket: BUCKET_NAME,
     metadata: function (req, file, cb) {
       cb(null, {fieldName: file.fieldname});
     },
