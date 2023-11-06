@@ -9,9 +9,13 @@ import paymentController from "../controllers/PaymentController.js";
 import cronController from "../controllers/CronController.js";
 import AdminController from "../controllers/Admin/AdminController.js";
 import emailController from "../controllers/Admin/EmailController.js";
+import groupController from "../controllers/Admin/GroupController.js";
+
 
 import multer from 'multer';
 import { upload } from "../utils/multer.js";
+import { uploadS3 } from "../utils/multerS3.js";
+
 import DrycleanController from "../controllers/DrycleanController.js";
 import FolderController from "../controllers/Folder/FolderController.js";
 import { qr_slip } from "../helpers/qr_slip.js";
@@ -113,7 +117,7 @@ router.post("/add-to-cart",CheckAuth,DrycleanController.Add_To_Cart)
 router.post("/delete-cart-item",CheckAuth,DrycleanController.delete_cart_item)
 router.post("/dry-clean-booking",CheckAuth,DrycleanController.dry_clean_booking)
 
-/***********Admin panel***************/
+/*********** ------------ Admin panel ---------------***************/
 
 router.get("/get_content",AdminController.get_page_content)
 router.get("/get_faq",AdminController.get_faq_content)
@@ -152,7 +156,11 @@ router.post("/create_emailTemplate",CheckAuth,emailController.create_emailTempla
 router.post("/delete_emailTemplate",CheckAuth,emailController.delete_emailTemplate)
 router.post("/update_emailTemplate_status",CheckAuth,emailController.update_emailTemplate_status)
 
-
+/****** Admin group ***********/
+router.get("/get_group_list",CheckAuth,groupController.get_group_list)
+router.post('/create_group',CheckAuth,uploadS3.single('profile_pic') ,groupController.create_group);
+	
+/*****  ---------- Admin API End ---------- *****/
 /*dry cleaning*/
 router.post("/update_drycleaning_service",upload.single('service_pic'),AdminController.update_drycleaning_service)
 router.post("/add_drycleaning_service",upload.single('service_pic'),AdminController.add_drycleaning_service)
