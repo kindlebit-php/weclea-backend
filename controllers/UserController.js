@@ -338,7 +338,7 @@ export const get_user_profile = async(req,res)=>{
 					if(result[0].profile_image){
 						var img = process.env.BASE_URL+'/uploads/'+result[0].profile_image;
 					}else{
-						var img = process.env.BASE_URL+'/uploads/profile.png';
+						var img = process.env.BASE_URL+'/uploads/profile.jpg';
 
 					}
 					let initi = {
