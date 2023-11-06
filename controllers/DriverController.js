@@ -84,8 +84,8 @@ export const get_order_detail = async (req, res) => {
                 left JOIN users AS u ON b.user_id = u.id
                 left JOIN booking_instructions AS bin ON b.user_id = bin.user_id
                 WHERE b.order_id = ? AND b.user_id IN (?)`;
-console.log('queryorderList',query)
       dbConnection.query(query, [orderId, userIds], (error, data) => {
+        console.log(data)
         if (error) {
           return res.json({ status: false, message: error.message });
         } else if (data.length === 0) {
@@ -111,7 +111,7 @@ console.log('queryorderList',query)
           name,
           profile_image: `${profile_image === "null" ? "" : profile_image}`,
           mobile,
-          comment:`${comment == null || comment == undefined ? "There are no instructions from the customer" : comment}`,
+          comment:`${comment === null || comment === "undefined" || comment === "" ? "There are no instructions from the customer" : comment}`,
           address,
           appartment,
           city,
@@ -587,7 +587,6 @@ export const get_drop_order_detail = async (req, res) => {
         } else if (data.length === 0) {
           return res.json({ status: false, message: "data Not found" });
         }
-
         const {
           name,
           profile_image,
@@ -605,7 +604,7 @@ export const get_drop_order_detail = async (req, res) => {
         const resData = {
           name,
           profile_image: `${profile_image === "null" ? "" : profile_image}`,
-          comment:`${comment == null || comment == undefined ? "There are no instructions from the customer" : comment}`,
+          comment:`${comment == null || comment == undefined || comment == "" ? "There are no instructions from the customer" : comment}`,
           address,
           appartment,
           city,
