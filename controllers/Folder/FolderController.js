@@ -1294,26 +1294,26 @@ export const order_histroy_detail= async(req,res)=>{
                       {
                         title: "Wash",
                         imageList: imageList1,
-                        wash_date: wash_date,
-                        wash_time: wash_time
+                        date: wash_date,
+                        time: wash_time
                       },
                       {
                         title: "Dry",
                         imageList: imageList2,
-                        dry_date: dry_date,
-                        dry_time: dry_time
+                        date: dry_date,
+                        time: dry_time
                       },
                       {
                         title: "Fold",
                         imageList: imageList3,
-                        fold_date: fold_date,
-                        fold_time: fold_time
+                        date: fold_date,
+                        time: fold_time
                       },
                       {
                         title: "Pack",
                         imageList: imageList4,
-                        pack_date: pack_date,
-                        pack_time: pack_time
+                        date: pack_date,
+                        time: pack_time
                       }
                     ];
                     
