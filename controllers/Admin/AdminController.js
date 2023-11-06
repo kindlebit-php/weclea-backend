@@ -71,7 +71,11 @@ const BUCKET_NAME = 'weclea-bucket';
         	const loads = "select * from dry_clean_services where isDelete=0 order by updated_at desc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
-				res.json({'status':true,"message":"Success",'data':data});
+				const dryCleanChares = `SELECT dry_clean_charges FROM settings `;
+        		dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
+        			if (error) throw error;
+        			res.json({'status':true,"message":"Success",'data':data,"mini_order_amount":dryCleanCharesdata[0].dry_clean_charges});
+        		})	
 			})
     }catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -330,52 +334,33 @@ export const get_user_history = async(req,res)=>{
 }
 export const sendNotification=async(req,res)=>{
 	var reqData=req.body;
-	/*try{
+	try{
 		const loads = "select wc_email_template.* from wc_email_template where id=12";
 		dbConnection.query(loads,[reqData.user_id], function (error, rows) {
 			if (error) throw error;
-			if (rows.length>0) {
-	    
-
+			if (rows.length>0) {	    
+				var message= rows[0].body;
 				message =message.replace('[username]',argument.username );
-		        message =message.replace('[channel_name]',argument.title );
-		        message =message.replace( '[subject]',argument.seller_name);
-		        message =message.replace( '[channel_id]',argument.id);
-		        message =message.replace('[message]',argument.title );
-		        message =message.replace('[seller_name]',argument.seller_name );
-		        subject =subject.replace( '[subject]',argument.seller_name);
+		        message =message.replace('[url]',argument.title );
+		        message =message.replace( '[subject]',argument.subject);
+		        message =message.replace('[message]',argument.message );
+
 				const mailOptions = 
 		     	{
 			        from: 'ankuchauhan68@gmail.com',
 			        to: reqData.emails,
 			        subject: reqData.subject,
-			        html: `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">
-			            <div style="margin:50px auto;width:70%;padding:20px 0">
-			            <div style="border-bottom:1px solid #eee">
-			            <a href="" style="font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600">WeClea</a>
-			            </div>
-			            <p style="font-size:1.1em">Hi ,</p>
-			            <p>You have an upcoming booking on ${ele.date} ,Please purchase loads..</p>
-			            <p style="font-size:0.9em;">Regards,<br />WeClea</p>
-			            <hr style="border:none;border-top:1px solid #eee" />
-			            <div style="float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300">
-			            <p>WeClea Inc</p>
-			            <p>USA</p>
-			            </div>
-			            </div>
-			            </div>`,
+			        html: message,
 		        };
-
 		        transport.sendMail(mailOptions, function (error, info) 
 		        {
-
-
+		        	console.log(error,info);
 		        })
     		}
 		})
 	}catch(error){
 
-	}*/
+	}
 }
 
 /*********** User Listing End ************/
@@ -630,19 +615,6 @@ export const delete_faq = async(req,res)=>{
     	}else{
 			res.json({'status':false,"message":"Record not found"});
 		}
-    	/*const qrySelect = "select id from wc_faq where id=?";
-		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
-		if (error) throw error;
-			if (data.length>0) {
-			    var updateContnetQry = "delete from wc_faq where id=? ";
-			    dbConnection.query(updateContnetQry,[reqData.id], function (error, data) {
-				if (error) throw error;
-					res.json({'status':true,"message":"FAQ has been deleted successfully",'data':data});
-				});
-			}else{
-				res.json({'status':false,"message":"Record not found"});
-			}
-		});*/
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
