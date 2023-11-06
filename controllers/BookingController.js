@@ -24,6 +24,7 @@ export const customer_booking = async(req,res)=>{
                 if(total_loads > Number(results[0].total_loads)){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
+                    console.log("data")
                     let dateObject = new Date();
                     let hours = dateObject.getHours();
                     let minutes = dateObject.getMinutes();
@@ -44,6 +45,7 @@ export const customer_booking = async(req,res)=>{
                     }else{
                         var driver_id = 0
                     }
+                    console.log("data")
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+category_id+"',1)";
                     dbConnection.query(sql, async function (err, result) {
                     var updateLoads = (results[0].total_loads - total_loads);
@@ -68,15 +70,19 @@ export const customer_booking = async(req,res)=>{
                             var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
                            dbConnection.query(sql2, async function (err, result1) {
                             const qr_codes = result1.map((row) => row.qr_code);
+                            console.log("test1",qr_codes)
                                 const getAll_qrCode= await generateQRCode(qr_codes)
+                                console.log('getAll_qrCode',getAll_qrCode)
                                 const userData1 = await getUserData (result.insertId);
+                                console.log('userData1',userData1)
+                              
                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                console.log(pdfBytes,"skfjuhsdkj")
-                                const match = pdfBytes.match(/uploads\\(.+)/);
-                                const newPath = 'uploads//' +match[1];
+                                console.log('pdfBytes',pdfBytes)
+                                // const match = pdfBytes.match(/uploads\\(.+)/);
+                                // const newPath = 'uploads/' +match[1];
   
 
-                                const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
                                 dbConnection.query(updatePdf, async function (err, result2) {
                                     console.log(result2)
                                 })
@@ -179,12 +185,12 @@ export const customer_booking = async(req,res)=>{
                                                 console.log(getAll_qrCode)
                                                 const userData1 = await getUserData (result.insertId);
                                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                                const match = pdfBytes.match(/uploads\\(.+)/);
-                                                const newPath = 'uploads//' +match[1];
+                                                // const match = pdfBytes.match(/uploads\\(.+)/);
+                                                // const newPath = 'uploads//' +match[1];
                                                 
                   
                 
-                                                const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                                const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
                                                 dbConnection.query(updatePdf, async function (err, result2) {
                                                     console.log(result2)
                                                 })
@@ -282,8 +288,9 @@ export const customer_booking = async(req,res)=>{
                             }else{
                                 var driver_id = 0
                             }
+                            var order_types = 4
                             // console.log('currentBookingDate',currentBookingDate)
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"')";
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_types+"','"+driver_id+"',1,'"+category_id+"')";
                            
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
@@ -296,11 +303,11 @@ export const customer_booking = async(req,res)=>{
                                                 const getAll_qrCode= await generateQRCode(qr_codes)
                                                 const userData1 = await getUserData (result.insertId);
                                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                                const match = pdfBytes.match(/uploads\\(.+)/);
-                                                const newPath = 'uploads//' +match[1];
+                                                // const match = pdfBytes.match(/uploads\\(.+)/);
+                                                // const newPath = 'uploads//' +match[1];
                   
                 
-                                                const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                                const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
                                                 dbConnection.query(updatePdf, async function (err, result2) {
                                                     // console.log('result2',result2)
                                                 })
@@ -365,6 +372,24 @@ export const customer_booking = async(req,res)=>{
     }
 }
 
+export const subscription_dates_fre = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            var datetime = new Date();
+            var resData = [];
+            const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+            var sql = "select id ,date, order_type,frequency from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' and order_type = 2 order by date desc";
+             dbConnection.query(sql, function (err, resultss) {
+            
+                res.json({'status':true,"message":"user subscriptions list",'data':resultss,'order_type':2});
+            });
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
+}
+
 export const subscription_dates = async(req,res)=>{
 
         try { 
@@ -390,23 +415,43 @@ export const subscription_dates = async(req,res)=>{
 
 }
 
+export const subscription_dates_custom = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            var datetime = new Date();
+            var resData = [];
+            const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+            var sql = "select id ,date, order_type from bookings where user_id = '"+userData[0].id+"' and date >= '"+currentFinalDate+"' and order_type = 4 order by date desc";
+             dbConnection.query(sql, function (err, resultss) {
+            
+                res.json({'status':true,"message":"user subscriptions list",'data':resultss,'order_type': 4});
+            });
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
+}
+
 export const booking_tracking_status = async(req,res)=>{
 
         try { 
             var resData = [];
-            var resPickImg = [];
-            var resWashImg = [];
-            var resDryImg = [];
-            var resPackImg = [];
-            var resFoldImg = [];
+            
             const userData = res.user;
             var datetime = new Date();
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-            var sql = "select bookings.id,booking_images.wash_images,booking_images.dry_images,booking_images.fold_images,booking_images.pack_images,booking_images.drop_image,bookings.order_status,bookings.order_type,booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.customer_pick_date, ' ', booking_timing.customer_pick_time) AS pickup_confirm_date ,CONCAT(booking_timing.wash_date, ' ', booking_timing.wash_time) AS wash_date,CONCAT(booking_timing.dry_date, ' ', booking_timing.dry_time) AS dry_date,CONCAT(booking_timing.fold_date, ' ', booking_timing.fold_time) AS fold_date,CONCAT(booking_timing.pack_date, ' ', booking_timing.pack_time) AS pack_date from bookings left join booking_timing on bookings.id = booking_timing.booking_id left join booking_images on booking_images.booking_id = bookings.id where bookings.order_status != 6 and bookings.order_status != 7 and booking_timing.customer_pick_time IS NOT NULL";
+            var sql = "select bookings.id,booking_images.wash_images,booking_images.dry_images,booking_images.fold_images,booking_images.pack_images,booking_images.drop_image,bookings.order_status,bookings.order_type,booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.driver_pick_date, ' ', booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(booking_timing.wash_date, ' ', booking_timing.wash_time) AS wash_date,CONCAT(booking_timing.dry_date, ' ', booking_timing.dry_time) AS dry_date,CONCAT(booking_timing.fold_date, ' ', booking_timing.fold_time) AS fold_date,CONCAT(booking_timing.pack_date, ' ', booking_timing.pack_time) AS pack_date from bookings left join booking_timing on bookings.id = booking_timing.booking_id left join booking_images on booking_images.booking_id = bookings.id where bookings.order_status != 0 and booking_timing.driver_pick_time IS NOT NULL";
             dbConnection.query(sql, function (err, resultss) {
             if(resultss){
             resultss.forEach(element =>
             {
+
+                var resPickImg = [];
+                var resWashImg = [];
+                var resDryImg = [];
+                var resPackImg = [];
+                var resFoldImg = [];
                 const {id,order_type,dry_images,wash_images,fold_images,pack_images,dry_date,fold_date,pack_date,order_status,pickup_images,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status} = element;
                 if(pickup_images){
                     const pickup_images_array = pickup_images.split(',');
@@ -418,10 +463,12 @@ export const booking_tracking_status = async(req,res)=>{
 
                 if(wash_images){
                     const wash_images_array = wash_images.split(',');
+                    console.log('wash_images_array',wash_images_array)
                     wash_images_array.forEach(function callback(img, key)
                     {
-                        resWashImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resWashImg[key] = process.env.BASE_URL+'/'+img;
                     })
+                    console.log('resWashImg',resWashImg)
                 }
 
                 if(dry_images){
@@ -586,7 +633,7 @@ export const assign_driver = async(req,res)=>{
                 var sql = "update bookings set driver_id = '"+driver_id+"' where id = '"+booking_id+"'";
                 dbConnection.query(sql, function (error, result) {
                 if (error) throw error;
-                    res.json({'status':true,"message":"Employee profile has been updated!"});
+                    res.json({'status':true,"message":"Driver has been assigned successfully!"});
                 }); 
         }else{
             res.json({'status':false,"message":"All fields are required"});
@@ -604,7 +651,7 @@ export const assign_folder = async(req,res)=>{
                 var sql = "update bookings set folder_id = '"+folder_id+"' where id = '"+booking_id+"'";
                 dbConnection.query(sql, function (error, result) {
                 if (error) throw error;
-                    res.json({'status':true,"message":"Employee profile has been updated!"});
+                    res.json({'status':true,"message":"Folder assigned successfully!"});
                 }); 
         }else{
             res.json({'status':false,"message":"All fields are required"});
@@ -732,6 +779,8 @@ export default {
     booking_delievery_instruction,
     assign_driver,
     assign_folder,
+    subscription_dates_fre,
+    subscription_dates_custom,
     booking_history,
     booking_rating
 }

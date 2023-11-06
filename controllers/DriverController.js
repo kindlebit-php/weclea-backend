@@ -111,7 +111,7 @@ console.log('queryorderList',query)
           name,
           profile_image: `${profile_image === "null" ? "" : profile_image}`,
           mobile,
-          comment,
+          comment:`${comment == null || comment == undefined ? "There are no instructions from the customer" : comment}`,
           address,
           appartment,
           city,
@@ -166,7 +166,8 @@ export const print_All_Drop_QrCode = async (req, res) => {
   try {
     const userData = res.user;
     const booking_id = req.body.booking_id;
-    const data = `SELECT id AS qr_codeID, qr_code,driver_drop_status FROM booking_qr WHERE folder_pack_status = 1 AND booking_id  = ${booking_id}`;
+
+          const data = `SELECT id AS qr_codeID, qr_code,driver_drop_status FROM booking_qr WHERE folder_pack_status = 1 AND booking_id  = ${booking_id}`;
     dbConnection.query(data, function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
@@ -185,6 +186,7 @@ export const print_All_Drop_QrCode = async (req, res) => {
         });
       }
     });
+
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
@@ -592,7 +594,7 @@ export const get_drop_order_detail = async (req, res) => {
         const resData = {
           name,
           profile_image: `${profile_image === "null" ? "" : profile_image}`,
-          comment,
+          comment:`${comment == null || comment == undefined ? "There are no instructions from the customer" : comment}`,
           address,
           appartment,
           city,
@@ -647,27 +649,31 @@ export const drop_loads = async (req, res) => {
                 });
               }
 
-              const updateOrderStatusQuery =
-                "UPDATE bookings SET order_status = '5' WHERE id = ?";
-              dbConnection.query(
-                updateOrderStatusQuery,
-                [booking_id],
-                function (updateError, updateResult) {
-                  if (updateError) {
-                    return res.json({
-                      status: false,
-                      message: updateError.message,
-                    });
-                  }
-
-                  res.json({
+               res.json({
                     status: true,
                     message: "Data retrieved and updated successfully!",
                     booking_id: booking_id,
                     qrCode_id: data[0].id,
-                  });
-                }
-              );
+                });
+
+              // const updateOrderStatusQuery =
+              //   "UPDATE bookings SET order_status = '6' WHERE id = ?";
+              //   console.log('updateOrderStatusQuery',updateOrderStatusQuery)
+              // dbConnection.query(
+              //   updateOrderStatusQuery,
+              //   [booking_id],
+              //   function (updateError, updateResult) {
+              //     console.log('updateResult',updateResult)
+              //     if (updateError) {
+              //       return res.json({
+              //         status: false,
+              //         message: updateError.message,
+              //       });
+              //     }
+
+                 
+              //   }
+              // );
             }
           );
         } else {

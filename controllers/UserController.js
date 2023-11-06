@@ -338,7 +338,7 @@ export const get_user_profile = async(req,res)=>{
 					if(result[0].profile_image){
 						var img = process.env.BASE_URL+'/uploads/'+result[0].profile_image;
 					}else{
-						var img = process.env.BASE_URL+'/uploads/profile.png';
+						var img = process.env.BASE_URL+'/uploads/profile.jpg';
 
 					}
 					let initi = {
@@ -559,7 +559,7 @@ export const order_list = async (req, res) => {
 	var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
 	const list =
-		"SELECT b.id, b.order_id,b.driver_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
+		"SELECT b.id, b.order_id,b.driver_id,b.folder_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
 	  
 	  const data = await new Promise((resolve, reject) => {
 		dbConnection.query(list, (error, data) => {
@@ -631,7 +631,7 @@ export const order_list = async (req, res) => {
 		} else if (item.order_status === 4) {
 		  item.order_status = "Pack";
 		} else if (item.order_status === 5) {
-		  item.order_status = "Driver Collected The Order";
+		  item.order_status = "Order Collected";
 		} else if (item.order_status === 6) {
 		  item.order_status = "Completed";
 		} else if (item.order_status === 7) {
@@ -641,7 +641,7 @@ export const order_list = async (req, res) => {
 		} else {
 		  item.order_status = "NA";
 		}
-		const imagesQuery= `SELECT bi.pickup_images,bi.wash_images,bi.dry_images,bi.fold_images,bi.pack_images,bi.drop_image,bi.extra_load_images FROM booking_images AS bi left JOIN bookings AS b ON bi.booking_id = b.id WHERE b.id = ${item.id} `
+		const imagesQuery= `SELECT bi.pickup_images,bi.wash_images,bi.dry_images,bi.fold_images,bi.pack_images,bi.drop_image,bi.extra_load_images FROM booking_images AS bi left JOIN bookings AS b ON bi.booking_id = b.id WHERE bi.pickup_images IS NOT NULL and b.id = ${item.id} `
 		if (item.order_images === 1) {
 			const imagesResults = await new Promise((resolve, reject) => {
 			  dbConnection.query(imagesQuery, (error, Data) => {
