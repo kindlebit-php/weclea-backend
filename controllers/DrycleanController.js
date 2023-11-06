@@ -187,8 +187,43 @@ export const get_category = async (req, res) => {
   //-------------------------------------------------------------------------------------------------------------------------------//
   //-------------------------------------------------------------------------------------------------------------------------------//
   //-------------------------------------------------------------------------------------------------------------------------------//
-
+  export const Scan_received_loads = (req, res) => {
+    const userData = res.user;
+    const folder_id = userData[0].id;
+    const { qr_code } = req.body;
   
+    try {
+      const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ?";
+      dbConnection.query(verifyQr, [qr_code], function (error, data) {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+        if (data.length === 0 || data[0].driver_pickup_status === 0 || data[0].folder_receive_status === 1) {
+          return res.json({ status: false, message: "Invalid QR code or load status" });
+        }
+        
+        const checkFolderQuery = "SELECT folder_id FROM bookings WHERE id = ?";
+        dbConnection.query(checkFolderQuery, [data[0].booking_id], function (folderCheckError, folderCheckData) {
+          if (folderCheckError) {
+            return res.json({ status: false, message: folderCheckError.message });
+          }else if (folderCheckData[0].folder_id === 0) {
+            const updateBooking = `UPDATE bookings SET folder_id = ${folder_id} WHERE id = ${data[0].booking_id}`;
+            dbConnection.query(updateBooking, function (updateBookingErr, updateBookingResult) {
+              if (updateBookingErr) {
+                return res.json({ status: false, message: updateBookingErr.message });
+              }
+              return res.json({ status: true, message: "Load data scanned and updated." });
+            });
+          } else {
+            return res.json({ status: false, message: "Folder is already assigned!" });
+          }
+        });
+      });
+    } catch (error) {
+      res.json({ status: false, message: error.message });
+    }
+  };
+
 
   export default {
     get_category,

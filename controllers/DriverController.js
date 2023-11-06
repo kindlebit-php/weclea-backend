@@ -587,7 +587,6 @@ export const get_drop_order_detail = async (req, res) => {
         } else if (data.length === 0) {
           return res.json({ status: false, message: "data Not found" });
         }
-
         const {
           name,
           profile_image,
@@ -605,7 +604,7 @@ export const get_drop_order_detail = async (req, res) => {
         const resData = {
           name,
           profile_image: `${profile_image === "null" ? "" : profile_image}`,
-          comment:`${comment == null || comment == undefined ? "There are no instructions from the customer" : comment}`,
+          comment:`${comment == null || comment == undefined || comment == "" ? "There are no instructions from the customer" : comment}`,
           address,
           appartment,
           city,
