@@ -289,7 +289,7 @@ export const submit_pickup_details = async (req, res) => {
     const userId = `SELECT user_id,order_type FROM bookings WHERE id = ?`;
 
     dbConnection.query(userId, [booking_id], function (error, dataBooking) {
-      console.log(data);
+      // console.log(data);
       if (error) {
         res.json({ status: false, message: error.message });
       } else {
