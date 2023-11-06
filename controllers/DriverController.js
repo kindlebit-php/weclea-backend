@@ -310,9 +310,9 @@ export const submit_pickup_details = async (req, res) => {
           const currentDate = date();
           if(dataBooking[0].order_type == 3){
 
-          const update_Date_Time = `UPDATE dry_clean_booking_timing SET customer_pick_time = '${currentTime}' , customer_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+          var update_Date_Time = `UPDATE dry_clean_booking_timing SET customer_pick_time = '${currentTime}' , customer_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
         }else{
-          const update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+          var update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
 
         }
           const result = data[0];
@@ -337,10 +337,10 @@ export const submit_pickup_details = async (req, res) => {
                 }
                 const pickupImagesJSON = imageArray.join(", ");
                 if(dataBooking[0].order_type == 3){
-                   const update_pickupimages =
+                   var update_pickupimages =
                   "UPDATE dry_clean_booking_images SET pickup_images = ? WHERE booking_id = ?";
                 }else{
-                   const update_pickupimages =
+                   var update_pickupimages =
                   "UPDATE booking_images SET pickup_images = ? WHERE booking_id = ?";
                 }
                
