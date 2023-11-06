@@ -466,7 +466,7 @@ export const booking_tracking_status = async(req,res)=>{
                     console.log('wash_images_array',wash_images_array)
                     wash_images_array.forEach(function callback(img, key)
                     {
-                        resWashImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resWashImg[key] = process.env.BASE_URL+'/'+img;
                     })
                     console.log('resWashImg',resWashImg)
                 }
