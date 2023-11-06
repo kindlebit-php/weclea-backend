@@ -286,7 +286,7 @@ export const submit_pickup_details = async (req, res) => {
     const { booking_id } = req.body;
     const userData = res.user;
     const driverId = userData[0].id;
-    const userId = `SELECT user_id FROM bookings WHERE id = ?`;
+    const userId = `SELECT user_id,order_type FROM bookings WHERE id = ?`;
 
     dbConnection.query(userId, [booking_id], function (error, data) {
       console.log(data);
@@ -308,7 +308,13 @@ export const submit_pickup_details = async (req, res) => {
           }
           const currentTime = time();
           const currentDate = date();
+          if(order_type == 3){
+
+          const update_Date_Time = `UPDATE dry_clean_booking_timing SET customer_pick_time = '${currentTime}' , customer_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+        }else{
           const update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+
+        }
           const result = data[0];
           dbConnection.query(
             update_Date_Time,
@@ -330,9 +336,14 @@ export const submit_pickup_details = async (req, res) => {
                   });
                 }
                 const pickupImagesJSON = imageArray.join(", ");
-
-                const update_pickupimages =
+                if(order_type == 3){
+                   const update_pickupimages =
+                  "UPDATE dry_clean_booking_images SET pickup_images = ? WHERE booking_id = ?";
+                }else{
+                   const update_pickupimages =
                   "UPDATE booking_images SET pickup_images = ? WHERE booking_id = ?";
+                }
+               
                 dbConnection.query(
                   update_pickupimages,
                   [pickupImagesJSON, booking_id],
