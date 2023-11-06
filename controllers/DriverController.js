@@ -12,12 +12,12 @@ export const get_orders = async (req, res) => {
     const {type} = req.body;
 
   const currentDate = dateFormat.format(datetime,'YYYY-MM-DD'); 
-    // const order = `SELECT id,order_id, date, time FROM bookings WHERE cron_status = 1 AND date >= '${currentDate}' AND driver_id = ${userData[0].id}`;
+   
     if(type == 1){
-    var order = "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '8' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type != '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance desc;";
+    var order = "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '8' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type != '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance desc;";
 
     }else{
-    var order = "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type = '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance desc;";
+    var order = "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '8' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type = '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance desc;";
 
     }
     console.log('order',order)
@@ -37,7 +37,7 @@ export const get_orders = async (req, res) => {
 // Driver order api
 
 export const get_dry_clean_orders = async (req, res) => {
-  try {
+  try { 
     const userData = res.user;
     var datetime = new Date();
     const currentDate = dateFormat.format(datetime, "YYYY-MM-DD");
@@ -69,7 +69,7 @@ export const get_order_detail = async (req, res) => {
 
     const userIdQuery = `
             SELECT user_id FROM bookings AS b1
-            JOIN users AS u ON u.id = b1.driver_id
+            left JOIN users AS u ON u.id = b1.driver_id
             WHERE u.id = ?`;
     dbConnection.query(userIdQuery, [driverId], async (error, userIdResult) => {
       if (error) {
@@ -80,11 +80,11 @@ export const get_order_detail = async (req, res) => {
       const query = `
                 SELECT u.name,u.profile_image,u.mobile, bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
                 FROM bookings AS b
-                JOIN customer_address AS ca ON b.user_id = ca.user_id
-                JOIN users AS u ON b.user_id = u.id
-                JOIN booking_instructions AS bin ON b.user_id = bin.user_id
+                left JOIN customer_address AS ca ON b.user_id = ca.user_id
+                left JOIN users AS u ON b.user_id = u.id
+                left JOIN booking_instructions AS bin ON b.user_id = bin.user_id
                 WHERE b.order_id = ? AND b.user_id IN (?)`;
-
+console.log('queryorderList',query)
       dbConnection.query(query, [orderId, userIds], (error, data) => {
         if (error) {
           return res.json({ status: false, message: error.message });
@@ -96,12 +96,12 @@ export const get_order_detail = async (req, res) => {
           name,
           profile_image,
           mobile,
-          comment,
           address,
           appartment,
           city,
           state,
           zip,
+          comment,
           latitude,
           longitude,
           booking_id,
@@ -166,7 +166,8 @@ export const print_All_Drop_QrCode = async (req, res) => {
   try {
     const userData = res.user;
     const booking_id = req.body.booking_id;
-    const data = `SELECT id AS qr_codeID, qr_code,driver_drop_status FROM booking_qr WHERE folder_pack_status = 1 AND booking_id  = ${booking_id}`;
+
+          const data = `SELECT id AS qr_codeID, qr_code,driver_drop_status FROM booking_qr WHERE folder_pack_status = 1 AND booking_id  = ${booking_id}`;
     dbConnection.query(data, function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
@@ -185,6 +186,7 @@ export const print_All_Drop_QrCode = async (req, res) => {
         });
       }
     });
+
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
@@ -495,18 +497,17 @@ export const get_drop_orders = async (req, res) => {
   try {
     const userData = res.user;
     const { type } = req.body;
-
-        var datetime = new Date();
-    const currentDate = dateFormat.format(datetime,'YYYY-MM-DD'); 
-    // const order = `SELECT order_id FROM bookings WHERE order_status = '4' AND driver_id = ${userData[0].id}`;
+    // console.log('hi')
     if(type == 1){
-    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status = '4' and bookings.order_type != '3'and bookings.order_type != '8' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
 
     }else{
-    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status = '4' and bookings.order_type = '3' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
 
     }
+    console.log('order_type',order)
     dbConnection.query(order, function (error, data) {
+      console.log('kailashtest',data)
       if (error) throw error;
       res.json({
         status: true,
@@ -648,27 +649,31 @@ export const drop_loads = async (req, res) => {
                 });
               }
 
-              const updateOrderStatusQuery =
-                "UPDATE bookings SET order_status = '5' WHERE id = ?";
-              dbConnection.query(
-                updateOrderStatusQuery,
-                [booking_id],
-                function (updateError, updateResult) {
-                  if (updateError) {
-                    return res.json({
-                      status: false,
-                      message: updateError.message,
-                    });
-                  }
-
-                  res.json({
+               res.json({
                     status: true,
                     message: "Data retrieved and updated successfully!",
                     booking_id: booking_id,
                     qrCode_id: data[0].id,
-                  });
-                }
-              );
+                });
+
+              // const updateOrderStatusQuery =
+              //   "UPDATE bookings SET order_status = '6' WHERE id = ?";
+              //   console.log('updateOrderStatusQuery',updateOrderStatusQuery)
+              // dbConnection.query(
+              //   updateOrderStatusQuery,
+              //   [booking_id],
+              //   function (updateError, updateResult) {
+              //     console.log('updateResult',updateResult)
+              //     if (updateError) {
+              //       return res.json({
+              //         status: false,
+              //         message: updateError.message,
+              //       });
+              //     }
+
+                 
+              //   }
+              // );
             }
           );
         } else {

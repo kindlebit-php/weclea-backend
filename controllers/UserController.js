@@ -338,7 +338,7 @@ export const get_user_profile = async(req,res)=>{
 					if(result[0].profile_image){
 						var img = process.env.BASE_URL+'/uploads/'+result[0].profile_image;
 					}else{
-						var img = process.env.BASE_URL+'/uploads/profile.png';
+						var img = process.env.BASE_URL+'/uploads/profile.jpg';
 
 					}
 					let initi = {
@@ -559,7 +559,7 @@ export const order_list = async (req, res) => {
 	var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
 	const list =
-		"SELECT b.id, b.order_id,b.driver_id, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b JOIN customer_drop_address AS cda ON b.user_id = cda.user_id JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
+		"SELECT b.id, b.order_id,b.driver_id,b.folder_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
 	  
 	  const data = await new Promise((resolve, reject) => {
 		dbConnection.query(list, (error, data) => {
@@ -571,6 +571,7 @@ export const order_list = async (req, res) => {
 	  });
 	  console.log(data,"data1")
 	  const driverData = [];
+	  const folderData = [];
 	  const imagesData = [];
   
 	  for (const item of data) {
@@ -590,41 +591,57 @@ export const order_list = async (req, res) => {
 		  driverData.push(driverResults);
 		  item.Nearby_driver = driverResults;
 		}
+		if (item.Folder) {
+			const Folder_list = `SELECT id, name FROM users WHERE role = 3`;
+	
+			const folderResults = await new Promise((resolve, reject) => {
+			  dbConnection.query(Folder_list, (error, Dataa) => {
+				if (error) {
+				  reject(error);
+				} else {
+				  resolve(Dataa);
+				}
+			  });
+			});
+			console.log(folderResults,"data3")
+			folderData.push(folderResults);
+			item.Folder = folderResults;
+		  }
   
 		if (item.delievery_day === 0) {
-		  item.delievery_day = "same_day";
+		  item.delievery_day = "Same Day";
 		} else if (item.delievery_day === 1) {
-		  item.delievery_day = "next_day";
+		  item.delievery_day = "Next Day";
 		}
   
 		if (item.status === 0) {
-		  item.status = "inactive";
+		  item.status = "Inactive";
 		} else if (item.status === 1) {
-		  item.status = "active";
+		  item.status = "Active";
 		}
   
-		
+		console.log(item.order_status)
   
 		if (item.order_status === 1) {
-		  item.order_status = "wash";
+		  item.order_status = "Wash";
 		} else if (item.order_status === 2) {
-		  item.order_status = "dry";
+		  item.order_status = "Dry";
 		} else if (item.order_status === 3) {
-		  item.order_status = "fold";
+		  item.order_status = "Fold";
 		} else if (item.order_status === 4) {
-		  item.order_status = "pack";
+		  item.order_status = "Pack";
 		} else if (item.order_status === 5) {
-		  item.order_status = "way-to-drop";
+		  item.order_status = "Order Collected";
 		} else if (item.order_status === 6) {
-		  item.order_status = "completed";
+		  item.order_status = "Completed";
 		} else if (item.order_status === 7) {
-		  item.order_status = "not_found";
+		  item.order_status = "Order Not Found";
 		} else if (item.order_status === 8) {
-		  item.order_status = "pickup";
+		  item.order_status = "Order Pickup";
 		} else {
 		  item.order_status = "NA";
 		}
-		const imagesQuery= `SELECT pickup_images,wash_images,dry_images,fold_images,pack_images,drop_image,extra_load_images FROM booking_images AS bi JOIN bookings AS b ON bi.booking_id = b.id WHERE b.id = ${item.id} `
+		const imagesQuery= `SELECT bi.pickup_images,bi.wash_images,bi.dry_images,bi.fold_images,bi.pack_images,bi.drop_image,bi.extra_load_images FROM booking_images AS bi left JOIN bookings AS b ON bi.booking_id = b.id WHERE bi.pickup_images IS NOT NULL and b.id = ${item.id} `
 		if (item.order_images === 1) {
 			const imagesResults = await new Promise((resolve, reject) => {
 			  dbConnection.query(imagesQuery, (error, Data) => {
@@ -804,11 +821,11 @@ export const order_list = async (req, res) => {
 		}
   
 		if (item.order_type === 1) {
-		  item.order_type = "one time";
+		  item.order_type = "One Time Order";
 		} else if (item.order_type === 2) {
-		  item.order_type = "subscription";
+		  item.order_type = "Subscription Order";
 		} else if (item.order_type === 3) {
-		  item.order_type = "dry_clean";
+		  item.order_type = "Dry Clean Order";
 		}
   
 		if (item.delievery_instruction) {
@@ -970,10 +987,46 @@ export const customer_list = async (req, res) => {
 	  res.json({ status: false, message: error.message });
 	}
   };
+    export const contact_us = async (req, res) => {
+		try {
+			const {name,email,message} = req.body;
+			if(name  && email && message){
+				var sql = "INSERT INTO contact_us (name, email,message) VALUES ('"+name+"', '"+email+"','"+message+"')";
+				dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+					res.json({'status':true,"message":"We will connect you shortly!"});
+				});
+			}else{
+				res.json({'status':false,"message":"All fields are required"});
+			}
+		} catch (error) {
+		  	res.json({ status: false, message: error.message });
+		}
+	}
 
+	export const get_deleivery_instruction = async (req, res) => {
+		try {
+				const userData = res.user;
+				var sql = "select delievery_instruction from booking_instructions where user_id = '"+userData[0].id+"'";
+				dbConnection.query(sql, function (error, result) {
+				if (error) throw error;
+				if(result){
+					var finalResult = result[0]
+				}else{
+					var finalResult = result
+
+				}
+					res.json({'status':true,"message":"Delievery instruction list",'data':finalResult});
+				});
+			
+		} catch (error) {
+		  	res.json({ status: false, message: error.message });
+		}
+	}
 export default {
 	user_registered_address,
 	customer_register,
+	contact_us,
 	get_notification,
 	customer_address,
 	customer_login,
@@ -992,5 +1045,6 @@ export default {
 	update_employee,
 	delete_employee,
 	update_user_status,
-	customer_order_histroy
+	customer_order_histroy,
+	get_deleivery_instruction
 }

@@ -1,5 +1,7 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
+import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
+import { getDates,randomNumber } from "../helpers/date.js";
 
 export const get_category = async (req, res) => {
     try {
@@ -108,7 +110,7 @@ export const get_category = async (req, res) => {
         const current_time = hours + ":" + minutes;
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
 
-        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,category_id,total_amount) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,1,'"+userData[0].category_id+"','"+amount+"')";
+        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,category_id,total_amount,total_loads) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,1,'"+userData[0].category_id+"','"+amount+"',1)";
 
         dbConnection.query(sql, function (err, result) {
         if(result){
@@ -126,6 +128,35 @@ export const get_category = async (req, res) => {
 
         });
 
+        const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
+        dbConnection.query(custmer_address, function (error, custmeraddressResult) {
+          var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
+          dbConnection.query(sqlDistance, function (error, locationResult) {
+          if(locationResult.length > 0){
+            var driver_id = locationResult[0].id
+          }else{
+            var driver_id = 0
+          }
+        var qrSQL = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
+        dbConnection.query(qrSQL, function (err, results) {
+        if(results){
+          var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
+          dbConnection.query(sql2, async function (err, result1) {
+          const qr_codes = result1.map((row) => row.qr_code);
+          const getAll_qrCode= await generateQRCode(qr_codes)
+          const userData1 = await getUserData (result.insertId);
+          const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+          // const match = pdfBytes.match(/uploads\\(.+)/);
+          // const newPath = 'uploads//' +match[1];
+          const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
+          dbConnection.query(updatePdf, async function (err, result2) {
+          })
+          });
+        }
+        }); 
+        }); 
+        });     
+                        
         const updateService = "update cart set booking_id = '"+result.insertId+"' where user_id = '"+userData[0].id+"' and status = '0'";
         dbConnection.query(updateService, function (error, data) {
              if(error) throw error;

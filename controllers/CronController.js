@@ -22,7 +22,7 @@ export const booking_subscription_cron = async(req,res)=>{
                     var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
                 }
                 dbConnection.query(usrLoads, function (error, resultss) {
-                    if(elem.total_loads > resultss[0].total_loads){
+                    if(elem.total_loads > Number(resultss[0].total_loads)){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
 
@@ -39,11 +39,11 @@ export const booking_subscription_cron = async(req,res)=>{
                                             const getAll_qrCode= await generateQRCode(qr_codes)
                                             const userData1 = await getUserData (result.insertId);
                                             const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                            const match = pdfBytes.match(/uploads\\(.+)/);
-                                            const newPath = 'uploads//' +match[1];
+                                            // const match = pdfBytes.match(/uploads\\(.+)/);
+                                            // const newPath = 'uploads//' +match[1];
               
             
-                                            const updatePdf = `UPDATE booking_qr SET pdf = '${newPath}' WHERE id = ${results.insertId}`;
+                                            const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
                                             dbConnection.query(updatePdf, async function (err, result2) {
                                                 console.log(result2)
                                             })
@@ -117,7 +117,7 @@ export const booking_load_alert = async(req,res)=>{
                     dbConnection.query(userLoads, function (error, userLoadsresults){
                         console.log('userLoadsresults',userLoadsresults)
                         console.log('ele.loads',ele.total_loads)
-                        if(userLoadsresults[0].totalCount < ele.total_loads){
+                        if(Number(userLoadsresults[0].totalCount) < ele.total_loads){
 
                             const user = "select name, email from users where id = '"+ele.user_id+"'";
                             dbConnection.query(user, function (error, userresults) 

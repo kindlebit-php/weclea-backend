@@ -25,6 +25,7 @@ router.post('/customer-register',userController.customer_register);
 router.post('/delete-employee',userController.delete_employee);
 router.post('/newsletter',userController.newsletter);
 router.post('/register-employee',userController.register_employee);
+router.post('/contact-us',userController.contact_us);
 router.post('/update-employee',userController.update_employee);
 router.post('/update-user-status',userController.update_user_status);
 router.post('/customer-address',CheckAuth ,userController.customer_address);
@@ -39,6 +40,7 @@ router.get("/order-list",userController.order_list)
 
 router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
+router.get('/get-delivery-instruction' ,CheckAuth,userController.get_deleivery_instruction);
 router.post('/get-user-loads',CheckAuth ,loadController.get_user_loads);
 router.post('/get-user-home-data',CheckAuth ,loadController.get_user_home_data);
 router.get('/get-user-subscription',CheckAuth ,loadController.get_user_subscription);
@@ -49,6 +51,8 @@ router.post('/assign-driver' ,bookingController.assign_driver);
 router.post('/assign-folder' ,bookingController.assign_folder);
 router.post('/delete-booking-date',CheckAuth ,bookingController.delete_booking_date);
 router.get('/user-subscription-dates',CheckAuth ,bookingController.subscription_dates);
+router.get('/subscription-dates-fre',CheckAuth ,bookingController.subscription_dates_fre);
+router.get('/subscription-dates-custom',CheckAuth ,bookingController.subscription_dates_custom);
 router.get('/booking-history',CheckAuth ,bookingController.booking_history);
 router.get('/booking-tracking-status',CheckAuth ,bookingController.booking_tracking_status);
 router.post('/booking-tracking-details',CheckAuth ,bookingController.booking_tracking_details);
@@ -84,6 +88,7 @@ router.post("/customer-list-wash",CheckAuth,FolderController.customer_list_wash)
 router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id)
 router.post("/submit-wash-detail",CheckAuth,upload.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads_images", maxCount: 5 },]),FolderController.submit_wash_detail)
 router.post("/print-extra-loads-QrCode",CheckAuth,FolderController.print_extra_loads_QrCode)
+router.post("/scanning-extra-loads",CheckAuth,FolderController.scanning_extra_loads)
 router.post("/Scan-loads-For-Dry",CheckAuth,FolderController.Scan_loads_For_Dry)
 //router.post("/submit-dry-detail",CheckAuth,upload.array("images", 5),FolderController.submit_dry_detail)
 router.post("/booking-pickup-instruction",CheckAuth,bookingController.booking_pickup_instruction)
@@ -92,6 +97,7 @@ router.post("/Scan-loads-For-Fold",CheckAuth,FolderController.Scan_loads_For_Fol
 //router.post("/submit-fold-detail",CheckAuth,upload.array("images", 5),FolderController.submit_fold_detail)
 router.post("/Scan-loads-For-Pack",CheckAuth,FolderController.Scan_loads_For_Pack)
 router.post("/folder-order-histroy",CheckAuth,FolderController.order_histroy);
+router.post("/order_histroy_detail",CheckAuth,FolderController.order_histroy_detail)
 router.get("/profile",CheckAuth,driverController.profile)
 
 //**********************************************************************************//
