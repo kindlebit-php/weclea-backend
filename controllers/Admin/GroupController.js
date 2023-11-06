@@ -66,7 +66,7 @@ export const create_group = async(req,res)=>{
 
 				reqData.profile_pic='';
 			    if (req.files) {
-			        let getFile = req.files.profile_pic;//mimetype
+			       /* let getFile = req.files.profile_pic;//mimetype
 			        var ext=path.extname(getFile['name']);
 			        var filename= Date.now()+ext;
 			        var fileData =getFile['data']; 
@@ -90,7 +90,16 @@ export const create_group = async(req,res)=>{
 								res.json({'status':true,"message":"Group has been created successfully",'data':data});
 							});
 			            });
-			       });
+			       });*/
+			    	req.files.map(function(file) {
+			            console.log("File uplaod ===>", {url: file.location, name: file.key, type: file.mimetype, size: file.size});
+			       		reqData.profile_pic=file.Location;
+		              	var addContnetQry = "insert wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=? ";
+					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code], function (error, data) {
+						if (error) throw error;
+							res.json({'status':true,"message":"Group has been created successfully",'data':data});
+						});
+			        });
 
 				}else{
 					var addContnetQry = "insert wc_emp_group set `manage_name`=?, `location=?,country=?,group_name=?, zip_code=? ";
