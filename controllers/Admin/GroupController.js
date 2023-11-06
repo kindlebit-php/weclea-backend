@@ -57,6 +57,7 @@ export const update_emailTemplate = async(req,res)=>{
 }
 export const create_group = async(req,res)=>{
 	const reqData = req.body;
+	console.log("create_group", reqData,req.files)
 	//wc_emp_group //`manage_name`, `profile_pic`, `location`, `country`, `group_name`, `zip_code`, 
     try { 
     	const qrySelect = "select id from wc_emp_group where `group_name`=? and status=0";
@@ -102,7 +103,7 @@ export const create_group = async(req,res)=>{
 			        });
 
 				}else{
-					var addContnetQry = "insert wc_emp_group set `manage_name`=?, `location=?,country=?,group_name=?, zip_code=? ";
+					var addContnetQry = "insert wc_emp_group set `manage_name`=?, location=?,country=?,group_name=?, zip_code=? ";
 				    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.location, reqData.country, reqData.group_name, reqData.zip_code], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Group has been created successfully",'data':data});
