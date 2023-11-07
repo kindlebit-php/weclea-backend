@@ -655,7 +655,7 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
 
         }
       }
-     if(type != 14){
+     if(type != 6){
 
       
 console.log('updateQRtatusQueryss',updateQRtatusQuery)
@@ -687,7 +687,6 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
             if (updateOrderStatusErr) {
               return res.json({ status: false, message: updateOrderStatusErr.message });
             }
-
             const processMessages = {
               1: "Tagging process is completed! Please go to the next step",
               2: "Spoting process is completed! Please go to the next step",
