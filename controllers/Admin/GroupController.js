@@ -34,19 +34,36 @@ export const get_emailTemplate_detail = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
-export const update_emailTemplate = async(req,res)=>{
+export const update_group = async(req,res)=>{
 	const reqData = req.body;
 	//`rating_id`, `feedback`
     try { 
-    	const qrySelect = "select id from wc_email_template where `subject`=? and status=0 and id!=?";
-		dbConnection.query(qrySelect,[reqData.rating_id, reqData.feedback, reqData.id], function (error, data) {
+    	const qrySelect = "select id from wc_emp_group where `group_name`=? and status=0 and id!=?";
+		dbConnection.query(qrySelect,[reqData.group_name, reqData.id], function (error, data) {
 		if (error) throw error;
-			if (data.length<=0) { ///`category_id`, `type`, `loads`, `min_load_per_day`, `price`,
-			    var updateContnetQry = "update wc_email_template set `subject`=?, `body`=? where id = ? ";
-			    dbConnection.query(updateContnetQry,[reqData.subject, reqData.body,reqData.id], function (error, data) {
-				if (error) throw error;
-					res.json({'status':true,"message":"Email template has been updated successfully",'data':data});
-				});
+			if (data.length<=0) { 
+			  
+			    reqData.profile_pic='';
+			    if (req.files) {
+			    	req.files.map(function(file) {
+			            console.log("File uplaod ===>", {url: file.location, name: file.key, type: file.mimetype, size: file.size});
+			       		reqData.profile_pic=file.location;
+		              	var addContnetQry = "update wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=? where id=?";
+					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.id], function (error, data) {
+						if (error) throw error;
+							res.json({'status':true,"message":"Group has been updated successfully",'data':data});
+						});
+			        });
+
+				}else{
+					var addContnetQry = "update wc_emp_group set `manage_name`=?, location=?,country=?,group_name=?, zip_code=? where id=? ";
+				    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.id], function (error, data) {
+					if (error) throw error;
+						res.json({'status':true,"message":"Group has been updated successfully",'data':data});
+					});
+				}
+
+
 			}else{
 				res.json({'status':false,"message":"Same Email subject already exist"});
 			}
@@ -67,31 +84,6 @@ export const create_group = async(req,res)=>{
 
 				reqData.profile_pic='';
 			    if (req.files) {
-			       /* let getFile = req.files.profile_pic;//mimetype
-			        var ext=path.extname(getFile['name']);
-			        var filename= Date.now()+ext;
-			        var fileData =getFile['data']; 
-			        s3bucket.createBucket(function () {
-			             var params = {
-			              Bucket: BUCKET_NAME+"/weclea-bucket/profile_pic/",
-			              Key: filename,
-			              ACL: 'public-read',
-			              Body:fileData,
-
-			             };
-			            s3bucket.upload(params, function (err, data) {
-			                if (err) {
-			                 console.log('error in callback');
-			                 console.log(err);
-			                }
-			              	reqData.profile_pic=data.Location;
-			              	var addContnetQry = "insert wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=? ";
-						    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code], function (error, data) {
-							if (error) throw error;
-								res.json({'status':true,"message":"Group has been created successfully",'data':data});
-							});
-			            });
-			       });*/
 			    	req.files.map(function(file) {
 			            console.log("File uplaod ===>", {url: file.location, name: file.key, type: file.mimetype, size: file.size});
 			       		reqData.profile_pic=file.location;
@@ -173,7 +165,8 @@ export const update_emailTemplate_status = async(req,res)=>{
 /****** end Eamil section*******/
 export default {
 	get_group_list,
-	create_group
+	create_group,
+	update_group,
 	
 
 
