@@ -403,10 +403,7 @@ export const submit_wash_detail = async (req, res) => {
                   const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-                  console.log('bookingdata[0].total_loads',bookingdata[0].total_loads)
-                  console.log('extra_loads',extra_loads)
-                  var totalPrintLoads = (bookingdata[0].total_loads + extra_loads)
-                  console.log('totalPrintLoads',totalPrintLoads)
+                  var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
               return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
 
 
@@ -484,10 +481,7 @@ export const submit_wash_detail = async (req, res) => {
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
- console.log('bookingdata[0].total_loadsamnki',bookingdata[0].total_loads)
-                  console.log('extra_loadamkiis',extra_loads)
-                  var totalPrintLoads = (bookingdata[0].total_loads + extra_loads)
-                  console.log('totalPrintLankioads',totalPrintLoads)
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
@@ -548,10 +542,7 @@ export const submit_wash_detail = async (req, res) => {
                   dbConnection.query(updateBooking, function (err, results) {
                   })
                           }
- console.log('bookingdata[0].total_loadssss',bookingdata[0].total_loads)
-                  console.log('extra_loadsssss',extra_loads)
-                  var totalPrintLoads = (bookingdata[0].total_loads + extra_loads)
-                  console.log('totalPrintLoadsssss',totalPrintLoads)
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
                       
 
@@ -602,10 +593,7 @@ export const submit_wash_detail = async (req, res) => {
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                         dbConnection.query(updateBooking, function (err, results) {
                         })
- console.log('bookingdata[0].total_loadasdss',bookingdata[0].total_loads)
-                  console.log('extra_loadasds',extra_loads)
-                  var totalPrintLoads = (bookingdata[0].total_loads + extra_loads)
-                  console.log('totalPrintLoadanks',totalPrintLoads)
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
                        
                         }
@@ -629,10 +617,7 @@ export const submit_wash_detail = async (req, res) => {
         })
         dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
         })
-   console.log('bookingdata[0].totsdasdal_loads',bookingdata[0].total_loads)
-                  console.log('extra_asdasloads',extra_loads)
-                  var totalPrintLoads = (bookingdata[0].total_loads + extra_loads)
-                  console.log('totalasdsPrintLoads',totalPrintLoads)
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
       })
 
