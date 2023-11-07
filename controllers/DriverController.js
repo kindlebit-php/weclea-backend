@@ -225,7 +225,13 @@ export const pickup_loads = async (req, res) => {
         }
 
         if (data.length > 0 && data[0].driver_pickup_status === 0) {
-          const updateStatus = `UPDATE booking_qr SET driver_pickup_status = '1' WHERE id = ${data[0].id}`;
+          if(qrDataResult[0].totalRecord == 0){
+          var updateStatus = `UPDATE dry_clean_booking_qr SET driver_pickup_status = '1' WHERE id = ${data[0].id}`;
+
+          }else{
+          var updateStatus = `UPDATE booking_qr SET driver_pickup_status = '1' WHERE id = ${data[0].id}`;
+
+          }
 
           dbConnection.query(
             updateStatus,
