@@ -18,11 +18,13 @@ export const uploadS3 = multer({
   storage: multerS3({
     s3: s3,
     bucket: BUCKET_NAME,
+    acl: 'public-read',
     metadata: function (req, file, cb) {
       cb(null, {fieldName: file.fieldname});
     },
     key: function (req, file, cb) {
-      cb(null, Date.now().toString())
+        //cb(null, file.originalname); 
+      cb(null, Date.now() + '-' + file.originalname)
     }
   })
 })

@@ -333,12 +333,16 @@ export const submit_wash_detail = async (req, res) => {
           dbConnection.query(booking, function (error, bookingdata) {
 
           var  qrCountSql = "select count(id) as qrCount from booking_qr where booking_id = '"+booking_id+"' ";
-
+          console.log('qrCountSql',qrCountSql)
           dbConnection.query(qrCountSql, function (error, qrCountresults){
+            console.log('qrCountresults',qrCountresults)
           if(qrCountresults[0].qrCount > bookingdata[0].total_loads){
               var deleteRecord = (qrCountresults[0].qrCount - bookingdata[0].total_loads)
+              console.log('deleteRecord',deleteRecord)
               var  qrdeleteSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
+              console.log('qrdeleteSql',qrdeleteSql)
               dbConnection.query(qrdeleteSql, function (error, qrdeleteresults){
+                console.log('qrdeleteresults',qrdeleteresults)
               })
             }
           })
@@ -399,8 +403,8 @@ export const submit_wash_detail = async (req, res) => {
                   const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-                  var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
-                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: totalPrintLoads}});
+                  var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
+              return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
 
 
                     }else{
@@ -477,9 +481,8 @@ export const submit_wash_detail = async (req, res) => {
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
-
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
+            return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
                           if(userLoadsresults[0].totalCount > 0){
@@ -539,9 +542,8 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                   dbConnection.query(updateBooking, function (err, results) {
                   })
                           }
-var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
-
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
+            return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
                       
 
                         }else{
@@ -591,9 +593,8 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                         dbConnection.query(updateBooking, function (err, results) {
                         })
-              var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
-
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
+            return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
                        
                         }
 
@@ -616,7 +617,8 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
         })
         dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
         })
-          return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: bookingdata[0].total_loads}});
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
+            return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
       })
 
         }

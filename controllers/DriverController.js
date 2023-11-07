@@ -138,7 +138,14 @@ export const print_All_QrCode = async (req, res) => {
   try {
     const userData = res.user;
     const booking_id = req.body.booking_id;
-    const data = `SELECT id AS qr_codeID, qr_code,driver_pickup_status FROM booking_qr WHERE booking_id = ${booking_id}`;
+
+    const bookingSQL = `SELECT order_type FROM bookings WHERE id = ${booking_id}`;
+    dbConnection.query(bookingSQL, function (error, bookingResult) {
+    if(bookingResult[0].order_type != 3){
+      var data = `SELECT id AS qr_codeID, qr_code,driver_pickup_status FROM booking_qr WHERE booking_id = ${booking_id}`;
+    }else{
+      var data = `SELECT id AS qr_codeID, qr_code,driver_pickup_status FROM dry_clean_booking_qr WHERE booking_id = ${booking_id}`;
+    }
     dbConnection.query(data, function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
@@ -157,6 +164,7 @@ export const print_All_QrCode = async (req, res) => {
         });
       }
     });
+      });
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
@@ -198,8 +206,18 @@ export const pickup_loads = async (req, res) => {
     const driverId = userData[0].id;
     const { qr_code, qr_codeID } = req.body;
 
-    const bookingDataQuery =
+    var bookingDataQuery =
+      "SELECT count(id) as totalRecord FROM booking_qr WHERE qr_code = '"+qr_code+"' AND id = '"+qr_codeID+"'";
+      console.log('bookingDataQuery',bookingDataQuery)
+      dbConnection.query(bookingDataQuery, function (error, qrDataResult) {
+      if(qrDataResult[0].totalRecord == 0){
+         var bookingDataQuery =
+      "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ? AND id = ?";
+      }else{
+          var bookingDataQuery =
       "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
+      }
+      console.log('bookingDataQuery',bookingDataQuery)
     dbConnection.query(
       bookingDataQuery,
       [qr_code, qr_codeID],
@@ -207,9 +225,15 @@ export const pickup_loads = async (req, res) => {
         if (error) {
           return res.json({ status: false, message: error.message });
         }
-
+console.log('datakailash',data)
         if (data.length > 0 && data[0].driver_pickup_status === 0) {
-          const updateStatus = `UPDATE booking_qr SET driver_pickup_status = '1' WHERE id = ${data[0].id}`;
+          if(qrDataResult[0].totalRecord == 0){
+          var updateStatus = `UPDATE dry_clean_booking_qr SET driver_pickup_status = '1' WHERE id = ${data[0].id}`;
+
+          }else{
+          var updateStatus = `UPDATE booking_qr SET driver_pickup_status = '1' WHERE id = ${data[0].id}`;
+
+          }
 
           dbConnection.query(
             updateStatus,
@@ -237,6 +261,8 @@ export const pickup_loads = async (req, res) => {
         }
       }
     );
+      })
+   
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
