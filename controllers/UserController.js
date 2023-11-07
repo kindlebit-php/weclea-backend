@@ -18,7 +18,6 @@ export const customer_register = async(req,res)=>{
         if(name && email && password  && mobile && role && category_id){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
 			
-			const customer_id=stripeCustomer.id;
 			dbConnection.query(checkIfEmailExist, function (error, data) {
 				// console.log(data[])
 				if(data[0].total == 0){
@@ -33,6 +32,7 @@ export const customer_register = async(req,res)=>{
 					phone: mobile
 					});
 					console.log('stripeCustomer',stripeCustomer)
+					const customer_id=stripeCustomer.id;
 					bcrypt.hash(password, saltRounds, function(error, hash) {
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude,category_id) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"','"+category_id+"')";
 						dbConnection.query(sql, function (err, result) {
