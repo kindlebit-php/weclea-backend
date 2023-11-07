@@ -166,6 +166,7 @@ router.post("/update_emailTemplate_status",CheckAuth,emailController.update_emai
 router.get("/get_group_list",CheckAuth,groupController.get_group_list)
 router.post("/create_group",uploadS3.array('profile_pic',25),groupController.create_group);
 router.post("/update_group",uploadS3.array('profile_pic',25),groupController.update_group);
+router.post("/delete_group",CheckAuth,groupController.delete_group)
 
 	
 /*****  ---------- Admin API End ---------- *****/
