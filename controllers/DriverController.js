@@ -198,8 +198,16 @@ export const pickup_loads = async (req, res) => {
     const driverId = userData[0].id;
     const { qr_code, qr_codeID } = req.body;
 
-    const bookingDataQuery =
+    var bookingDataQuery =
+      "SELECT count(id) as totalRecord FROM booking_qr WHERE qr_code = '"+qr_code+"' AND id = '"+qr_codeID+"'";
+      dbConnection.query(bookingDataQuery, function (error, qrDataResult) {
+      if(qrDataResult[0].totalRecord == 0){
+         var bookingDataQuery =
+      "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ? AND id = ?";
+      }else{
+          var bookingDataQuery =
       "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
+      }
     dbConnection.query(
       bookingDataQuery,
       [qr_code, qr_codeID],
@@ -237,6 +245,8 @@ export const pickup_loads = async (req, res) => {
         }
       }
     );
+      })
+   
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
