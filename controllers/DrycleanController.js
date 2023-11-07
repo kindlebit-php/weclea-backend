@@ -1,7 +1,9 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
 import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
-import { getDates,randomNumber,randomNumberDryClean} from "../helpers/date.js";
+import { date, getDates,randomNumber,randomNumberDryClean, time} from "../helpers/date.js";
+import { fcm_notification } from '../helpers/fcm.js';
+import path from "path";
 
 export const get_category = async (req, res) => {
     try {
@@ -231,7 +233,7 @@ export const customer_list_dryClean = (req, res) => {
   try {
     var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-    const bookingIdQuery = "SELECT bookings.id FROM bookings left join dry_clean_booking_qr on dry_clean_booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 14 and bookings.order_type != 3";
+    const bookingIdQuery = "SELECT bookings.id FROM bookings left join dry_clean_booking_qr on dry_clean_booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 14 and bookings.order_type != 1 and bookings.order_type != 2";
     console.log('bookingIdQuery',bookingIdQuery)
     dbConnection.query(bookingIdQuery, (error, userIdResult) => {
       if (error) {
@@ -286,7 +288,7 @@ export const customer_list_dryClean = (req, res) => {
           }
           return res.json({
             status: true,
-            message: "Updated successfully!",
+            message: "Retrieved successfully!",
             data: resData,
           });
         }
@@ -328,30 +330,30 @@ export const submit_dryClean_process_detail = async (req, res) => {
       if (type == 1) {
         updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET tagging_time = ?, tagging_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET tagging_images = ? WHERE booking_id = ?";
-        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = 9 WHERE id = ?";
         updateQRtatusQuery = "UPDATE dry_clean_booking_qr SET tagging_status = ? WHERE booking_id = ?";
       } else if (type == 2) {
         updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET spotting_time = ?, spotting_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET spoting_images = ? WHERE booking_id = ?";
-        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = 10 WHERE id = ?";
         updateQRtatusQuery = "UPDATE dry_clean_booking_qr SET spotting_status = ? WHERE booking_id = ?";
         
       } else if (type == 3) {
         updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET cleaning_time = ?, cleaning_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET cleaning_images = ? WHERE booking_id = ?";
-        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = 11 WHERE id = ?";
         updateQRtatusQuery = "UPDATE dry_clean_booking_qr SET cleaning_status = ? WHERE booking_id = ?";
         
       }else if (type == 4) {
         updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET inspect_time = ?, inspect_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET inspect_images = ? WHERE booking_id = ?";
-        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = 12 WHERE id = ?";
         updateQRtatusQuery = "UPDATE dry_clean_booking_qr SET inspect_status = ? WHERE booking_id = ?";
         
       }else if (type == 5) {
         updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET press_time = ?, press_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET press_images = ? WHERE booking_id = ?";
-        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = 13 WHERE id = ?";
         updateQRtatusQuery = "UPDATE dry_clean_booking_qr SET press_status = ? WHERE booking_id = ?";
         
       }else if(type == 6){
@@ -653,7 +655,7 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
 
         }
       }
-     if(type != 4){
+     if(type != 6){
 
       
 console.log('updateQRtatusQueryss',updateQRtatusQuery)
@@ -681,11 +683,10 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
             return res.json({ status: false, message: updateImagesErr.message });
           }
      
-          dbConnection.query(updateOrderStatusQuery, [type, booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
+          dbConnection.query(updateOrderStatusQuery, [ booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
             if (updateOrderStatusErr) {
               return res.json({ status: false, message: updateOrderStatusErr.message });
             }
-
             const processMessages = {
               1: "Tagging process is completed! Please go to the next step",
               2: "Spoting process is completed! Please go to the next step",
@@ -735,6 +736,7 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
     });
     });
   } catch (error) {
+    console.log("error",error.message)
     res.json({ status: false, message: error.message });
   }
 };
@@ -814,15 +816,13 @@ export const scanning_extra_loads_dryClean = async (req, res) => {
     const { qr_code, qr_codeID } = req.body;
 
     const bookingDataQuery =
-      "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
+      "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ? AND id = ?";
     dbConnection.query(
       bookingDataQuery,
-      [qr_code, qr_codeID],
-      function (error, data) {
+      [qr_code, qr_codeID],function (error, data) {
         if (error) {
           return res.json({ status: false, message: error.message });
         }
-
         if (data.length > 0 && data[0].press_status === 1) {
           const updateStatus = `UPDATE dry_clean_booking_qr SET package_status = '1' WHERE id = ${data[0].id}`;
 
@@ -874,7 +874,7 @@ export const order_histroy_dryClean = async (req, res) => {
           FROM bookings AS b
           JOIN users AS u ON b.user_id = u.id
           JOIN dry_clean_booking_images AS bi ON b.id = bi.booking_id 
-          WHERE b.order_status = '14' AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)`;
+          WHERE b.order_status = '14' AND b.order_type != 1 AND b.order_type != 2 AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)`;
 
         const queryParams = [folder_id, userIds, bookingIds];
 

@@ -173,7 +173,7 @@ export const addRoleAndPermission = async(req,res)=>{
 	    updateData['role_id'] = arg.role_id
 	    updateData['permission'] = arg.permission_id
 	    if (arg.id && arg.status == false) {
-	      dbConnectionquery("DELETE FROM `wc_roles_permissions` where id=?", [arg.id], function (error, row) {
+	      dbConnection.query("DELETE FROM `wc_roles_permissions` where id=?", [arg.id], function (error, row) {
 	        if (!!error) {
 	          dbFunc.connectionRelease;
 	          console.log('error', error);
@@ -183,7 +183,7 @@ export const addRoleAndPermission = async(req,res)=>{
 	        }
 	      });
 	    } else {
-	      dbConnectionquery("INSERT wc_roles_permissions SET ?", [updateData], function (error, row) {
+	      dbConnection.query("INSERT wc_roles_permissions SET ?", [updateData], function (error, row) {
 	        if (!!error) {
 	          dbFunc.connectionRelease;
 	          console.log('error', error);
@@ -209,7 +209,7 @@ export const delPermissions = async(req,res)=>{
        });
    	}	
   	try {
-  	    dbConnectionquery("UPDATE `wc_permissions` SET status=0 where id=?", [arg.permission_id], function (error, row) {
+  	    dbConnection.query("UPDATE `wc_permissions` SET status=0 where id=?", [arg.permission_id], function (error, row) {
 	      if (!!error) {
 	        dbFunc.connectionRelease;
 	        console.log('error', error);
@@ -233,7 +233,7 @@ export const getPermissionsDetail = async(req,res)=>{
     }	
   	try {
   	    //console.log('getTestimonialDetail',arg);
-	    dbConnectionquery("SELECT wc_permissions.*  FROM wc_permissions  where status=1 and id=? ", [arg.permission_id], (error, rows, fields) => {
+	    dbConnection.query("SELECT wc_permissions.*  FROM wc_permissions  where status=1 and id=? ", [arg.permission_id], (error, rows, fields) => {
 	      if (!!error) {
 	        dbFunc.connectionRelease;
 	        console.log(error)
@@ -252,7 +252,7 @@ export const getPermissions = async(req,res)=>{
 	var arg= req.params;	
   	try {    
   		console.log('getPermissions', arg);
-	    dbConnectionquery("SELECT wc_permissions.* FROM wc_permissions  where status=1 order by id desc", (error, rows, fields) => {
+	    dbConnection.query("SELECT wc_permissions.* FROM wc_permissions  where status=1 order by id desc", (error, rows, fields) => {
 	      if (!!error) {
 	        dbFunc.connectionRelease;
 	        console.log(error)
@@ -280,7 +280,7 @@ export const addPermission = async(req,res)=>{
 	    updateData['perm_mod'] = arg.perm_mod
 	    updateData['perm_desc'] = arg.perm_desc
 	    if (arg.role_id) {
-	      dbConnectionquery("UPDATE `wc_permissions` SET ? where id=?", [updateData, arg.role_id], function (error, row) {
+	      dbConnection.query("UPDATE `wc_permissions` SET ? where id=?", [updateData, arg.role_id], function (error, row) {
 	        if (!!error) {
 	          dbFunc.connectionRelease;
 	          console.log('error', error);
@@ -290,7 +290,7 @@ export const addPermission = async(req,res)=>{
 	        }
 	      });
 	    } else {
-	      dbConnectionquery("INSERT wc_role SET ?", [updateData], function (error, row) {
+	      dbConnection.query("INSERT wc_role SET ?", [updateData], function (error, row) {
 	        if (!!error) {
 	          dbFunc.connectionRelease;
 	          console.log('error', error);
@@ -316,11 +316,11 @@ export const addPermission = async(req,res)=>{
        });
     }	
   	try {
-	    dbConnectionquery("DELETE from `wc_role` where id=?", [arg.role_id], function (error, row) {
+	    dbConnection.query("DELETE from `wc_role` where id=?", [arg.role_id], function (error, row) {
 	      var updateData = {}
 	      updateData['role_id'] = '0';
 	      updateData['isAdmin'] = '0'
-	      dbConnectionquery("UPDATE `wc_users` SET ? where role_id=?", [updateData, arg.role_id], function (error, row) {
+	      dbConnection.query("UPDATE `wc_users` SET ? where role_id=?", [updateData, arg.role_id], function (error, row) {
 	        if (!!error) {
 	          dbFunc.connectionRelease;
 	          console.log('error', error);
@@ -351,7 +351,7 @@ export const getRoleDetail = async(req,res)=>{
     }	
   	try { 
 	    //console.log('getTestimonialDetail',arg);
-	    dbConnectionquery("SELECT wc_role.*  FROM wc_role  where status=1 and id=? ", [arg.role_id], (error, rows, fields) => {
+	    dbConnection.query("SELECT wc_role.*  FROM wc_role  where status=1 and id=? ", [arg.role_id], (error, rows, fields) => {
 	      if (!!error) {
 	        dbFunc.connectionRelease;
 	        console.log(error)
@@ -369,7 +369,7 @@ export const getRoleDetail = async(req,res)=>{
 	var arg= req.body;	
   	try { 
 	    console.log('getTestimonial', arg);
-	    dbConnectionquery("SELECT wc_role.* FROM wc_role  where status=1 order by id desc", (error, rows, fields) => {
+	    dbConnection.query("SELECT wc_role.* FROM wc_role  where status=1 order by id desc", (error, rows, fields) => {
 	      if (!!error) {
 	        dbFunc.connectionRelease;
 	        console.log(error)
@@ -398,7 +398,7 @@ export const addRole = async(req,res)=>{
 	    var updateData = {}
 	    updateData['role'] = arg.role
 	    if (arg.role_id && arg.role_id > 0) {
-	      dbConnectionquery("SELECT wc_role.* FROM wc_role  where role=? and id!=? order by id desc", [arg.role, arg.role_id], (error, rows, fields) => {
+	      dbConnection.query("SELECT wc_role.* FROM wc_role  where role=? and id!=? order by id desc", [arg.role, arg.role_id], (error, rows, fields) => {
 	        if (!!error) {
 	          dbFunc.connectionRelease;
 	          console.log(error)
