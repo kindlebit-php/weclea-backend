@@ -94,7 +94,7 @@ export const create_group = async(req,res)=>{
 			       });*/
 			    	req.files.map(function(file) {
 			            console.log("File uplaod ===>", {url: file.location, name: file.key, type: file.mimetype, size: file.size});
-			       		reqData.profile_pic=file.Location;
+			       		reqData.profile_pic=file.location;
 		              	var addContnetQry = "insert wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=? ";
 					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code], function (error, data) {
 						if (error) throw error;
