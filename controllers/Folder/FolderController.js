@@ -179,9 +179,14 @@ export const customer_list_wash = (req, res) => {
               }
               console.log('images',pickup_images)
               const separatedStrings = pickup_images.split(",")
-               const imagesUrl=separatedStrings.map((val) => {
-               return `${process.env.BASE_URL}/${val}`;
+              const imagesUrl = separatedStrings.map((val) => {
+                return `${process.env.BASE_URL}/${val}`;
               });
+                const imageList = imagesUrl.map(imagePath => ({
+                  path: imagePath,
+                  type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                })
+                )
                  resData.push({
                 Booking_id,
                 Customer_Id,
@@ -190,7 +195,7 @@ export const customer_list_wash = (req, res) => {
                 total_loads,
                 time,
                 order_status,
-                imagesUrl,
+                imageList,
               });
             }
           }
