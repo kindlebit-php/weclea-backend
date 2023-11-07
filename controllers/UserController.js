@@ -32,10 +32,6 @@ export const customer_register = async(req,res)=>{
 					phone: mobile
 					});
 					const customer_id=stripeCustomer.id;
-					console.log('stripeCustomer',stripeCustomer)
-					
-					console.log('customer_id',customer_id)
-
 					bcrypt.hash(password, saltRounds, function(error, hash) {
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude,category_id) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"','"+category_id+"')";
 						dbConnection.query(sql, function (err, result) {

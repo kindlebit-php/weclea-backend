@@ -487,7 +487,7 @@ export default {
 	addRoleAndPermission,
 	assignRole,
 	getAssignedRoleUser,
-	updateAssignRole,
+	updateAssignRole
 	
 
 
