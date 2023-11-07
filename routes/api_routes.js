@@ -116,12 +116,19 @@ router.post("/customer-extra-payment",CheckAuth,paymentController.customer_extra
 router.post("/customer-extra-payment-cardId",CheckAuth,paymentController.customer_extra_payment_cardId)
 router.post("/load_Subscription",CheckAuth,paymentController.load_Subscription)
 router.post("/load-Subscription-cardId",CheckAuth,paymentController.load_Subscription_cardId)
-//**********************************************************************************//
+//********************************Module---DryClean*****************************************//
 router.get("/get-dry-clean-services",CheckAuth,DrycleanController.get_category)
 router.get("/get-cart-item",CheckAuth,DrycleanController.get_cart_items)
 router.post("/add-to-cart",CheckAuth,DrycleanController.Add_To_Cart)
 router.post("/delete-cart-item",CheckAuth,DrycleanController.delete_cart_item)
 router.post("/dry-clean-booking",CheckAuth,DrycleanController.dry_clean_booking)
+router.post("/Scan-dryClean-received-loads",CheckAuth,DrycleanController.Scan_dryClean_received_loads)
+router.post("/customer-list-dryClean",CheckAuth,DrycleanController.customer_list_dryClean)
+router.post("/submit-dryClean-process-detail",CheckAuth,upload.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads_images", maxCount: 5 },]),DrycleanController.submit_dryClean_process_detail)
+router.post("/print-DryClean-extra-loads-QrCode",CheckAuth,DrycleanController.print_DryClean_extra_loads_QrCode)
+router.post("/scanning-extra-loads-dryClean",CheckAuth,DrycleanController.scanning_extra_loads_dryClean)
+router.post("/order-history-dryClean",CheckAuth,DrycleanController.order_histroy_dryClean);
+router.post("/order-histroy-dryClean-detail",CheckAuth,DrycleanController.order_histroy_dryClean_detail)
 
 /*********** ------------ Admin panel ---------------***************/
 

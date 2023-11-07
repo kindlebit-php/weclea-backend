@@ -187,13 +187,13 @@ export const get_category = async (req, res) => {
   //-------------------------------------------------------------------------------------------------------------------------------//
   //-------------------------------------------------------------------------------------------------------------------------------//
   //-------------------------------------------------------------------------------------------------------------------------------//
-  export const Scan_received_loads = (req, res) => {
+  export const Scan_dryClean_received_loads = (req, res) => {
     const userData = res.user;
     const folder_id = userData[0].id;
     const { qr_code } = req.body;
   
     try {
-      const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ?";
+      const verifyQr = "SELECT * FROM booking_qr WHERE dry_clean_booking_qr = ?";
       dbConnection.query(verifyQr, [qr_code], function (error, data) {
         if (error) {
           return res.json({ status: false, message: error.message });
@@ -223,9 +223,6 @@ export const get_category = async (req, res) => {
       res.json({ status: false, message: error.message });
     }
   };
-
-
-
   
 export const customer_list_dryClean = (req, res) => {
   const userData = res.user;
@@ -234,7 +231,7 @@ export const customer_list_dryClean = (req, res) => {
   try {
     var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-    const bookingIdQuery = "SELECT bookings.id FROM bookings left join booking_qr on booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 14 and bookings.order_type != 3";
+    const bookingIdQuery = "SELECT bookings.id FROM bookings left join dry_clean_booking_qr on dry_clean_booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 14 and bookings.order_type != 3";
     console.log('bookingIdQuery',bookingIdQuery)
     dbConnection.query(bookingIdQuery, (error, userIdResult) => {
       if (error) {
@@ -300,13 +297,453 @@ export const customer_list_dryClean = (req, res) => {
   }
 };
 
+export const submit_dryClean_process_detail = async (req, res) => {
+  try {
+    const userData = res.user;
+    const folder_id = userData[0].id;
+    const { booking_id, type , extra_loads } = req.body;
+    const currentTime = time();
+    const currentDate = date();
+    const userIdQuery = "SELECT user_id FROM bookings WHERE id = ?";
+
+    dbConnection.query(userIdQuery, [booking_id], function (error, data) {
+      if (error) {
+        return res.json({ status: false, message: error.message });
+      }
+      const customerId_Query = "SELECT u.customer_id,bin.delievery_instruction FROM users AS u JOIN booking_instructions AS bin ON u.id = bin.user_id WHERE u.id = ?";
+      dbConnection.query(customerId_Query, [data[0].user_id], function (error, data1) {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+        const loadPrice_query = "SELECT loads_price FROM settings WHERE id = 1";
+        dbConnection.query(loadPrice_query, function (error, data2) {
+          if (error) {
+            return res.json({ status: false, message: error.message });
+          }
+      let updateDateTimeQuery;
+      let updatePickupImagesQuery;
+      let updateOrderStatusQuery;
+      let updateQRtatusQuery;
+
+      if (type == 1) {
+        updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET tagging_time = ?, tagging_date = ? WHERE booking_id = ?`;
+        updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET tagging_images = ? WHERE booking_id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE dry_clean_booking_qr SET tagging_status = ? WHERE booking_id = ?";
+      } else if (type == 2) {
+        updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET spotting_time = ?, spotting_date = ? WHERE booking_id = ?`;
+        updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET spoting_images = ? WHERE booking_id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE dry_clean_booking_qr SET spotting_status = ? WHERE booking_id = ?";
+        
+      } else if (type == 3) {
+        updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET cleaning_time = ?, cleaning_date = ? WHERE booking_id = ?`;
+        updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET cleaning_images = ? WHERE booking_id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE dry_clean_booking_qr SET cleaning_status = ? WHERE booking_id = ?";
+        
+      }else if (type == 4) {
+        updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET inspect_time = ?, inspect_date = ? WHERE booking_id = ?`;
+        updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET inspect_images = ? WHERE booking_id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE dry_clean_booking_qr SET inspect_status = ? WHERE booking_id = ?";
+        
+      }else if (type == 5) {
+        updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET press_time = ?, press_date = ? WHERE booking_id = ?`;
+        updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET press_images = ? WHERE booking_id = ?";
+        updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        updateQRtatusQuery = "UPDATE dry_clean_booking_qr SET press_status = ? WHERE booking_id = ?";
+        
+      }else if(type == 6){
+        updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET package_time = ?, package_date = ? WHERE booking_id = ?`;
+        updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET package_images = ? WHERE booking_id = ?";
+        // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+       
+        if(extra_loads !=''){
+          var booking = "select user_id,category_id ,extra_loads,total_loads from bookings where id = '"+booking_id+"'";
+          dbConnection.query(booking, function (error, bookingdata) {
+
+          var  qrCountSql = "select count(id) as qrCount from dry_clean_booking_qr where booking_id = '"+booking_id+"' ";
+
+          dbConnection.query(qrCountSql, function (error, qrCountresults){
+          if(qrCountresults[0].qrCount > bookingdata[0].total_loads){
+              var deleteRecord = (qrCountresults[0].qrCount - bookingdata[0].total_loads)
+              var  qrdeleteSql = "delete from dry_clean_booking_qr order by id desc limit "+deleteRecord+"";
+              dbConnection.query(qrdeleteSql, function (error, qrdeleteresults){
+              })
+            }
+          })
+
+            if(bookingdata[0].category_id == 1){
+              var userLoads = "select commercial as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
+            }else if(bookingdata[0].category_id == 2){
+              var userLoads = "select residential as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
+            }else{
+              var userLoads = "select yeshiba as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
+            }
+                 dbConnection.query(userLoads, function (error, userLoadsresults){
+                    if(Number(userLoadsresults[0].totalCount) >= Number(extra_loads)){
+                      var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
+                      if(bookingdata[0].category_id == 1){
+                      var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
+                      }else if(bookingdata[0].category_id == 2){
+                      var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
+                      }else{
+                      var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"' ";
+                      }
+                      dbConnection.query(usrLoadsup, function (error, result) {
+                      })
+
+                      for (var i = 0; extra_loads > i; i++) {
+                        var sql = "INSERT INTO dry_clean_booking_qr (booking_id,qr_code,driver_pickup_status,tagging_status,spotting_status,cleaning_status,inspect_status,press_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1,1,1)";
+                        dbConnection.query(sql, function (err, results) {
+                          if(results){
+                            var sql2= `SELECT qr_code FROM dry_clean_booking_qr WHERE id=${results.insertId}`
+                            dbConnection.query(sql2, async function (err, result1) {
+                              const qr_codes = result1.map((row) => row.qr_code);
+                              const getAll_qrCode= await generateQRCode(qr_codes)
+                              const userData1 = await getUserData(booking_id);
+                              const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                              // const match = pdfBytes.match(/uploads\\(.+)/);
+                              // const newPath = 'uploads//' +match[1];
+                              const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
+                              dbConnection.query(updatePdf, async function (err, result2) {
+                               
+                              })
+                            });
+                          }
+                        });     
+                      }
+
+                const imageArray = [];
+                req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                });
+                if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                }
+                const pickupImagesJSON = imageArray.join(", ");
+
+                var extraSQL = "UPDATE dry_clean_booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                })
+                  const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                  dbConnection.query(updateBooking, function (err, results) {
+                  })
+                  var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: totalPrintLoads}});
 
 
-export const print_extra_loads_QrCode = async (req, res) => {
+                    }else{
+                      const users = "select card_status from users where id = '"+bookingdata[0].user_id+"'"
+                      dbConnection.query(users,async function (error, usersresult) {
+                        if(usersresult[0].card_status == 1){
+                          console.log('enter card status')
+                         const customerId=data1[0].customer_id;
+                         const paymentMethods = await stripe.paymentMethods.list({
+                          customer: customerId,
+                          type: "card",
+                        });
+                        const cards = paymentMethods.data.map((paymentMethod) => ({
+                          cardId: paymentMethod.id,
+                          brand: paymentMethod.card.brand,
+                          last4: paymentMethod.card.last4,
+                        }));
+                         const amount=data2[0].loads_price * extra_loads;
+                          const paymentIntent = await stripe.paymentIntents.create({
+                            amount: amount * 100,
+                            currency: 'usd',
+                            customer: customerId,
+                            payment_method: cards[0].cardId,
+                            off_session: true,
+                            confirm: true,
+                            description: 'Payment by client',
+                          });
+                         
+                          if (paymentIntent.status === 'succeeded') {
+                            console.log('payemnt success')
+
+
+                            for (var i = 0; extra_loads > i; i++) {
+                        console.log('reached at qr code')
+                        var sqlQR = "INSERT INTO dry_clean_booking_qr (booking_id,qr_code,driver_pickup_status,tagging_status,spotting_status,cleaning_status,inspect_status,press_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1,1,1)";
+                        dbConnection.query(sqlQR, function (err, results) {
+                          if(results){
+                            var sql2= `SELECT qr_code FROM dry_clean_booking_qr WHERE id=${results.insertId}`
+                            dbConnection.query(sql2, async function (err, result1) {
+                              const qr_codes = result1.map((row) => row.qr_code);
+                              const getAll_qrCode= await generateQRCode(qr_codes)
+                              const userData1 = await getUserData(booking_id);
+                              const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                              // const match = pdfBytes.match(/uploads\\(.+)/);
+                              // const newPath = 'uploads//' +match[1];
+                              const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
+                              dbConnection.query(updatePdf, async function (err, result2) {
+                               
+                              })
+                            });
+                          }
+                        });     
+                      }
+
+                            const currentDate = date(); 
+                            const sqls = `INSERT INTO payment (user_id,booking_id, amount, payment_id, date) VALUES ('${
+                              data[0].user_id}', '${booking_id}', '${amount}', '${paymentIntent.id}', '${currentDate}')`;
+
+                            dbConnection.query(sqls, function (error, result) {
+                                  });
+                  const imageArray = [];
+                  req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                  });
+                  if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                  }
+                  const pickupImagesJSON = imageArray.join(", ");
+
+                  var extraSQL = "UPDATE dry_clean_booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                  dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                  })
+
+                            const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                  dbConnection.query(updateBooking, function (err, results) {
+                  })
+var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+
+                             return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+                            // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
+                          }else{
+                          if(userLoadsresults[0].totalCount > 0){
+
+                            var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
+                          }else{
+                            var removeV = userLoadsresults[0].totalCount.replace("-","")
+                            var updateLoadsRe = (removeV + extra_loads);
+                            var updateLoads = '-'+updateLoadsRe
+
+                          }
+                          if(bookingdata[0].category_id == 1){
+                          var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
+                          }else if(bookingdata[0].category_id == 2){
+                          var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
+                          }else{
+                          var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"' ";
+                          }
+                          dbConnection.query(usrLoadsup, function (error, result) {
+                          })
+                        for (var i = 0; extra_loads > i; i++) {
+                          var sql = "INSERT INTO dry_clean_booking_qr (booking_id,qr_code,driver_pickup_status,tagging_status,spotting_status,cleaning_status,inspect_status,press_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1,1,1)";
+                            //var sqlQR = "INSERT INTO dry_clean_booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
+                            
+                            dbConnection.query(sql, function (err, results) {
+                              if(results){
+                                var sql2= `SELECT qr_code FROM dry_clean_booking_qr WHERE id=${results.insertId}`
+                                dbConnection.query(sql2, async function (err, result1) {
+                                  const qr_codes = result1.map((row) => row.qr_code);
+                                  const getAll_qrCode= await generateQRCode(qr_codes)
+                                  const userData1 = await getUserData (booking_id);
+                                  const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                                  // const match = pdfBytes.match(/uploads\\(.+)/);
+                                  // const newPath = 'uploads//' +match[1];
+                                  const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
+                                  dbConnection.query(updatePdf, async function (err, result2) {
+                                  })
+                                });
+                              }
+                            });     
+                        }
+
+                          const imageArray = [];
+                req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                });
+                if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                }
+                const pickupImagesJSON = imageArray.join(", ");
+
+                var extraSQL = "UPDATE dry_clean_booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                })
+
+                        const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                  dbConnection.query(updateBooking, function (err, results) {
+                  })
+                          }
+var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+
+                             return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+                      
+
+                        }else{
+                          var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
+                          if(bookingdata[0].category_id == 1){
+                          var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
+                          }else if(bookingdata[0].category_id == 2){
+                          var usrLoadsup = "update customer_loads_availabilty set residential ='"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"'";
+                          }else{
+                          var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"' ";
+                          }
+                          dbConnection.query(usrLoadsup, function (error, result) {
+                          })
+                        for (var i = 0; extra_loads > i; i++) {
+                            // var sql = "INSERT INTO dry_clean_booking_qr (booking_id,qr_code) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"')";
+                            var sql = "INSERT INTO dry_clean_booking_qr (booking_id,qr_code,driver_pickup_status,tagging_status,spotting_status,cleaning_status,inspect_status,press_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1,1,1)";
+                            //var sql = "INSERT INTO dry_clean_booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
+                            
+                            dbConnection.query(sql, function (err, results) {
+                              if(results){
+                                var sql2= `SELECT qr_code FROM dry_clean_booking_qr WHERE id=${results.insertId}`
+                                dbConnection.query(sql2, async function (err, result1) {
+                                  const qr_codes = result1.map((row) => row.qr_code);
+                                  const getAll_qrCode= await generateQRCode(qr_codes)
+                                  const userData1 = await getUserData (booking_id);
+                                  const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                                  // const match = pdfBytes.match(/uploads\\(.+)/);
+                                  // const newPath = 'uploads//' +match[1];
+                                  const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
+                                  dbConnection.query(updatePdf, async function (err, result2) {
+                                  })
+                                });
+                              }
+                            });     
+                        }
+                          const imageArray = [];
+                req.files.extra_loads_images.forEach((e, i) => {
+                  imageArray.push(e.path);
+                });
+                if (imageArray.length > 5) {
+                  return res.json({ status: false, message: "Only 5 images are allowed" });
+                }
+                const pickupImagesJSON = imageArray.join(", ");
+
+                var extraSQL = "UPDATE dry_clean_booking_images SET extra_load_images = '"+pickupImagesJSON+"' WHERE booking_id = '"+booking_id+"'";
+                dbConnection.query(extraSQL, function (error, userLoadsresultss){
+                })
+                            const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
+                        dbConnection.query(updateBooking, function (err, results) {
+                        })
+              var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
+
+                             return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+                       
+                        }
+
+                      })
+                    }
+                 })
+          })
+        }else{
+          var booking = "select user_id,total_loads from bookings where id = '"+booking_id+"'";
+          dbConnection.query(booking, function (error, bookingdata) {
+        updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET package_time = ?, package_date = ? WHERE booking_id = ?`;
+        updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET package_images = ? WHERE booking_id = ?";
+        // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
+        const imageArray = [];
+        req.files.images.forEach((e, i) => {
+        imageArray.push(e.path);
+        });
+        const pickupImagesJSON = imageArray.join(", ");
+        dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
+        })
+        dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
+        })
+          return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads: bookingdata[0].total_loads}});
+      })
+
+        }
+      }
+     if(type != 4){
+
+      
+console.log('updateQRtatusQueryss',updateQRtatusQuery)
+      dbConnection.query(updateQRtatusQuery, [1, booking_id], function (updateQRErr, updateQRResult) {
+        console.log('updateQRResult',updateQRResult)
+      })
+      dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
+        if (updateTimeErr) {
+          return res.json({ status: false, message: updateTimeErr.message });
+        }
+// console.log('req.files',req.files)
+        const imageArray = [];
+        req.files.images.forEach((e, i) => {
+          imageArray.push(e.path);
+        });
+        console.log(imageArray)
+        if (imageArray.length > 5) {
+          return res.json({ status: false, message: "Only 5 images are allowed" });
+        }
+
+        const pickupImagesJSON = imageArray.join(", ");
+        console.log(pickupImagesJSON)
+        dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
+          if (updateImagesErr) {
+            return res.json({ status: false, message: updateImagesErr.message });
+          }
+     
+          dbConnection.query(updateOrderStatusQuery, [type, booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
+            if (updateOrderStatusErr) {
+              return res.json({ status: false, message: updateOrderStatusErr.message });
+            }
+
+            const processMessages = {
+              1: "Tagging process is completed! Please go to the next step",
+              2: "Spoting process is completed! Please go to the next step",
+              3: "Cleaning process is completed! Please go to the next step",
+              4: "Inspect process is completed! Please go to the next step",
+              5: "Press process is completed! Please go to the next step",
+              6: "Package process is completed order is ready to pickup"
+            };
+
+            const responseData = {
+              status: true,
+              message: processMessages[type],
+              data: { customer_id: data[0].user_id , Note_From_Delivery:data1[0].delievery_instruction },
+            };
+            const title={
+              1: "loads Tagging",
+              2: "loads Spoting",
+              3: "loads Cleaning",
+              4: "loads Inspect",
+              5: "loads Press",
+              6: "loads Package"
+            }
+            const body={
+              1: "Tagging process is completed!",
+              2: "Spoting process is completed! ",
+              3: "Cleaning process is completed! ",
+              4: "Inspect process is completed! ",
+              5: "Press process is completed! ",
+              6: "Package process is completed! "
+            };
+            const fold_type={
+              1: "Tagging",
+              2: "Spoting",
+              3: "Cleaning",
+              4: "Inspect",
+              5: "Press",
+              6: "Package",
+            };
+            fcm_notification(title[type], body[type], data[0].user_id, fold_type[type])
+            return res.json(responseData);
+          });
+        
+        });
+      });
+    }
+    });
+    });
+    });
+  } catch (error) {
+    res.json({ status: false, message: error.message });
+  }
+};
+
+export const print_DryClean_extra_loads_QrCode = async (req, res) => {
   try {
     const userData = res.user;
     const booking_id = req.body.booking_id;
-    const data = `SELECT id AS qr_codeID, qr_code, folder_pack_status FROM booking_qr WHERE driver_pickup_status = '1' AND folder_recive_status = '1' AND folder_dry_status = '1' AND folder_fold_status = '1' AND booking_id = ?`;
+    const data = `SELECT id AS qr_codeID, qr_code, package_status FROM dry_clean_booking_qr WHERE driver_pickup_status = '1' AND tagging_status = '1' AND spotting_status = '1' AND cleaning_status = '1' AND inspect_status = '1'AND press_status = '1' AND booking_id = ?`;
 
     dbConnection.query(data, [booking_id], function (error, data) {
       if (error) {
@@ -314,14 +751,14 @@ export const print_extra_loads_QrCode = async (req, res) => {
       } else {
         let count = 0;
         for (let i = 0; i < data.length; i++) {
-          if (data[i].folder_pack_status === 1) {
+          if (data[i].package_status === 1) {
             count++;
           }
         }
         const total_qr_code=data.map((row) => row.qr_code);
         const customerId_Query = "SELECT b.user_id AS customer_id,bin.delievery_instruction AS Note_From_Delivery FROM bookings AS b JOIN booking_instructions AS bin ON b.user_id = bin.user_id WHERE b.id = ?";
         if ( total_qr_code.length === count) {
-          let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
+          let updateOrderStatusQuery = "UPDATE bookings SET order_status = 14 WHERE id = ?";
           dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
             if (updateOrderStatusErr) {
               return res.json({ status: false, message: updateOrderStatusErr.message });
@@ -370,12 +807,306 @@ export const print_extra_loads_QrCode = async (req, res) => {
   }
 };
 
+export const scanning_extra_loads_dryClean = async (req, res) => {
+  try {
+    const userData = res.user;
+    const driverId = userData[0].id;
+    const { qr_code, qr_codeID } = req.body;
+
+    const bookingDataQuery =
+      "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
+    dbConnection.query(
+      bookingDataQuery,
+      [qr_code, qr_codeID],
+      function (error, data) {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+
+        if (data.length > 0 && data[0].press_status === 1) {
+          const updateStatus = `UPDATE dry_clean_booking_qr SET package_status = '1' WHERE id = ${data[0].id}`;
+
+          dbConnection.query(updateStatus,function (updateerror, updateResult) {
+              if (updateerror) {
+                return res.json({status: false,message: updateerror.message,});
+              }
+              const result = {
+                booking_id: data[0].booking_id,
+                qrCode_id: data[0].id,
+                package_status: 1,
+              };
+              res.json({
+                status: true,
+                message: "Data scanned and updated successfully!",
+                data: result,
+              });
+            }
+          );
+        } else {
+          res.json({ status: false, message: "data not processed" });
+        }
+      } 
+    );
+  } catch (error) {
+    res.json({ status: false, message: error.message });
+  }
+};
+
+export const order_histroy_dryClean = async (req, res) => {
+  try {
+    const userData = res.user;
+    const folder_id = userData[0].id;
+    const {date,orderId}= req.body
+    const userIdQuery = `
+            SELECT  b1.id,b1.user_id FROM bookings AS b1
+            JOIN users AS u ON u.id = b1.folder_id
+            WHERE u.id = ?`;
+    dbConnection.query(
+      userIdQuery,
+      [folder_id],
+      async (error, userIdResult) => {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+        const userIds = userIdResult.map((row) => row.user_id);
+        const bookingIds = userIdResult.map((row) => row.id);
+        let query = `SELECT b.id AS BookingId, u.name,b.order_status, b.order_id, b.user_id AS Customer_Id, CONCAT(b.date, ' ', b.time) AS PickUp_date_time, b.date, bi.package_images
+          FROM bookings AS b
+          JOIN users AS u ON b.user_id = u.id
+          JOIN dry_clean_booking_images AS bi ON b.id = bi.booking_id 
+          WHERE b.order_status = '14' AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)`;
+
+        const queryParams = [folder_id, userIds, bookingIds];
+
+        if (date) {
+          query += ' AND b.date = ?';
+          queryParams.push(date);
+        }
+
+        if (orderId) {
+          query += ' AND b.order_id = ?';
+          queryParams.push(orderId);
+        }
+
+        query += ' ORDER BY PickUp_date_time DESC';
+      
+  
+        dbConnection.query(query,queryParams,(error, data) => {
+          console.log(data)
+            if (error) {
+              return res.json({ status: false, message: error.message });
+            } else if (data.length < 0) {
+              return res.json({ status: false, message: "data not found" });
+            } else {
+              const resData = [];
+              const imageArray = [];
+              if (data?.length > 0) {
+                for (const elem of data) {
+                  let {BookingId,name,order_status, Customer_Id, PickUp_date_time, package_images
+                   } = elem;
+                  const separatedStrings = package_images.split(",")
+                  const imagesUrl = separatedStrings.map((val) => {
+                    return `${process.env.BASE_URL}/${val}`;
+                  });
+                    const imageList = imagesUrl.map(imagePath => ({
+                      path: imagePath,
+                      type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                    if (order_status === 1) {
+                      order_status = "tagging";
+                    } else if (order_status === 2) {
+                      order_status = "spoting";
+                    } else if (order_status === 3) {
+                      order_status = "cleaning";
+                    } else if (order_status === 4) {
+                      order_status = "inspect";
+                    } else if (order_status === 5) {
+                      order_status = "press";
+                    } else if (order_status === 6) {
+                      order_status = "package";
+                    } else {
+                      order_status = "NA";
+                    }
+                  resData.push({
+                    BookingId,
+                    name,
+                    order_status,
+                    Customer_Id,
+                    PickUp_date_time,
+                    imageList,
+                  });
+                }
+              }
+              return res.json({
+                status: true,
+                message: "Updated successfully!",
+                data: resData,
+              });
+            }
+          }
+        );
+      }
+    );
+  } catch (error) {
+    console.log(error.message);
+    res.json({ status: false, message: error.message });
+  }
+};
+
+export const order_histroy_dryClean_detail= async(req,res)=>{
+  try {
+    const userData = res.user;
+    const folder_id = userData[0].id;
+    const BookingId=req.body.BookingId;
+   
+        const query = `SELECT  b.user_id AS Customer_Id,cda.address,cda.zip AS Zip_Code,u.mobile,CONCAT(b.date, ' ', b.time) AS PickUp_date_time ,bi.tagging_images,bi.spoting_images,bi.cleaning_images,bi.inspect_images,bi.press_images,bi.package_images,bt.tagging_date,bt.tagging_time,bt.spotting_date,bt.spotting_time,bt.cleaning_date,bt.cleaning_time,bt.inspect_date,bt.inspect_time,bt.press_date,bt.press_time,bt.package_date,bt.package_time
+      FROM bookings AS b
+      JOIN customer_drop_address AS cda ON b.user_id = cda.user_id
+      JOIN users AS u ON b.user_id = u.id
+      JOIN dry_clean_booking_timing AS bt ON b.id = bt.booking_id
+      JOIN dry_clean_booking_images AS bi ON b.id = bi.booking_id
+      WHERE  b.id = ? ORDER BY PickUp_date_time DESC`;
+
+        dbConnection.query(query,[BookingId],(error, data) => {
+            console.log(data);
+            if (error) {
+              return res.json({ status: false, message: error.message });
+            } else if (data.length < 0) {
+              return res.json({ status: false, message: "data not found" });
+            } else {
+              const imageArray = [];
+              if (data?.length > 0) {
+                for (const elem of data) {
+                  const { Customer_Id,address,Zip_Code,mobile,PickUp_date_time,tagging_images,spoting_images,cleaning_images, inspect_images,press_images, package_images,tagging_date,tagging_time,spotting_date,spotting_time,cleaning_date,cleaning_time,inspect_date,inspect_time,press_date,press_time,package_date,package_time } = elem;
+                  const separatedStrings1 = tagging_images.split(",")
+                  const imagesUrl1 = separatedStrings1.map((val) => {
+                    return `${process.env.BASE_URL}/${val}`;
+                  });
+                    const imageList1 = imagesUrl1.map(imagePath => ({
+                      path: imagePath,
+                      type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                    const separatedStrings2 = spoting_images.split(",")
+                  const imagesUrl2 = separatedStrings2.map((val) => {
+                    return `${process.env.BASE_URL}/${val}`;
+                  });
+                    const imageList2 = imagesUrl2.map(imagePath => ({
+                      path: imagePath,
+                      type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                    const separatedStrings3 = cleaning_images.split(",")
+                  const imagesUrl3 = separatedStrings3.map((val) => {
+                    return `${process.env.BASE_URL}/${val}`;
+                  });
+                    const imageList3 = imagesUrl3.map(imagePath => ({
+                      path: imagePath,
+                      type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                    const separatedStrings4 = inspect_images.split(",")
+                  const imagesUrl4 = separatedStrings4.map((val) => {
+                    return `${process.env.BASE_URL}/${val}`;
+                  });
+                    const imageList4 = imagesUrl4.map(imagePath => ({
+                      path: imagePath,
+                      type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                    const separatedStrings5 = press_images.split(",")
+                    const imagesUrl5 = separatedStrings5.map((val) => {
+                      return `${process.env.BASE_URL}/${val}`;
+                    });
+                      const imageList5 = imagesUrl5.map(imagePath => ({
+                        path: imagePath,
+                        type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                      })
+                      )
+                      const separatedStrings6 = package_images.split(",")
+                      const imagesUrl6 = separatedStrings6.map((val) => {
+                        return `${process.env.BASE_URL}/${val}`;
+                      });
+                        const imageList6 = imagesUrl6.map(imagePath => ({
+                          path: imagePath,
+                          type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                        })
+                        )
+                    const laundry_detail = [
+                      {
+                        title: "Tagging",
+                        imageList: imageList1,
+                        date: tagging_date,
+                        time: tagging_time
+                      },
+                      {
+                        title: "Spotting",
+                        imageList: imageList2,
+                        date: spotting_date,
+                        time: spotting_time
+                      },
+                      {
+                        title: "Cleaning",
+                        imageList: imageList3,
+                        date: cleaning_date,
+                        time: cleaning_time
+                      },
+                      {
+                        title: "Inspect",
+                        imageList: imageList4,
+                        date: inspect_date,
+                        time: inspect_time
+                      },
+                      {
+                        title: "Press",
+                        imageList: imageList5,
+                        date: press_date,
+                        time: press_time
+                      },
+                      {
+                        title: "Package",
+                        imageList: imageList6,
+                        date: package_date,
+                        time: package_time
+                      }
+                    ];
+                    
+
+                  const resData={Customer_Id,
+                    address,
+                    Zip_Code,
+                    mobile,
+                    PickUp_date_time,
+                    laundry_detail}
+                    return res.json({
+                      status: true,
+                      message: "Updated successfully!",
+                      data: resData,
+                    });
+                }
+              }
+            }
+          }
+        );
+  }  catch (error) {
+    console.log(error.message);
+    res.json({ status: false, message: error.message });
+  }
+}
 
   export default {
     get_category,
     Add_To_Cart,
     delete_cart_item,
     get_cart_items,
-    dry_clean_booking
+    dry_clean_booking,
+    Scan_dryClean_received_loads,
+    customer_list_dryClean,
+    submit_dryClean_process_detail,
+    print_DryClean_extra_loads_QrCode,
+    scanning_extra_loads_dryClean,
+    order_histroy_dryClean,
+    order_histroy_dryClean_detail
   }
   
