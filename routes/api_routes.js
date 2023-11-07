@@ -23,6 +23,7 @@ import { qr_slip } from "../helpers/qr_slip.js";
 
 
 router.post('/customer-register',userController.customer_register);
+router.post('/user-signup',userController.user_signup);
 router.post('/delete-employee',userController.delete_employee);
 router.post('/newsletter',userController.newsletter);
 router.post('/register-employee',userController.register_employee);
