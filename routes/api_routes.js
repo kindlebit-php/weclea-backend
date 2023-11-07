@@ -179,7 +179,7 @@ router.get("/getPermissions",CheckAuth,permissionController.getPermissions)
 router.get("/getRoleAndPermissionById/:role_id/",CheckAuth,permissionController.getRoleAndPermissionById)
 router.get("/getRoleAndPermission",CheckAuth,permissionController.getRoleAndPermission)
      
-router.post("/updateLoginAccess",CheckAuth,permissionController.updateLoginAccess)
+//router.post("/updateLoginAccess",CheckAuth,permissionController.updateLoginAccess)
 router.post("/updateAssignRole",CheckAuth,permissionController.updateAssignRole)
 router.post("/assignRole",CheckAuth,permissionController.assignRole)
 router.post("/addRoleAndPermission",CheckAuth,permissionController.addRoleAndPermission)
