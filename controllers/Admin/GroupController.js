@@ -14,7 +14,7 @@ const BUCKET_NAME = 'weclea-bucket';
 /********  Email template suggesstion  ***********/
 export const get_group_list = async(req,res)=>{
       try { 
-        	const loads = "select * from wc_emp_group order by id desc";
+        	const loads = "select * from wc_emp_group where status=0 order by id desc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
@@ -112,18 +112,18 @@ export const create_group = async(req,res)=>{
     }
 }
 
-export const delete_emailTemplate = async(req,res)=>{
+export const delete_group = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	const qrySelect = "select id from wc_email_template where id=?";
+    	const qrySelect = "select id from wc_emp_group where id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
-				var msg= "Feedback Suggestion has been activated successfully"
+				var msg= "Group has been activated successfully"
 				if (reqData.isDelete==1) {
-					msg= "Feedback Suggestion has been deleted successfully"
+					msg= "Group has been deleted successfully"
 				}
-			    var updateContnetQry = "update wc_email_template set isDelete=? where id=? ";
+			    var updateContnetQry = "update wc_emp_group set status=? where id=? ";
 			    dbConnection.query(updateContnetQry,[reqData.isDelete,reqData.id], function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":msg,'data':data});
