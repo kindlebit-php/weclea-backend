@@ -19,11 +19,11 @@ export const customer_register = async(req,res)=>{
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
 			
 			const customer_id=stripeCustomer.id;
-			dbConnection.query(checkIfEmailExist, function (error, data) {
+			dbConnection.query(checkIfEmailExist,async function (error, data) {
 				// console.log(data[])
 				if(data[0].total == 0){
 					const checkIfMobileExist = "select count(id) as mobiletotal from users where mobile = '"+mobile+"'";
-					dbConnection.query(checkIfMobileExist, function (error, mobiledata) {
+					dbConnection.query(checkIfMobileExist,async function (error, mobiledata) {
 					if(mobiledata[0].mobiletotal == 0){
 
 					const stripeCustomer = await stripe.customers.create({
