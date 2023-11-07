@@ -10,6 +10,7 @@ import cronController from "../controllers/CronController.js";
 import AdminController from "../controllers/Admin/AdminController.js";
 import emailController from "../controllers/Admin/EmailController.js";
 import groupController from "../controllers/Admin/GroupController.js";
+import permissionController from "../controllers/Admin/PermissionController.js";
 
 
 import multer from 'multer';
@@ -168,6 +169,23 @@ router.post("/create_group",uploadS3.array('profile_pic',25),groupController.cre
 router.post("/update_group",uploadS3.array('profile_pic',25),groupController.update_group);
 router.post("/delete_group",CheckAuth,groupController.delete_group)
 
+/****** Admin Role & Permission ***********/
+router.get("/getRole",CheckAuth,permissionController.getRole)
+router.get("/getRoleDetail/:role_id/",CheckAuth,permissionController.getRoleDetail)
+router.get("/delRole/:role_id/",CheckAuth,permissionController.delRole)
+router.get("/getPermissionsDetail/:permission_id/",CheckAuth,permissionController.getPermissionsDetail)
+router.get("/delPermission/:permission_id/",CheckAuth,permissionController.delPermission)
+router.get("/getPermissions",CheckAuth,permissionController.getPermissions)
+router.get("/getRoleAndPermissionById/:role_id/",CheckAuth,permissionController.getRoleAndPermissionById)
+router.get("/getRoleAndPermission",CheckAuth,permissionController.getRoleAndPermission)
+     
+router.post("/updateLoginAccess",CheckAuth,permissionController.updateLoginAccess)
+router.post("/updateAssignRole",CheckAuth,permissionController.updateAssignRole)
+router.post("/assignRole",CheckAuth,permissionController.assignRole)
+router.post("/addRoleAndPermission",CheckAuth,permissionController.addRoleAndPermission)
+router.post("/addPermission",CheckAuth,permissionController.addPermission)
+router.post("/addRole",CheckAuth,permissionController.addRole)
+    
 	
 /*****  ---------- Admin API End ---------- *****/
 /*dry cleaning*/
