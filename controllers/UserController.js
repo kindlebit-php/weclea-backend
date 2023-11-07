@@ -80,6 +80,21 @@ export const user_signup = async(req,res)=>{
 
 					bcrypt.hash(password, saltRounds, function(error, hash) {
 						if(role == 2){
+						if(req.file.licence_front_image){
+							var licence_front_image = req.file.licence_front_image;
+						}else{
+							var licence_front_image = '';
+						}
+						if(req.file.licence_back_image){
+							var licence_back_image = req.file.licence_back_image;
+						}else{
+							var licence_front_image = '';
+						}
+						if(req.file.profile_image){
+							var profile_image = req.file.profile_image;
+						}else{
+							var profile_image = '';
+						}
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,licence_front_image,licence_back_image,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+group_id+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+licence_front_image+"','"+licence_back_image+"','"+profile_image+"','"+area+"')";
 						}else{
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,zip_code,country,state,city,address,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+profile_image+"','"+area+"')";
