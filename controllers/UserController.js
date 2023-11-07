@@ -110,6 +110,7 @@ export const user_signup = async(req,res)=>{
       }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
+}
 
 //customer address API
 export const customer_address = async(req,res)=>{
