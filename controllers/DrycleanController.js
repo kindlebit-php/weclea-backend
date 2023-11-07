@@ -225,6 +225,152 @@ export const get_category = async (req, res) => {
   };
 
 
+
+  
+export const customer_list_dryClean = (req, res) => {
+  const userData = res.user;
+  const folder_id = userData[0].id;
+  const customer_id = req.body.customer_id;
+  try {
+    var datetime = new Date();
+    const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+    const bookingIdQuery = "SELECT bookings.id FROM bookings left join booking_qr on booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 14 and bookings.order_type != 3";
+    console.log('bookingIdQuery',bookingIdQuery)
+    dbConnection.query(bookingIdQuery, (error, userIdResult) => {
+      if (error) {
+        return res.json({ status: false, message: error.message });
+      }
+      if (userIdResult.length === 0) {
+        return res.json({ status: false, message: "User has no bookings" });
+      }
+      const booking_id = userIdResult.map((row) => row.id);
+      let query = `SELECT b.id AS Booking_id,b.total_loads,bin.delievery_instruction AS Note_From_Delivery, b.user_id AS Customer_Id, b.date, b.time, b.order_status as orderStatus, bi.pickup_images
+                      FROM bookings AS b
+                      left JOIN dry_clean_booking_images AS bi ON b.id = bi.booking_id
+                      left JOIN booking_instructions AS bin ON b.user_id = bin.user_id
+                      WHERE bi.pickup_images IS NOT NULL and b.id IN (?)`;
+                      if (customer_id) {
+        
+                        query += ' AND b.user_id = ?';
+                      }
+          console.log('querylist',query)
+                      dbConnection.query(query, customer_id ? [booking_id, customer_id] : [booking_id], (error, data) => {
+                        console.log(data)
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        } else if (data.length == 0) {
+          return res.json({ status: false, message: "Data not found" });
+        } else {
+          const resData = [];
+          if (data?.length > 0) {
+            for (const elem of data) {
+              const {Booking_id,total_loads, Customer_Id,Note_From_Delivery, date, time, orderStatus, pickup_images } = elem;
+              if(orderStatus == 8){
+                var order_status = 0
+              }else{
+                var order_status = orderStatus
+              }
+              console.log('images',pickup_images)
+              const separatedStrings = pickup_images.split(",")
+               const imagesUrl=separatedStrings.map((val) => {
+               return `${process.env.BASE_URL}/${val}`;
+              });
+                 resData.push({
+                Booking_id,
+                Customer_Id,
+                Note_From_Delivery,
+                date,
+                total_loads,
+                time,
+                order_status,
+                imagesUrl,
+              });
+            }
+          }
+          return res.json({
+            status: true,
+            message: "Updated successfully!",
+            data: resData,
+          });
+        }
+      });
+    });
+  } catch (error) {
+    res.json({ status: false, message: error.message });
+  }
+};
+
+
+
+export const print_extra_loads_QrCode = async (req, res) => {
+  try {
+    const userData = res.user;
+    const booking_id = req.body.booking_id;
+    const data = `SELECT id AS qr_codeID, qr_code, folder_pack_status FROM booking_qr WHERE driver_pickup_status = '1' AND folder_recive_status = '1' AND folder_dry_status = '1' AND folder_fold_status = '1' AND booking_id = ?`;
+
+    dbConnection.query(data, [booking_id], function (error, data) {
+      if (error) {
+        return res.json({ status: false, message: error.message });
+      } else {
+        let count = 0;
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].folder_pack_status === 1) {
+            count++;
+          }
+        }
+        const total_qr_code=data.map((row) => row.qr_code);
+        const customerId_Query = "SELECT b.user_id AS customer_id,bin.delievery_instruction AS Note_From_Delivery FROM bookings AS b JOIN booking_instructions AS bin ON b.user_id = bin.user_id WHERE b.id = ?";
+        if ( total_qr_code.length === count) {
+          let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
+          dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
+            if (updateOrderStatusErr) {
+              return res.json({ status: false, message: updateOrderStatusErr.message });
+            }
+           
+      dbConnection.query(customerId_Query, [booking_id], function (error, data1) {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+        const Customer_Id=data1[0].customer_id;
+        const Note_From_Delivery=data1[0].Note_From_Delivery;
+        const combinedResponse = {
+          status: true,
+          message: "Data retrieved and order status updated successfully!",
+          Customer_Id,Note_From_Delivery,
+          scanned_qr_code:count,
+          data
+        };
+        return res.json(combinedResponse);
+
+      })
+            
+          });
+        } else {
+          dbConnection.query(customerId_Query, [booking_id], function (error, data1) {
+            if (error) {
+              return res.json({ status: false, message: error.message });
+            }
+            const Customer_Id=data1[0].customer_id;
+            const Note_From_Delivery=data1[0].Note_From_Delivery;
+            const combinedResponse = {
+              status: true,
+              message: "Data retrieved successfully!",
+              Customer_Id,Note_From_Delivery,
+              scanned_qr_code:count,
+              data
+            };
+            return res.json(combinedResponse);
+    
+          })
+        }
+      }
+    });
+  } catch (error) {
+    return res.json({ status: false, message: error.message });
+  }
+};
+
+
   export default {
     get_category,
     Add_To_Cart,
