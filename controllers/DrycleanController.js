@@ -874,7 +874,7 @@ export const order_histroy_dryClean = async (req, res) => {
           FROM bookings AS b
           JOIN users AS u ON b.user_id = u.id
           JOIN dry_clean_booking_images AS bi ON b.id = bi.booking_id 
-          WHERE b.order_status = '14' AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)`;
+          WHERE b.order_status = '14' AND b.order_type != 1 AND b.order_type != 2 AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)`;
 
         const queryParams = [folder_id, userIds, bookingIds];
 
