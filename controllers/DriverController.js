@@ -208,6 +208,7 @@ export const pickup_loads = async (req, res) => {
 
     var bookingDataQuery =
       "SELECT count(id) as totalRecord FROM booking_qr WHERE qr_code = '"+qr_code+"' AND id = '"+qr_codeID+"'";
+      console.log('bookingDataQuery',bookingDataQuery)
       dbConnection.query(bookingDataQuery, function (error, qrDataResult) {
       if(qrDataResult[0].totalRecord == 0){
          var bookingDataQuery =
@@ -216,6 +217,7 @@ export const pickup_loads = async (req, res) => {
           var bookingDataQuery =
       "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
       }
+      console.log('bookingDataQuery',bookingDataQuery)
     dbConnection.query(
       bookingDataQuery,
       [qr_code, qr_codeID],
@@ -223,7 +225,7 @@ export const pickup_loads = async (req, res) => {
         if (error) {
           return res.json({ status: false, message: error.message });
         }
-
+console.log('datakailash',data)
         if (data.length > 0 && data[0].driver_pickup_status === 0) {
           if(qrDataResult[0].totalRecord == 0){
           var updateStatus = `UPDATE dry_clean_booking_qr SET driver_pickup_status = '1' WHERE id = ${data[0].id}`;
