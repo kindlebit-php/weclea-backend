@@ -167,5 +167,7 @@ export default {
 	get_group_list,
 	create_group,
 	update_group,
-	delete_group
+	
+
+
 }
