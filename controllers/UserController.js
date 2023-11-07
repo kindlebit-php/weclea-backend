@@ -17,12 +17,7 @@ export const customer_register = async(req,res)=>{
         const {name,email,password,mobile,comment,role,latitude,longitude,category_id} = req.body;
         if(name && email && password  && mobile && role && category_id){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
-			const stripeCustomer = await stripe.customers.create({
-			email: email,
-			name: name,
-			description: "Opening stripe account",
-			phone: mobile
-			});
+			
 			const customer_id=stripeCustomer.id;
 			dbConnection.query(checkIfEmailExist, function (error, data) {
 				// console.log(data[])
@@ -30,7 +25,14 @@ export const customer_register = async(req,res)=>{
 					const checkIfMobileExist = "select count(id) as mobiletotal from users where mobile = '"+mobile+"'";
 					dbConnection.query(checkIfMobileExist, function (error, mobiledata) {
 					if(mobiledata[0].mobiletotal == 0){
-					
+						
+					const stripeCustomer = await stripe.customers.create({
+					email: email,
+					name: name,
+					description: "Opening stripe account",
+					phone: mobile
+					});
+
 					bcrypt.hash(password, saltRounds, function(error, hash) {
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude,category_id) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"','"+category_id+"')";
 						dbConnection.query(sql, function (err, result) {
