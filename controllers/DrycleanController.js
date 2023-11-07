@@ -1,7 +1,7 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
 import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
-import { getDates,randomNumber } from "../helpers/date.js";
+import { getDates,randomNumber,randomNumberDryClean} from "../helpers/date.js";
 
 export const get_category = async (req, res) => {
     try {
@@ -145,7 +145,7 @@ export const get_category = async (req, res) => {
           }else{
             var driver_id = 0
           }
-        var qrSQL = "INSERT INTO dry_clean_booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
+        var qrSQL = "INSERT INTO dry_clean_booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumberDryClean(result.insertId)+"')";
         dbConnection.query(qrSQL, function (err, results) {
         if(results){
           var sql2= `SELECT qr_code FROM dry_clean_booking_qr WHERE id=${results.insertId}`
