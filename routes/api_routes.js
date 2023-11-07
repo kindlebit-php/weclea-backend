@@ -122,6 +122,7 @@ router.get("/get-cart-item",CheckAuth,DrycleanController.get_cart_items)
 router.post("/add-to-cart",CheckAuth,DrycleanController.Add_To_Cart)
 router.post("/delete-cart-item",CheckAuth,DrycleanController.delete_cart_item)
 router.post("/dry-clean-booking",CheckAuth,DrycleanController.dry_clean_booking)
+                     //==============----------============------------//
 router.post("/Scan-dryClean-received-loads",CheckAuth,DrycleanController.Scan_dryClean_received_loads)
 router.post("/customer-list-dryClean",CheckAuth,DrycleanController.customer_list_dryClean)
 router.post("/submit-dryClean-process-detail",CheckAuth,upload.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads_images", maxCount: 5 },]),DrycleanController.submit_dryClean_process_detail)
