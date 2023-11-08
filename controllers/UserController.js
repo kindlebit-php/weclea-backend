@@ -70,6 +70,7 @@ export const user_signup = async(req,res)=>{
         if(name && email && password  && mobile && role){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
 			dbConnection.query(checkIfEmailExist,async function (error, data) {
+				console.log(req.files)
 
 				// console.log(data[])
 				if(data[0].total == 0){
@@ -80,19 +81,19 @@ export const user_signup = async(req,res)=>{
 
 					bcrypt.hash(password, saltRounds, function(error, hash) {
 						if(role == 2){
-							console.log(req.files)
 						if(req.files.licence_front_image){
-							var licence_front_image = req.files.licence_front_image;
+							var licence_front_image = "uploads/"+req.files.licence_front_image[0].originalname;
+							console.log("1",licence_front_image)
 						}else{
 							var licence_front_image = '';
 						}
 						if(req.files.licence_back_image){
-							var licence_back_image = req.files.licence_back_image;
+							var licence_back_image = "uploads/"+req.files.licence_back_image[0].originalname;
 						}else{
 							var licence_front_image = '';
 						}
 						if(req.files.profile_image){
-							var profile_image = req.files.profile_image;
+							var profile_image = "uploads/"+req.files.profile_image[0].originalname;
 						}else{
 							var profile_image = '';
 						}
@@ -102,6 +103,7 @@ export const user_signup = async(req,res)=>{
 						}
 						
 						dbConnection.query(sql, function (err, result) {
+							console.log(result)
 							if (err) throw err;
 							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
