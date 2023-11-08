@@ -17,20 +17,21 @@ export const customer_register = async(req,res)=>{
         const {name,email,password,mobile,comment,role,latitude,longitude,category_id} = req.body;
         if(name && email && password  && mobile && role && category_id){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
-			const stripeCustomer = await stripe.customers.create({
-			email: email,
-			name: name,
-			description: "Opening stripe account",
-			phone: mobile
-			});
-			const customer_id=stripeCustomer.id;
-			dbConnection.query(checkIfEmailExist, function (error, data) {
+			dbConnection.query(checkIfEmailExist,async function (error, data) {
+
 				// console.log(data[])
 				if(data[0].total == 0){
 					const checkIfMobileExist = "select count(id) as mobiletotal from users where mobile = '"+mobile+"'";
-					dbConnection.query(checkIfMobileExist, function (error, mobiledata) {
+					dbConnection.query(checkIfMobileExist,async function (error, mobiledata) {
 					if(mobiledata[0].mobiletotal == 0){
-					
+						const stripeCustomer = await stripe.customers.create({
+						email: email,
+						name: name,
+						description: "Opening stripe account",
+						phone: mobile
+						});
+						const customer_id=stripeCustomer.id;
+
 					bcrypt.hash(password, saltRounds, function(error, hash) {
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude,category_id) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"','"+category_id+"')";
 						dbConnection.query(sql, function (err, result) {
@@ -57,6 +58,74 @@ export const customer_register = async(req,res)=>{
             res.json({'status':false,"message":"All fields are required"});
     	}
     }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+
+export const user_signup = async(req,res)=>{
+      try {
+      		const saltRounds = 10;
+        const {name,email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,area} = req.body;
+        if(name && email && password  && mobile && role){
+        	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
+			dbConnection.query(checkIfEmailExist,async function (error, data) {
+				console.log(req.files)
+
+				// console.log(data[])
+				if(data[0].total == 0){
+					const checkIfMobileExist = "select count(id) as mobiletotal from users where mobile = '"+mobile+"'";
+					dbConnection.query(checkIfMobileExist,async function (error, mobiledata) {
+					if(mobiledata[0].mobiletotal == 0){
+
+
+					bcrypt.hash(password, saltRounds, function(error, hash) {
+						if(role == 2){
+						if(req.files.licence_front_image){
+							var licence_front_image = "uploads/"+req.files.licence_front_image[0].originalname;
+							console.log("1",licence_front_image)
+						}else{
+							var licence_front_image = '';
+						}
+						if(req.files.licence_back_image){
+							var licence_back_image = "uploads/"+req.files.licence_back_image[0].originalname;
+						}else{
+							var licence_front_image = '';
+						}
+						if(req.files.profile_image){
+							var profile_image = "uploads/"+req.files.profile_image[0].originalname;
+						}else{
+							var profile_image = '';
+						}
+							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,licence_front_image,licence_back_image,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+group_id+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+licence_front_image+"','"+licence_back_image+"','"+profile_image+"','"+area+"')";
+						}else{
+							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,zip_code,country,state,city,address,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+profile_image+"','"+area+"')";
+						}
+						
+						dbConnection.query(sql, function (err, result) {
+							console.log(result)
+							if (err) throw err;
+							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
+							dbConnection.query(sql, function (err, userList) {
+								userList[0].token = generateToken({ userId: userList[0].id, type: role });
+								res.json({'status':true,"message":"User registered successfully!",'data':userList[0]});
+							}); 
+							}); 
+						});
+
+					}else{
+						res.json({'status':false,"message":'Mobile Number is already registered'});  
+					}
+				})
+				}else{
+				res.json({'status':false,"message":'Email is already registered'});  
+				}
+			})
+		}else{
+            res.json({'status':false,"message":"All fields are required"});
+
+		}
+      }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
 }
@@ -398,7 +467,7 @@ export const edit_user_profile = async(req,res)=>{
      try { 
         const userData = res.user;
         const {name,dob,category_id} = req.body;
-        if(name  && dob && category_id){
+        if(name && category_id){
 			
 			// const checkIfMobileExist = "select count(id) as total from users where id = '"+userData[0].id+"' and mobile = '"+mobile+"'";
 			// dbConnection.query(checkIfMobileExist, function (error, data) {
@@ -1046,5 +1115,6 @@ export default {
 	delete_employee,
 	update_user_status,
 	customer_order_histroy,
-	get_deleivery_instruction
+	get_deleivery_instruction,
+	user_signup
 }
