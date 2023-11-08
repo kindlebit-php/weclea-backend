@@ -7,7 +7,7 @@ export const get_loads = async(req,res)=>{
       try { 
             const userData = res.user;
             const {category_id} = req.body;
-        	const loads = "select id,type,loads,price from admin_packages where category_id = '"+category_id+"'";
+        	const loads = "select id,type,loads,price from admin_packages where category_id = '"+category_id+"' and isDelete = 0";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"data get successfully!",'data':data, 'card_status':userData[0].card_status});
@@ -98,7 +98,7 @@ export const get_user_loads = async(req,res)=>{
 
             }else{
                 let nodata = {
-                    "available_loads":0,
+                    "available_loads":'0',
                 }
                 res.json({'status':true,"message":"Price get successfully!",'data':nodata,'card_status':userData[0].card_status});
 

@@ -13,86 +13,124 @@ const stripes = new Stripe(process.env.STRIPE_PUBLISH_KEY);
 export const Scan_received_loads = (req, res) => {
   const userData = res.user;
   const folder_id = userData[0].id;
-  const { qr_code, qr_codeID, type } = req.body;
-  const currentTime = time();
-  const currentDate = date();
-  const wash_scan_timing = `${currentDate} ${currentTime}`;
+  const { qr_code } = req.body;
 
   try {
-    const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
-    dbConnection.query(verifyQr, [qr_code, qr_codeID], function (error, data) {
+    const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ?";
+    dbConnection.query(verifyQr, [qr_code], function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
-
-
-      if (type == 1) {
-        if (data.length == 0 || data[0].driver_pickup_status != 1 || data[0].folder_recive_status != 0) {
-          return res.json({ status: false, message: "Invalid QR code or load status" });
-        }
-        const updateStatus = `UPDATE booking_qr SET folder_recive_status = '1' WHERE id = ${data[0].id}`;
-        const update_Date_Time = `UPDATE booking_timing SET wash_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-        const updateBooking = `UPDATE bookings SET folder_id = ${folder_id} WHERE id = ${data[0].booking_id}`;
-
-        dbConnection.query(updateStatus, function (updateerror, updateResult) {
-          if (updateerror) {
-            return res.json({ status: false, message: updateerror.message });
-          }
-          if (updateResult.affectedRows === 1) {
-            dbConnection.query(update_Date_Time, function (updateTimeErr, updateTimeResult) {
-              if (updateTimeErr) {
-                return res.json({ status: false, message: updateTimeErr.message });
-              }
-              if (updateTimeResult.affectedRows === 1) {
-                dbConnection.query(updateBooking, function (updateBookingErr, updateBookingResult) {
-                  if (updateBookingErr) {
-                    return res.json({ status: false, message: updateBookingErr.message });
-                  }
-                  return res.json({ status: true, message: "Load scanned and updated." });
-                });
-              }
-            });
-          }
-        });
-      } else if (type >= 2 && type <= 4) {
-        if (data.length == 0 || data[0].driver_pickup_status != 1 || data[0].folder_recive_status != 1) {
-          return res.json({ status: false, message: "Invalid QR code or load status" });
-        }
-        let update_Date_Time2;
-        let verifyStatus;
-
-        if (type == 2) {
-          update_Date_Time2 = `UPDATE booking_timing SET dry_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          verifyStatus = `SELECT * FROM bookings WHERE order_status = '1' AND id = ${data[0].booking_id}`;
-        } else if (type == 3) {
-          update_Date_Time2 = `UPDATE booking_timing SET fold_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          verifyStatus = `SELECT * FROM bookings WHERE order_status = '2' AND id = ${data[0].booking_id}`;
-        } else if (type == 4) {
-          update_Date_Time2 = `UPDATE booking_timing SET pack_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          verifyStatus = `SELECT * FROM bookings WHERE order_status = '3' AND id = ${data[0].booking_id}`;
-        }
-
-        dbConnection.query(verifyStatus, function (verifyStatusErr, verifyStatusResult) {
-          if (verifyStatusErr) {
-            return res.json({ status: false, message: verifyStatusErr.message });
-          }
-          dbConnection.query(update_Date_Time2, function (updateTimeErr, updateTimeResult) {
-            if (updateTimeErr) {
-              return res.json({ status: false, message: updateTimeErr.message });
-            }
-            if (updateTimeResult.affectedRows === 1) {
-              return res.json({ status: true, message: "Load scanned and updated." });
-            }
-          });
-        });
-      } else {
-        return res.json({ status: false, message: "Invalid 'type' value" });
+      if (data.length === 0 || data[0].driver_pickup_status === 0 || data[0].folder_receive_status === 1) {
+        return res.json({ status: false, message: "Invalid QR code or load status" });
       }
+      
+      const checkFolderQuery = "SELECT folder_id FROM bookings WHERE id = ?";
+      dbConnection.query(checkFolderQuery, [data[0].booking_id], function (folderCheckError, folderCheckData) {
+        if (folderCheckError) {
+          return res.json({ status: false, message: folderCheckError.message });
+        }else if (folderCheckData[0].folder_id === 0) {
+          const updateBooking = `UPDATE bookings SET folder_id = ${folder_id} WHERE id = ${data[0].booking_id}`;
+          dbConnection.query(updateBooking, function (updateBookingErr, updateBookingResult) {
+            if (updateBookingErr) {
+              return res.json({ status: false, message: updateBookingErr.message });
+            }
+            return res.json({ status: true, message: "Load data scanned and updated." });
+          });
+        } else {
+          return res.json({ status: false, message: "Folder is already assigned!" });
+        }
+      });
     });
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
 };
+
+
+// export const Scan_received_loads = (req, res) => {
+//   const userData = res.user;
+//   const folder_id = userData[0].id;
+//   const { qr_code, qr_codeID, type } = req.body;
+//   const currentTime = time();
+//   const currentDate = date();
+//   const wash_scan_timing = `${currentDate} ${currentTime}`;
+
+//   try {
+//     const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
+//     dbConnection.query(verifyQr, [qr_code, qr_codeID], function (error, data) {
+//       if (error) {
+//         return res.json({ status: false, message: error.message });
+//       }
+
+
+//       if (type == 1) {
+//         if (data.length == 0 || data[0].driver_pickup_status != 1 || data[0].folder_recive_status != 0) {
+//           return res.json({ status: false, message: "Invalid QR code or load status" });
+//         }
+//         const updateStatus = `UPDATE booking_qr SET folder_recive_status = '1' WHERE id = ${data[0].id}`;
+//         const update_Date_Time = `UPDATE booking_timing SET wash_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+//         const updateBooking = `UPDATE bookings SET folder_id = ${folder_id} WHERE id = ${data[0].booking_id}`;
+
+//         dbConnection.query(updateStatus, function (updateerror, updateResult) {
+//           if (updateerror) {
+//             return res.json({ status: false, message: updateerror.message });
+//           }
+//           if (updateResult.affectedRows === 1) {
+//             dbConnection.query(update_Date_Time, function (updateTimeErr, updateTimeResult) {
+//               if (updateTimeErr) {
+//                 return res.json({ status: false, message: updateTimeErr.message });
+//               }
+//               if (updateTimeResult.affectedRows === 1) {
+//                 dbConnection.query(updateBooking, function (updateBookingErr, updateBookingResult) {
+//                   if (updateBookingErr) {
+//                     return res.json({ status: false, message: updateBookingErr.message });
+//                   }
+//                   return res.json({ status: true, message: "Load scanned and updated." });
+//                 });
+//               }
+//             });
+//           }
+//         });
+//       } else if (type >= 2 && type <= 4) {
+//         if (data.length == 0 || data[0].driver_pickup_status != 1 || data[0].folder_recive_status != 1) {
+//           return res.json({ status: false, message: "Invalid QR code or load status" });
+//         }
+//         let update_Date_Time2;
+//         let verifyStatus;
+
+//         if (type == 2) {
+//           update_Date_Time2 = `UPDATE booking_timing SET dry_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+//           verifyStatus = `SELECT * FROM bookings WHERE order_status = '1' AND id = ${data[0].booking_id}`;
+//         } else if (type == 3) {
+//           update_Date_Time2 = `UPDATE booking_timing SET fold_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+//           verifyStatus = `SELECT * FROM bookings WHERE order_status = '2' AND id = ${data[0].booking_id}`;
+//         } else if (type == 4) {
+//           update_Date_Time2 = `UPDATE booking_timing SET pack_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+//           verifyStatus = `SELECT * FROM bookings WHERE order_status = '3' AND id = ${data[0].booking_id}`;
+//         }
+
+//         dbConnection.query(verifyStatus, function (verifyStatusErr, verifyStatusResult) {
+//           if (verifyStatusErr) {
+//             return res.json({ status: false, message: verifyStatusErr.message });
+//           }
+//           dbConnection.query(update_Date_Time2, function (updateTimeErr, updateTimeResult) {
+//             if (updateTimeErr) {
+//               return res.json({ status: false, message: updateTimeErr.message });
+//             }
+//             if (updateTimeResult.affectedRows === 1) {
+//               return res.json({ status: true, message: "Load scanned and updated." });
+//             }
+//           });
+//         });
+//       } else {
+//         return res.json({ status: false, message: "Invalid 'type' value" });
+//       }
+//     });
+//   } catch (error) {
+//     res.json({ status: false, message: error.message });
+//   }
+// };
 
 
 
@@ -103,7 +141,7 @@ export const customer_list_wash = (req, res) => {
   try {
     var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-    const bookingIdQuery = "SELECT bookings.id FROM bookings left join booking_qr on booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 4";
+    const bookingIdQuery = "SELECT bookings.id FROM bookings left join booking_qr on booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 4 and bookings.order_type != 3";
     console.log('bookingIdQuery',bookingIdQuery)
     dbConnection.query(bookingIdQuery, (error, userIdResult) => {
       if (error) {
@@ -141,9 +179,14 @@ export const customer_list_wash = (req, res) => {
               }
               console.log('images',pickup_images)
               const separatedStrings = pickup_images.split(",")
-               const imagesUrl=separatedStrings.map((val) => {
-               return `${process.env.BASE_URL}/${val}`;
+              const imagesUrl = separatedStrings.map((val) => {
+                return `${process.env.BASE_URL}/${val}`;
               });
+                const imageList = imagesUrl.map(imagePath => ({
+                  path: imagePath,
+                  type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                })
+                )
                  resData.push({
                 Booking_id,
                 Customer_Id,
@@ -152,7 +195,7 @@ export const customer_list_wash = (req, res) => {
                 total_loads,
                 time,
                 order_status,
-                imagesUrl,
+                imageList,
               });
             }
           }
@@ -295,12 +338,16 @@ export const submit_wash_detail = async (req, res) => {
           dbConnection.query(booking, function (error, bookingdata) {
 
           var  qrCountSql = "select count(id) as qrCount from booking_qr where booking_id = '"+booking_id+"' ";
-
+          console.log('qrCountSql',qrCountSql)
           dbConnection.query(qrCountSql, function (error, qrCountresults){
+            console.log('qrCountresults',qrCountresults)
           if(qrCountresults[0].qrCount > bookingdata[0].total_loads){
               var deleteRecord = (qrCountresults[0].qrCount - bookingdata[0].total_loads)
+              console.log('deleteRecord',deleteRecord)
               var  qrdeleteSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
+              console.log('qrdeleteSql',qrdeleteSql)
               dbConnection.query(qrdeleteSql, function (error, qrdeleteresults){
+                console.log('qrdeleteresults',qrdeleteresults)
               })
             }
           })
@@ -361,8 +408,8 @@ export const submit_wash_detail = async (req, res) => {
                   const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-                  var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
-                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: totalPrintLoads}});
+                  var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
+              return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
 
 
                     }else{
@@ -439,9 +486,8 @@ export const submit_wash_detail = async (req, res) => {
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                   dbConnection.query(updateBooking, function (err, results) {
                   })
-var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
-
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
+            return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
                           if(userLoadsresults[0].totalCount > 0){
@@ -501,9 +547,8 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                   dbConnection.query(updateBooking, function (err, results) {
                   })
                           }
-var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
-
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
+            return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
                       
 
                         }else{
@@ -553,9 +598,8 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                             const updateBooking = "UPDATE bookings SET extra_loads = '"+extra_loads+"' WHERE id = '"+booking_id+"'";
                         dbConnection.query(updateBooking, function (err, results) {
                         })
-              var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
-
-                             return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
+            return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
                        
                         }
 
@@ -578,7 +622,8 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
         })
         dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
         })
-          return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: bookingdata[0].total_loads}});
+ var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
+            return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads:Number(totalPrintLoads) }});
       })
 
         }
@@ -1256,26 +1301,26 @@ export const order_histroy_detail= async(req,res)=>{
                       {
                         title: "Wash",
                         imageList: imageList1,
-                        wash_date: wash_date,
-                        wash_time: wash_time
+                        date: wash_date,
+                        time: wash_time
                       },
                       {
                         title: "Dry",
                         imageList: imageList2,
-                        dry_date: dry_date,
-                        dry_time: dry_time
+                        date: dry_date,
+                        time: dry_time
                       },
                       {
                         title: "Fold",
                         imageList: imageList3,
-                        fold_date: fold_date,
-                        fold_time: fold_time
+                        date: fold_date,
+                        time: fold_time
                       },
                       {
                         title: "Pack",
                         imageList: imageList4,
-                        pack_date: pack_date,
-                        pack_time: pack_time
+                        date: pack_date,
+                        time: pack_time
                       }
                     ];
                     
