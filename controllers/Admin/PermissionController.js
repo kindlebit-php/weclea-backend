@@ -51,13 +51,13 @@ export const getAssignedRoleUser = async(req,res)=>{
 	var arg= req.body;	
   	try {      
   		dbConnection.query("SELECT users.id, users.name, users.email,users.status, users.role_id ,wc_role.role as role_name, users.profile_image,users.mobile,users.isAdmin FROM  `users` LEFT join wc_role on wc_role.id=users.role_id where users.role_id>0", function (error, row) {
-	      if (!!error) {
-	        dbFunc.connectionRelease;
-	        console.log('error', error);
-	        res.json({ "success": false, "message": error.code });
-	      } else {
-	        res.json({ "success": true, "message": "Permissions updated successfully",  body: row });
-	      }
+	      	if (!!error) {
+	        	dbFunc.connectionRelease;
+	        	console.log('error', error);
+	        	res.json({ "success": false, "message": error.code });
+	      	} else {
+	        	res.json({ "success": true, "message": "Permissions updated successfully",  body: row });
+	      	}
 	    });
   	}catch (error) {
         res.json({'status':false,"message":error.message});  
