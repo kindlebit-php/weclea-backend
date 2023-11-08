@@ -80,18 +80,19 @@ export const user_signup = async(req,res)=>{
 
 					bcrypt.hash(password, saltRounds, function(error, hash) {
 						if(role == 2){
-						if(req.file.licence_front_image){
-							var licence_front_image = req.file.licence_front_image;
+							console.log(req.files)
+						if(req.files.licence_front_image){
+							var licence_front_image = req.files.licence_front_image;
 						}else{
 							var licence_front_image = '';
 						}
-						if(req.file.licence_back_image){
-							var licence_back_image = req.file.licence_back_image;
+						if(req.files.licence_back_image){
+							var licence_back_image = req.files.licence_back_image;
 						}else{
 							var licence_front_image = '';
 						}
-						if(req.file.profile_image){
-							var profile_image = req.file.profile_image;
+						if(req.files.profile_image){
+							var profile_image = req.files.profile_image;
 						}else{
 							var profile_image = '';
 						}

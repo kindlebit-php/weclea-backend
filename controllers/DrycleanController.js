@@ -4,6 +4,9 @@ import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js'
 import { date, getDates,randomNumber,randomNumberDryClean, time} from "../helpers/date.js";
 import { fcm_notification } from '../helpers/fcm.js';
 import path from "path";
+import Stripe from "stripe";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripes = new Stripe(process.env.STRIPE_PUBLISH_KEY);
 
 export const get_category = async (req, res) => {
     try {
@@ -511,8 +514,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                   dbConnection.query(updateBooking, function (err, results) {
                   })
 var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
-
-                             return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+                             return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads:parseInt(totalPrintLoads) }});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
                           if(userLoadsresults[0].totalCount > 0){
@@ -574,7 +576,7 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                           }
 var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
 
-                             return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+                             return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads:parseInt(totalPrintLoads) }});
                       
 
                         }else{
@@ -626,8 +628,8 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
                         dbConnection.query(updateBooking, function (err, results) {
                         })
               var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
-
-                             return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads:totalPrintLoads }});
+                                console.log(totalPrintLoads)
+                             return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads:parseInt(totalPrintLoads) }});
                        
                         }
 
@@ -638,6 +640,7 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
         }else{
           var booking = "select user_id,total_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
+            console.log(bookingdata)
         updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET package_time = ?, package_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET package_images = ? WHERE booking_id = ?";
         // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
@@ -650,7 +653,7 @@ var totalPrintLoads = (bookingdata[0].category_id + extra_loads)
         })
         dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
         })
-          return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads: bookingdata[0].total_loads}});
+          return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads: parseInt(bookingdata[0]?.total_loads)}});
       })
 
         }
