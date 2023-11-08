@@ -747,32 +747,26 @@ export const booking_history = async(req,res)=>{
                 if(order_type != 3){
                 var delivery_time = deliever_time;
                 var delivery_date = deliever_date;
+                var imageList = []
                 if(drop_image){
-                    const separatedStrings = drop_image.split(", ")
-                    const imagesUrl = separatedStrings.map((val) => {
-                        return `${process.env.BASE_URL}/${val}`;
-                    });
-                    var imageList = imagesUrl.map(imagePath => ({
-                        path: imagePath,
-                        type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    const pickup_images_array = drop_image.split(',');
+                    pickup_images_array.forEach(function callback(img, key)
+                    {
+                        imageList[key] = process.env.BASE_URL+'/uploads/'+img;
                     })
-                    )
-                }else{
-                    var imageList = [];
                 }
                 }else{
                 var delivery_time = dryCleanDelTime;
                 var delivery_date = dryCleanDelDate;
                 if(dryCleanDropImage){
-                    const separatedStrings = dryCleanDropImage.split(", ")
-                    const imagesUrl = separatedStrings.map((val) => {
-                        return `${process.env.BASE_URL}/${val}`;
-                    });
-                    var imageList = imagesUrl.map(imagePath => ({
-                        path: imagePath,
-                        type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                var imageList = []
+                if(drop_image){
+                    const pickup_images_array = dryCleanDropImage.split(',');
+                    pickup_images_array.forEach(function callback(img, key)
+                    {
+                        imageList[key] = process.env.BASE_URL+'/uploads/'+img;
                     })
-                    )
+                }
                 }else{
                     var imageList = [];
                 }
