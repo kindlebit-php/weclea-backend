@@ -27,7 +27,6 @@ export const updateAssignRole = async(req,res)=>{
 	    updateData['isAdmin'] = '1'
 	    dbConnection.query("SELECT users.id FROM  `users` where users.id=?", [arg.user_id], function (error, rows) {
 	      if (!!error) {
-	        dbFunc.connectionRelease;
 	        console.log('error', error);
 	        res.json({ "success": false, "message": error.code });
 	      } else {
@@ -78,7 +77,6 @@ export const assignRole = async(req,res)=>{
 	    updateData['isAdmin'] = '1'
 	    dbConnection.query("SELECT users.role_id FROM  `users` where users.id=?", [arg.user_id], function (error, rows) {
 	      if (!!error) {
-	        dbFunc.connectionRelease;
 	        console.log('error', error);
 	        res.json({ "success": false, "message": error.code });
 	      } else {
@@ -88,7 +86,6 @@ export const assignRole = async(req,res)=>{
 	        }
 	        dbConnection.query("UPDATE `users` SET ? where id=?", [updateData, arg.user_id], function (error, row) {
 	          if (!!error) {
-	            dbFunc.connectionRelease;
 	            console.log('error', error);
 	            res.json({ "success": false, "message": error.code });
 	          } else {
@@ -116,7 +113,6 @@ export const getRoleAndPermissionById = async(req,res)=>{
 	    var role_id = arg.role_id;
 	    dbConnection.query("SELECT  wc_permissions.perm_mod,wc_permissions.perm_desc,wc_role.role ,wc_roles_permissions.*,wc_roles_permissions.id roles_permissions_id,wc_permissions.id permission_id FROM wc_permissions LEFT JOIN wc_roles_permissions on wc_roles_permissions.permission=wc_permissions.id and wc_roles_permissions.role_id=? LEFT JOIN wc_role on wc_role.id=wc_roles_permissions.role_id GROUP by wc_permissions.id", [role_id], (error, roleAndPermission, fields) => {
 	      if (!!error) {
-	        dbFunc.connectionRelease;
 	        console.log(error)
 	        res.json({ "success": false, "message": error.code });
 	      }
@@ -132,7 +128,6 @@ export const getRoleAndPermission = async(req,res)=>{
   		console.log('getRoleAndPermission', arg);
 	    dbConnection.query("SELECT wc_role.* FROM wc_role  where status=1 order by id desc", (error, rows, fields) => {
 	      if (!!error) {
-	        dbFunc.connectionRelease;
 	        console.log(error)
 	        res.json({ "success": false, "message": error.code });
 	      } else {
@@ -141,7 +136,6 @@ export const getRoleAndPermission = async(req,res)=>{
 	          var k = 0;
 	          dbConnection.query("SELECT wc_permissions.perm_mod, wc_permissions.perm_desc,wc_role.role ,wc_roles_permissions.*,wc_roles_permissions.id roles_permissions_id,wc_permissions.id permission_id FROM wc_permissions LEFT JOIN wc_roles_permissions on wc_roles_permissions.permission=wc_permissions.id and wc_roles_permissions.role_id=? LEFT JOIN wc_role on wc_role.id=wc_roles_permissions.role_id GROUP by wc_permissions.id", [role_id], (error, roleAndPermission, fields) => {
 	            if (!!error) {
-	              dbFunc.connectionRelease;
 	              console.log(error)
 	              res.json({ "success": false, "message": error.code });
 	            }
@@ -175,7 +169,6 @@ export const addRoleAndPermission = async(req,res)=>{
 	    if (arg.id && arg.status == false) {
 	      dbConnection.query("DELETE FROM `wc_roles_permissions` where id=?", [arg.id], function (error, row) {
 	        if (!!error) {
-	          dbFunc.connectionRelease;
 	          console.log('error', error);
 	          res.json({ "success": false, "message": error.code });
 	        } else {
