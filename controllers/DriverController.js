@@ -225,7 +225,6 @@ export const pickup_loads = async (req, res) => {
         if (error) {
           return res.json({ status: false, message: error.message });
         }
-console.log('datakailash',data)
         if (data.length > 0 && data[0].driver_pickup_status === 0) {
           if(qrDataResult[0].totalRecord == 0){
           var updateStatus = `UPDATE dry_clean_booking_qr SET driver_pickup_status = '1' WHERE id = ${data[0].id}`;
@@ -424,7 +423,7 @@ export const laundry_NotFound = async (req, res) => {
     const userData = res.user;
     const driverId = userData[0].id;
 
-    const userIdQuery = `SELECT user_id FROM bookings WHERE id = ?`;
+    const userIdQuery = `SELECT user_id,order_type FROM bookings WHERE id = ?`;
 
     dbConnection.query(userIdQuery, [booking_id], function (error, userIdData) {
       if (error) {
@@ -432,6 +431,7 @@ export const laundry_NotFound = async (req, res) => {
       }
 
       const userId = userIdData[0].user_id;
+      const orderType = userIdData[0].order_type;
       const query = `
         SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.total_loads
         FROM bookings AS b
@@ -446,7 +446,13 @@ export const laundry_NotFound = async (req, res) => {
 
         const currentTime = time();
         const currentDate = date();
-        const update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+        if(orderType !=3 ){
+          var update_Date_Time = `UPDATE booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+
+        }else{
+          var update_Date_Time = `UPDATE dry_clean_booking_timing SET driver_pick_time = '${currentTime}' , driver_pick_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+
+        }
         const result = bookingData[0];
         dbConnection.query(
           update_Date_Time,
@@ -468,9 +474,13 @@ export const laundry_NotFound = async (req, res) => {
                 });
               }
               const pickupImagesJSON = imageArray.join(", ");
-
-              const update_pickupimages =
+            if(orderType !=3 ){
+              var update_pickupimages =
                 "UPDATE booking_images SET pickup_images = ? WHERE booking_id = ?";
+              }else{
+                var update_pickupimages =
+                "UPDATE dry_clean_booking_images SET pickup_images = ? WHERE booking_id = ?";
+              }
               dbConnection.query(
                 update_pickupimages,
                 [pickupImagesJSON, booking_id],
@@ -658,9 +668,17 @@ export const drop_loads = async (req, res) => {
     const userData = res.user;
     const driverId = userData[0].id;
     const { qr_code, qr_codeID } = req.body;
-    const bookingDataQuery =
+     var bookingDataQuery =
+      "SELECT count(id) as totalRecord FROM booking_qr WHERE qr_code = '"+qr_code+"' AND id = '"+qr_codeID+"'";
+      console.log('bookingDataQuery',bookingDataQuery)
+      dbConnection.query(bookingDataQuery, function (error, qrDataResult) {
+      if(qrDataResult[0].totalRecord == 0){
+         var bookingDataQuery =
+      "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ? AND id = ?";
+      }else{
+          var bookingDataQuery =
       "SELECT * FROM booking_qr WHERE qr_code = ? AND id = ?";
-
+      }
     dbConnection.query(
       bookingDataQuery,
       [qr_code, qr_codeID],
@@ -670,8 +688,14 @@ export const drop_loads = async (req, res) => {
         }
 
         if (data.length > 0 && data[0].driver_drop_status === 0) {
-          const updateStatusQuery =
+           if(qrDataResult[0].totalRecord == 0){
+      var updateStatusQuery =
+            "UPDATE dry_clean_booking_qr SET driver_drop_status = '1' WHERE id = ?";
+           }else{
+            var updateStatusQuery =
             "UPDATE booking_qr SET driver_drop_status = '1' WHERE id = ?";
+           }
+          
           const booking_id = data[0].booking_id;
 
           dbConnection.query(
@@ -717,6 +741,7 @@ export const drop_loads = async (req, res) => {
         }
       }
     );
+  })
   } catch (error) {
     res.json({ status: false, message: error.message });
   }
@@ -765,7 +790,7 @@ export const submit_drop_details = async (req, res) => {
     const userData = res.user;
     const driverId = userData[0].id;
 
-    const userIdQuery = `SELECT user_id, order_status FROM bookings WHERE id = ?`;
+    const userIdQuery = `SELECT user_id, order_status,order_type FROM bookings WHERE id = ?`;
 
     dbConnection.query(userIdQuery, [booking_id], function (error, data) {
       if (error) {
@@ -775,6 +800,7 @@ export const submit_drop_details = async (req, res) => {
       } else {
         const userId = data[0].user_id;
         const order_status = data[0].order_status;
+        const order_type = data[0].order_type;
 
         // Check if order_status is not equal to 5
         // if (order_status < 5) {
@@ -795,7 +821,13 @@ export const submit_drop_details = async (req, res) => {
 
           const currentTime = time();
           const currentDate = date();
+          if(order_type != 3){
           const update_Date_Time = `UPDATE booking_timing SET deliever_time = '${currentTime}' , deliever_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+
+        }else{
+          const update_Date_Time = `UPDATE dry_clean_booking_timing SET deliever_time = '${currentTime}' , deliever_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+
+        }
           const result = data[0];
           dbConnection.query(
             update_Date_Time,
@@ -817,9 +849,14 @@ export const submit_drop_details = async (req, res) => {
                   });
                 }
                 const dropImagesJSON = imageArray.join(", ");
-
-                const update_dropimages =
+        if(order_type != 3){
+    const update_dropimages =
                   "UPDATE booking_images SET drop_image = ? WHERE booking_id = ?";
+                }else{
+                    const update_dropimages =
+                  "UPDATE dry_clean_booking_images SET drop_image = ? WHERE booking_id = ?";
+                }
+              
                 dbConnection.query(
                   update_dropimages,
                   [dropImagesJSON, booking_id],
