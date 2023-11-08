@@ -476,7 +476,7 @@ export const updateLoginAccess = async(req,res)=>{
     }
     try { 
 	    var updateData = {}
-	    dbConnection.query("SELECT users.user_id FROM  `users` where users.id=?", [arg.user_id], function (error, rows) {
+	    dbConnection.query("SELECT users.id FROM  `users` where users.id=?", [arg.user_id], function (error, rows) {
 	      if (!!error) {
 	        console.log('error', error);
 	        res.json({ "success": false, "message": error.code });
