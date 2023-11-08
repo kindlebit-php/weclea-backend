@@ -384,7 +384,11 @@ export const get_packagesList = async(req,res)=>{
         	const loads = "select * from admin_packages where isDelete=0 order by created_at desc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
-				res.json({'status':true,"message":"Success",'data':data});
+				const dryCleanChares = `SELECT extra_chages FROM settings `;
+        		dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
+        			if (error) throw error;
+        			res.json({'status':true,"message":"Success",'data':data,"mini_order_amount":dryCleanCharesdata[0].extra_chages});
+        		})	
 			})
     }catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -397,8 +401,8 @@ export const update_packages = async(req,res)=>{
 		dbConnection.query(qrySelect,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price , reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) { ///`category_id`, `type`, `loads`, `min_load_per_day`, `price`,
-			    var updateContnetQry = "update admin_packages set `category_id`=?, `type`=?, `loads`=?, `min_load_per_day`=?, `price`=? where id = ? ";
-			    dbConnection.query(updateContnetQry,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price,reqData.id], function (error, data) {
+			    var updateContnetQry = "update admin_packages set `category_id`=?, `type`=?, `loads`=?, `min_load_per_day`=?, `price`=?, `note`=? where id = ? ";
+			    dbConnection.query(updateContnetQry,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price, reqData.note,reqData.id], function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Package has been updated successfully",'data':data});
 				});
@@ -418,8 +422,8 @@ export const create_packages = async(req,res)=>{
 		dbConnection.query(qrySelect,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) {
-			    var addContnetQry = "insert admin_packages set `category_id`=?, `type`=?, `loads`=?, `min_load_per_day`=?, `price`=? ";
-			    dbConnection.query(addContnetQry,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price], function (error, data) {
+			    var addContnetQry = "insert admin_packages set `category_id`=?, `type`=?, `loads`=?, `min_load_per_day`=?, `price`=?, `note`=? ";
+			    dbConnection.query(addContnetQry,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price, reqData.note], function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Package has been saved successfully",'data':data});
 				});
@@ -963,6 +967,30 @@ export const update_feedbackQes_status = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+export const update_extra_chagres_status = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from settings where id=1";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "Extra Charges has been deactivated successfully"
+				if (reqData.status==1) {
+					msg= "Extra Charges has been activated successfully"
+				}
+			    var updateContnetQry = "update settings set extra_chages=? where id=1 ";
+			    dbConnection.query(updateContnetQry,[reqData.extra_chages,1], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
 
 /****** end feedback section*******/
 export default {
@@ -997,6 +1025,7 @@ export default {
 	update_feedbackQes,
 	create_feedbackQes,
 	delete_feedbackQes,
-	update_feedbackQes_status
+	update_feedbackQes_status,
+	update_extra_chagres_status
 
 }
