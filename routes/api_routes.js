@@ -189,6 +189,7 @@ router.post("/assignRole",CheckAuth,permissionController.assignRole)
 router.post("/addRoleAndPermission",CheckAuth,permissionController.addRoleAndPermission)
 router.post("/addPermission",CheckAuth,permissionController.addPermission)
 router.post("/addRole",CheckAuth,permissionController.addRole)
+router.post("/updateLoginAccess",CheckAuth,permissionController.updateLoginAccess)
     
 	
 /*****  ---------- Admin API End ---------- *****/
