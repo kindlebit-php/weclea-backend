@@ -739,11 +739,14 @@ export const booking_history = async(req,res)=>{
     try {   
             const userData = res.user;
             var resData = []
-            const sql = "select bookings.date ,bookings.id ,bookings.time, bookings.total_loads,booking_images.drop_image,booking_timing.deliever_date,booking_timing.deliever_time from bookings left join booking_timing on booking_timing.booking_id = bookings.id left join booking_images on booking_images.booking_id = bookings.id where bookings.order_status = 6 and user_id = '"+userData[0].id+"'";
+            const sql = "select bookings.date,bookings.order_type ,bookings.id,dry_clean_booking_timing.deliever_time as dryCleanDelTime,dry_clean_booking_timing.deliever_date as dryCleanDelDate ,bookings.time, bookings.total_loads,booking_images.drop_image,dry_clean_booking_images.drop_image as dryCleanDropImage,booking_timing.deliever_date,booking_timing.deliever_time from bookings left join booking_timing on booking_timing.booking_id = bookings.id left join booking_images on booking_images.booking_id = bookings.id left join dry_clean_booking_images on dry_clean_booking_images.booking_id = bookings.id left join dry_clean_booking_timing on dry_clean_booking_timing.booking_id = bookings.id where bookings.order_status = 6 and user_id = '"+userData[0].id+"'";
             console.log('sql',sql)
             dbConnection.query(sql, function (err, results) {
                 results.forEach(ele => {
-                const {id,date,time,total_loads,drop_image,deliever_date,deliever_time} = ele;
+                const {id,date,order_type,dryCleanDropImage,time,total_loads,drop_image,deliever_date,deliever_time,dryCleanDelTime,dryCleanDelDate} = ele;
+                if(order_type != 3){
+                var delivery_time = deliever_time;
+                var delivery_date = deliever_date;
                 if(drop_image){
                     const separatedStrings = drop_image.split(", ")
                     const imagesUrl = separatedStrings.map((val) => {
@@ -757,8 +760,25 @@ export const booking_history = async(req,res)=>{
                 }else{
                     var imageList = [];
                 }
+                }else{
+                var delivery_time = dryCleanDelTime;
+                var delivery_date = dryCleanDelDate;
+                if(dryCleanDropImage){
+                    const separatedStrings = dryCleanDropImage.split(", ")
+                    const imagesUrl = separatedStrings.map((val) => {
+                        return `${process.env.BASE_URL}/${val}`;
+                    });
+                    var imageList = imagesUrl.map(imagePath => ({
+                        path: imagePath,
+                        type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
+                    })
+                    )
+                }else{
+                    var imageList = [];
+                }
+                }
                     const init = {
-                        'id':id,'date':date,'time':time,'total_loads':total_loads,'deliever_date':deliever_date,'deliever_time':deliever_time,'images':imageList
+                        'id':id,'date':date,'time':time,'total_loads':total_loads,'deliever_date':delivery_date,'deliever_time':delivery_time,'images':imageList
                     }
                     resData.push(init)
                 })
