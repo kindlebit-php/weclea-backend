@@ -288,6 +288,18 @@ export const get_dashboard_content = async(req,res)=>{
 
 /*********  User Listing*************/
 
+export const get_all_userList = async(req,res)=>{
+	var reqData= req.params;
+    try { 
+    	const loads = "select id, email, mobile,name, role, role_id, status,profile_image from users";
+		dbConnection.query(loads, function (error, data) {
+		if (error) throw error;
+			res.json({'status':true,"message":"Success",'data':data});
+		})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
 export const get_userList = async(req,res)=>{
 	var reqData= req.params;
     try { 
@@ -966,6 +978,7 @@ export default {
 	create_packages,
 	delete_packages,
 	get_package_details,
+	get_all_userList,
 	get_userList,
 	get_user_history,
 	update_package_status,
