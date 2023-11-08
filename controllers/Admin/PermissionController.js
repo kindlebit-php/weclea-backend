@@ -465,6 +465,41 @@ export const update_emailTemplate_status = async(req,res)=>{
     }
 }
 
+export const updateLoginAccess = async(req,res)=>{
+   	let arg = req.body;
+    if ( !arg.user_id  || arg.user_id=='') {
+		return res.json({
+			"success":false,
+			"body":"",
+			"message":"All field required"
+		});
+    }
+    try { 
+	    var updateData = {}
+	    dbConnection.query("SELECT users.user_id FROM  `users` where users.user_id=?", [arg.user_id], function (error, rows) {
+	      if (!!error) {
+	        console.log('error', error);
+	        res.json({ "success": false, "message": error.code });
+	      } else {
+	        var msg = "Admin login access denied"
+	        if (arg.isAdmin) {
+	          msg = "Admin login access granted"
+	        }
+	        dbConnection.query("UPDATE `users` SET `isAdmin`=IF(isAdmin='1', '0', '1') where user_id=?", [arg.user_id], function (error, row) {
+	          if (!!error) {
+	            console.log('error', error);
+	            res.json({ "success": false, "message": error.code });
+	          } else {
+	            res.json({ "success": true, "message": msg, body: row });
+	          }
+	        });
+	      }
+	    });
+  	}catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
 /****** end Eamil section*******/
 export default {
 	addRole,
@@ -480,7 +515,9 @@ export default {
 	addRoleAndPermission,
 	assignRole,
 	getAssignedRoleUser,
-	updateAssignRole
+	updateAssignRole,
+	updateLoginAccess
+
 	
 
 
