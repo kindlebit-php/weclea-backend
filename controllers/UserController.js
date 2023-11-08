@@ -465,7 +465,7 @@ export const edit_user_profile = async(req,res)=>{
      try { 
         const userData = res.user;
         const {name,dob,category_id} = req.body;
-        if(name  && dob && category_id){
+        if(name && category_id){
 			
 			// const checkIfMobileExist = "select count(id) as total from users where id = '"+userData[0].id+"' and mobile = '"+mobile+"'";
 			// dbConnection.query(checkIfMobileExist, function (error, data) {
