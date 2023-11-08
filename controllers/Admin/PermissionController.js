@@ -476,7 +476,7 @@ export const updateLoginAccess = async(req,res)=>{
     }
     try { 
 	    var updateData = {}
-	    dbConnection.query("SELECT users.user_id FROM  `users` where users.user_id=?", [arg.user_id], function (error, rows) {
+	    dbConnection.query("SELECT users.user_id FROM  `users` where users.id=?", [arg.user_id], function (error, rows) {
 	      if (!!error) {
 	        console.log('error', error);
 	        res.json({ "success": false, "message": error.code });
@@ -485,7 +485,7 @@ export const updateLoginAccess = async(req,res)=>{
 	        if (arg.isAdmin) {
 	          msg = "Admin login access granted"
 	        }
-	        dbConnection.query("UPDATE `users` SET `isAdmin`=IF(isAdmin='1', '0', '1') where user_id=?", [arg.user_id], function (error, row) {
+	        dbConnection.query("UPDATE `users` SET `isAdmin`=IF(isAdmin='1', '0', '1') where id=?", [arg.user_id], function (error, row) {
 	          if (!!error) {
 	            console.log('error', error);
 	            res.json({ "success": false, "message": error.code });
