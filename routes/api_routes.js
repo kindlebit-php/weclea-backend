@@ -181,6 +181,7 @@ router.get("/get_group_list",CheckAuth,groupController.get_group_list)
 router.post("/create_group",uploadS3.array('profile_pic',25),groupController.create_group);
 router.post("/update_group",uploadS3.array('profile_pic',25),groupController.update_group);
 router.post("/delete_group",CheckAuth,groupController.delete_group)
+router.post("/get_grouped_emp_list",CheckAuth,groupController.get_grouped_emp_list)
 
 /****** Admin Role & Permission ***********/
 router.get("/getRole",CheckAuth,permissionController.getRole)
