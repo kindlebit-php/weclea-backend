@@ -236,7 +236,7 @@ export const customer_list_dryClean = (req, res) => {
   try {
     var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-    const bookingIdQuery = "SELECT bookings.id FROM bookings left join dry_clean_booking_qr on dry_clean_booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 14 and bookings.order_type != 1 and bookings.order_type != 2";
+    const bookingIdQuery = "SELECT bookings.id FROM bookings left join dry_clean_booking_qr on dry_clean_booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 4 and bookings.order_type != 1 and bookings.order_type != 2";
     console.log('bookingIdQuery',bookingIdQuery)
     dbConnection.query(bookingIdQuery, (error, userIdResult) => {
       if (error) {
@@ -765,7 +765,7 @@ export const print_DryClean_extra_loads_QrCode = async (req, res) => {
         const total_qr_code=data.map((row) => row.qr_code);
         const customerId_Query = "SELECT b.user_id AS customer_id,bin.delievery_instruction AS Note_From_Delivery FROM bookings AS b JOIN booking_instructions AS bin ON b.user_id = bin.user_id WHERE b.id = ?";
         if ( total_qr_code.length === count) {
-          let updateOrderStatusQuery = "UPDATE bookings SET order_status = 14 WHERE id = ?";
+          let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
           dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
             if (updateOrderStatusErr) {
               return res.json({ status: false, message: updateOrderStatusErr.message });
@@ -879,7 +879,7 @@ export const order_histroy_dryClean = async (req, res) => {
           FROM bookings AS b
           JOIN users AS u ON b.user_id = u.id
           JOIN dry_clean_booking_images AS bi ON b.id = bi.booking_id 
-          WHERE b.order_status = '14' AND b.order_type != 1 AND b.order_type != 2 AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)`;
+          WHERE b.order_status = '4' AND b.order_type != 1 AND b.order_type != 2 AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)`;
 
         const queryParams = [folder_id, userIds, bookingIds];
 
@@ -928,7 +928,7 @@ export const order_histroy_dryClean = async (req, res) => {
                       order_status = "inspect";
                     } else if (order_status === 13) {
                       order_status = "press";
-                    } else if (order_status === 14) {
+                    } else if (order_status === 4) {
                       order_status = "package";
                     } else {
                       order_status = "NA";
