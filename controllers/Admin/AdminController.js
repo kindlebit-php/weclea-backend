@@ -1,6 +1,9 @@
 import dbConnection from'../../config/db.js';
 import transport from "../../helpers/mail.js";
-
+import bcrypt from 'bcrypt';
+import { generateToken } from "../../config/generateToken.js";
+import transport from "../../helpers/mail.js";
+import dotenv from "dotenv";
 import AWS from 'aws-sdk';
 const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
 const USER_SECRET = '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';
@@ -1000,6 +1003,54 @@ export const update_extra_chagres_status = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+//customer login API
+export const admin_login = async(req,res)=>{
+	try { 
+		const {email,password,type} = req.body;
+		if(email && password && type){
+			const checkIfEmailExist = "select * from users where email = '"+email+"' and isAdmin=1";
+			dbConnection.query(checkIfEmailExist, function (error, data) {
+				if(data.length > 0){
+					if(data[0].status == 1){
+					bcrypt.compare(password, data[0].password, function(error, result) {
+						if(result == true){
+							data.forEach(element =>
+							{
+								const {id,name,email,mobile,comment,role,status,category_id,isAdmin,role_id,zip_code} = element;
+								
+								const initi = {
+									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,"role_id":role_id,"isAdmin":isAdmin,"zip_code":zip_code,'token': generateToken({ userId: id, type: type }),
+								}
+								const get_address_count = "select count(id)  as total from customer_address where user_id = '"+id+"'";
+								dbConnection.query(get_address_count, function (error, addressresult) {
+								if(addressresult[0].total > 0){
+									var addresscount = 1
+								}else{
+									var addresscount = 0
+								}
+								res.json({'status':true,"message":"Logged in successfully!",'data': initi,'address_count':addresscount});
+							
+							});
+							});
+						}else{
+							res.json({'status':false,"message":"Incorrect password!"});
+						}
+					});
+				}else{
+					res.json({'status':false,"message":"Your account has been deactivated, please connect with admin!"});
+				}
+				}else{
+					res.json({'status':false,"message":"User not found!"});
+						
+				}
+			});
+		}else{
+			res.json({'status':false,"message":"All fields are required"});
+		}
+	}catch (error) {
+		res.json({'status':false,"message":error.message});  
+	}
+}
 
 /****** end feedback section*******/
 export default {
@@ -1035,6 +1086,7 @@ export default {
 	create_feedbackQes,
 	delete_feedbackQes,
 	update_feedbackQes_status,
-	update_extra_chagres_status
+	update_extra_chagres_status,
+	admin_login
 
 }

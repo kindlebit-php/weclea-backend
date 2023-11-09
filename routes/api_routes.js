@@ -135,6 +135,7 @@ router.post("/order-histroy-dryClean-detail",CheckAuth,DrycleanController.order_
 
 /*********** ------------ Admin panel ---------------***************/
 
+router.post("/admin_login",AdminController.admin_login)
 router.get("/get_content",AdminController.get_page_content)
 router.get("/get_faq",AdminController.get_faq_content)
 router.post("/update_page_content",CheckAuth,AdminController.update_page_content)
