@@ -912,7 +912,7 @@ export const booking_history = async(req,res)=>{
                 }
                 }
                     const init = {
-                        'id':id,'date':date,'time':time,'total_loads':total_loads,'deliever_date':delivery_date,'deliever_time':delivery_time,'images':imageList
+                        'id':id,'date':date,'time':time,'order_type':order_type,'total_loads':total_loads,'deliever_date':delivery_date,'deliever_time':delivery_time,'images':imageList
                     }
                     resData.push(init)
                 })
