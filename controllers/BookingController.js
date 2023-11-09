@@ -63,33 +63,48 @@ export const customer_booking = async(req,res)=>{
                         dbConnection.query(paymentsql, function (err,paymentResult ) {
                         });
                     }
-                        for (var i = 0; total_loads > i; i++) {
-                        var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
-                        dbConnection.query(sql, function (err, results) {
-                           if(results){
-                            var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
-                           dbConnection.query(sql2, async function (err, result1) {
-                            const qr_codes = result1.map((row) => row.qr_code);
-                            console.log("test1",qr_codes)
-                                const getAll_qrCode= await generateQRCode(qr_codes)
-                                console.log('getAll_qrCode',getAll_qrCode)
-                                const userData1 = await getUserData (result.insertId);
+                        const qrCodesArray = [];
+                        const insertIds=[]
+
+    for (let i = 0; i < total_loads; i++) {
+        const sql = "INSERT INTO booking_qr (booking_id, qr_code) VALUES (?, ?)";
+        const values = [result.insertId, randomNumber(result.insertId)];
+
+        await new Promise((resolve, reject) => {
+            dbConnection.query(sql, values, function (err, results) {
+                if (err) {
+                    reject(err);
+                } else {
+                    const sql2 = `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`;
+                    dbConnection.query(sql2, function (err, result1) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            qrCodesArray.push(result1[0].qr_code);
+                            insertIds.push(results.insertId);
+                            resolve();
+                        }
+                    });
+                }
+            });
+        });
+    }
+                                console.log("All QR codes:", qrCodesArray);
+                                const qr_codes = qrCodesArray.join(",")
+                                console.log("All QR codes1:", qr_codes);
+                                 const getAll_qrCode= await generateQRCode(qrCodesArray)
+                                 console.log('getAll_qrCode2',getAll_qrCode)
+                                const userData1 = await getUserData(result.insertId);
                                 console.log('userData1',userData1)
-                              
+                                
                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
                                 console.log('pdfBytes',pdfBytes)
-                                // const match = pdfBytes.match(/uploads\\(.+)/);
-                                // const newPath = 'uploads/' +match[1];
-  
 
-                                const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
+                                const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                 dbConnection.query(updatePdf, async function (err, result2) {
-                                    console.log(result2)
-                                })
-                        });
-                           }
-                        });     
-                        }
+                                console.log(result2);
+                                    });
+
                         
                         var bookingsql = "INSERT INTO booking_images (booking_id) VALUES ('"+result.insertId+"')";
                         dbConnection.query(bookingsql, function (err, bookingresult) {                        

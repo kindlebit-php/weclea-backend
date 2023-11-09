@@ -65,56 +65,68 @@ export const getUserData=async(booking_id)=>{
 }
 
 
-export const generatePDF = async (data, qrCode) => {
-  const order_id = data.order_id;
-  const date = data.date;
-  const address = data.address;
 
-  const qrCodeImageData = qrCode.split('data:image/png;base64,')[1];
+export const generatePDF = async (data, qrCodesArray) => {
   const executablePath = '/usr/bin/chromium-browser';
   const browser = await puppeteer.launch({
     executablePath: '/usr/bin/chromium-browser',
     args: ['--no-sandbox'], 
   });
+ // const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
-  const htmlContent = `<!DOCTYPE html>
-    <head>
-        <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;700&display=swap" rel="stylesheet">
-    </head>
-    <html>
-        <body style="background: #dfdfdf;">
-            <div style="margin:0 auto;font-family: 'Lexend Deca', sans-serif;width: 375px;background: #ffffff;padding: 0px;display: flex;align-items: start;justify-content: space-between;flex-wrap:wrap;">
-                <table class="table" style="border-collapse: collapse;width:100%;display: table;">
-                    <thead>
-                        <tr>
-                            <th scope="col" style="padding: 15px 5px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;"><img src="https://api.weclea.com/uploads/logo.png" style="width: 70%;"> </th>
-                            <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
-                                <p style="margin: 0 0 8px;display: flex;justify-content: space between;align-items: center;font-weight: 600;">Invoice # <span>${order_id}</span></p>
-                                <p style="margin: 0;display: flex;justify-content: space between;align-items: center;font-weight: 600;">Issue Date <span>${date}</span></p>
-                            </th>
-                        </tr>
-                    </thead>
-                </table>
-                <table class="table" style="border-collapse: collapse;width:100%;display: table;">
-                    <thead>
-                        <tr>
-                            <td colspan="3" style="color: #212121;padding: 15px 15px;font-size: 14px;border-bottom: 1px solid #ccc;font-weight: 600;">Pickup Address <p style="font-size: 14px;margin: 8px 0 0;font-weight: 500;color: #4a4a4a;">${address}</p></td>
-                        </tr>
-                        <tr>
-                            <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
-                                <p style="margin: 0 0 8px;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Contact:</p>
-                                <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">Weclea</p>
-                                <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">hello@weclea.com</p>
-                                <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">(123) 456-7890</p>
-                            </th>
-                            <th scope="col" style="padding: 0px 0px 0px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;"><img src="data:image/png;base64, ${qrCodeImageData}" style="width: 80%;"> </th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-        </body>
-    </html>`;
+  let htmlContent = '';
+
+  for (let i = 0; i < qrCodesArray.length; i++) {
+    const qrCode = qrCodesArray[i];
+
+    const order_id = data.order_id;
+    const date = data.date;
+    const address = data.address;
+
+    const qrCodeImageTags = `<img src="${qrCode}" style="width: 80%;">`;
+
+    const sectionHtml = `<!DOCTYPE html>
+      <head>
+          <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;700&display=swap" rel="stylesheet">
+      </head>
+      <html>
+          <body style="background: #dfdfdf;">
+              <div style="margin:0 auto;font-family: 'Lexend Deca', sans-serif;width: 375px;background: #ffffff;padding: 0px;display: flex;align-items: start;justify-content: space-between;flex-wrap:wrap;">
+                  <table class="table" style="border-collapse: collapse;width:100%;display: table;">
+                      <thead>
+                          <tr>
+                              <th scope="col" style="padding: 15px 5px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;"><img src="https://api.weclea.com/uploads/logo.png" style="width: 70%;"> </th>
+                              <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
+                                  <p style="margin: 0 0 8px;display: flex;justify-content: space between;align-items: center;font-weight: 600;">Invoice # <span>${order_id}</span></p>
+                                  <p style="margin: 0;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Issue Date <span>${date}</span></p>
+                              </th>
+                          </tr>
+                      </thead>
+                  </table>
+                  <table class="table" style="border-collapse: collapse;width:100%;display: table;">
+                      <thead>
+                          <tr>
+                              <td colspan="3" style="color: #212121;padding: 15px 15px;font-size: 14px;border-bottom: 1px solid #ccc;font-weight: 600;">Pickup Address <p style="font-size: 14px;margin: 8px 0 0;font-weight: 500;color: #4a4a4a;">${address}</p></td>
+                          </tr>
+                          <tr>
+                              <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
+                                  <p style="margin: 0 0 8px;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Contact:</p>
+                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">Weclea</p>
+                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">hello@weclea.com</p>
+                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">(123) 456-7890</p>
+                              </th>
+                              <th scope="col" style="padding: 0px 0px 0px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;">${qrCodeImageTags}</th>
+                          </tr>
+                      </thead>
+                  </table>
+              </div>
+              <div style="page-break-after: always;"></div> <!-- Add a page break after each section -->
+          </body>
+      </html>`;
+
+    htmlContent += sectionHtml;
+  }
 
   await page.setContent(htmlContent);
 
@@ -133,14 +145,38 @@ export const generatePDF = async (data, qrCode) => {
 };
 
 
-export const generateQRCode= async(qr_code)=>
-{
-  return new Promise((resolve, reject) => {
-    qrcode.toDataURL(qr_code, (err, qrCode) => {
-      if (err) {
-        reject(err);
+
+
+
+
+export const generateQRCode = async (qr_codes) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const generateQRCodePromise = async (data) => {
+        return new Promise((resolve, reject) => {
+          qrcode.toDataURL(data, (err, qrCode) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(qrCode);
+          });
+        });
+      };
+
+      if (!Array.isArray(qr_codes)) {
+        reject(new Error('Input should be an array of QR codes.'));
+        return;
       }
-      resolve(qrCode);
-    });
+
+      const generatedQRs = await Promise.all(qr_codes.map(generateQRCodePromise));
+      resolve(generatedQRs);
+    } catch (error) {
+      reject(error);
+    }
   });
-}
+};
+
+
+
+
+
