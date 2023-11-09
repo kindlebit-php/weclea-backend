@@ -23,7 +23,7 @@ import { qr_slip } from "../helpers/qr_slip.js";
 
 
 router.post('/customer-register',userController.customer_register);
-router.post('/user-signup',upload.fields([{ name: "licence_front_image", maxCount: 1 },{ name: "licence_back_image", maxCount: 1 },{ name: "profile_image", maxCount: 1 },]),userController.user_signup);
+router.post('/order-managament-user-singup',upload.fields([{ name: "licence_front_image", maxCount: 1 },{ name: "licence_back_image", maxCount: 1 },{ name: "profile_image", maxCount: 1 },]),userController.order_managament_user_singup);
 router.post('/delete-employee',userController.delete_employee);
 router.post('/newsletter',userController.newsletter);
 router.post('/register-employee',userController.register_employee);
