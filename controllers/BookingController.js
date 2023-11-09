@@ -909,19 +909,20 @@ export const booking_history = async(req,res)=>{
                     {
                         imageList[key] = process.env.BASE_URL+'/uploads/'+img;
                     })
+                }else{
+                    var imageList = [];
                 }
                 }else{
                 var delivery_time = dryCleanDelTime;
                 var delivery_date = dryCleanDelDate;
                 if(dryCleanDropImage){
                 var imageList = []
-                if(drop_image){
                     const pickup_images_array = dryCleanDropImage.split(',');
                     pickup_images_array.forEach(function callback(img, key)
                     {
                         imageList[key] = process.env.BASE_URL+'/uploads/'+img;
                     })
-                }
+                
                 }else{
                     var imageList = [];
                 }
