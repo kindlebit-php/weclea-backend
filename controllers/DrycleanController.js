@@ -642,7 +642,17 @@ export const submit_dryClean_process_detail = async (req, res) => {
         }else{
           var booking = "select user_id,total_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
-            console.log(bookingdata)
+
+               var  qrCountSql = "select count(id) as qrCount from booking_qr where booking_id = '"+booking_id+"' ";
+        dbConnection.query(qrCountSql, function (error, qrCountresults){
+        if(qrCountresults[0].qrCount > bookingdata[0].total_loads){
+          var deleteRecord = (qrCountresults[0].qrCount - bookingdata[0].total_loads)
+          var  qrdeleteSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
+          dbConnection.query(qrdeleteSql, function (error, qrdeleteresults){
+          })
+        }
+        })
+
         updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET package_time = ?, package_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET package_images = ? WHERE booking_id = ?";
         // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
