@@ -13,18 +13,18 @@ const BUCKET_NAME = 'weclea-bucket';
 
 /********  Email template suggesstion  ***********/
 export const get_group_list = async(req,res)=>{
-      try { 
-        	const loads = "select * from wc_emp_group where status=0 order by id desc";
-			dbConnection.query(loads, function (error, data) {
-			if (error) throw error;
-				res.json({'status':true,"message":"Success",'data':data});
-			})
+    try { 
+    	const loads = "select * from wc_emp_group where status=0 order by id desc";
+		dbConnection.query(loads, function (error, data) {
+		if (error) throw error;
+			res.json({'status':true,"message":"Success",'data':data});
+		})
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
 }
-export const get_emailTemplate_detail = async(req,res)=>{
-      try { 
+export const get_group_user_list = async(req,res)=>{
+    try { 
     	const loads = "select * from wc_email_template  where wc_email_template.status=0 order by wc_rating_feeback.create_date desc";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
@@ -38,8 +38,8 @@ export const update_group = async(req,res)=>{
 	const reqData = req.body;
 	//`rating_id`, `feedback`
     try { 
-    	const qrySelect = "select id from wc_emp_group where `group_name`=? and status=0 and id!=?";
-		dbConnection.query(qrySelect,[reqData.group_name, reqData.id], function (error, data) {
+    	const qrySelect = "select id from wc_emp_group where `group_name`=? and status=0 and zip_code=? and id!=?";
+		dbConnection.query(qrySelect,[reqData.group_name, reqData.zip_code, reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) { 
 			  
@@ -77,8 +77,8 @@ export const create_group = async(req,res)=>{
 	console.log("create_group", reqData,req.files)
 	//wc_emp_group //`manage_name`, `profile_pic`, `location`, `country`, `group_name`, `zip_code`, 
     try { 
-    	const qrySelect = "select id from wc_emp_group where `group_name`=? and status=0";
-		dbConnection.query(qrySelect,[reqData.group_name], function (error, data) {
+    	const qrySelect = "select id from wc_emp_group where `group_name`=? and status=0 and zip_code=?";
+		dbConnection.query(qrySelect,[reqData.group_name, reqData.zip_code], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) {
 
@@ -137,10 +137,10 @@ export const delete_group = async(req,res)=>{
     }
 }
 
-export const update_emailTemplate_status = async(req,res)=>{
+export const get_grouped_emp_list = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	const qrySelect = "select id from wc_email_template where id=?";
+    	const qrySelect = "select id from users where group_id=?";
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
@@ -148,8 +148,8 @@ export const update_emailTemplate_status = async(req,res)=>{
 				if (reqData.status==1) {
 					msg= "Email template has been activated successfully"
 				}
-			    var updateContnetQry = "update wc_email_template set status=? where id=? ";
-			    dbConnection.query(updateContnetQry,[reqData.status,reqData.id], function (error, data) {
+			    var qryStr = "select * from users where (group_id=? or zip_code=?) and role_id>0 and role!=1";
+			    dbConnection.query(qryStr,[reqData.group_id], function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":msg,'data':data});
 				});
@@ -167,5 +167,6 @@ export default {
 	get_group_list,
 	create_group,
 	update_group,
-	delete_group
+	delete_group,
+	get_grouped_emp_list
 }
