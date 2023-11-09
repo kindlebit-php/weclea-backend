@@ -851,10 +851,10 @@ export const submit_drop_details = async (req, res) => {
                 }
                 const dropImagesJSON = imageArray.join(", ");
         if(order_type != 3){
-    const update_dropimages =
+    var update_dropimages =
                   "UPDATE booking_images SET drop_image = ? WHERE booking_id = ?";
                 }else{
-                    const update_dropimages =
+                    var update_dropimages =
                   "UPDATE dry_clean_booking_images SET drop_image = ? WHERE booking_id = ?";
                 }
               
