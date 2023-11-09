@@ -38,7 +38,9 @@ jobs:
       - name: Deploy on server
         run: |
           # Perform cleanup steps here (e.g., deleting temporary files)
-          docker-compose down
-          docker-compose up -d
+          #docker-compose down
+          #docker-compose up -d
+          docker-compose stop app
+          docker-compose up -d app
           # Add your cleanup commands heree
           #docker system prune -af
