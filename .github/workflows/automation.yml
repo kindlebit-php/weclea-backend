@@ -17,7 +17,7 @@ jobs:
         env:
           GIT_MAX_INPUT: 10000000 # Set a larger value for maxBuffer (in bytes)
 
-      # - name: Copy uploads folder
+      # - name: Copy uploads folder // don't uncommit it 
       #   run: |
       #     cp -r /home/ubuntu/uploads /var/weclea/weclea_backend/weclea-backend/weclea-backend/weclea-backend
 
