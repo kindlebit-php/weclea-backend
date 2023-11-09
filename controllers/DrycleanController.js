@@ -18,7 +18,7 @@ export const get_category = async (req, res) => {
         dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
           data.forEach(element =>
           {
-            const {id,title,price,image} = element;
+            const {id,title,price,image,note} = element;
             if(image){
               var img = process.env.BASE_URL+'/uploads/'+image;
             }else{

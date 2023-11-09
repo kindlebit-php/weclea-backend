@@ -67,6 +67,7 @@ export const order_managament_user_singup = async(req,res)=>{
       try {
       		const saltRounds = 10;
         const {name,email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,area} = req.body;
+        console.log('password',password)
         if(name && email && password  && mobile && role){
         	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
 			dbConnection.query(checkIfEmailExist,async function (error, data) {
@@ -80,6 +81,8 @@ export const order_managament_user_singup = async(req,res)=>{
 
 
 					bcrypt.hash(password, saltRounds, function(error, hash) {
+						 console.log('hash',hash);
+return false;
 						if(role == 2){
 						if(req.files.licence_front_image){
 							var licence_front_image = "uploads/"+req.files.licence_front_image[0].originalname;
@@ -101,7 +104,8 @@ export const order_managament_user_singup = async(req,res)=>{
 						}else{
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,zip_code,country,state,city,address,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+profile_image+"','"+area+"')";
 						}
-						
+						console.log('sql', sql)
+						return false;
 						dbConnection.query(sql, function (err, result) {
 							console.log(result)
 							if (err) throw err;
