@@ -648,7 +648,7 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
         if (updateTimeErr) {
           return res.json({ status: false, message: updateTimeErr.message });
         }
-// console.log('req.files',req.files)
+console.log('req.files',req.files)
         const imageArray = [];
         req.files.images.forEach((e, i) => {
           imageArray.push(e.path);
