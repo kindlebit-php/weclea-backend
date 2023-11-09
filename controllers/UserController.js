@@ -233,10 +233,10 @@ export const customer_login = async(req,res)=>{
 						if(result == true){
 							data.forEach(element =>
 							{
-								const {id,name,email,mobile,comment,role,status,category_id} = element;
+								const {id,name,email,mobile,comment,role,status,category_id,isAdmin,role_id,zip_code} = element;
 								
 								const initi = {
-									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,'token': generateToken({ userId: id, type: type }),
+									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,"role_id":role_id,"isAdmin":isAdmin,"zip_code":zip_code,'token': generateToken({ userId: id, type: type }),
 								}
 								const get_address_count = "select count(id)  as total from customer_address where user_id = '"+id+"'";
 								dbConnection.query(get_address_count, function (error, addressresult) {

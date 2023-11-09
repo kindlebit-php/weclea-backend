@@ -291,7 +291,7 @@ export const get_dashboard_content = async(req,res)=>{
 export const get_all_userList = async(req,res)=>{
 	var reqData= req.params;
     try { 
-    	const loads = "select id, email, mobile,name, role, role_id, status,profile_image from users";
+    	const loads = "select id, email, mobile,name, role, role_id, status,profile_image,isAdmin from users";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
 			res.json({'status':true,"message":"Success",'data':data});
