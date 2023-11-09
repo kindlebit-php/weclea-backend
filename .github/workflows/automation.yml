@@ -17,9 +17,9 @@ jobs:
         env:
           GIT_MAX_INPUT: 10000000 # Set a larger value for maxBuffer (in bytes)
 
-      - name: Copy uploads folder
-        run: |
-          cp -r /home/ubuntu/uploads /var/weclea/weclea_backend/weclea-backend/weclea-backend/weclea-backend
+      # - name: Copy uploads folder
+      #   run: |
+      #     cp -r /home/ubuntu/uploads /var/weclea/weclea_backend/weclea-backend/weclea-backend/weclea-backend
 
       - name: Copy .env file
         run: |
@@ -41,3 +41,4 @@ jobs:
           docker-compose down
           docker-compose up -d
           # Add your cleanup commands heree
+          docker system prune -af
