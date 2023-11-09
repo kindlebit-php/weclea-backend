@@ -63,7 +63,78 @@ export const customer_register = async(req,res)=>{
 }
 
 
-export const user_signup = async(req,res)=>{
+export const order_managament_user_singup = async(req,res)=>{
+      try {
+      		const saltRounds = 10;
+        const {name,email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,area} = req.body;
+        console.log('password',password)
+        if(name && email && password  && mobile && role){
+        	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
+			dbConnection.query(checkIfEmailExist,async function (error, data) {
+				console.log(req.files)
+
+				// console.log(data[])
+				if(data[0].total == 0){
+					const checkIfMobileExist = "select count(id) as mobiletotal from users where mobile = '"+mobile+"'";
+					dbConnection.query(checkIfMobileExist,async function (error, mobiledata) {
+					if(mobiledata[0].mobiletotal == 0){
+
+
+					bcrypt.hash(password, saltRounds, function(error, hash) {
+						 console.log('hash',hash);
+return false;
+						if(role == 2){
+						if(req.files.licence_front_image){
+							var licence_front_image = "uploads/"+req.files.licence_front_image[0].originalname;
+							console.log("1",licence_front_image)
+						}else{
+							var licence_front_image = '';
+						}
+						if(req.files.licence_back_image){
+							var licence_back_image = "uploads/"+req.files.licence_back_image[0].originalname;
+						}else{
+							var licence_front_image = '';
+						}
+						if(req.files.profile_image){
+							var profile_image = "uploads/"+req.files.profile_image[0].originalname;
+						}else{
+							var profile_image = '';
+						}
+							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,licence_front_image,licence_back_image,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+group_id+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+licence_front_image+"','"+licence_back_image+"','"+profile_image+"','"+area+"')";
+						}else{
+							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,zip_code,country,state,city,address,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+profile_image+"','"+area+"')";
+						}
+						console.log('sql', sql)
+						return false;
+						dbConnection.query(sql, function (err, result) {
+							console.log(result)
+							if (err) throw err;
+							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
+							dbConnection.query(sql, function (err, userList) {
+								userList[0].token = generateToken({ userId: userList[0].id, type: role });
+								res.json({'status':true,"message":"User registered successfully!",'data':userList[0]});
+							}); 
+							}); 
+						});
+
+					}else{
+						res.json({'status':false,"message":'Mobile Number is already registered'});  
+					}
+				})
+				}else{
+				res.json({'status':false,"message":'Email is already registered'});  
+				}
+			})
+		}else{
+            res.json({'status':false,"message":"All fields are required"});
+
+		}
+      }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+export const order_managament_user_update = async(req,res)=>{
       try {
       		const saltRounds = 10;
         const {name,email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,area} = req.body;
@@ -233,10 +304,10 @@ export const customer_login = async(req,res)=>{
 						if(result == true){
 							data.forEach(element =>
 							{
-								const {id,name,email,mobile,comment,role,status,category_id} = element;
+								const {id,name,email,mobile,comment,role,status,category_id,isAdmin,role_id,zip_code} = element;
 								
 								const initi = {
-									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,'token': generateToken({ userId: id, type: type }),
+									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,"role_id":role_id,"isAdmin":isAdmin,"zip_code":zip_code,'token': generateToken({ userId: id, type: type }),
 								}
 								const get_address_count = "select count(id)  as total from customer_address where user_id = '"+id+"'";
 								dbConnection.query(get_address_count, function (error, addressresult) {
@@ -628,7 +699,7 @@ export const order_list = async (req, res) => {
 	var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
 	const list =
-		"SELECT b.id, b.order_id,b.driver_id,b.folder_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.date = '"+currentFinalDate+"'";
+		"SELECT b.id, b.order_id,b.driver_id,b.folder_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.order_type != 3 and b.date = '"+currentFinalDate+"'";
 	  
 	  const data = await new Promise((resolve, reject) => {
 		dbConnection.query(list, (error, data) => {
@@ -1116,5 +1187,6 @@ export default {
 	update_user_status,
 	customer_order_histroy,
 	get_deleivery_instruction,
-	user_signup
+	order_managament_user_singup,
+	order_managament_user_update
 }

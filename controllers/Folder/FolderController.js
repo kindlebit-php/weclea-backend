@@ -338,16 +338,12 @@ export const submit_wash_detail = async (req, res) => {
           dbConnection.query(booking, function (error, bookingdata) {
 
           var  qrCountSql = "select count(id) as qrCount from booking_qr where booking_id = '"+booking_id+"' ";
-          console.log('qrCountSql',qrCountSql)
           dbConnection.query(qrCountSql, function (error, qrCountresults){
-            console.log('qrCountresults',qrCountresults)
           if(qrCountresults[0].qrCount > bookingdata[0].total_loads){
               var deleteRecord = (qrCountresults[0].qrCount - bookingdata[0].total_loads)
-              console.log('deleteRecord',deleteRecord)
               var  qrdeleteSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
-              console.log('qrdeleteSql',qrdeleteSql)
+
               dbConnection.query(qrdeleteSql, function (error, qrdeleteresults){
-                console.log('qrdeleteresults',qrdeleteresults)
               })
             }
           })
@@ -608,8 +604,21 @@ export const submit_wash_detail = async (req, res) => {
                  })
           })
         }else{
+
+      
           var booking = "select user_id,total_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
+
+          var  qrCountSql = "select count(id) as qrCount from booking_qr where booking_id = '"+booking_id+"' ";
+        dbConnection.query(qrCountSql, function (error, qrCountresults){
+        if(qrCountresults[0].qrCount > bookingdata[0].total_loads){
+          var deleteRecord = (qrCountresults[0].qrCount - bookingdata[0].total_loads)
+          var  qrdeleteSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
+          dbConnection.query(qrdeleteSql, function (error, qrdeleteresults){
+          })
+        }
+        })
+
         updateDateTimeQuery = `UPDATE booking_timing SET pack_time = ?, pack_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE booking_images SET pack_images = ? WHERE booking_id = ?";
         // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
@@ -639,7 +648,6 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
         if (updateTimeErr) {
           return res.json({ status: false, message: updateTimeErr.message });
         }
-// console.log('req.files',req.files)
         const imageArray = [];
         req.files.images.forEach((e, i) => {
           imageArray.push(e.path);

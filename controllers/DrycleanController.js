@@ -11,21 +11,21 @@ const stripes = new Stripe(process.env.STRIPE_PUBLISH_KEY);
 export const get_category = async (req, res) => {
     try {
       var resData = [];
-    const category = `SELECT id, title, price, image FROM dry_clean_services WHERE status = 1  and isDelete = 0`;
+    const category = `SELECT id, title, price, note, image FROM dry_clean_services WHERE status = 1  and isDelete = 0`;
       dbConnection.query(category, function (error, data) {
         if (error) throw error;
         const dryCleanChares = `SELECT dry_clean_charges FROM settings `;
         dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
           data.forEach(element =>
           {
-            const {id,title,price,image} = element;
+            const {id,title,price,image,note} = element;
             if(image){
               var img = process.env.BASE_URL+'/uploads/'+image;
             }else{
               var img = process.env.BASE_URL+'/uploads/pants.jpg';
             }
             const initi = {
-            "id":id,"title":title,"price":price,"image":img
+            "id":id,"title":title,'note':note,"price":price,"image":img
             }
             resData.push(initi);
           });
@@ -236,7 +236,7 @@ export const customer_list_dryClean = (req, res) => {
   try {
     var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-    const bookingIdQuery = "SELECT bookings.id FROM bookings left join dry_clean_booking_qr on dry_clean_booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 14 and bookings.order_type != 1 and bookings.order_type != 2";
+    const bookingIdQuery = "SELECT bookings.id FROM bookings left join dry_clean_booking_qr on dry_clean_booking_qr.driver_pickup_status = 1 WHERE bookings.folder_id = '"+folder_id+"' and bookings.date = '"+currentFinalDate+"' and bookings.order_status != 4 and bookings.order_type != 1 and bookings.order_type != 2";
     console.log('bookingIdQuery',bookingIdQuery)
     dbConnection.query(bookingIdQuery, (error, userIdResult) => {
       if (error) {
@@ -642,7 +642,17 @@ export const submit_dryClean_process_detail = async (req, res) => {
         }else{
           var booking = "select user_id,total_loads from bookings where id = '"+booking_id+"'";
           dbConnection.query(booking, function (error, bookingdata) {
-            console.log(bookingdata)
+
+               var  qrCountSql = "select count(id) as qrCount from booking_qr where booking_id = '"+booking_id+"' ";
+        dbConnection.query(qrCountSql, function (error, qrCountresults){
+        if(qrCountresults[0].qrCount > bookingdata[0].total_loads){
+          var deleteRecord = (qrCountresults[0].qrCount - bookingdata[0].total_loads)
+          var  qrdeleteSql = "delete from booking_qr order by id desc limit "+deleteRecord+"";
+          dbConnection.query(qrdeleteSql, function (error, qrdeleteresults){
+          })
+        }
+        })
+
         updateDateTimeQuery = `UPDATE dry_clean_booking_timing SET package_time = ?, package_date = ? WHERE booking_id = ?`;
         updatePickupImagesQuery = "UPDATE dry_clean_booking_images SET package_images = ? WHERE booking_id = ?";
         // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
@@ -765,7 +775,7 @@ export const print_DryClean_extra_loads_QrCode = async (req, res) => {
         const total_qr_code=data.map((row) => row.qr_code);
         const customerId_Query = "SELECT b.user_id AS customer_id,bin.delievery_instruction AS Note_From_Delivery FROM bookings AS b JOIN booking_instructions AS bin ON b.user_id = bin.user_id WHERE b.id = ?";
         if ( total_qr_code.length === count) {
-          let updateOrderStatusQuery = "UPDATE bookings SET order_status = 14 WHERE id = ?";
+          let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
           dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
             if (updateOrderStatusErr) {
               return res.json({ status: false, message: updateOrderStatusErr.message });
@@ -879,7 +889,7 @@ export const order_histroy_dryClean = async (req, res) => {
           FROM bookings AS b
           JOIN users AS u ON b.user_id = u.id
           JOIN dry_clean_booking_images AS bi ON b.id = bi.booking_id 
-          WHERE b.order_status = '14' AND b.order_type != 1 AND b.order_type != 2 AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)`;
+          WHERE b.order_status = '4' AND b.order_type != 1 AND b.order_type != 2 AND b.folder_id = ? AND b.user_id IN (?) AND b.id IN (?)`;
 
         const queryParams = [folder_id, userIds, bookingIds];
 
@@ -928,7 +938,7 @@ export const order_histroy_dryClean = async (req, res) => {
                       order_status = "inspect";
                     } else if (order_status === 13) {
                       order_status = "press";
-                    } else if (order_status === 14) {
+                    } else if (order_status === 4) {
                       order_status = "package";
                     } else {
                       order_status = "NA";

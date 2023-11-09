@@ -34,6 +34,7 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_BIND_ADDRESS: "0.0.0.0"
     volumes:
+     - ./my.cnf:/etc/mysql/my.cnf
      - db_backup:/var/lib/mysql
     networks:
       - myconnection

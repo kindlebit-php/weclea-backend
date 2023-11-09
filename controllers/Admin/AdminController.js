@@ -1,6 +1,8 @@
 import dbConnection from'../../config/db.js';
 import transport from "../../helpers/mail.js";
-
+import bcrypt from 'bcrypt';
+import { generateToken } from "../../config/generateToken.js";
+import dotenv from "dotenv";
 import AWS from 'aws-sdk';
 const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
 const USER_SECRET = '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';
@@ -67,16 +69,16 @@ const BUCKET_NAME = 'weclea-bucket';
 
 */
  export const get_drycleaning_itemlist = async(req,res)=>{
-      try { 
-        	const loads = "select * from dry_clean_services where isDelete=0 order by updated_at desc";
-			dbConnection.query(loads, function (error, data) {
+    try { 
+		const loads = "select * from dry_clean_services where isDelete=0 order by updated_at desc";
+		dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
-				const dryCleanChares = `SELECT dry_clean_charges FROM settings `;
-        		dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
-        			if (error) throw error;
-        			res.json({'status':true,"message":"Success",'data':data,"mini_order_amount":dryCleanCharesdata[0].dry_clean_charges});
-        		})	
-			})
+			const dryCleanChares = `SELECT dry_clean_charges FROM settings `;
+			dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
+				if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data,"mini_order_amount":dryCleanCharesdata[0].dry_clean_charges});
+			});	
+		});
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
@@ -121,8 +123,8 @@ export const add_drycleaning_service = async(req,res)=>{
 			                console.log("S3 AWS res==>",data)
 			              	product_image=data.Location;
 							//`title`, `price`, `image`,*/
-							var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?";
-						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image], function (error, data) {
+							var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?, `note`=?";
+						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image, reqData.note], function (error, data) {
 							if (error) throw error;
 								res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 							});	              
@@ -132,8 +134,8 @@ export const add_drycleaning_service = async(req,res)=>{
 					*/	
 		    	}else{
 					
-				   	var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?";
-				    dbConnection.query(addContnetQry,[reqData.title, reqData.price], function (error, data) {
+				   	var addContnetQry = "insert dry_clean_services set `title`=?, `price`=? , note=?";
+				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, reqData.note], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 					});
@@ -186,8 +188,8 @@ export const update_drycleaning_service = async(req,res)=>{
 			                console.log("S3 AWS res==>",data)
 			              	product_image=data.Location;*/
 							//`title`, `price`, `image`,
-							var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, `image`=? where id=?";
-						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image, reqData.id], function (error, data) {
+							var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, `image`=?, note=? where id=?";
+						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image, reqData.note, reqData.id], function (error, data) {
 							if (error) throw error;
 								res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 							});	              
@@ -197,8 +199,8 @@ export const update_drycleaning_service = async(req,res)=>{
 
 		    	}else{
 					
-				   	var addContnetQry = "update dry_clean_services set `title`=?, `price`=? where id=?";
-				    dbConnection.query(addContnetQry,[reqData.title, reqData.price,reqData.id], function (error, data) {
+				   	var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, note=? where id=?";
+				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, reqData.note,reqData.id], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 					});
@@ -291,7 +293,7 @@ export const get_dashboard_content = async(req,res)=>{
 export const get_all_userList = async(req,res)=>{
 	var reqData= req.params;
     try { 
-    	const loads = "select id, email, mobile,name, role, role_id, status,profile_image from users";
+    	const loads = "select id, email, mobile,name, role, role_id, status,profile_image,isAdmin from users";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
 			res.json({'status':true,"message":"Success",'data':data});
@@ -384,7 +386,11 @@ export const get_packagesList = async(req,res)=>{
         	const loads = "select * from admin_packages where isDelete=0 order by created_at desc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
-				res.json({'status':true,"message":"Success",'data':data});
+				const dryCleanChares = `SELECT extra_chages FROM settings `;
+        		dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
+        			if (error) throw error;
+        			res.json({'status':true,"message":"Success",'data':data,"mini_order_amount":dryCleanCharesdata[0].extra_chages});
+        		})	
 			})
     }catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -397,8 +403,8 @@ export const update_packages = async(req,res)=>{
 		dbConnection.query(qrySelect,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price , reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) { ///`category_id`, `type`, `loads`, `min_load_per_day`, `price`,
-			    var updateContnetQry = "update admin_packages set `category_id`=?, `type`=?, `loads`=?, `min_load_per_day`=?, `price`=? where id = ? ";
-			    dbConnection.query(updateContnetQry,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price,reqData.id], function (error, data) {
+			    var updateContnetQry = "update admin_packages set `category_id`=?, `type`=?, `loads`=?, `min_load_per_day`=?, `price`=?, `note`=? where id = ? ";
+			    dbConnection.query(updateContnetQry,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price, reqData.note,reqData.id], function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Package has been updated successfully",'data':data});
 				});
@@ -418,8 +424,8 @@ export const create_packages = async(req,res)=>{
 		dbConnection.query(qrySelect,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) {
-			    var addContnetQry = "insert admin_packages set `category_id`=?, `type`=?, `loads`=?, `min_load_per_day`=?, `price`=? ";
-			    dbConnection.query(addContnetQry,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price], function (error, data) {
+			    var addContnetQry = "insert admin_packages set `category_id`=?, `type`=?, `loads`=?, `min_load_per_day`=?, `price`=?, `note`=? ";
+			    dbConnection.query(addContnetQry,[reqData.category_id, reqData.type, reqData.loads, reqData.min_load_per_day, reqData.price, reqData.note], function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Package has been saved successfully",'data':data});
 				});
@@ -963,6 +969,87 @@ export const update_feedbackQes_status = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+export const update_extra_chagres_status = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from settings where id=1";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "Extra Charges has been updated successfully"
+				if (reqData.type=='dry') {
+					msg= "Minimum order amount has been updated successfully"
+				}
+				if (reqData.type=='dry') {
+					var updateContnetQry = "update settings set dry_clean_charges=? where id=1 ";
+				    dbConnection.query(updateContnetQry,[reqData.extra_chages,1], function (error, data) {
+					if (error) throw error;
+						res.json({'status':true,"message":msg,'data':data});
+					});
+				}else{
+					var updateContnetQry = "update settings set extra_chages=? where id=1 ";
+				    dbConnection.query(updateContnetQry,[reqData.extra_chages,1], function (error, data) {
+					if (error) throw error;
+						res.json({'status':true,"message":msg,'data':data});
+					});	
+				}
+			    
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+//customer login API
+export const admin_login = async(req,res)=>{
+	try { 
+		const {email,password,type} = req.body;
+		if(email && password && type){
+			const checkIfEmailExist = "select * from users where email = '"+email+"' and isAdmin=1";
+			dbConnection.query(checkIfEmailExist, function (error, data) {
+				if(data.length > 0){
+					if(data[0].status == 1){
+					bcrypt.compare(password, data[0].password, function(error, result) {
+						if(result == true){
+							data.forEach(element =>
+							{
+								const {id,name,email,mobile,comment,role,status,category_id,isAdmin,role_id,zip_code} = element;
+								
+								const initi = {
+									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,"role_id":role_id,"isAdmin":isAdmin,"zip_code":zip_code,'token': generateToken({ userId: id, type: type }),
+								}
+								const get_address_count = "select count(id)  as total from customer_address where user_id = '"+id+"'";
+								dbConnection.query(get_address_count, function (error, addressresult) {
+								if(addressresult[0].total > 0){
+									var addresscount = 1
+								}else{
+									var addresscount = 0
+								}
+								res.json({'status':true,"message":"Logged in successfully!",'data': initi,'address_count':addresscount});
+							
+							});
+							});
+						}else{
+							res.json({'status':false,"message":"Incorrect password!"});
+						}
+					});
+				}else{
+					res.json({'status':false,"message":"Your account has been deactivated, please connect with admin!"});
+				}
+				}else{
+					res.json({'status':false,"message":"User not found!"});
+						
+				}
+			});
+		}else{
+			res.json({'status':false,"message":"All fields are required"});
+		}
+	}catch (error) {
+		res.json({'status':false,"message":error.message});  
+	}
+}
 
 /****** end feedback section*******/
 export default {
@@ -997,6 +1084,8 @@ export default {
 	update_feedbackQes,
 	create_feedbackQes,
 	delete_feedbackQes,
-	update_feedbackQes_status
+	update_feedbackQes_status,
+	update_extra_chagres_status,
+	admin_login
 
 }

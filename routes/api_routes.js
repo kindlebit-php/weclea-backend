@@ -23,7 +23,7 @@ import { qr_slip } from "../helpers/qr_slip.js";
 
 
 router.post('/customer-register',userController.customer_register);
-router.post('/user-signup',upload.fields([{ name: "licence_front_image", maxCount: 1 },{ name: "licence_back_image", maxCount: 1 },{ name: "profile_image", maxCount: 1 },]),userController.user_signup);
+router.post('/order-managament-user-singup',upload.fields([{ name: "licence_front_image", maxCount: 1 },{ name: "licence_back_image", maxCount: 1 },{ name: "profile_image", maxCount: 1 },]),userController.order_managament_user_singup);
 router.post('/delete-employee',userController.delete_employee);
 router.post('/newsletter',userController.newsletter);
 router.post('/register-employee',userController.register_employee);
@@ -135,6 +135,7 @@ router.post("/order-histroy-dryClean-detail",CheckAuth,DrycleanController.order_
 
 /*********** ------------ Admin panel ---------------***************/
 
+router.post("/admin_login",AdminController.admin_login)
 router.get("/get_content",AdminController.get_page_content)
 router.get("/get_faq",AdminController.get_faq_content)
 router.post("/update_page_content",CheckAuth,AdminController.update_page_content)
@@ -150,6 +151,7 @@ router.get("/get_package_details/:id?",CheckAuth,AdminController.get_package_det
 router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
 router.get("/get_user_history/:user_id?",CheckAuth,AdminController.get_user_history)
 router.get("/get_all_userList/",CheckAuth,AdminController.get_all_userList)
+router.post("/update_extra_chagres_status",CheckAuth,AdminController.update_extra_chagres_status)
 
 
 
@@ -180,6 +182,7 @@ router.get("/get_group_list",CheckAuth,groupController.get_group_list)
 router.post("/create_group",uploadS3.array('profile_pic',25),groupController.create_group);
 router.post("/update_group",uploadS3.array('profile_pic',25),groupController.update_group);
 router.post("/delete_group",CheckAuth,groupController.delete_group)
+router.post("/get_grouped_emp_list",CheckAuth,groupController.get_grouped_emp_list)
 
 /****** Admin Role & Permission ***********/
 router.get("/getRole",CheckAuth,permissionController.getRole)
@@ -197,6 +200,7 @@ router.post("/assignRole",CheckAuth,permissionController.assignRole)
 router.post("/addRoleAndPermission",CheckAuth,permissionController.addRoleAndPermission)
 router.post("/addPermission",CheckAuth,permissionController.addPermission)
 router.post("/addRole",CheckAuth,permissionController.addRole)
+router.post("/updateLoginAccess",CheckAuth,permissionController.updateLoginAccess)
     
 	
 /*****  ---------- Admin API End ---------- *****/

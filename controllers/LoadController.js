@@ -7,11 +7,14 @@ export const get_loads = async(req,res)=>{
       try { 
             const userData = res.user;
             const {category_id} = req.body;
-        	const loads = "select id,type,loads,price from admin_packages where category_id = '"+category_id+"' and isDelete = 0";
+        	const loads = "select id,type,loads,price,note from admin_packages where category_id = '"+category_id+"' and isDelete = 0";
 			dbConnection.query(loads, function (error, data) {
+            const extraSQL = "select extra_chages from settings";
+            dbConnection.query(extraSQL, function (error, extraSQLResult) {
 			if (error) throw error;
-				res.json({'status':true,"message":"data get successfully!",'data':data, 'card_status':userData[0].card_status});
+				res.json({'status':true,"message":"data get successfully!",'data':data, 'card_status':userData[0].card_status,'extra_charges':extraSQLResult[0].extra_chages});
 			})
+            })
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
