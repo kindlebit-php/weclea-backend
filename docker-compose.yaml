@@ -33,6 +33,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_BIND_ADDRESS: "0.0.0.0"
+      MYSQL_INIT_COMMAND: "--sql-mode=''"
     volumes:
      - db_backup:/var/lib/mysql
     networks:
