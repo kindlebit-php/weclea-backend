@@ -793,6 +793,7 @@ export const submit_drop_details = async (req, res) => {
     const userIdQuery = `SELECT user_id, order_status,order_type FROM bookings WHERE id = ?`;
 
     dbConnection.query(userIdQuery, [booking_id], function (error, data) {
+      console.log('data',data)
       if (error) {
         return res.json({ status: false, message: error.message });
       } else if (data.length === 0) {
@@ -822,10 +823,10 @@ export const submit_drop_details = async (req, res) => {
           const currentTime = time();
           const currentDate = date();
           if(order_type != 3){
-          const update_Date_Time = `UPDATE booking_timing SET deliever_time = '${currentTime}' , deliever_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+          var update_Date_Time = `UPDATE booking_timing SET deliever_time = '${currentTime}' , deliever_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
 
         }else{
-          const update_Date_Time = `UPDATE dry_clean_booking_timing SET deliever_time = '${currentTime}' , deliever_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
+          var update_Date_Time = `UPDATE dry_clean_booking_timing SET deliever_time = '${currentTime}' , deliever_date = '${currentDate}' WHERE booking_id = ${booking_id}`;
 
         }
           const result = data[0];
