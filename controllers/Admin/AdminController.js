@@ -67,16 +67,16 @@ const BUCKET_NAME = 'weclea-bucket';
 
 */
  export const get_drycleaning_itemlist = async(req,res)=>{
-      try { 
-        	const loads = "select * from dry_clean_services where isDelete=0 order by updated_at desc";
-			dbConnection.query(loads, function (error, data) {
+    try { 
+		const loads = "select * from dry_clean_services where isDelete=0 order by updated_at desc";
+		dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
-				const dryCleanChares = `SELECT dry_clean_charges FROM settings `;
-        		dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
-        			if (error) throw error;
-        			res.json({'status':true,"message":"Success",'data':data,"mini_order_amount":dryCleanCharesdata[0].dry_clean_charges});
-        		})	
-			})
+			const dryCleanChares = `SELECT dry_clean_charges FROM settings `;
+			dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
+				if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data,"mini_order_amount":dryCleanCharesdata[0].dry_clean_charges});
+			});	
+		});
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
@@ -121,8 +121,8 @@ export const add_drycleaning_service = async(req,res)=>{
 			                console.log("S3 AWS res==>",data)
 			              	product_image=data.Location;
 							//`title`, `price`, `image`,*/
-							var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?";
-						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image], function (error, data) {
+							var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?, `image`=?, `note`=?";
+						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image, reqData.note], function (error, data) {
 							if (error) throw error;
 								res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 							});	              
@@ -132,8 +132,8 @@ export const add_drycleaning_service = async(req,res)=>{
 					*/	
 		    	}else{
 					
-				   	var addContnetQry = "insert dry_clean_services set `title`=?, `price`=?";
-				    dbConnection.query(addContnetQry,[reqData.title, reqData.price], function (error, data) {
+				   	var addContnetQry = "insert dry_clean_services set `title`=?, `price`=? , note=?";
+				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, reqData.note], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 					});
@@ -186,8 +186,8 @@ export const update_drycleaning_service = async(req,res)=>{
 			                console.log("S3 AWS res==>",data)
 			              	product_image=data.Location;*/
 							//`title`, `price`, `image`,
-							var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, `image`=? where id=?";
-						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image, reqData.id], function (error, data) {
+							var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, `image`=?, note=? where id=?";
+						    dbConnection.query(addContnetQry,[reqData.title, reqData.price, product_image, reqData.note, reqData.id], function (error, data) {
 							if (error) throw error;
 								res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 							});	              
@@ -197,8 +197,8 @@ export const update_drycleaning_service = async(req,res)=>{
 
 		    	}else{
 					
-				   	var addContnetQry = "update dry_clean_services set `title`=?, `price`=? where id=?";
-				    dbConnection.query(addContnetQry,[reqData.title, reqData.price,reqData.id], function (error, data) {
+				   	var addContnetQry = "update dry_clean_services set `title`=?, `price`=?, note=? where id=?";
+				    dbConnection.query(addContnetQry,[reqData.title, reqData.price, reqData.note,reqData.id], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Service has been saved successfully",'data':data});
 					});
@@ -974,15 +974,24 @@ export const update_extra_chagres_status = async(req,res)=>{
 		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
-				var msg= "Extra Charges has been deactivated successfully"
-				if (reqData.status==1) {
-					msg= "Extra Charges has been activated successfully"
+				var msg= "Extra Charges has been updated successfully"
+				if (reqData.type=='dry') {
+					msg= "Minimum order amount has been updated successfully"
 				}
-			    var updateContnetQry = "update settings set extra_chages=? where id=1 ";
-			    dbConnection.query(updateContnetQry,[reqData.extra_chages,1], function (error, data) {
-				if (error) throw error;
-					res.json({'status':true,"message":msg,'data':data});
-				});
+				if (reqData.type=='dry') {
+					var updateContnetQry = "update settings set dry_clean_charges=? where id=1 ";
+				    dbConnection.query(updateContnetQry,[reqData.extra_chages,1], function (error, data) {
+					if (error) throw error;
+						res.json({'status':true,"message":msg,'data':data});
+					});
+				}else{
+					var updateContnetQry = "update settings set extra_chages=? where id=1 ";
+				    dbConnection.query(updateContnetQry,[reqData.extra_chages,1], function (error, data) {
+					if (error) throw error;
+						res.json({'status':true,"message":msg,'data':data});
+					});	
+				}
+			    
 			}else{
 				res.json({'status':false,"message":"Record not found"});
 			}
