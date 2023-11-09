@@ -41,4 +41,4 @@ jobs:
           docker-compose down
           docker-compose up -d
           # Add your cleanup commands heree
-          docker system prune -af
+          #docker system prune -af
