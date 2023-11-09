@@ -918,17 +918,17 @@ export const order_histroy_dryClean = async (req, res) => {
                       type: path.extname(imagePath) === '.mov' || path.extname(imagePath) === '.mp4' ? 'video' : 'image',
                     })
                     )
-                    if (order_status === 1) {
+                    if (order_status === 9) {
                       order_status = "tagging";
-                    } else if (order_status === 2) {
+                    } else if (order_status === 10) {
                       order_status = "spoting";
-                    } else if (order_status === 3) {
+                    } else if (order_status === 11) {
                       order_status = "cleaning";
-                    } else if (order_status === 4) {
+                    } else if (order_status === 12) {
                       order_status = "inspect";
-                    } else if (order_status === 5) {
+                    } else if (order_status === 13) {
                       order_status = "press";
-                    } else if (order_status === 6) {
+                    } else if (order_status === 14) {
                       order_status = "package";
                     } else {
                       order_status = "NA";
