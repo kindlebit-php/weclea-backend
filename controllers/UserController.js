@@ -130,72 +130,57 @@ export const order_managament_user_singup = async(req,res)=>{
     }
 }
 
-export const order_managament_user_update = async(req,res)=>{
-      try {
-      		const saltRounds = 10;
-        const {name,email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,area} = req.body;
-        if(name && email && password  && mobile && role){
-        	const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
-			dbConnection.query(checkIfEmailExist,async function (error, data) {
-				console.log(req.files)
-
-				// console.log(data[])
-				if(data[0].total == 0){
-					const checkIfMobileExist = "select count(id) as mobiletotal from users where mobile = '"+mobile+"'";
-					dbConnection.query(checkIfMobileExist,async function (error, mobiledata) {
-					if(mobiledata[0].mobiletotal == 0){
-
-
-					bcrypt.hash(password, saltRounds, function(error, hash) {
-						if(role == 2){
-						if(req.files.licence_front_image){
-							var licence_front_image = "uploads/"+req.files.licence_front_image[0].originalname;
-							console.log("1",licence_front_image)
-						}else{
-							var licence_front_image = '';
-						}
-						if(req.files.licence_back_image){
-							var licence_back_image = "uploads/"+req.files.licence_back_image[0].originalname;
-						}else{
-							var licence_front_image = '';
-						}
-						if(req.files.profile_image){
-							var profile_image = "uploads/"+req.files.profile_image[0].originalname;
-						}else{
-							var profile_image = '';
-						}
-							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,licence_front_image,licence_back_image,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+group_id+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+licence_front_image+"','"+licence_back_image+"','"+profile_image+"','"+area+"')";
-						}else{
-							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,zip_code,country,state,city,address,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+profile_image+"','"+area+"')";
-						}
-						
-						dbConnection.query(sql, function (err, result) {
-							console.log(result)
-							if (err) throw err;
-							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
-							dbConnection.query(sql, function (err, userList) {
-								userList[0].token = generateToken({ userId: userList[0].id, type: role });
-								res.json({'status':true,"message":"User registered successfully!",'data':userList[0]});
-							}); 
-							}); 
-						});
-
+export const order_managament_user_update = async (req, res) => {
+	console.log(req.files)
+    try {
+        const saltRounds = 10;
+        const { id, name, password, latitude, longitude, group_id, zip_code, country, state, city, address, area } = req.body;
+        if (id && name && group_id && latitude && longitude && zip_code && country && state && city && address && area) {
+            const checkIfUserExists = "SELECT id FROM users WHERE id = '" + id + "'";
+            dbConnection.query(checkIfUserExists, async function (error, userData) {
+                if (userData.length > 0) {
+                    // User exists, proceed with update
+					if(req.files.profile_image){
+						var profile_image = "uploads/"+req.files.profile_image[0].originalname;
 					}else{
-						res.json({'status':false,"message":'Mobile Number is already registered'});  
+						var profile_image = '';
 					}
-				})
-				}else{
-				res.json({'status':false,"message":'Email is already registered'});  
-				}
-			})
-		}else{
-            res.json({'status':false,"message":"All fields are required"});
-
-		}
-      }catch (error) {
-        res.json({'status':false,"message":error.message});  
+                    const checkIfPasswordExist = "SELECT id FROM users WHERE password = '" + password + "'";
+                    dbConnection.query(checkIfPasswordExist, async function (error, passwordData) {
+                        if (passwordData.length === 0) {
+                            bcrypt.hash(password, saltRounds, function (error, hash) {
+                                const updateQuery = "UPDATE users SET name = '" + name + "', password = '" + hash + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
+                                dbConnection.query(updateQuery, function (err, result) {
+                                    if (err) throw err;
+                                    const selectQuery = "SELECT id, name, email, mobile, comment, role, status, category_id FROM users WHERE id = '" + id + "'";
+                                    dbConnection.query(selectQuery, function (err, updatedUserData) {
+                                        res.json({ 'status': true, "message": "User updated successfully!", 'data': updatedUserData[0] });
+                                    });
+                                });
+                            });
+                        } else {
+							const updateQuery = "UPDATE users SET name = '" + name + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
+							dbConnection.query(updateQuery, function (err, result) {
+								if (err) throw err;
+								const selectQuery = "SELECT id, name, email, mobile, comment, role, status, category_id FROM users WHERE id = '" + id + "'";
+								dbConnection.query(selectQuery, function (err, updatedUserData) {
+									res.json({ 'status': true, "message": "User updated successfully!", 'data': updatedUserData[0] });
+								});
+							});
+                        }
+                    });
+                } else {
+                    res.json({ 'status': false, "message": 'User not found' });
+                }
+            });
+        } else {
+            res.json({ 'status': false, "message": "All fields are required" });
+        }
+    } catch (error) {
+        res.json({ 'status': false, "message": error.message });
     }
 }
+
 
 //customer address API
 export const customer_address = async(req,res)=>{
