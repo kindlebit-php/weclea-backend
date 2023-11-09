@@ -2,7 +2,6 @@ import dbConnection from'../../config/db.js';
 import transport from "../../helpers/mail.js";
 import bcrypt from 'bcrypt';
 import { generateToken } from "../../config/generateToken.js";
-import transport from "../../helpers/mail.js";
 import dotenv from "dotenv";
 import AWS from 'aws-sdk';
 const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
