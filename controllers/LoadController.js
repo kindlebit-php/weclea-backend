@@ -7,7 +7,7 @@ export const get_loads = async(req,res)=>{
       try { 
             const userData = res.user;
             const {category_id} = req.body;
-        	const loads = "select id,type,loads,price from admin_packages where category_id = '"+category_id+"' and isDelete = 0";
+        	const loads = "select id,type,loads,price,note from admin_packages where category_id = '"+category_id+"' and isDelete = 0";
 			dbConnection.query(loads, function (error, data) {
             const extraSQL = "select extra_chages from settings";
             dbConnection.query(extraSQL, function (error, extraSQLResult) {

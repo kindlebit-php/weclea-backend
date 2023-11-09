@@ -11,7 +11,7 @@ const stripes = new Stripe(process.env.STRIPE_PUBLISH_KEY);
 export const get_category = async (req, res) => {
     try {
       var resData = [];
-    const category = `SELECT id, title, price, image FROM dry_clean_services WHERE status = 1  and isDelete = 0`;
+    const category = `SELECT id, title, price, note, image FROM dry_clean_services WHERE status = 1  and isDelete = 0`;
       dbConnection.query(category, function (error, data) {
         if (error) throw error;
         const dryCleanChares = `SELECT dry_clean_charges FROM settings `;
