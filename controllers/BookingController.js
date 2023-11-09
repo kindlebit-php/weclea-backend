@@ -536,6 +536,11 @@ export const booking_tracking_details = async(req,res)=>{
             var resDryImg = [];
             var resPackImg = [];
             var resFoldImg = [];
+            var resInsImg = [];
+            var resCleanImg = [];
+            var resSpotImg = [];
+            var resTagImg = [];
+            var resInspectImg = [];
             const userData = res.user;
             var datetime = new Date();
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
@@ -546,6 +551,122 @@ export const booking_tracking_details = async(req,res)=>{
             }
             dbConnection.query(sql, function (err, resultss) {
             if(resultss){
+            if(type == 3){
+            resultss.forEach(element =>
+            {
+                const {id,extra_loads,total_loads,package_date,order_type,inspect_date,cleaning_date,tagging_date,deliever_date,order_id,tagging_images,spoting_images,cleaning_images,inspect_images,press_images,dry_date,fold_date,pack_date,order_status,package_images,spotting_date,pickup_images,press_date,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status} = element;
+                if(pickup_images){
+                    const pickup_images_array = pickup_images.split(',');
+                    pickup_images_array.forEach(function callback(img, key)
+                    {
+                        resPickImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                if(press_images){
+                    const press_images_array = inspect_date.split(',');
+                    press_images_array.forEach(function callback(img, key)
+                    {
+                        resInspectImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                if(tagging_images){
+                    const tagging_images_array = tagging_images.split(',');
+                    tagging_images_array.forEach(function callback(img, key)
+                    {
+                        resTagImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                if(spoting_images){
+                    const spoting_images_array = spoting_images.split(',');
+                    spoting_images_array.forEach(function callback(img, key)
+                    {
+                        resSpotImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                if(cleaning_images){
+                    const cleaning_images_array = cleaning_images.split(',');
+                    cleaning_images_array.forEach(function callback(img, key)
+                    {
+                        resCleanImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                if(inspect_images){
+                    const inspect_images_array = inspect_images.split(',');
+                    inspect_images_array.forEach(function callback(img, key)
+                    {
+                        resInsImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                if(package_images){
+                    const package_images_array = package_images.split(',');
+                    package_images_array.forEach(function callback(img, key)
+                    {
+                        resPackImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                    })
+                }
+
+                    const laundry_detail = [
+                      {
+                        title: "Pickup Request",
+                        status:1,
+                        date: request_confirm_date
+                      },
+                      {
+                        title: "Tagging",
+                        imageList: resTagImg,
+                        status:1,
+                        date: tagging_date
+                      }, 
+                      {
+                        title: "Spoting Stains",
+                        imageList: resSpotImg,
+                        status:1,
+                        date: spotting_date
+                      },
+                      {
+                        title: "Cleaning",
+                        imageList: resCleanImg,
+                        status:1,
+                        date: cleaning_date
+                      },
+                      {
+                        title: "Inspect / Reclean",
+                        imageList: resInsImg,
+                        status:1,
+                        date: inspect_date
+                      },
+                      {
+                        title: "Press",
+                        imageList: resInspectImg,
+                        status:1,
+                        date: press_date
+                      }, 
+                      {
+                        title: "Package",
+                        imageList: resPackImg,
+                        status:1,
+                        date: package_date
+                      }, 
+                      {
+                        title: "Bags Delivered",
+                        status:1,
+                        date: deliever_date
+                      }
+                    ];
+
+
+                const initi = {
+                    "id":id,"order_id":order_id,"order_type":order_type,'laundry_detail':laundry_detail
+                }
+                res.json({'status':true,"message":"user order list","order_id":order_id,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
+            })
+            }else{
             resultss.forEach(element =>
             {
                 const {id,extra_loads,total_loads,order_type,deliever_date,order_id,dry_images,wash_images,fold_images,pack_images,dry_date,fold_date,pack_date,order_status,pickup_images,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status} = element;
@@ -588,33 +709,6 @@ export const booking_tracking_details = async(req,res)=>{
                         resPackImg[key] = process.env.BASE_URL+'/uploads/'+img;
                     })
                 }
-        if(order_status == 1){
-            var wash_status = 1;
-        }else if(order_status == 2){
-            var dry_status = 1;
-            var wash_status = 1;
-        }else if(order_status == 3){
-            var fold_status = 1;
-            var dry_status = 1;
-            var wash_status = 1;
-        }else if(order_status == 4){
-            var pack_status = 1;
-            var fold_status = 1;
-            var dry_status = 1;
-            var wash_status = 1;
-        }else if(order_status == 6){
-            var pack_status = 1;
-            var dry_status = 1;
-            var fold_status = 1;
-            var wash_status = 1;
-            var statusN = 1
-        }else{
-            var pack_status = 0;
-            var dry_status = 0;
-            var fold_status = 0;
-            var wash_status = 0;
-            var statusN = 0
-        }
 
 
                     const laundry_detail = [
@@ -626,30 +720,30 @@ export const booking_tracking_details = async(req,res)=>{
                       {
                         title: "Wash",
                         imageList: resWashImg,
-                        status:wash_status,
+                        status:1,
                         date: wash_date
                       },
                       {
                         title: "Dry",
                         imageList: resDryImg,
-                        status:dry_status,
+                        status:1,
                         date: dry_date
                       },
                       {
                         title: "Fold",
                         imageList: resFoldImg,
-                        status:fold_status,
+                        status:1,
                         date: fold_date
                       },
                       {
                         title: "Pack",
                         imageList: resPackImg,
-                        status:pack_status,
+                        status:1,
                         date: pack_date
                       }, 
                       {
                         title: "Bags Delivered",
-                        status:statusN,
+                        status:1,
                         date: deliever_date
                       }
                     ];
@@ -660,6 +754,7 @@ export const booking_tracking_details = async(req,res)=>{
                 }
                 res.json({'status':true,"message":"user order list","order_id":order_id,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
             })
+            }
             }else{
                 res.json({'status':false,"message":"Not found"});
 
