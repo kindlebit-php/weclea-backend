@@ -528,7 +528,7 @@ export const booking_tracking_status = async(req,res)=>{
 
 export const booking_tracking_details = async(req,res)=>{
 
-        const {booking_id} = req.body;
+        const {booking_id,type} = req.body;
         try { 
             var resData = [];
             var resPickImg = [];
@@ -539,7 +539,11 @@ export const booking_tracking_details = async(req,res)=>{
             const userData = res.user;
             var datetime = new Date();
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+            if(type == 3){
+                var sql = "select bookings.id,bookings.extra_loads,bookings.total_loads,bookings.order_id,dry_clean_booking_images.tagging_images,dry_clean_booking_images.spoting_images,dry_clean_booking_images.cleaning_images,dry_clean_booking_images.inspect_images,dry_clean_booking_images.drop_image,dry_clean_booking_images.press_images,dry_clean_booking_images.package_images,bookings.order_status,bookings.order_type,dry_clean_booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(dry_clean_booking_timing.driver_pick_date, ' ', dry_clean_booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(dry_clean_booking_timing.tagging_date, ' ', dry_clean_booking_timing.tagging_time) AS tagging_date,CONCAT(dry_clean_booking_timing.spotting_date, ' ', dry_clean_booking_timing.spotting_time) AS spotting_date,CONCAT(dry_clean_booking_timing.cleaning_date, ' ', dry_clean_booking_timing.cleaning_time) AS cleaning_date,CONCAT(dry_clean_booking_timing.inspect_date, ' ', dry_clean_booking_timing.inspect_time) AS inspect_date,CONCAT(dry_clean_booking_timing.press_date, ' ', dry_clean_booking_timing.press_time) AS press_date,CONCAT(dry_clean_booking_timing.package_date, ' ', dry_clean_booking_timing.package_time) AS package_date,CONCAT(dry_clean_booking_timing.deliever_date, ' ', dry_clean_booking_timing.deliever_time) AS deliever_date from bookings left join dry_clean_booking_timing on bookings.id = dry_clean_booking_timing.booking_id left join dry_clean_booking_images on dry_clean_booking_images.booking_id = bookings.id where bookings.id = '"+booking_id+"' and dry_clean_booking_timing.driver_pick_date IS NOT NULL";
+            }else{
             var sql = "select bookings.id,bookings.extra_loads,bookings.total_loads,bookings.order_id,booking_images.wash_images,booking_images.dry_images,booking_images.fold_images,booking_images.pack_images,booking_images.drop_image,bookings.order_status,bookings.order_type,booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.driver_pick_date, ' ', booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(booking_timing.wash_date, ' ', booking_timing.wash_time) AS wash_date,CONCAT(booking_timing.dry_date, ' ', booking_timing.dry_time) AS dry_date,CONCAT(booking_timing.fold_date, ' ', booking_timing.fold_time) AS fold_date,CONCAT(booking_timing.pack_date, ' ', booking_timing.pack_time) AS pack_date,CONCAT(booking_timing.deliever_date, ' ', booking_timing.deliever_time) AS deliever_date from bookings left join booking_timing on bookings.id = booking_timing.booking_id left join booking_images on booking_images.booking_id = bookings.id where bookings.id = '"+booking_id+"' and booking_timing.driver_pick_date IS NOT NULL";
+            }
             dbConnection.query(sql, function (err, resultss) {
             if(resultss){
             resultss.forEach(element =>
@@ -584,7 +588,7 @@ export const booking_tracking_details = async(req,res)=>{
                         resPackImg[key] = process.env.BASE_URL+'/uploads/'+img;
                     })
                 }
-                        if(order_status == 1){
+        if(order_status == 1){
             var wash_status = 1;
         }else if(order_status == 2){
             var dry_status = 1;
