@@ -228,12 +228,12 @@ export const customer_address = async(req,res)=>{
 	        res.json({'status':true,"message":"Address added successfully!"});
 	}else{
 		if(pickup_address && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long){
-			var sql = "update customer_address set address='"+pickup_address+"', appartment='"+pickup_appartment+"',city='"+pickup_city+"',state='"+pickup_state+"',zip='"+pickup_zipcode+"',latitude='"+pickup_lat+"',longitude='"+pickup_lat+"' where user_id = '"+userData[0].id+"'";
+			var sql = "update customer_address set address='"+pickup_address+"', appartment='"+pickup_appartment+"',city='"+pickup_city+"',state='"+pickup_state+"',zip='"+pickup_zipcode+"',latitude='"+pickup_lat+"',longitude='"+pickup_long+"' where user_id = '"+userData[0].id+"'";
 			dbConnection.query(sql, function (error, result) {
 			});
 		}
 		if(drop_address && drop_city  && drop_state && drop_zipcode && drop_lat && drop_long){
-			var sql = "update customer_drop_address set address='"+drop_address+"', appartment='"+drop_appartment+"',city='"+drop_city+"',state='"+drop_state+"',zip='"+drop_zipcode+"',latitude='"+drop_lat+"',longitude='"+drop_lat+"' where user_id = '"+userData[0].id+"'";
+			var sql = "update customer_drop_address set address='"+drop_address+"', appartment='"+drop_appartment+"',city='"+drop_city+"',state='"+drop_state+"',zip='"+drop_zipcode+"',latitude='"+drop_lat+"',longitude='"+drop_long+"' where user_id = '"+userData[0].id+"'";
 			dbConnection.query(sql, function (error, result) {
 			});
 		}
