@@ -765,7 +765,6 @@ export const booking_tracking_details = async(req,res)=>{
                       }
                     ];
 
-
                 const initi = {
                     "id":id,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
                 }
