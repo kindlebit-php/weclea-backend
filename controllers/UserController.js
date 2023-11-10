@@ -798,8 +798,11 @@ export const order_list = async (req, res) => {
 				  if (error) {
 					reject(error);
 				  } else {
-					const separatedStrings = Data[0].dry_images.split(", ");
 					const imageList = [];
+				  	
+				  	if(Data[0].dry_images){
+
+					const separatedStrings = Data[0].dry_images.split(", ");
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
@@ -812,6 +815,7 @@ export const order_list = async (req, res) => {
 			
 					  imageList.push(subImageObjects);
 					});
+				}
 					const flattenedImageList = [].concat(...imageList);
 			
 					resolve(flattenedImageList);
@@ -827,8 +831,9 @@ export const order_list = async (req, res) => {
 				  if (error) {
 					reject(error);
 				  } else {
-					const separatedStrings = Data[0].fold_images.split(", ");
 					const imageList = [];
+				  	if(Data[0].fold_images){
+					const separatedStrings = Data[0].fold_images.split(", ");
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
@@ -841,6 +846,7 @@ export const order_list = async (req, res) => {
 			
 					  imageList.push(subImageObjects);
 					});
+				}
 					const flattenedImageList = [].concat(...imageList);
 			
 					resolve(flattenedImageList);
@@ -856,8 +862,9 @@ export const order_list = async (req, res) => {
 				  if (error) {
 					reject(error);
 				  } else {
-					const separatedStrings = Data[0].pack_images.split(", ");
 					const imageList = [];
+				  	if(Data[0].pack_images){
+					const separatedStrings = Data[0].pack_images.split(", ");
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
@@ -870,6 +877,7 @@ export const order_list = async (req, res) => {
 			
 					  imageList.push(subImageObjects);
 					});
+				}
 					const flattenedImageList = [].concat(...imageList);
 			
 					resolve(flattenedImageList);
