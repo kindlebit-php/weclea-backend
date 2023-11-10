@@ -680,7 +680,7 @@ export const booking_tracking_details = async(req,res)=>{
                 const initi = {
                     "id":id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_id":order_id,"order_type":order_type,'laundry_detail':laundry_detail
                 }
-                res.json({'status':true,"message":"user order list","order_id":order_id,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
+                res.json({'status':true,"message":"user order list","order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
             })
             }else{
             resultss.forEach(element =>
