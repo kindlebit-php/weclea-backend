@@ -124,7 +124,7 @@ export const get_category = async (req, res) => {
           }else{
             var driver_id = 0
           }
-        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,category_id,total_amount,total_loads) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,1,'"+userData[0].category_id+"','"+amount+"',1)";
+        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,category_id,total_amount,total_loads) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,'"+driver_id+"','"+userData[0].category_id+"','"+amount+"',1)";
 
         dbConnection.query(sql, function (err, result) {
         if(result){

@@ -36,7 +36,7 @@ export const customer_booking = async(req,res)=>{
 
                     const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
                     dbConnection.query(custmer_address, function (error, custmeraddressResult) {
-                    var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
+                    var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25 order by distance asc;";
                     dbConnection.query(sqlDistance, function (error, locationResult) {
                     // return false;
                     if(locationResult.length > 0){
@@ -176,7 +176,7 @@ export const customer_booking = async(req,res)=>{
                            console.log('asdsaasdsad')
                             const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
                             dbConnection.query(custmer_address, function (error, custmeraddressResult) {
-                            var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
+                            var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25 order by distance asc;";
                             dbConnection.query(sqlDistance, function (error, locationResult) {
                             // return false;
                             if(locationResult.length > 0){
@@ -293,7 +293,7 @@ export const customer_booking = async(req,res)=>{
 
                             const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
                             dbConnection.query(custmer_address, function (error, custmeraddressResult) {
-                            var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
+                            var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25 order by distance asc;";
                             dbConnection.query(sqlDistance, function (error, locationResult) {
                             // return false;
                             if(locationResult.length > 0){
