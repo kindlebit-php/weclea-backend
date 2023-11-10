@@ -666,6 +666,7 @@ export const booking_tracking_details = async(req,res)=>{
                         title: "Package",
                         imageList: resPackImg,
                         status:1,
+                        imageList: resTagImg,
                         date: package_date
                       }, 
                       {
@@ -759,6 +760,7 @@ export const booking_tracking_details = async(req,res)=>{
                       {
                         title: "Bags Delivered",
                         status:1,
+                        imageList: resWashImg,
                         date: deliever_date
                       }
                     ];
