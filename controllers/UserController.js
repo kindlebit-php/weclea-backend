@@ -243,22 +243,10 @@ export const customer_address = async(req,res)=>{
 			});
 		}
 		if(delievery_instruction !=''){
-    		const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
-	        dbConnection.query(delieverySql, function (error, delieveryresult) {
-	        if(delieveryresult[0].delieveryCount == 0){
-				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+delievery_instruction+"')";
-				dbConnection.query(sql, function (error, result) {
-				});
-	        }else{
+    		
 	        	var sql = "update booking_instructions set delievery_instruction='"+delievery_instruction+"' where  user_id ='"+userData[0].id+"'";
-				dbConnection.query(sql, function (error, result) {
-				});
-	        }
+				dbConnection.query(sql, function (error, result) {    
 	        })
-	    }else{
-	    	var sql = "INSERT INTO booking_instructions (user_id) VALUES ('"+userData[0].id+"')";
-				dbConnection.query(sql, function (error, result) {
-				});
 	    }
 	    res.json({'status':true,"message":"Address updated successfully!"});
 
@@ -799,7 +787,7 @@ export const order_list = async (req, res) => {
 					reject(error);
 				  } else {
 					const imageList = [];
-				  	
+
 				  	if(Data[0].dry_images){
 
 					const separatedStrings = Data[0].dry_images.split(", ");
