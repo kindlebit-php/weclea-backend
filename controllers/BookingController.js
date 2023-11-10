@@ -631,6 +631,7 @@ export const booking_tracking_details = async(req,res)=>{
                       {
                         title: "Pickup Request",
                         status:1,
+                        imageList: [],
                         date: request_confirm_date
                       },
                       {
@@ -673,6 +674,8 @@ export const booking_tracking_details = async(req,res)=>{
                       {
                         title: "Bags Delivered",
                         status:1,
+                        imageList: [],
+
                         date: deliever_date
                       }
                     ];
@@ -732,6 +735,7 @@ export const booking_tracking_details = async(req,res)=>{
                       {
                         title: "Pickup Request",
                         status:1,
+                        imageList: [],
                         date: request_confirm_date
                       },
                       {
@@ -761,7 +765,7 @@ export const booking_tracking_details = async(req,res)=>{
                       {
                         title: "Bags Delivered",
                         status:1,
-                        imageList: resWashImg,
+                        imageList: [],
                         date: deliever_date
                       }
                     ];
