@@ -685,7 +685,7 @@ export const booking_tracking_details = async(req,res)=>{
             }else{
             resultss.forEach(element =>
             {
-                const {id,extra_loads,total_loads,order_type,deliever_date,order_id,dry_images,wash_images,fold_images,pack_images,dry_date,fold_date,pack_date,order_status,pickup_images,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status} = element;
+                const {id,extra_loads,total_loads,order_type,deliever_date,order_id,dry_images,wash_images,fold_images,pack_images,dry_date,fold_date,pack_date,order_status,pickup_images,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status,user_id,name,email,mobile} = element;
                 if(pickup_images){
                     const pickup_images_array = pickup_images.split(',');
                     pickup_images_array.forEach(function callback(img, key)
@@ -767,9 +767,9 @@ export const booking_tracking_details = async(req,res)=>{
 
 
                 const initi = {
-                    "id":id,"order_id":order_id,"order_type":order_type,'laundry_detail':laundry_detail
+                    "id":id,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
                 }
-                res.json({'status':true,"message":"user order list","order_id":order_id,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
+                res.json({'status':true,"message":"user order list","order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
             })
             }
             }else{
