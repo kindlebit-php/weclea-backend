@@ -887,7 +887,7 @@ export const order_list = async (req, res) => {
 				  } else {
 					const imageList = [];
 
-				  	if(drop_image){
+				  	if(Data[0].drop_image){
 					const separatedStrings = Data[0].drop_image.split(", ");
 			
 					separatedStrings.forEach(val => {
