@@ -865,6 +865,20 @@ export const delete_booking_date = async(req,res)=>{
         }
 }
 
+export const get_rating_details = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            const {rating_id} = req.body;
+            var sql = "select id,feedback from wc_rating_feeback where rating_id = '"+rating_id+"' and isDelete = 0";
+            dbConnection.query(sql, function (err, results) {
+                res.json({'status':true,"message":"Rating List",'data':results});
+            }); 
+        }catch (error) {
+            res.json({'status':false,"message":error.message});  
+        }
+}
+
 
 export const booking_rating = async(req,res)=>{
 
@@ -955,6 +969,7 @@ export default {
     booking_delievery_instruction,
     assign_driver,
     assign_folder,
+    get_rating_details,
     subscription_dates_fre,
     subscription_dates_custom,
     booking_history,
