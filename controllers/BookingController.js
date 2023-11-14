@@ -884,23 +884,11 @@ export const booking_rating = async(req,res)=>{
 
     try { 
         const userData = res.user;
-        const { booking_id,title,body,rating,images} = req.body;
-        if(booking_id  && rating ){
-             const imageArray = [];
-             var pickupImagesJSON ='';
-                if(req.files){
-                    req.files.forEach((e, i) => {
-                        imageArray.push(e.path);
-                    });
-                if (imageArray.length > 5) {
-                    return res.json({ status: false, message: "Only 5 images are allowed" });
-                }
-                    var pickupImagesJSON = imageArray.join(", ");
-                }
-            var sql = "INSERT INTO ratings (booking_id,user_id,rating,title,body,images) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating+"', '"+title+"', '"+body+"','"+pickupImagesJSON+"')";
-            console.log('sql',sql)
+        const { booking_id,rating_feedback_id} = req.body;
+        if(booking_id  && rating_feedback_id ){
+            var sql = "INSERT INTO ratings (booking_id,user_id,rating_feedback_id) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating_feedback_id+"')";
             dbConnection.query(sql, function (err, results) {
-                res.json({'status':true,"message":"Rating submitted"});
+                res.json({'status':true,"message":"Rating submitted successfully"});
             }); 
         }else{
             res.json({'status':false,"message":"All fields are required"});
