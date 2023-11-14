@@ -159,6 +159,7 @@ router.get("/get_states/:country_id?",AdminController.get_states)
 router.get("/get_cities/:state_id?",AdminController.get_cities)
 
 
+
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
 router.post("/update_faq_index",CheckAuth,AdminController.update_faq_index)
 router.get("/get_all_order/:type?/:searchStr?/:start?/:limit?",CheckAuth,AdminController.get_all_order)
