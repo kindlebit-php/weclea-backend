@@ -108,7 +108,6 @@ export const order_managament_user_singup = async(req,res)=>{
 						}
 						
 						dbConnection.query(sql, function (err, result) {
-							console.log(result)
 							if (err) throw err;
 							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
@@ -136,7 +135,6 @@ export const order_managament_user_singup = async(req,res)=>{
 }
 
 export const order_managament_user_update = async (req, res) => {
-	console.log(req.files)
     try {
         const saltRounds = 10;
         const { id, name, password, latitude, longitude, group_id, zip_code, country, state, city, address, area } = req.body;
@@ -320,7 +318,7 @@ export const forgot_password = async(req,res)=>{
 		const {email} = req.body;
 		if(email){
 			const checkIfEmailExist = "select * from users where email = '"+email+"'";
-			console.log('checkIfEmailExist',checkIfEmailExist)
+
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data.length > 0){
 					var otp = 123456
