@@ -47,6 +47,56 @@ export const Scan_received_loads = (req, res) => {
   }
 };
 
+export const Scan_loads_folder = (req, res) => {
+  try {
+    const userData = res.user;
+    const { qr_code, type } = req.body;
+    const currentTime = time();
+    const currentDate = date();
+    const wash_scan_timing = `${currentDate} ${currentTime}`;
+
+    const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ?";
+    dbConnection.query(verifyQr, [qr_code], function (error, data) {
+      if (error) {
+        return res.json({ status: false, message: error.message });
+      }
+
+      if (type >= 1 && type <= 4) {
+        if (data.length === 0 || data[0].driver_pickup_status !== 1 || data[0].folder_recive_status !== 0) {
+          return res.json({ status: false, message: "Invalid QR code or load status" });
+        }
+
+        let update_Date_Time2;
+
+        if (type === 1) {
+          update_Date_Time2 = `UPDATE booking_timing SET wash_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+        } else if (type === 2) {
+          update_Date_Time2 = `UPDATE booking_timing SET dry_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+        } else if (type === 3) {
+          update_Date_Time2 = `UPDATE booking_timing SET fold_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+        } else if (type === 4) {
+          update_Date_Time2 = `UPDATE booking_timing SET pack_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+        }
+
+        dbConnection.query(update_Date_Time2, function (updateTimeErr, updateTimeResult) {
+          if (updateTimeErr) {
+            return res.json({ status: false, message: updateTimeErr.message });
+          }
+          if (updateTimeResult.affectedRows === 1) {
+            return res.json({ status: true, message: "Load scanned and updated." });
+          }
+        });
+      } else {
+        return res.json({ status: false, message: "Invalid 'type' value" });
+      }
+    });
+  } catch (error) {
+    res.json({ status: false, message: error.message });
+  }
+};
+
+
+
 
 // export const Scan_received_loads = (req, res) => {
 //   const userData = res.user;
@@ -1358,6 +1408,7 @@ export const order_histroy_detail= async(req,res)=>{
 
 export default {
   Scan_received_loads,
+  Scan_loads_folder,
   customer_list_wash,
   wash_detail_ByCustomer_id,
   submit_wash_detail,
