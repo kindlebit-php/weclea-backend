@@ -154,6 +154,10 @@ router.get("/get_user_history/:user_id?",CheckAuth,AdminController.get_user_hist
 router.get("/get_all_userList/",CheckAuth,AdminController.get_all_userList)
 router.post("/update_extra_chagres_status",CheckAuth,AdminController.update_extra_chagres_status)
 
+router.get("/get_countries",AdminController.get_countries)
+router.get("/get_states/:country_id?",AdminController.get_states)
+router.get("/get_cities/:state_id?",AdminController.get_cities)
+
 
 
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)

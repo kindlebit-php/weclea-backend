@@ -68,6 +68,53 @@ const BUCKET_NAME = 'weclea-bucket';
     }
 
 */
+ export const get_countries = async(req,res)=>{
+    try { 
+		const loads = "select * from wc_countries order by name asc";
+		dbConnection.query(loads, function (error, data) {
+			if (error) throw error;
+			res.json({'status':true,"message":"Success",'data':data});
+		
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const get_states = async(req,res)=>{
+	var reqData=req.params
+    try { 
+    	if (reqData.country_id) {
+    		const country_id= reqData.country_id
+			const loads = "select * from wc_states where country_id=? order by name asc";
+			dbConnection.query(loads,[country_id], function (error, data) {
+				if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});
+				
+			});
+		}else{
+			res.json({'status':false,"message":"Please send required parameters"});
+		}
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const get_cities = async(req,res)=>{
+    var reqData=req.params
+    try { 
+    	if (reqData.state_id) {
+    		const state_id= reqData.state_id 
+			const loads = "select * from wc_cities where state_id=? order by name asc";
+			dbConnection.query(loads,[state_id], function (error, data) {
+				if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});	
+			});
+		}else{
+			res.json({'status':false,"message":"Please send required parameters"});
+		}	
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
  export const get_drycleaning_itemlist = async(req,res)=>{
     try { 
 		const loads = "select * from dry_clean_services where isDelete=0 order by updated_at desc";
@@ -836,7 +883,7 @@ export const get_driver_detail = async(req,res)=>{
 	                    var totalRecords=false;
 	                }
 
-			    	const loads = "SELECT *,(SELECT users.email FROM users WHERE id=bookings.user_id LIMIT 1) customer_email,(SELECT users.name FROM users WHERE id=bookings.user_id LIMIT 1) customer_name,(SELECT users.profile_image FROM users WHERE id=bookings.user_id LIMIT 1) customer_pic FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc limit ? offset ?";
+			    	const loads = "SELECT *,(SELECT users.email FROM users WHERE id=bookings.user_id LIMIT 1) customer_email,(SELECT users.name FROM users WHERE id=bookings.user_id LIMIT 1) customer_name,(SELECT users.profile_image FROM users WHERE id=bookings.user_id LIMIT 1) customer_pic FROM  bookings LEFT JOIN `users` on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc limit ? offset ?";
 					dbConnection.query(loads,[reqData.user_id,LimitNum,startNum], function (error, rows) {
 					if (error) throw error;
 
@@ -1087,6 +1134,9 @@ export default {
 	delete_feedbackQes,
 	update_feedbackQes_status,
 	update_extra_chagres_status,
-	admin_login
+	admin_login,
+	get_cities,
+	get_states,
+	get_countries
 
 }
