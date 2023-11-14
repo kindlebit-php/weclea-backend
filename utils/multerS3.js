@@ -1,6 +1,6 @@
 import multer from 'multer';
 import multerS3 from 'multer-s3';
-import { S3Client} from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand} from '@aws-sdk/client-s3';
 
 const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
 const USER_SECRET = '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';
