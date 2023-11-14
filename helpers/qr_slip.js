@@ -3,7 +3,6 @@ import qrcode from "qrcode";
 import { v4 as uuidv4 } from 'uuid'; 
 //import pdf from "pdf-creator-node"; 
 import puppeteer from 'puppeteer';
-import { s3 } from "../utils/multerS3.js";
 
 
 
@@ -129,42 +128,20 @@ export const generatePDF = async (data, qrCodesArray) => {
     htmlContent += sectionHtml;
   }
 
-  // await page.setContent(htmlContent);
-
-  // const pdfPath = `uploads/${uuidv4()}.pdf`;
-
-  // const options = {
-  //   path: pdfPath,
-  //   format: 'A4',
-  // };
-
-  // await page.pdf(options);
-
-  // await browser.close();
-
   await page.setContent(htmlContent);
 
-  const pdfBuffer = await page.pdf({
+  const pdfPath = `uploads/${uuidv4()}.pdf`;
+
+  const options = {
+    path: pdfPath,
     format: 'A4',
-  });
-
-  const pdfKey = `${uuidv4()}.pdf`;
-
-  const uploadParams = {
-    Bucket: 'weclea-bucket',
-    Key: pdfKey,
-    Body: pdfBuffer,
-    ContentType: 'application/pdf',
-    ACL: 'public-read',
   };
 
-  const uploadResult = await s3.upload(uploadParams).promise();
+  await page.pdf(options);
 
   await browser.close();
-  console.log(uploadResult.Location)
-  return uploadResult.Location;
 
- // return pdfPath;
+  return pdfPath;
 };
 
 
