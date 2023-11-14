@@ -99,6 +99,11 @@ export const order_managament_user_singup = async(req,res)=>{
 						}
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,licence_front_image,licence_back_image,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+group_id+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+licence_front_image+"','"+licence_back_image+"','"+profile_image+"','"+area+"')";
 						}else{
+							if(req.files.profile_image){
+							var profile_image = "uploads/"+req.files.profile_image[0].originalname;
+							}else{
+							var profile_image = '';
+							}
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,zip_code,country,state,city,address,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+profile_image+"','"+area+"')";
 						}
 						
@@ -445,9 +450,9 @@ export const get_user_profile = async(req,res)=>{
 				{
 					const {id,name,dob,email,mobile,category_id} = element;
 					if(result[0].profile_image){
-						var img = process.env.BASE_URL+'/uploads/'+result[0].profile_image;
+						var img = process.env.S3_URL+result[0].profile_image;
 					}else{
-						var img = process.env.BASE_URL+'/uploads/profile.jpg';
+						var img = process.env.S3_URL+'/uploads/profile.jpg';
 
 					}
 					let initi = {
@@ -668,7 +673,7 @@ export const order_list = async (req, res) => {
 	var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
 	const list =
-		"SELECT b.id, b.order_id,b.driver_id,b.folder_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.order_type != 3 and b.date = '"+currentFinalDate+"' order by id desc";
+		"SELECT b.id, b.order_id,b.driver_id,b.folder_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction ,users.name,users.email,users.mobile FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id left join users on b.user_id = users.id WHERE b.cron_status = 1 and b.order_type != 3 and b.date = '"+currentFinalDate+"' order by id desc";
 	  console.log('list',list)
 	  const data = await new Promise((resolve, reject) => {
 		dbConnection.query(list, (error, data) => {
@@ -762,7 +767,7 @@ export const order_list = async (req, res) => {
 		  
 				  separatedStrings.forEach(val => {
 					const subImages = val.split(',').map(subVal => {
-					  return `${process.env.BASE_URL}/${subVal.trim()}`;
+					  return `${process.env.S3_URL}${subVal.trim()}`;
 					});
 					const subImageObjects = subImages.map(subImagePath => ({
 					  path: subImagePath,
@@ -794,7 +799,7 @@ export const order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -825,7 +830,7 @@ export const order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -856,7 +861,7 @@ export const order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -888,7 +893,7 @@ export const order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -918,7 +923,7 @@ export const order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -1082,7 +1087,7 @@ export const customer_list = async (req, res) => {
 					  const { booking_Id,total_loads,deliever_date,deliever_time,drop_image } = elem;
 					  const separatedStrings = drop_image.split(", ")
 					  const imagesUrl=separatedStrings.map((val) => {
-					  return `${process.env.BASE_URL}/${val}`;
+					  return `${process.env.S3_URL}${val}`;
 					 });
 					  resData.push({
 						booking_Id,

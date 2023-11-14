@@ -20,7 +20,7 @@ export const get_category = async (req, res) => {
           {
             const {id,title,price,image,note} = element;
             if(image){
-              var img = process.env.BASE_URL+'/uploads/'+image;
+              var img = process.env.S3_URL+image;
             }else{
               var img = process.env.BASE_URL+'/uploads/pants.jpg';
             }
@@ -275,7 +275,7 @@ export const customer_list_dryClean = (req, res) => {
               }
               const separatedStrings = pickup_images.split(",")
               const imagesUrl = separatedStrings.map((val) => {
-                return `${process.env.BASE_URL}/${val}`;
+                return `${process.env.S3_URL}${val}`;
               });
                 const imageList = imagesUrl.map(imagePath => ({
                   path: imagePath,
@@ -922,7 +922,7 @@ export const order_histroy_dryClean = async (req, res) => {
                    } = elem;
                   const separatedStrings = package_images.split(",")
                   const imagesUrl = separatedStrings.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList = imagesUrl.map(imagePath => ({
                       path: imagePath,
@@ -997,7 +997,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                   const { Customer_Id,address,Zip_Code,mobile,PickUp_date_time,tagging_images,spoting_images,cleaning_images, inspect_images,press_images, package_images,tagging_date,tagging_time,spotting_date,spotting_time,cleaning_date,cleaning_time,inspect_date,inspect_time,press_date,press_time,package_date,package_time } = elem;
                   const separatedStrings1 = tagging_images.split(",")
                   const imagesUrl1 = separatedStrings1.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList1 = imagesUrl1.map(imagePath => ({
                       path: imagePath,
@@ -1006,7 +1006,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                     )
                     const separatedStrings2 = spoting_images.split(",")
                   const imagesUrl2 = separatedStrings2.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList2 = imagesUrl2.map(imagePath => ({
                       path: imagePath,
@@ -1015,7 +1015,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                     )
                     const separatedStrings3 = cleaning_images.split(",")
                   const imagesUrl3 = separatedStrings3.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList3 = imagesUrl3.map(imagePath => ({
                       path: imagePath,
@@ -1024,7 +1024,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                     )
                     const separatedStrings4 = inspect_images.split(",")
                   const imagesUrl4 = separatedStrings4.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList4 = imagesUrl4.map(imagePath => ({
                       path: imagePath,
@@ -1033,7 +1033,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                     )
                     const separatedStrings5 = press_images.split(",")
                     const imagesUrl5 = separatedStrings5.map((val) => {
-                      return `${process.env.BASE_URL}/${val}`;
+                      return `${process.env.S3_URL}${val}`;
                     });
                       const imageList5 = imagesUrl5.map(imagePath => ({
                         path: imagePath,
@@ -1042,7 +1042,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                       )
                       const separatedStrings6 = package_images.split(",")
                       const imagesUrl6 = separatedStrings6.map((val) => {
-                        return `${process.env.BASE_URL}/${val}`;
+                        return `${process.env.S3_URL}${val}`;
                       });
                         const imageList6 = imagesUrl6.map(imagePath => ({
                           path: imagePath,
