@@ -82,25 +82,27 @@ export const order_managament_user_singup = async(req,res)=>{
 					bcrypt.hash(password, saltRounds, function(error, hash) {
 						if(role == 2){
 						if(req.files.licence_front_image){
-							var licence_front_image = "uploads/"+req.files.licence_front_image[0].originalname;
+							console.log('req.files.licence_front_image[0].key',req.files.licence_front_image[0].key)
+							console.log('req.files',req.files.licence_front_image)
+							var licence_front_image = req.files.licence_front_image[0].key;
 							console.log("1",licence_front_image)
 						}else{
 							var licence_front_image = '';
 						}
 						if(req.files.licence_back_image){
-							var licence_back_image = "uploads/"+req.files.licence_back_image[0].originalname;
+							var licence_back_image = req.files.licence_back_image[0].key;
 						}else{
 							var licence_front_image = '';
 						}
 						if(req.files.profile_image){
-							var profile_image = "uploads/"+req.files.profile_image[0].originalname;
+							var profile_image = req.files.profile_image[0].key;
 						}else{
 							var profile_image = '';
 						}
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,licence_front_image,licence_back_image,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+group_id+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+licence_front_image+"','"+licence_back_image+"','"+profile_image+"','"+area+"')";
 						}else{
 							if(req.files.profile_image){
-							var profile_image = "uploads/"+req.files.profile_image[0].originalname;
+							var profile_image = "uploads/"+req.files.profile_image[0].key;
 							}else{
 							var profile_image = '';
 							}
@@ -146,7 +148,7 @@ export const order_managament_user_update = async (req, res) => {
                 if (userData.length > 0) {
                     // User exists, proceed with update
 					if(req.files.profile_image){
-						var profile_image = "uploads/"+req.files.profile_image[0].originalname;
+						var profile_image = req.files.profile_image[0].key;
 					}else{
 						var profile_image = '';
 					}
@@ -518,7 +520,7 @@ export const edit_user_profile = async(req,res)=>{
 			// dbConnection.query(checkIfMobileExist, function (error, data) {
 			// if(data[0].total == 1 ){
 				if(req.file){
-					var userProfile = req.file.originalname;
+					var userProfile = req.file.key;
 				}else{
 				var userProfile = userData[0].profile_image;
 				}

@@ -358,8 +358,7 @@ export const submit_pickup_details = async (req, res) => {
                 });
               } else {
                 const imageArray = [];
-                req.files.forEach((e, i) => {
-                  console.log('e.key',e.key)
+                req.files.images.forEach((e, i) => {
                   imageArray.push(e.key);
                 });
                 console.log('imageArray',imageArray)
