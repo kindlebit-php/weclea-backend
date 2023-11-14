@@ -148,6 +148,7 @@ export const order_managament_user_update = async (req, res) => {
                     const checkIfPasswordExist = "SELECT id FROM users WHERE password = '" + password + "'";
                     dbConnection.query(checkIfPasswordExist, async function (error, passwordData) {
                         if (passwordData.length === 0) {
+						
                             bcrypt.hash(password, saltRounds, function (error, hash) {
                                 const updateQuery = "UPDATE users SET name = '" + name + "', password = '" + hash + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
                                 dbConnection.query(updateQuery, function (err, result) {
@@ -675,7 +676,8 @@ export const  user_registered_address = async(req,res)=>{
 	}
 }
 
-export const order_list = async (req, res) => {
+export const 
+order_list = async (req, res) => {
 	try {
 	var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
@@ -1144,6 +1146,18 @@ export const customer_list = async (req, res) => {
 		  	res.json({ status: false, message: error.message });
 		}
 	}
+
+	export const dry_clean_history = async (req, res) => {
+		try {
+		  const list = "SELECT order_id,name, order_status, date,time from bookings WHERE role = 3";
+		  dbConnection.query(list, function (error, data) {
+			if (error) throw error;
+			res.json({status: true, message: "List retrived succesfully", data: data});           
+		  });
+		} catch (error) {   
+		  res.json({ status: false, message: error.message });   
+		}   
+	  };  
 export default {
 	user_registered_address,
 	customer_register,
