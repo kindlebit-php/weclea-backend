@@ -883,7 +883,7 @@ export const get_driver_detail = async(req,res)=>{
 	                    var totalRecords=false;
 	                }
 
-			    	const loads = "SELECT *,(SELECT users.email FROM users WHERE id=bookings.user_id LIMIT 1) customer_email,(SELECT users.name FROM users WHERE id=bookings.user_id LIMIT 1) customer_name,(SELECT users.profile_image FROM users WHERE id=bookings.user_id LIMIT 1) customer_pic FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc limit ? offset ?";
+			    	const loads = "SELECT *,(SELECT users.email FROM users WHERE id=bookings.user_id LIMIT 1) customer_email,(SELECT users.name FROM users WHERE id=bookings.user_id LIMIT 1) customer_name,(SELECT users.profile_image FROM users WHERE id=bookings.user_id LIMIT 1) customer_pic FROM  bookings LEFT JOIN `users` on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc limit ? offset ?";
 					dbConnection.query(loads,[reqData.user_id,LimitNum,startNum], function (error, rows) {
 					if (error) throw error;
 
