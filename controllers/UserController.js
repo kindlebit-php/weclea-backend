@@ -450,9 +450,9 @@ export const get_user_profile = async(req,res)=>{
 				{
 					const {id,name,dob,email,mobile,category_id} = element;
 					if(result[0].profile_image){
-						var img = process.env.BASE_URL+'/uploads/'+result[0].profile_image;
+						var img = process.env.S3_URL+result[0].profile_image;
 					}else{
-						var img = process.env.BASE_URL+'/uploads/profile.jpg';
+						var img = process.env.S3_URL+'/uploads/profile.jpg';
 
 					}
 					let initi = {
@@ -767,7 +767,7 @@ export const order_list = async (req, res) => {
 		  
 				  separatedStrings.forEach(val => {
 					const subImages = val.split(',').map(subVal => {
-					  return `${process.env.BASE_URL}/${subVal.trim()}`;
+					  return `${process.env.S3_URL}${subVal.trim()}`;
 					});
 					const subImageObjects = subImages.map(subImagePath => ({
 					  path: subImagePath,
@@ -799,7 +799,7 @@ export const order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -830,7 +830,7 @@ export const order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -861,7 +861,7 @@ export const order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -893,7 +893,7 @@ export const order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -923,7 +923,7 @@ export const order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -1087,7 +1087,7 @@ export const customer_list = async (req, res) => {
 					  const { booking_Id,total_loads,deliever_date,deliever_time,drop_image } = elem;
 					  const separatedStrings = drop_image.split(", ")
 					  const imagesUrl=separatedStrings.map((val) => {
-					  return `${process.env.BASE_URL}/${val}`;
+					  return `${process.env.S3_URL}${val}`;
 					 });
 					  resData.push({
 						booking_Id,

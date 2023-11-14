@@ -472,7 +472,7 @@ export const booking_tracking_status = async(req,res)=>{
                     const pickup_images_array = pickup_images.split(',');
                     pickup_images_array.forEach(function callback(img, key)
                     {
-                        resPickImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resPickImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -481,7 +481,7 @@ export const booking_tracking_status = async(req,res)=>{
                     console.log('wash_images_array',wash_images_array)
                     wash_images_array.forEach(function callback(img, key)
                     {
-                        resWashImg[key] = process.env.BASE_URL+'/'+img;
+                        resWashImg[key] = process.env.S3_URL+img;
                     })
                     console.log('resWashImg',resWashImg)
                 }
@@ -490,7 +490,7 @@ export const booking_tracking_status = async(req,res)=>{
                     const dry_images_array = dry_images.split(',');
                     dry_images_array.forEach(function callback(img, key)
                     {
-                        resDryImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resDryImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -498,7 +498,7 @@ export const booking_tracking_status = async(req,res)=>{
                     const fold_images_array = fold_images.split(',');
                     fold_images_array.forEach(function callback(img, key)
                     {
-                        resFoldImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resFoldImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -506,7 +506,7 @@ export const booking_tracking_status = async(req,res)=>{
                     const pack_images_array = pack_images.split(',');
                     pack_images_array.forEach(function callback(img, key)
                     {
-                        resPackImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resPackImg[key] = process.env.S3_URL+img;
                     })
                 }
                 if(order_status == 1){
@@ -575,7 +575,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const pickup_images_array = pickup_images.split(',');
                     pickup_images_array.forEach(function callback(img, key)
                     {
-                        resPickImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resPickImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -583,7 +583,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const press_images_array = inspect_date.split(',');
                     press_images_array.forEach(function callback(img, key)
                     {
-                        resInspectImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resInspectImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -591,7 +591,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const tagging_images_array = tagging_images.split(',');
                     tagging_images_array.forEach(function callback(img, key)
                     {
-                        resTagImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resTagImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -599,7 +599,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const spoting_images_array = spoting_images.split(',');
                     spoting_images_array.forEach(function callback(img, key)
                     {
-                        resSpotImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resSpotImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -607,7 +607,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const cleaning_images_array = cleaning_images.split(',');
                     cleaning_images_array.forEach(function callback(img, key)
                     {
-                        resCleanImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resCleanImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -615,7 +615,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const inspect_images_array = inspect_images.split(',');
                     inspect_images_array.forEach(function callback(img, key)
                     {
-                        resInsImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resInsImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -623,7 +623,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const package_images_array = package_images.split(',');
                     package_images_array.forEach(function callback(img, key)
                     {
-                        resPackImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resPackImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -694,7 +694,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const pickup_images_array = pickup_images.split(',');
                     pickup_images_array.forEach(function callback(img, key)
                     {
-                        resPickImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resPickImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -702,7 +702,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const wash_images_array = wash_images.split(',');
                     wash_images_array.forEach(function callback(img, key)
                     {
-                        resWashImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resWashImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -710,7 +710,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const dry_images_array = dry_images.split(',');
                     dry_images_array.forEach(function callback(img, key)
                     {
-                        resDryImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resDryImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -718,7 +718,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const fold_images_array = fold_images.split(',');
                     fold_images_array.forEach(function callback(img, key)
                     {
-                        resFoldImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resFoldImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -726,7 +726,7 @@ export const booking_tracking_details = async(req,res)=>{
                     const pack_images_array = pack_images.split(',');
                     pack_images_array.forEach(function callback(img, key)
                     {
-                        resPackImg[key] = process.env.BASE_URL+'/uploads/'+img;
+                        resPackImg[key] = process.env.S3_URL+img;
                     })
                 }
 
@@ -913,7 +913,7 @@ export const booking_history = async(req,res)=>{
                     const pickup_images_array = drop_image.split(',');
                     pickup_images_array.forEach(function callback(img, key)
                     {
-                        imageList[key] = process.env.BASE_URL+'/uploads/'+img;
+                        imageList[key] = process.env.S3_URL+img;
                     })
                 }else{
                     var imageList = [];
@@ -926,7 +926,7 @@ export const booking_history = async(req,res)=>{
                     const pickup_images_array = dryCleanDropImage.split(',');
                     pickup_images_array.forEach(function callback(img, key)
                     {
-                        imageList[key] = process.env.BASE_URL+'/uploads/'+img;
+                        imageList[key] = process.env.S3_URL+img;
                     })
                 
                 }else{
