@@ -866,7 +866,7 @@ export const get_driver_detail = async(req,res)=>{
 			if(reqData.searchStr  && reqData.searchStr!='all') {
 			  	//query=" and ( bookings.id like '%"+reqData.searchStr+"%' or bookings.date like '%"+reqData.searchStr+"%')";          
 			}
-	        const loads = "SELECT * FROM `users` LEFT JOIN bookings on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc";
+	        const loads = "SELECT * FROM `bookings` LEFT JOIN users on bookings.user_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE  users.id=? "+query+" order by bookings.id desc";
 			dbConnection.query(loads,[reqData.user_id], function (error, data) {
 				if (error) {
 	                res.json({'status':false,"message":error.message}); 
@@ -882,15 +882,18 @@ export const get_driver_detail = async(req,res)=>{
 	                }else{
 	                    var totalRecords=false;
 	                }
+	                const loads = "SELECT * FROM `users`  WHERE users.role=2 and users.id=?";
+					dbConnection.query(loads,[reqData.user_id], function (error, userinfo) {
+						if (error) throw error;
+				    	const loads = "SELECT *, users.email customer_email, users.name customer_name,users.profile_image customer_pic FROM  bookings LEFT JOIN `users` on bookings.user_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE  bookings.driver_id=? "+query+" order by bookings.id desc limit ? offset ?";
+						dbConnection.query(loads,[reqData.user_id,LimitNum,startNum], function (error, rows) {
+						if (error) throw error;
 
-			    	const loads = "SELECT *,(SELECT users.email FROM users WHERE id=bookings.user_id LIMIT 1) customer_email,(SELECT users.name FROM users WHERE id=bookings.user_id LIMIT 1) customer_name,(SELECT users.profile_image FROM users WHERE id=bookings.user_id LIMIT 1) customer_pic FROM  bookings LEFT JOIN `users` on bookings.driver_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE users.role=2 and users.id=? "+query+" order by bookings.id desc limit ? offset ?";
-					dbConnection.query(loads,[reqData.user_id,LimitNum,startNum], function (error, rows) {
-					if (error) throw error;
-
-						if (rows.length>0) {
-	                		userinfo=rows[0];
-	                	}
-						res.json({'status':true,"message":"Success",'data':{totalRecords,userinfo:userinfo,order:rows}});
+							if (userinfo.length>0) {
+		                		userinfo=userinfo[0];
+		                	}
+							res.json({'status':true,"message":"Success",'data':{totalRecords,userinfo:userinfo,order:rows}});
+						});
 					});
 				}	
 			});	
