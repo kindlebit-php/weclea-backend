@@ -1,10 +1,30 @@
 import dbConnection from "../config/db.js";
 import qrcode from "qrcode";
 import { v4 as uuidv4 } from 'uuid'; 
+import fs from 'fs/promises';
 //import pdf from "pdf-creator-node"; 
 import puppeteer from 'puppeteer';
+import AWS from 'aws-sdk';
 
+const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
+const USER_SECRET = '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';
+const BUCKET_NAME = 'weclea-bucket';
 
+// export const s3 = new AWS.s3({
+//   credentials: {
+//       accessKeyId: USER_KEY,
+//       secretAccessKey: USER_SECRET
+//   },
+//   region: "us-east-2"
+// })
+
+AWS.config.update({
+  accessKeyId: USER_KEY,
+  secretAccessKey: USER_SECRET,
+  region: "us-east-2",
+});
+
+const s3 = new AWS.S3();
 
 export const qr_slip = async (req, res) => {
     try {
@@ -68,11 +88,11 @@ export const getUserData=async(booking_id)=>{
 
 export const generatePDF = async (data, qrCodesArray) => {
   const executablePath = '/usr/bin/chromium-browser';
-  const browser = await puppeteer.launch({
-    executablePath: '/usr/bin/chromium-browser',
-    args: ['--no-sandbox'], 
-  });
- // const browser = await puppeteer.launch();
+  // const browser = await puppeteer.launch({
+  //   executablePath: '/usr/bin/chromium-browser',
+  //   args: ['--no-sandbox'], 
+  // });
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
   let htmlContent = '';
@@ -130,20 +150,37 @@ export const generatePDF = async (data, qrCodesArray) => {
 
   await page.setContent(htmlContent);
 
-  const pdfPath = `uploads/${uuidv4()}.pdf`;
+  const pdfPath = `${uuidv4()}.pdf`;
 
   const options = {
     path: pdfPath,
     format: 'A4',
   };
 
-  await page.pdf(options);
 
-  await browser.close();
+//   await page.pdf(options);
 
-  return pdfPath;
+//   await browser.close();
+
+//   return pdfPath;
+// };
+ const pdfBuffer = await page.pdf({
+  format: 'A4',
+});
+console.log(pdfBuffer.buffer)
+const uploadParams = {
+  Bucket:BUCKET_NAME,
+  Key: pdfPath,
+  Body: Buffer.from(pdfBuffer),
+  ContentType: 'application/pdf',
 };
+const dataa= await s3.upload(uploadParams).promise();
+console.log("datadsfkjh",dataa)
+await browser.close();
 
+const s3Url = dataa.Location;
+return s3Url;
+};
 
 
 
