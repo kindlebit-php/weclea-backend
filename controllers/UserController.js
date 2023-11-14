@@ -82,8 +82,6 @@ export const order_managament_user_singup = async(req,res)=>{
 					bcrypt.hash(password, saltRounds, function(error, hash) {
 						if(role == 2){
 						if(req.files.licence_front_image){
-							console.log('req.files.licence_front_image[0].key',req.files.licence_front_image[0].key)
-							console.log('req.files',req.files.licence_front_image)
 							var licence_front_image = req.files.licence_front_image[0].key;
 							console.log("1",licence_front_image)
 						}else{
@@ -102,7 +100,7 @@ export const order_managament_user_singup = async(req,res)=>{
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,licence_front_image,licence_back_image,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+group_id+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+licence_front_image+"','"+licence_back_image+"','"+profile_image+"','"+area+"')";
 						}else{
 							if(req.files.profile_image){
-							var profile_image = "uploads/"+req.files.profile_image[0].key;
+							var profile_image = req.files.profile_image[0].key;
 							}else{
 							var profile_image = '';
 							}
