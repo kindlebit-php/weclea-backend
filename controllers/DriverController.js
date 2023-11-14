@@ -358,9 +358,10 @@ export const submit_pickup_details = async (req, res) => {
                 });
               } else {
                 const imageArray = [];
-                req.files.forEach((e, i) => {
-                  imageArray.push(e.path);
+                req.files.images.forEach((e, i) => {
+                  imageArray.push(e.key);
                 });
+                console.log('imageArray',imageArray)
                 if (req.files.length > 5) {
                   return res.json({
                     status: false,

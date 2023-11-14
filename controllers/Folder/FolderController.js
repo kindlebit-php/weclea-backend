@@ -230,7 +230,7 @@ export const customer_list_wash = (req, res) => {
               console.log('images',pickup_images)
               const separatedStrings = pickup_images.split(",")
               const imagesUrl = separatedStrings.map((val) => {
-                return `${process.env.BASE_URL}/${val}`;
+                return `${process.env.S3_URL}${val}`;
               });
                 const imageList = imagesUrl.map(imagePath => ({
                   path: imagePath,
@@ -302,7 +302,7 @@ export const wash_detail_ByCustomer_id = async (req, res) => {
               const { Booking_id, Customer_Id, comment, date, time, order_status, pickup_images } = elem;
               const separatedStrings = pickup_images.split(",")
               const imagesUrl = separatedStrings.map((val) => {
-                return `${process.env.BASE_URL}/${val}`;
+                return `${process.env.S3_URL}${val}`;
               });
                 const imageList = imagesUrl.map(imagePath => ({
                   path: imagePath,
@@ -1248,7 +1248,7 @@ export const order_histroy = async (req, res) => {
                   let {BookingId,name,order_status, Customer_Id, PickUp_date_time, pack_images } = elem;
                   const separatedStrings = pack_images.split(",")
                   const imagesUrl = separatedStrings.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList = imagesUrl.map(imagePath => ({
                       path: imagePath,
@@ -1321,7 +1321,7 @@ export const order_histroy_detail= async(req,res)=>{
                   const { Customer_Id,address,Zip_Code,mobile,PickUp_date_time,wash_images,dry_images,fold_images, pack_images,wash_date,wash_time,dry_date,dry_time,fold_date,fold_time,pack_date,pack_time } = elem;
                   const separatedStrings1 = wash_images.split(",")
                   const imagesUrl1 = separatedStrings1.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList1 = imagesUrl1.map(imagePath => ({
                       path: imagePath,
@@ -1330,7 +1330,7 @@ export const order_histroy_detail= async(req,res)=>{
                     )
                     const separatedStrings2 = dry_images.split(",")
                   const imagesUrl2 = separatedStrings2.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList2 = imagesUrl2.map(imagePath => ({
                       path: imagePath,
@@ -1339,7 +1339,7 @@ export const order_histroy_detail= async(req,res)=>{
                     )
                     const separatedStrings3 = fold_images.split(",")
                   const imagesUrl3 = separatedStrings3.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList3 = imagesUrl3.map(imagePath => ({
                       path: imagePath,
@@ -1348,7 +1348,7 @@ export const order_histroy_detail= async(req,res)=>{
                     )
                     const separatedStrings4 = pack_images.split(",")
                   const imagesUrl4 = separatedStrings4.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList4 = imagesUrl4.map(imagePath => ({
                       path: imagePath,

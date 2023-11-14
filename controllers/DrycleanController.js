@@ -20,7 +20,7 @@ export const get_category = async (req, res) => {
           {
             const {id,title,price,image,note} = element;
             if(image){
-              var img = process.env.BASE_URL+'/uploads/'+image;
+              var img = process.env.S3_URL+image;
             }else{
               var img = process.env.BASE_URL+'/uploads/pants.jpg';
             }
@@ -114,8 +114,17 @@ export const get_category = async (req, res) => {
         let minutes = dateObject.getMinutes();
         const current_time = hours + ":" + minutes;
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
-
-        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,category_id,total_amount,total_loads) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,1,'"+userData[0].category_id+"','"+amount+"',1)";
+         const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
+        dbConnection.query(custmer_address, function (error, custmeraddressResult) {
+          var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25 order by distance asc;";
+          dbConnection.query(sqlDistance, function (error, locationResult) {
+            console.log('list of driver',locationResult)
+          if(locationResult.length > 0){
+            var driver_id = locationResult[0].id
+          }else{
+            var driver_id = 0
+          }
+        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,category_id,total_amount,total_loads) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,'"+driver_id+"','"+userData[0].category_id+"','"+amount+"',1)";
 
         dbConnection.query(sql, function (err, result) {
         if(result){
@@ -141,15 +150,7 @@ export const get_category = async (req, res) => {
         dbConnection.query(bookingsql, function (err, bookingresult) {
         });
 
-        const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
-        dbConnection.query(custmer_address, function (error, custmeraddressResult) {
-          var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 ORDER BY distance) as vt where vt.distance < 25;";
-          dbConnection.query(sqlDistance, function (error, locationResult) {
-          if(locationResult.length > 0){
-            var driver_id = locationResult[0].id
-          }else{
-            var driver_id = 0
-          }
+       
         var qrSQL = "INSERT INTO dry_clean_booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumberDryClean(result.insertId)+"')";
         dbConnection.query(qrSQL, function (err, results) {
         if(results){
@@ -166,8 +167,6 @@ export const get_category = async (req, res) => {
           })
           });
         }
-        }); 
-        }); 
         });     
                         
         const updateService = "update cart set booking_id = '"+result.insertId+"' where user_id = '"+userData[0].id+"' and status = '0'";
@@ -180,7 +179,9 @@ export const get_category = async (req, res) => {
             res.json({'status':false,"message":err.sqlMessage});
 
         }
-        });     
+        });
+        });   
+        });        
         }else{
             res.json({'status':false,"message":"All fields are required"});
       }             
@@ -327,7 +328,7 @@ export const customer_list_dryClean = (req, res) => {
               }
               const separatedStrings = pickup_images.split(",")
               const imagesUrl = separatedStrings.map((val) => {
-                return `${process.env.BASE_URL}/${val}`;
+                return `${process.env.S3_URL}${val}`;
               });
                 const imageList = imagesUrl.map(imagePath => ({
                   path: imagePath,
@@ -974,7 +975,7 @@ export const order_histroy_dryClean = async (req, res) => {
                    } = elem;
                   const separatedStrings = package_images.split(",")
                   const imagesUrl = separatedStrings.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList = imagesUrl.map(imagePath => ({
                       path: imagePath,
@@ -1049,7 +1050,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                   const { Customer_Id,address,Zip_Code,mobile,PickUp_date_time,tagging_images,spoting_images,cleaning_images, inspect_images,press_images, package_images,tagging_date,tagging_time,spotting_date,spotting_time,cleaning_date,cleaning_time,inspect_date,inspect_time,press_date,press_time,package_date,package_time } = elem;
                   const separatedStrings1 = tagging_images.split(",")
                   const imagesUrl1 = separatedStrings1.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList1 = imagesUrl1.map(imagePath => ({
                       path: imagePath,
@@ -1058,7 +1059,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                     )
                     const separatedStrings2 = spoting_images.split(",")
                   const imagesUrl2 = separatedStrings2.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList2 = imagesUrl2.map(imagePath => ({
                       path: imagePath,
@@ -1067,7 +1068,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                     )
                     const separatedStrings3 = cleaning_images.split(",")
                   const imagesUrl3 = separatedStrings3.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList3 = imagesUrl3.map(imagePath => ({
                       path: imagePath,
@@ -1076,7 +1077,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                     )
                     const separatedStrings4 = inspect_images.split(",")
                   const imagesUrl4 = separatedStrings4.map((val) => {
-                    return `${process.env.BASE_URL}/${val}`;
+                    return `${process.env.S3_URL}${val}`;
                   });
                     const imageList4 = imagesUrl4.map(imagePath => ({
                       path: imagePath,
@@ -1085,7 +1086,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                     )
                     const separatedStrings5 = press_images.split(",")
                     const imagesUrl5 = separatedStrings5.map((val) => {
-                      return `${process.env.BASE_URL}/${val}`;
+                      return `${process.env.S3_URL}${val}`;
                     });
                       const imageList5 = imagesUrl5.map(imagePath => ({
                         path: imagePath,
@@ -1094,7 +1095,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
                       )
                       const separatedStrings6 = package_images.split(",")
                       const imagesUrl6 = separatedStrings6.map((val) => {
-                        return `${process.env.BASE_URL}/${val}`;
+                        return `${process.env.S3_URL}${val}`;
                       });
                         const imageList6 = imagesUrl6.map(imagePath => ({
                           path: imagePath,

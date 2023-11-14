@@ -82,28 +82,32 @@ export const order_managament_user_singup = async(req,res)=>{
 					bcrypt.hash(password, saltRounds, function(error, hash) {
 						if(role == 2){
 						if(req.files.licence_front_image){
-							var licence_front_image = "uploads/"+req.files.licence_front_image[0].originalname;
+							var licence_front_image = req.files.licence_front_image[0].key;
 							console.log("1",licence_front_image)
 						}else{
 							var licence_front_image = '';
 						}
 						if(req.files.licence_back_image){
-							var licence_back_image = "uploads/"+req.files.licence_back_image[0].originalname;
+							var licence_back_image = req.files.licence_back_image[0].key;
 						}else{
 							var licence_front_image = '';
 						}
 						if(req.files.profile_image){
-							var profile_image = "uploads/"+req.files.profile_image[0].originalname;
+							var profile_image = req.files.profile_image[0].key;
 						}else{
 							var profile_image = '';
 						}
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,licence_front_image,licence_back_image,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+group_id+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+licence_front_image+"','"+licence_back_image+"','"+profile_image+"','"+area+"')";
 						}else{
+							if(req.files.profile_image){
+							var profile_image = req.files.profile_image[0].key;
+							}else{
+							var profile_image = '';
+							}
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,zip_code,country,state,city,address,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+profile_image+"','"+area+"')";
 						}
 						
 						dbConnection.query(sql, function (err, result) {
-							console.log(result)
 							if (err) throw err;
 							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
@@ -131,7 +135,6 @@ export const order_managament_user_singup = async(req,res)=>{
 }
 
 export const order_managament_user_update = async (req, res) => {
-	console.log(req.files)
     try {
         const saltRounds = 10;
         const { id, name, password, latitude, longitude, group_id, zip_code, country, state, city, address, area } = req.body;
@@ -141,7 +144,7 @@ export const order_managament_user_update = async (req, res) => {
                 if (userData.length > 0) {
                     // User exists, proceed with update
 					if(req.files.profile_image){
-						var profile_image = "uploads/"+req.files.profile_image[0].originalname;
+						var profile_image = req.files.profile_image[0].key;
 					}else{
 						var profile_image = '';
 					}
@@ -229,37 +232,25 @@ export const customer_address = async(req,res)=>{
 	        res.json({'status':true,"message":"Address added successfully!"});
 	}else{
 		if(pickup_address && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long){
-			var sql = "update customer_address set address='"+pickup_address+"', appartment='"+pickup_appartment+"',city='"+pickup_city+"',state='"+pickup_state+"',zip='"+pickup_zipcode+"',latitude='"+pickup_lat+"',longitude='"+pickup_lat+"' where user_id = '"+userData[0].id+"'";
+			var sql = "update customer_address set address='"+pickup_address+"', appartment='"+pickup_appartment+"',city='"+pickup_city+"',state='"+pickup_state+"',zip='"+pickup_zipcode+"',latitude='"+pickup_lat+"',longitude='"+pickup_long+"' where user_id = '"+userData[0].id+"'";
 			dbConnection.query(sql, function (error, result) {
 			});
 		}
 		if(drop_address && drop_city  && drop_state && drop_zipcode && drop_lat && drop_long){
-			var sql = "update customer_drop_address set address='"+drop_address+"', appartment='"+drop_appartment+"',city='"+drop_city+"',state='"+drop_state+"',zip='"+drop_zipcode+"',latitude='"+drop_lat+"',longitude='"+drop_lat+"' where user_id = '"+userData[0].id+"'";
+			var sql = "update customer_drop_address set address='"+drop_address+"', appartment='"+drop_appartment+"',city='"+drop_city+"',state='"+drop_state+"',zip='"+drop_zipcode+"',latitude='"+drop_lat+"',longitude='"+drop_long+"' where user_id = '"+userData[0].id+"'";
 			dbConnection.query(sql, function (error, result) {
 			});
 		}
 		if(billing_address && billing_city  && billing_state && billing_zipcode && billing_lat && billing_long){
-			var sql = "update customer_billing_address set address='"+billing_address+"', appartment='"+billing_appartment+"',city='"+billing_city+"',state='"+billing_state+"',zip='"+billing_zipcode+"',latitude='"+billing_lat+"',longitude='"+billing_lat+"' where user_id = '"+userData[0].id+"'";
+			var sql = "update customer_billing_address set address='"+billing_address+"', appartment='"+billing_appartment+"',city='"+billing_city+"',state='"+billing_state+"',zip='"+billing_zipcode+"',latitude='"+billing_lat+"',longitude='"+billing_long+"' where user_id = '"+userData[0].id+"'";
 			dbConnection.query(sql, function (error, result) {
 			});
 		}
 		if(delievery_instruction !=''){
-    		const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
-	        dbConnection.query(delieverySql, function (error, delieveryresult) {
-	        if(delieveryresult[0].delieveryCount == 0){
-				var sql = "INSERT INTO booking_instructions (user_id,delievery_instruction) VALUES ('"+userData[0].id+"','"+delievery_instruction+"')";
-				dbConnection.query(sql, function (error, result) {
-				});
-	        }else{
+    		
 	        	var sql = "update booking_instructions set delievery_instruction='"+delievery_instruction+"' where  user_id ='"+userData[0].id+"'";
-				dbConnection.query(sql, function (error, result) {
-				});
-	        }
+				dbConnection.query(sql, function (error, result) {    
 	        })
-	    }else{
-	    	var sql = "INSERT INTO booking_instructions (user_id) VALUES ('"+userData[0].id+"')";
-				dbConnection.query(sql, function (error, result) {
-				});
 	    }
 	    res.json({'status':true,"message":"Address updated successfully!"});
 
@@ -328,7 +319,7 @@ export const forgot_password = async(req,res)=>{
 		const {email} = req.body;
 		if(email){
 			const checkIfEmailExist = "select * from users where email = '"+email+"'";
-			console.log('checkIfEmailExist',checkIfEmailExist)
+
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data.length > 0){
 					var otp = 123456
@@ -458,9 +449,9 @@ export const get_user_profile = async(req,res)=>{
 				{
 					const {id,name,dob,email,mobile,category_id} = element;
 					if(result[0].profile_image){
-						var img = process.env.BASE_URL+'/uploads/'+result[0].profile_image;
+						var img = process.env.S3_URL+result[0].profile_image;
 					}else{
-						var img = process.env.BASE_URL+'/uploads/profile.jpg';
+						var img = process.env.S3_URL+'/uploads/profile.jpg';
 
 					}
 					let initi = {
@@ -526,7 +517,7 @@ export const edit_user_profile = async(req,res)=>{
 			// dbConnection.query(checkIfMobileExist, function (error, data) {
 			// if(data[0].total == 1 ){
 				if(req.file){
-					var userProfile = req.file.originalname;
+					var userProfile = req.file.key;
 				}else{
 				var userProfile = userData[0].profile_image;
 				}
@@ -682,8 +673,8 @@ order_list = async (req, res) => {
 	var datetime = new Date();
     const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
 	const list =
-		"SELECT b.id, b.order_id,b.driver_id,b.folder_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id WHERE b.cron_status = 1 and b.order_type != 3 and b.date = '"+currentFinalDate+"'";
-	  
+		"SELECT b.id, b.order_id,b.driver_id,b.folder_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction ,users.name,users.email,users.mobile FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id left join users on b.user_id = users.id WHERE b.cron_status = 1 and b.order_type != 3 and b.date = '"+currentFinalDate+"' order by id desc";
+	  console.log('list',list)
 	  const data = await new Promise((resolve, reject) => {
 		dbConnection.query(list, (error, data) => {
 		  if (error) {reject(error);
@@ -776,7 +767,7 @@ order_list = async (req, res) => {
 		  
 				  separatedStrings.forEach(val => {
 					const subImages = val.split(',').map(subVal => {
-					  return `${process.env.BASE_URL}/${subVal.trim()}`;
+					  return `${process.env.S3_URL}${subVal.trim()}`;
 					});
 					const subImageObjects = subImages.map(subImagePath => ({
 					  path: subImagePath,
@@ -800,12 +791,15 @@ order_list = async (req, res) => {
 				  if (error) {
 					reject(error);
 				  } else {
-					const separatedStrings = Data[0].dry_images.split(", ");
 					const imageList = [];
+
+				  	if(Data[0].dry_images){
+
+					const separatedStrings = Data[0].dry_images.split(", ");
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -814,6 +808,7 @@ order_list = async (req, res) => {
 			
 					  imageList.push(subImageObjects);
 					});
+				}
 					const flattenedImageList = [].concat(...imageList);
 			
 					resolve(flattenedImageList);
@@ -829,12 +824,13 @@ order_list = async (req, res) => {
 				  if (error) {
 					reject(error);
 				  } else {
-					const separatedStrings = Data[0].fold_images.split(", ");
 					const imageList = [];
+				  	if(Data[0].fold_images){
+					const separatedStrings = Data[0].fold_images.split(", ");
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -843,6 +839,7 @@ order_list = async (req, res) => {
 			
 					  imageList.push(subImageObjects);
 					});
+				}
 					const flattenedImageList = [].concat(...imageList);
 			
 					resolve(flattenedImageList);
@@ -858,12 +855,13 @@ order_list = async (req, res) => {
 				  if (error) {
 					reject(error);
 				  } else {
-					const separatedStrings = Data[0].pack_images.split(", ");
 					const imageList = [];
+				  	if(Data[0].pack_images){
+					const separatedStrings = Data[0].pack_images.split(", ");
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -872,6 +870,7 @@ order_list = async (req, res) => {
 			
 					  imageList.push(subImageObjects);
 					});
+				}
 					const flattenedImageList = [].concat(...imageList);
 			
 					resolve(flattenedImageList);
@@ -887,12 +886,14 @@ order_list = async (req, res) => {
 				  if (error) {
 					reject(error);
 				  } else {
-					const separatedStrings = Data[0].drop_image.split(", ");
 					const imageList = [];
+
+				  	if(Data[0].drop_image){
+					const separatedStrings = Data[0].drop_image.split(", ");
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -901,6 +902,7 @@ order_list = async (req, res) => {
 			
 					  imageList.push(subImageObjects);
 					});
+					}
 					const flattenedImageList = [].concat(...imageList);
 			
 					resolve(flattenedImageList);
@@ -921,7 +923,7 @@ order_list = async (req, res) => {
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
-						return `${process.env.BASE_URL}/${subVal.trim()}`;
+						return `${process.env.S3_URL}${subVal.trim()}`;
 					  });
 					  const subImageObjects = subImages.map(subImagePath => ({
 						path: subImagePath,
@@ -1085,7 +1087,7 @@ export const customer_list = async (req, res) => {
 					  const { booking_Id,total_loads,deliever_date,deliever_time,drop_image } = elem;
 					  const separatedStrings = drop_image.split(", ")
 					  const imagesUrl=separatedStrings.map((val) => {
-					  return `${process.env.BASE_URL}/${val}`;
+					  return `${process.env.S3_URL}${val}`;
 					 });
 					  resData.push({
 						booking_Id,

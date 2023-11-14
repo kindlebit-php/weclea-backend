@@ -52,11 +52,11 @@ export const setDateForNotification = (startDate,endDate, data, res) => {
 export const randomNumber = (booking_id) => {
 	  const currentDate = new Date();
      // return  Math.random().toString(36).slice(2)+'.'+booking_id;
-     return  'weclea123aelcew';
+     return  '1001'+booking_id;
 }
 
 export const randomNumberDryClean = (booking_id) => {
 	  const currentDate = new Date();
      // return  Math.random().toString(36).slice(2)+'.'+booking_id;
-     return  'weclea@123wecles';
+     return  '1001'+booking_id;
 }
