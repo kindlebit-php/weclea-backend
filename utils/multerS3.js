@@ -6,12 +6,12 @@ const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
 const USER_SECRET = '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';
 const BUCKET_NAME = 'weclea-bucket';
 
-const s3 = new S3Client({
+export const s3 = new S3Client({
     credentials: {
-        accessKeyId: USER_KEY, // store it in .env file to keep it safe
+        accessKeyId: USER_KEY,
         secretAccessKey: USER_SECRET
     },
-    region: "us-east-2" // this is the region that you select in AWS account
+    region: "us-east-2"
 })
 
 export const uploadS3 = multer({
