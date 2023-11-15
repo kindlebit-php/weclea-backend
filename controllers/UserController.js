@@ -1529,7 +1529,7 @@ export const customer_list = async (req, res) => {
 		try {
 			const driver_id= req.body.driver_id;
 			const user = "SELECT id,name, email, mobile,address,latitude,longitude FROM users WHERE id = ?";
-			dbConnection.query(list,[driver_id], function (error, data) {
+			dbConnection.query(user,[driver_id], function (error, data) {
 			  if (error) throw error;
 				const order= "SELECT id,date,order_id,order_status,order_type from bookings where driver_id=?";
 				dbConnection.query(order,[driver_id],async function(error,data2){
@@ -1539,59 +1539,67 @@ export const customer_list = async (req, res) => {
 					const totalCountThisWeek = data2.filter(row => isThisWeek(row.date)).length;
 					const totalCountThisMonth = data2.filter(row => isThisMonth(row.date)).length;
 			
-					const order_status = data2.map((row) => row.order_status);
-					if (order_status === 9) {
-						order_status = "tagging";
-					  } else if (order_status === 10) {
-						order_status = "Spotting";
-					  } else if (order_status === 11) {
-						order_status = "Cleaning";
-					  } else if (order_status === 1) {
-						order_status = "wash";
-					  }else if (order_status === 2) {
-						order_status = "Dry";
-					  }else if (order_status === 3) {
-						order_status = "Fold";
-					  }else if (order_status === 4) {
-						order_status = "Package";
-					  } else if (order_status === 12) {
-						  order_status = "Inspect";
-						} else if (order_status === 13) {
-						  order_status = "Press";
-						} else if (order_status === 5) {
-						order_status = "Order Collected";
-					  } else if (order_status === 6) {
-						order_status = "Completed";
-					  } else if (order_status === 7) {
-						order_status = "Order Not Found";
-					  } else if (order_status === 8) {
-						order_status = "Order Pickup";
-					  } else {
-						order_status = "NA";
-					  }
-
-
-					  const order_type = data2.map((row) => row.order_type);
-					if (order_type === 1) {
-						order_type = "Folder";
-					  } else if (order_type === 2) {
-						order_type = "Folder";
-					  } else if (order_type === 3) {
-						order_type = "Dry_Clean";
-					  }
-
+					var order_status = data2.map((row) => {
+						if (row.order_status === 9) {
+						  return "tagging";
+						} else if (row.order_status === 10) {
+						  return "Spotting";
+						} else if (row.order_status === 11) {
+						  return "Cleaning";
+						} else if (row.order_status === 1) {
+						  return "wash";
+						} else if (row.order_status === 2) {
+						  return "Dry";
+						} else if (row.order_status === 3) {
+						  return "Fold";
+						} else if (row.order_status === 4) {
+						  return "Package";
+						} else if (row.order_status === 12) {
+						  return "Inspect";
+						} else if (row.order_status === 13) {
+						  return "Press";
+						} else if (row.order_status === 5) {
+						  return "Order Collected";
+						} else if (row.order_status === 6) {
+						  return "Completed";
+						} else if (row.order_status === 7) {
+						  return "Order Not Found";
+						} else if (row.order_status === 8) {
+						  return "Order Pickup";
+						} else {
+						  return "NA";
+						}
+					  });
+			  
+					  var order_type = data2.map((row) => {
+						if (row.order_type === 1) {
+						  return "Folder";
+						} else if (row.order_type === 2) {
+						  return "Folder";
+						} else if (row.order_type === 3) {
+						  return "Dry_Clean";
+						} else {
+						  return "NA";
+						}
+					  });
+			  
 					  const result = {
-						user: userData[0], 
-						booking: {
+						user: data[0],
+						booking_count: {
 						  totalCountToday,
 						  totalCountThisWeek,
 						  totalCountThisMonth,
-						  order_status,
-						  order_type
-						}
+						},
+						booking_details: data2.map((row, index) => ({
+						  id: row.id,
+						  date: row.date,
+						  order_id: row.order_id,
+						  order_status: order_status[index],
+						  order_type: order_type[index],
+						})),
 					  };
-  
-					
+			  
+					  res.json({ status: true, message: "data retrieved successfully", data: result });
 				})
 			});
 
