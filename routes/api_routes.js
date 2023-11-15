@@ -218,6 +218,7 @@ router.post("/update_drycleaning_service",uploadS3.single('service_pic'),AdminCo
 router.post("/add_drycleaning_service",uploadS3.single('service_pic'),AdminController.add_drycleaning_service)
 router.post("/update_service_status",CheckAuth,AdminController.update_service_status)
 router.post("/delete_service",CheckAuth,AdminController.delete_service)
+router.post("/update-admin-email",CheckAuth,AdminController.update_admin_email)
 router.get("/get_drycleaning_itemlist",CheckAuth,AdminController.get_drycleaning_itemlist)
 
 
