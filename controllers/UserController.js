@@ -79,8 +79,9 @@ export const order_managament_user_singup = async(req,res)=>{
 					dbConnection.query(checkIfMobileExist,async function (error, mobiledata) {
 					if(mobiledata[0].mobiletotal == 0){
 
-
+						console.log('password',password)
 					bcrypt.hash(password, saltRounds, function(error, hash) {
+						console.log('hash',hash)
 						if(role == 2){
 						if(req.files.licence_front_image){
 							var licence_front_image = req.files.licence_front_image[0].key;
@@ -107,6 +108,7 @@ export const order_managament_user_singup = async(req,res)=>{
 							}
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,zip_code,country,state,city,address,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+profile_image+"','"+area+"')";
 						}
+						console.log('kaisql',sql)
 						
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;

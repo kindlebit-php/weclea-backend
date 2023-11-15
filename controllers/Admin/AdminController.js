@@ -864,7 +864,7 @@ export const get_driver_detail = async(req,res)=>{
 	        }
 	        var query="";
 			if(reqData.searchStr  && reqData.searchStr!='all') {
-			  	//query=" and ( bookings.id like '%"+reqData.searchStr+"%' or bookings.date like '%"+reqData.searchStr+"%')";          
+			  	query=" and ( bookings.id like '%"+reqData.searchStr+"%' or bookings.date like '%"+reqData.searchStr+"%')";          
 			}
 	        const loads = "SELECT * FROM `bookings` LEFT JOIN users on bookings.user_id=users.id left join booking_timing on booking_timing.booking_id=bookings.id WHERE  users.id=? "+query+" order by bookings.id desc";
 			dbConnection.query(loads,[reqData.user_id], function (error, data) {
