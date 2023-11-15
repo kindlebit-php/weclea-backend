@@ -60,24 +60,22 @@ export const Scan_loads_folder = (req, res) => {
         return res.json({ status: false, message: error.message });
       }
       console.log("12323",data)
-      if (type >= 1 && type <= 4) {
+      if (type >= 0 && type <= 3) {
         if (data.length === 0 || data[0].driver_pickup_status !== 1 || data[0].folder_recive_status !== 0) {
           return res.json({ status: false, message: "Invalid QR code or load status" });
         }
 
         let update_Date_Time2;
-        if (type == 1) {
+        if (type == 0) {
           update_Date_Time2 = `UPDATE booking_timing SET wash_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-        } else if (type == 2) {
+        } else if (type == 1) {
           update_Date_Time2 = `UPDATE booking_timing SET dry_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-        } else if (type == 3) {
+        } else if (type == 2) {
           update_Date_Time2 = `UPDATE booking_timing SET fold_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-        } else if (type == 4) {
+        } else if (type == 3) {
           update_Date_Time2 = `UPDATE booking_timing SET pack_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
         }
-        console.log("999999",data[0].booking_id)
         dbConnection.query(update_Date_Time2, function (updateTimeErr, updateTimeResult) {
-          console.log("resykt",updateTimeResult)
           if (updateTimeErr) {
             return res.json({ status: false, message: updateTimeErr.message });
           }
