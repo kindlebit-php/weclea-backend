@@ -955,10 +955,18 @@ export const update_admin_email = async(req,res)=>{
         try { 
             const userData = res.user;
             const {email} = req.body;
-            var sql = "update users set email = '"+email+"' where id = '"+userData[0].id+"'";
-            dbConnection.query(sql, function (err, results) {
-                res.json({'status':true,"message":"Email updated successfully"});
-            }); 
+
+			const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
+			dbConnection.query(checkIfEmailExist,async function (error, data) {
+				if(data[0].total == 0){
+					var sql = "update users set email = '"+email+"' where id = '"+userData[0].id+"'";
+					dbConnection.query(sql, function (err, results) {
+					res.json({'status':true,"message":"Email updated successfully"});
+					}); 
+				}else{
+					res.json({'status':false,"message":'Email is already registered'});  
+				}
+			})
         }catch (error) {
             res.json({'status':false,"message":error.message});  
         }
