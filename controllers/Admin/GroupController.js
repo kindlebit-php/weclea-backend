@@ -149,7 +149,7 @@ export const get_grouped_emp_list = async(req,res)=>{
 					msg= "Email template has been activated successfully"
 				}
 			    var qryStr = "select * from users where (group_id=? or zip_code=?) and (role_id>0 or role!=1)";
-			    dbConnection.query(qryStr,[reqData.group_id], function (error, data) {
+			    dbConnection.query(qryStr,[reqData.group_id,reqData.zip_code], function (error, data) {
 				if (error) throw error;
 					res.json({'status':true,"message":msg,'data':data});
 				});
