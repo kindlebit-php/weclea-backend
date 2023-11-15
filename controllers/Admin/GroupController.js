@@ -140,8 +140,8 @@ export const delete_group = async(req,res)=>{
 export const get_grouped_emp_list = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	const qrySelect = "select id from users where group_id=?";
-		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+    	const qrySelect = "select id from users where group_id=? or zip_code=?";
+		dbConnection.query(qrySelect,[reqData.group_id,reqData.zip_code], function (error, data) {
 		if (error) throw error;
 			if (data.length>0) {
 				var msg= "Email template has been deactivated successfully"
