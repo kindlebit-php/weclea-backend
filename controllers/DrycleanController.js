@@ -251,17 +251,17 @@ export const get_category = async (req, res) => {
   
           let update_Date_Time2;
   
-          if (type === 1) {
+          if (type == 1) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET tagging_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          } else if (type === 2) {
+          } else if (type == 2) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET spotting_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          } else if (type === 3) {
+          } else if (type == 3) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET cleaning_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          } else if (type === 4) {
+          } else if (type == 4) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET inspect_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          } else if (type === 5) {
+          } else if (type == 5) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET press_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          } else if (type === 6) {
+          } else if (type == 6) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET package_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
           }
   
