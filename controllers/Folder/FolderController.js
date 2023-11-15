@@ -61,7 +61,7 @@ export const Scan_loads_folder = (req, res) => {
       }
       console.log("12323",data)
       if (type >= 0 && type <= 3) {
-        if (data.length === 0 || data[0].driver_pickup_status !== 1 || data[0].folder_recive_status !== 0) {
+        if (data.length === 0 || data[0].driver_pickup_status !== 1 ) {
           return res.json({ status: false, message: "Invalid QR code or load status" });
         }
 
