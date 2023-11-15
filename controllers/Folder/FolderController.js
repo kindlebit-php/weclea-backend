@@ -438,7 +438,7 @@ export const submit_wash_detail = async (req, res) => {
 
                 const imageArray = [];
                 req.files.extra_loads_images.forEach((e, i) => {
-                  imageArray.push(e.path);
+                  imageArray.push(e.key);
                 });
                 if (imageArray.length > 5) {
                   return res.json({ status: false, message: "Only 5 images are allowed" });
@@ -515,7 +515,7 @@ export const submit_wash_detail = async (req, res) => {
                                   });
                   const imageArray = [];
                   req.files.extra_loads_images.forEach((e, i) => {
-                  imageArray.push(e.path);
+                  imageArray.push(e.key);
                   });
                   if (imageArray.length > 5) {
                   return res.json({ status: false, message: "Only 5 images are allowed" });
@@ -575,7 +575,7 @@ export const submit_wash_detail = async (req, res) => {
 
                           const imageArray = [];
                 req.files.extra_loads_images.forEach((e, i) => {
-                  imageArray.push(e.path);
+                  imageArray.push(e.key);
                 });
                 if (imageArray.length > 5) {
                   return res.json({ status: false, message: "Only 5 images are allowed" });
@@ -628,7 +628,7 @@ export const submit_wash_detail = async (req, res) => {
                         }
                           const imageArray = [];
                 req.files.extra_loads_images.forEach((e, i) => {
-                  imageArray.push(e.path);
+                  imageArray.push(e.key);
                 });
                 if (imageArray.length > 5) {
                   return res.json({ status: false, message: "Only 5 images are allowed" });
@@ -671,7 +671,7 @@ export const submit_wash_detail = async (req, res) => {
         // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         const imageArray = [];
         req.files.images.forEach((e, i) => {
-        imageArray.push(e.path);
+        imageArray.push(e.key);
         });
         const pickupImagesJSON = imageArray.join(", ");
         dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
@@ -697,7 +697,7 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
         }
         const imageArray = [];
         req.files.images.forEach((e, i) => {
-          imageArray.push(e.path);
+          imageArray.push(e.key);
         });
         console.log(imageArray)
         if (imageArray.length > 5) {
@@ -948,7 +948,7 @@ export const Scan_loads_For_Dry = (req, res) => {
 
 //           const imageArray = [];
 //           req.files.forEach((e, i) => {
-//             imageArray.push(e.path);
+//             imageArray.push(e.key);
 //           });
 
 //           if (req.files.length > 5) {
@@ -1082,7 +1082,7 @@ export const Scan_loads_For_Fold = (req, res) => {
 
 //           const imageArray = [];
 //           req.files.forEach((e, i) => {
-//             imageArray.push(e.path);
+//             imageArray.push(e.key);
 //           });
 
 //           if (req.files.length > 5) {
