@@ -48,16 +48,16 @@ export const update_group = async(req,res)=>{
 			    	req.files.map(function(file) {
 			            console.log("File uplaod ===>", {url: file.location, name: file.key, type: file.mimetype, size: file.size});
 			       		reqData.profile_pic=file.location;
-		              	var addContnetQry = "update wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=? where id=?";
-					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.id], function (error, data) {
+		              	var addContnetQry = "update wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=?,`state`=?, `county`=? where id=?";
+					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.state,reqData.county ,reqData.id], function (error, data) {
 						if (error) throw error;
 							res.json({'status':true,"message":"Group has been updated successfully",'data':data});
 						});
 			        });
 
 				}else{
-					var addContnetQry = "update wc_emp_group set `manage_name`=?, location=?,country=?,group_name=?, zip_code=? where id=? ";
-				    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.id], function (error, data) {
+					var addContnetQry = "update wc_emp_group set `manage_name`=?, location=?,country=?,group_name=?, zip_code=? ,`state`=?, `county`=? where id=? ";
+				    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.location, reqData.country, reqData.group_name, reqData.zip_code, reqData.state,reqData.county ,reqData.id], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Group has been updated successfully",'data':data});
 					});
@@ -87,8 +87,8 @@ export const create_group = async(req,res)=>{
 			    	req.files.map(function(file) {
 			            console.log("File uplaod ===>", {url: file.location, name: file.key, type: file.mimetype, size: file.size});
 			       		reqData.profile_pic=file.location;
-		              	var addContnetQry = "insert wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=? ";
-					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code], function (error, data) {
+		              	var addContnetQry = "insert wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=?,`state`=?, `county`=? ";
+					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.state,reqData.county], function (error, data) {
 						if (error) throw error;
 							res.json({'status':true,"message":"Group has been created successfully",'data':data});
 						});
