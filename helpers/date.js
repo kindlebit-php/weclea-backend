@@ -60,3 +60,32 @@ export const randomNumberDryClean = (booking_id) => {
      // return  Math.random().toString(36).slice(2)+'.'+booking_id;
      return  '1001'+booking_id;
 }
+
+
+export const isToday = (date) => {
+	const today = new Date();
+	const formattedToday = today.toISOString().split('T')[0]; 
+	return date === formattedToday;
+  }
+  
+
+  export const isThisWeek = (date) => {
+	const today = new Date();
+	const currentWeekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - today.getDay());
+	const formattedCurrentWeekStart = currentWeekStart.toISOString().split('T')[0];
+	const nextWeekStart = new Date(currentWeekStart);
+	nextWeekStart.setDate(nextWeekStart.getDate() + 7);
+	const formattedNextWeekStart = nextWeekStart.toISOString().split('T')[0];
+	return date >= formattedCurrentWeekStart && date < formattedNextWeekStart;
+  }
+  
+  export const isThisMonth = (date) => {
+	const today = new Date();
+	const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+	const formattedCurrentMonthStart = currentMonthStart.toISOString().split('T')[0];
+	const nextMonthStart = new Date(currentMonthStart);
+	nextMonthStart.setMonth(nextMonthStart.getMonth() + 1);
+	const formattedNextMonthStart = nextMonthStart.toISOString().split('T')[0];
+	return date >= formattedCurrentMonthStart && date < formattedNextMonthStart;
+  }
+  

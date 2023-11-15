@@ -7,6 +7,7 @@ import dateFormat from 'date-and-time';
 dotenv.config();
 import Stripe from "stripe";
 import path from "path";
+import { isThisMonth, isThisWeek, isToday } from '../helpers/date.js';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
@@ -1523,6 +1524,81 @@ export const customer_list = async (req, res) => {
 		  res.json({ status: false, message: error.message });   
 		}   
 	  };  
+
+	  export const driver_data=async(req,res)=>{
+		try {
+			const driver_id= req.body.driver_id;
+			const user = "SELECT id,name, email, mobile,address,latitude,longitude FROM users WHERE id = ?";
+			dbConnection.query(list,[driver_id], function (error, data) {
+			  if (error) throw error;
+				const order= "SELECT id,date,order_id,order_status,order_type from bookings where driver_id=?";
+				dbConnection.query(order,[driver_id],async function(error,data2){
+					if(error) throw error;
+
+					const totalCountToday = data2.filter(row => isToday(row.date)).length;
+					const totalCountThisWeek = data2.filter(row => isThisWeek(row.date)).length;
+					const totalCountThisMonth = data2.filter(row => isThisMonth(row.date)).length;
+			
+					const order_status = data2.map((row) => row.order_status);
+					if (order_status === 9) {
+						order_status = "tagging";
+					  } else if (order_status === 10) {
+						order_status = "Spotting";
+					  } else if (order_status === 11) {
+						order_status = "Cleaning";
+					  } else if (order_status === 1) {
+						order_status = "wash";
+					  }else if (order_status === 2) {
+						order_status = "Dry";
+					  }else if (order_status === 3) {
+						order_status = "Fold";
+					  }else if (order_status === 4) {
+						order_status = "Package";
+					  } else if (order_status === 12) {
+						  order_status = "Inspect";
+						} else if (order_status === 13) {
+						  order_status = "Press";
+						} else if (order_status === 5) {
+						order_status = "Order Collected";
+					  } else if (order_status === 6) {
+						order_status = "Completed";
+					  } else if (order_status === 7) {
+						order_status = "Order Not Found";
+					  } else if (order_status === 8) {
+						order_status = "Order Pickup";
+					  } else {
+						order_status = "NA";
+					  }
+
+
+					  const order_type = data2.map((row) => row.order_type);
+					if (order_type === 1) {
+						order_type = "Folder";
+					  } else if (order_type === 2) {
+						order_type = "Folder";
+					  } else if (order_type === 3) {
+						order_type = "Dry_Clean";
+					  }
+
+					  const result = {
+						user: userData[0], 
+						booking: {
+						  totalCountToday,
+						  totalCountThisWeek,
+						  totalCountThisMonth,
+						  order_status,
+						  order_type
+						}
+					  };
+  
+					
+				})
+			});
+
+		} catch (error) {
+			res.json({ status: false, message: error.message });
+		}
+	  }
 export default {
 	user_registered_address,
 	customer_register,
@@ -1549,5 +1625,6 @@ export default {
 	customer_order_histroy,
 	get_deleivery_instruction,
 	order_managament_user_singup,
-	order_managament_user_update
+	order_managament_user_update,
+	driver_data
 }
