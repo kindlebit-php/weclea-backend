@@ -151,10 +151,7 @@ export const order_managament_user_update = async (req, res) => {
 					}else{
 						var profile_image = '';
 					}
-                    const checkIfPasswordExist = "SELECT id FROM users WHERE password = '" + password + "'";
-                    dbConnection.query(checkIfPasswordExist, async function (error, passwordData) {
-                        if (passwordData.length === 0) {
-						
+                        if (password) {
                             bcrypt.hash(password, saltRounds, function (error, hash) {
                                 const updateQuery = "UPDATE users SET name = '" + name + "', password = '" + hash + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
                                 dbConnection.query(updateQuery, function (err, result) {
@@ -166,6 +163,7 @@ export const order_managament_user_update = async (req, res) => {
                                 });
                             });
                         } else {
+							const sql = "SELECT password FROM users WHERE id = '" + id + "'";
 							const updateQuery = "UPDATE users SET name = '" + name + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
 							dbConnection.query(updateQuery, function (err, result) {
 								if (err) throw err;
@@ -175,7 +173,6 @@ export const order_managament_user_update = async (req, res) => {
 								});
 							});
                         }
-                    });
                 } else {
                     res.json({ 'status': false, "message": 'User not found' });
                 }
