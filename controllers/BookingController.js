@@ -540,6 +540,289 @@ export const booking_tracking_status = async(req,res)=>{
     }
 
 }
+export const booking_tracking_status_both = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+
+            var resData = [];
+            var resPickImg = [];
+            var resWashImg = [];
+            var resDryImg = [];
+            var resPackImg = [];
+            var resFoldImg = [];
+            var resInsImg = [];
+            var resCleanImg = [];
+            var resSpotImg = [];
+            var resTagImg = [];
+            var resInspectImg = [];
+       
+                var sql = "select bookings.id,bookings.order_type, dry_clean_booking_images.tagging_images,dry_clean_booking_images.spoting_images,dry_clean_booking_images.cleaning_images,dry_clean_booking_images.inspect_images,dry_clean_booking_images.drop_image,dry_clean_booking_images.press_images,dry_clean_booking_images.package_images,dry_clean_booking_images.pickup_images,bookings.status,CONCAT(dry_clean_booking_timing.driver_pick_date, ' ', dry_clean_booking_timing.driver_pick_time) AS bpickup_confirm_date ,CONCAT(dry_clean_booking_timing.tagging_date, ' ', dry_clean_booking_timing.tagging_time) AS tagging_date,CONCAT(dry_clean_booking_timing.spotting_date, ' ', dry_clean_booking_timing.spotting_time) AS spotting_date,CONCAT(dry_clean_booking_timing.cleaning_date, ' ', dry_clean_booking_timing.cleaning_time) AS cleaning_date,CONCAT(dry_clean_booking_timing.inspect_date, ' ', dry_clean_booking_timing.inspect_time) AS inspect_date,CONCAT(dry_clean_booking_timing.press_date, ' ', dry_clean_booking_timing.press_time) AS press_date,CONCAT(dry_clean_booking_timing.package_date, ' ', dry_clean_booking_timing.package_time) AS package_date,CONCAT(dry_clean_booking_timing.deliever_date, ' ', dry_clean_booking_timing.deliever_time) AS bdeliever_date ,booking_images.wash_images,booking_images.dry_images,booking_images.fold_images,booking_images.pack_images,booking_images.drop_image,booking_images.pickup_images as bpickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.driver_pick_date, ' ', booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(booking_timing.wash_date, ' ', booking_timing.wash_time) AS wash_date,CONCAT(booking_timing.dry_date, ' ', booking_timing.dry_time) AS dry_date,CONCAT(booking_timing.fold_date, ' ', booking_timing.fold_time) AS fold_date,CONCAT(booking_timing.pack_date, ' ', booking_timing.pack_time) AS pack_date,CONCAT(booking_timing.deliever_date, ' ', booking_timing.deliever_time) AS cdeliever_date from bookings left join dry_clean_booking_timing on bookings.id = dry_clean_booking_timing.booking_id LEFT join booking_images on bookings.id = booking_images.booking_id LEFT join booking_timing on bookings.id = booking_timing.booking_id left join dry_clean_booking_images on dry_clean_booking_images.booking_id = bookings.id where user_id = '"+userData[0].id+"' and order_status != 6 and cron_status = 1";
+
+            dbConnection.query(sql, function (err, sqlResult) {
+                // console.log('sad',sqlResult)
+            sqlResult.forEach(ele => {
+                const {id,order_type,tagging_date,press_images,tagging_images,spotting_date,cleaning_date,inspect_date,dry_images,wash_images,fold_images,pack_images,dry_date,fold_date,pack_date,order_status,pickup_images,bpickup_images,wash_date,request_confirm_date,status,pickup_confirm_date,cleaning_images,spoting_images,press_date,package_date,drop_image,driver_pickup_status,inspect_images,package_images} = ele;
+                if(order_type == 3){
+                    if(pickup_images){
+                    const pickup_images_array = pickup_images.split(',');
+                    pickup_images_array.forEach(function callback(img, key)
+                    {
+                        resPickImg[key] = process.env.S3_URL+img;
+                    })
+                    var pickup_status = 1;
+                }else{
+                    var pickup_status = 0;
+                    resPickImg = [];
+                }
+
+                if(press_images){
+                    const press_images_array = press_images.split(',');
+                    press_images_array.forEach(function callback(img, key)
+                    {
+                        resInspectImg[key] = process.env.S3_URL+img;
+                    })
+                    var press_status = 1;
+                }else{
+                    var press_status = 0;
+                    resInspectImg = [];
+                }
+
+                if(tagging_images){
+                    const tagging_images_array = tagging_images.split(',');
+                    tagging_images_array.forEach(function callback(img, key)
+                    {
+                        resTagImg[key] = process.env.S3_URL+img;
+                    })
+                    var tagging_status = 1;
+
+                }else{
+                    var tagging_status = 0;
+                    resTagImg = [];
+                }
+
+                if(spoting_images){
+                    const spoting_images_array = spoting_images.split(',');
+                    spoting_images_array.forEach(function callback(img, key)
+                    {
+                        resSpotImg[key] = process.env.S3_URL+img;
+                    })
+                    var spoting_status = 1;
+
+                }else{
+                    var spoting_status = 0;
+                    resSpotImg = [];
+                }
+
+                if(cleaning_images){
+                    const cleaning_images_array = cleaning_images.split(',');
+                    cleaning_images_array.forEach(function callback(img, key)
+                    {
+                        resCleanImg[key] = process.env.S3_URL+img;
+                    })
+                    var cleaning_status = 1;
+
+                }else{
+                    var cleaning_status = 0;
+                    resCleanImg = [];
+                }
+
+                if(inspect_images){
+                    const inspect_images_array = inspect_images.split(',');
+                    inspect_images_array.forEach(function callback(img, key)
+                    {
+                        resInsImg[key] = process.env.S3_URL+img;
+                    })
+                    var inspect_status = 1;
+
+                }else{
+                    var inspect_status = 0;
+                    resInsImg = [];
+                }
+
+                if(package_images){
+                    const package_images_array = package_images.split(',');
+                    package_images_array.forEach(function callback(img, key)
+                    {
+                        resPackImg[key] = process.env.S3_URL+img;
+                    })
+                    var package_status = 1;
+
+                }else{
+                    var package_status = 0;
+                    resPackImg = [];
+                }
+            const laundry_detail = [
+                      {
+                        title: "Pickup Request",
+                        status:pickup_status,
+                        imageList: [],
+                        date: request_confirm_date
+                      },
+                      {
+                        title: "Tagging",
+                        imageList: resTagImg,
+                        status:tagging_status,
+                        date: tagging_date
+                      }, 
+                      {
+                        title: "Spoting Stains",
+                        imageList: resSpotImg,
+                        status:spoting_status,
+                        date: spotting_date
+                      },
+                      {
+                        title: "Cleaning",
+                        imageList: resCleanImg,
+                        status:cleaning_status,
+                        date: cleaning_date
+                      },
+                      {
+                        title: "Inspect / Reclean",
+                        imageList: resInsImg,
+                        status:inspect_status,
+                        date: inspect_date
+                      },
+                      {
+                        title: "Press",
+                        imageList: resInspectImg,
+                        status:press_status,
+                        date: press_date
+                      }, 
+                      {
+                        title: "Package",
+                        imageList: resPackImg,
+                        status:package_status,
+                        imageList: resTagImg,
+                        date: package_date
+                      }
+                    ];
+                    console.log('laundry_detail',laundry_detail)
+                    const init = {
+                    'id':id,"laundry_detail":laundry_detail
+                    }
+                    resData.push(init)
+                }else{
+                    if(bpickup_images){
+                    const pickup_images_array = bpickup_images.split(',');
+                    pickup_images_array.forEach(function callback(img, key)
+                    {
+                        resPickImg[key] = process.env.S3_URL+img;
+                    })
+                    var pickup_status = 1;
+
+                }else{
+                    var pickup_status = 0;
+                    resPickImg = [];
+                }
+
+                if(wash_images){
+                    const wash_images_array = wash_images.split(',');
+                    wash_images_array.forEach(function callback(img, key)
+                    {
+                        resWashImg[key] = process.env.S3_URL+img;
+                    })
+                    var wash_status = 1;
+
+                }else{
+                    var wash_status = 0;
+                    resWashImg = [];
+
+                }
+
+                if(dry_images){
+                    const dry_images_array = dry_images.split(',');
+                    dry_images_array.forEach(function callback(img, key)
+                    {
+                        resDryImg[key] = process.env.S3_URL+img;
+                    })
+                    var dry_status = 1;
+
+                }else{
+                    var dry_status = 0;
+                    resDryImg = [];
+
+                }
+
+                if(fold_images){
+                    const fold_images_array = fold_images.split(',');
+                    fold_images_array.forEach(function callback(img, key)
+                    {
+                        resFoldImg[key] = process.env.S3_URL+img;
+                    })
+                    var fold_status = 1;
+
+                }else{
+                    var fold_status = 0;
+                    resFoldImg = [];
+
+                }
+
+                if(pack_images){
+                    const pack_images_array = pack_images.split(',');
+                    pack_images_array.forEach(function callback(img, key)
+                    {
+                        resPackImg[key] = process.env.S3_URL+img;
+                    })
+                    var pack_status = 1;
+
+                }else{
+                    var pack_status = 0;
+                    resPackImg = [];
+                }
+                    const laundry_detail = [
+                      {
+                        title: "Pickup Request",
+                        status:pickup_status,
+                        imageList: [],
+                        date: request_confirm_date
+                      },
+                      {
+                        title: "Wash",
+                        imageList: resWashImg,
+                        status:wash_status,
+                        date: wash_date
+                      },
+                      {
+                        title: "Dry",
+                        imageList: resDryImg,
+                        status:dry_status,
+                        date: dry_date
+                      },
+                      {
+                        title: "Fold",
+                        imageList: resFoldImg,
+                        status:fold_status,
+                        date: fold_date
+                      },
+                      {
+                        title: "Pack",
+                        imageList: resPackImg,
+                        status:pickup_status,
+                        date: pack_date
+                      }
+                    ];
+
+                const initi = {
+                    "id":id,'laundry_detail':laundry_detail
+                }
+                    resData.push(initi)
+                
+                }
+            })
+                res.json({'status':true,"message":"user order list",'data':resData});
+            })
+            
+
+           
+
+          
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+
+
+}
 
 export const booking_tracking_details = async(req,res)=>{
 
@@ -1002,5 +1285,6 @@ export default {
     subscription_dates_fre,
     subscription_dates_custom,
     booking_history,
+    booking_tracking_status_both,
     booking_rating
 }

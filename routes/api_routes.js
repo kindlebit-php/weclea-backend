@@ -61,6 +61,7 @@ router.get('/subscription-dates-fre',CheckAuth ,bookingController.subscription_d
 router.get('/subscription-dates-custom',CheckAuth ,bookingController.subscription_dates_custom);
 router.get('/booking-history',CheckAuth ,bookingController.booking_history);
 router.get('/booking-tracking-status',CheckAuth ,bookingController.booking_tracking_status);
+router.get('/booking-tracking-status-both',CheckAuth ,bookingController.booking_tracking_status_both);
 router.post('/booking-tracking-details',CheckAuth ,bookingController.booking_tracking_details);
 router.get('/get-load-price',CheckAuth ,loadController.get_load_price);
 router.post('/customer-login',userController.customer_login);
