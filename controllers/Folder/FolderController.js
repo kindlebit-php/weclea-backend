@@ -60,24 +60,22 @@ export const Scan_loads_folder = (req, res) => {
         return res.json({ status: false, message: error.message });
       }
       console.log("12323",data)
-      if (type >= 1 && type <= 4) {
-        if (data.length === 0 || data[0].driver_pickup_status !== 1 || data[0].folder_recive_status !== 0) {
+      if (type >= 0 && type <= 3) {
+        if (data.length === 0 || data[0].driver_pickup_status !== 1 ) {
           return res.json({ status: false, message: "Invalid QR code or load status" });
         }
 
         let update_Date_Time2;
-        if (type == 1) {
+        if (type == 0) {
           update_Date_Time2 = `UPDATE booking_timing SET wash_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-        } else if (type == 2) {
+        } else if (type == 1) {
           update_Date_Time2 = `UPDATE booking_timing SET dry_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-        } else if (type == 3) {
+        } else if (type == 2) {
           update_Date_Time2 = `UPDATE booking_timing SET fold_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-        } else if (type == 4) {
+        } else if (type == 3) {
           update_Date_Time2 = `UPDATE booking_timing SET pack_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
         }
-        console.log("999999",data[0].booking_id)
         dbConnection.query(update_Date_Time2, function (updateTimeErr, updateTimeResult) {
-          console.log("resykt",updateTimeResult)
           if (updateTimeErr) {
             return res.json({ status: false, message: updateTimeErr.message });
           }
@@ -440,7 +438,7 @@ export const submit_wash_detail = async (req, res) => {
 
                 const imageArray = [];
                 req.files.extra_loads_images.forEach((e, i) => {
-                  imageArray.push(e.path);
+                  imageArray.push(e.key);
                 });
                 if (imageArray.length > 5) {
                   return res.json({ status: false, message: "Only 5 images are allowed" });
@@ -517,7 +515,7 @@ export const submit_wash_detail = async (req, res) => {
                                   });
                   const imageArray = [];
                   req.files.extra_loads_images.forEach((e, i) => {
-                  imageArray.push(e.path);
+                  imageArray.push(e.key);
                   });
                   if (imageArray.length > 5) {
                   return res.json({ status: false, message: "Only 5 images are allowed" });
@@ -577,7 +575,7 @@ export const submit_wash_detail = async (req, res) => {
 
                           const imageArray = [];
                 req.files.extra_loads_images.forEach((e, i) => {
-                  imageArray.push(e.path);
+                  imageArray.push(e.key);
                 });
                 if (imageArray.length > 5) {
                   return res.json({ status: false, message: "Only 5 images are allowed" });
@@ -630,7 +628,7 @@ export const submit_wash_detail = async (req, res) => {
                         }
                           const imageArray = [];
                 req.files.extra_loads_images.forEach((e, i) => {
-                  imageArray.push(e.path);
+                  imageArray.push(e.key);
                 });
                 if (imageArray.length > 5) {
                   return res.json({ status: false, message: "Only 5 images are allowed" });
@@ -673,7 +671,7 @@ export const submit_wash_detail = async (req, res) => {
         // updateOrderStatusQuery = "UPDATE bookings SET order_status = ? WHERE id = ?";
         const imageArray = [];
         req.files.images.forEach((e, i) => {
-        imageArray.push(e.path);
+        imageArray.push(e.key);
         });
         const pickupImagesJSON = imageArray.join(", ");
         dbConnection.query(updateDateTimeQuery, [currentTime, currentDate, booking_id], function (updateTimeErr, updateTimeResult) {
@@ -699,7 +697,7 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
         }
         const imageArray = [];
         req.files.images.forEach((e, i) => {
-          imageArray.push(e.path);
+          imageArray.push(e.key);
         });
         console.log(imageArray)
         if (imageArray.length > 5) {
@@ -950,7 +948,7 @@ export const Scan_loads_For_Dry = (req, res) => {
 
 //           const imageArray = [];
 //           req.files.forEach((e, i) => {
-//             imageArray.push(e.path);
+//             imageArray.push(e.key);
 //           });
 
 //           if (req.files.length > 5) {
@@ -1084,7 +1082,7 @@ export const Scan_loads_For_Fold = (req, res) => {
 
 //           const imageArray = [];
 //           req.files.forEach((e, i) => {
-//             imageArray.push(e.path);
+//             imageArray.push(e.key);
 //           });
 
 //           if (req.files.length > 5) {
