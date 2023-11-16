@@ -38,6 +38,7 @@ router.post('/update-password',CheckAuth ,userController.update_password);
 router.post('/edit-user-profile',CheckAuth,uploadS3.single('profile_image') ,userController.edit_user_profile);
 router.get("/driver-list",userController.driver_list)
 router.post("/driver-data",userController.driver_data)
+router.post("/folder-data",userController.folder_data)
 router.get("/customer-list",userController.customer_list)
 router.get("/folder-list",userController.folder_list)
 router.get("/order-list",userController.order_list)

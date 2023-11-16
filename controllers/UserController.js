@@ -141,7 +141,6 @@ export const order_managament_user_update = async (req, res) => {
     try {
         const saltRounds = 10;
         const { id, name, password, latitude, longitude, group_id, zip_code, country, state, city, address, area } = req.body;
-        if (id && name && group_id && latitude && longitude && zip_code && country && state && city && address && area) {
             const checkIfUserExists = "SELECT id FROM users WHERE id = '" + id + "'";
             dbConnection.query(checkIfUserExists, async function (error, userData) {
                 if (userData.length > 0) {
@@ -151,10 +150,7 @@ export const order_managament_user_update = async (req, res) => {
 					}else{
 						var profile_image = '';
 					}
-                    const checkIfPasswordExist = "SELECT id FROM users WHERE password = '" + password + "'";
-                    dbConnection.query(checkIfPasswordExist, async function (error, passwordData) {
-                        if (passwordData.length === 0) {
-						
+                        if (password) {
                             bcrypt.hash(password, saltRounds, function (error, hash) {
                                 const updateQuery = "UPDATE users SET name = '" + name + "', password = '" + hash + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
                                 dbConnection.query(updateQuery, function (err, result) {
@@ -166,7 +162,9 @@ export const order_managament_user_update = async (req, res) => {
                                 });
                             });
                         } else {
-							const updateQuery = "UPDATE users SET name = '" + name + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
+							const sql = "SELECT password FROM users WHERE id = '" + id + "'";
+							dbConnection.query(sql, function(err,result){
+							const updateQuery = "UPDATE users SET name = '" + name + "', password = '" + result[0].password + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
 							dbConnection.query(updateQuery, function (err, result) {
 								if (err) throw err;
 								const selectQuery = "SELECT id, name, email, mobile, comment, role, status, category_id FROM users WHERE id = '" + id + "'";
@@ -174,15 +172,14 @@ export const order_managament_user_update = async (req, res) => {
 									res.json({ 'status': true, "message": "User updated successfully!", 'data': updatedUserData[0] });
 								});
 							});
+						})
                         }
-                    });
+					
                 } else {
                     res.json({ 'status': false, "message": 'User not found' });
                 }
             });
-        } else {
-            res.json({ 'status': false, "message": "All fields are required" });
-        }
+        
     } catch (error) {
         res.json({ 'status': false, "message": error.message });
     }
@@ -1065,7 +1062,7 @@ export const order_list = async (req, res) => {
 				if (error) {
 				  reject(error);
 				} else {
-				  const separatedStrings = Data[0].wash_images.split(", ");
+				  const separatedStrings = Data[0].tagging_images.split(", ");
 				  const imageList = [];
 		  
 				  separatedStrings.forEach(val => {
@@ -1096,9 +1093,9 @@ export const order_list = async (req, res) => {
 				  } else {
 					const imageList = [];
 
-				  	if(Data[0].dry_images){
+				  	if(Data[0].spoting_images){
 
-					const separatedStrings = Data[0].tagging_images.split(", ");
+					const separatedStrings = Data[0].spoting_images.split(", ");
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
@@ -1573,11 +1570,11 @@ export const customer_list = async (req, res) => {
 			  
 					  var order_type = data2.map((row) => {
 						if (row.order_type === 1) {
-						  return "Folder";
+						  return "Laundry";
 						} else if (row.order_type === 2) {
-						  return "Folder";
+						  return "Laundry";
 						} else if (row.order_type === 3) {
-						  return "Dry_Clean";
+						  return "DryClean";
 						} else {
 						  return "NA";
 						}
@@ -1603,6 +1600,95 @@ export const customer_list = async (req, res) => {
 				})
 			});
 
+		} catch (error) {
+			res.json({ status: false, message: error.message });
+		}
+	  }
+
+	  export const folder_data=async(req,res)=>{
+		try {
+			const folder_id= req.body.folder_id;
+			const user = "SELECT id,name, email, mobile,address,latitude,longitude FROM users WHERE id = ?";
+			dbConnection.query(user,[folder_id], function (error, data) {
+			  if (error) throw error;
+				const order= "SELECT id,date,order_id,order_status,order_type from bookings where folder_id=?";
+				dbConnection.query(order,[folder_id],async function(error,data2){
+					if(error) throw error;
+
+					const totalCountToday = data2.filter(row => isToday(row.date)).length;
+					const totalCountThisWeek = data2.filter(row => isThisWeek(row.date)).length;
+					const totalCountThisMonth = data2.filter(row => isThisMonth(row.date)).length;
+			
+					var order_status = data2.map((row) => {
+						if (row.order_status === 9) {
+						  return "tagging";
+						} else if (row.order_status === 10) {
+						  return "Spotting";
+						} else if (row.order_status === 11) {
+						  return "Cleaning";
+						} else if (row.order_status === 1) {
+						  return "wash";
+						} else if (row.order_status === 2) {
+						  return "Dry";
+						} else if (row.order_status === 3) {
+						  return "Fold";
+						} else if (row.order_status === 4) {
+						  return "Package";
+						} else if (row.order_status === 12) {
+						  return "Inspect";
+						} else if (row.order_status === 13) {
+						  return "Press";
+						} else if (row.order_status === 5) {
+						  return "Order Collected";
+						} else if (row.order_status === 6) {
+						  return "Completed";
+						} else if (row.order_status === 7) {
+						  return "Order Not Found";
+						} else if (row.order_status === 8) {
+						  return "Order Pickup";
+						} else {
+						  return "NA";
+						}
+					  });
+			  
+					  var order_type = data2.map((row) => {
+						if (row.order_type === 1) {
+						  return "Laundry";
+						} else if (row.order_type === 2) {
+						  return "Laundry";
+						} else {
+						  return "NA";
+						}
+					  });
+			  
+					  const result = {
+						user: data[0],
+						booking_count: {
+						  totalCountToday,
+						  totalCountThisWeek,
+						  totalCountThisMonth,
+						},
+						booking_details: data2.map((row, index) => ({
+						  id: row.id,
+						  date: row.date,
+						  order_id: row.order_id,
+						  order_status: order_status[index],
+						  order_type: order_type[index],
+						})),
+					  };
+			  
+					  res.json({ status: true, message: "data retrieved successfully", data: result });
+				})
+			});
+
+		} catch (error) {
+			res.json({ status: false, message: error.message });
+		}
+	  }
+
+	  export const order_managament_user_history = async(req,res)=>{
+		try {
+			
 		} catch (error) {
 			res.json({ status: false, message: error.message });
 		}
@@ -1634,5 +1720,7 @@ export default {
 	get_deleivery_instruction,
 	order_managament_user_singup,
 	order_managament_user_update,
-	driver_data
+	driver_data,
+	folder_data,
+	order_managament_user_history
 }
