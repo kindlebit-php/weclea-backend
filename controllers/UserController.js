@@ -692,7 +692,7 @@ export const order_list = async (req, res) => {
   
 	  for (const item of data) {
 		if (item.Nearby_driver) {
-		  const driver_list = `SELECT id, name, SQRT(POW(69.1 * (30.7320 - latitude), 2) + POW(69.1 * ((longitude - 76.7726) * COS(30.7320 / 57.3)), 2)) AS distance FROM users   WHERE role = 2 ORDER BY distance ASC`;
+		  const driver_list = `SELECT id, name, SQRT(POW(69.1 * (30.7320 - latitude), 2) + POW(69.1 * ((longitude - 76.7726) * COS(30.7320 / 57.3)), 2)) AS distance FROM users   WHERE role = 2 and status = 1  ORDER BY distance ASC`;
   
 		  const driverResults = await new Promise((resolve, reject) => {
 			dbConnection.query(driver_list, (error, Data) => {
@@ -708,7 +708,7 @@ export const order_list = async (req, res) => {
 		  item.Nearby_driver = driverResults;
 		}
 		if (item.Folder) {
-			const Folder_list = `SELECT id, name FROM users WHERE role = 3`;
+			const Folder_list = `SELECT id, name FROM users WHERE role = 3 and status = 1 `;
 	
 			const folderResults = await new Promise((resolve, reject) => {
 			  dbConnection.query(Folder_list, (error, Dataa) => {
