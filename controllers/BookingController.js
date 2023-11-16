@@ -655,46 +655,46 @@ export const booking_tracking_status_both = async(req,res)=>{
             const laundry_detail = [
                       {
                         title: "Pickup Request",
-                        status:pickup_status,
+                        status:1,
                         imageList: [],
-                        date: request_confirm_date
+                        date: request_confirm_date 
                       },
                       {
                         title: "Tagging",
                         imageList: resTagImg,
                         status:tagging_status,
-                        date: tagging_date
+                        date: tagging_date || ''
                       }, 
                       {
                         title: "Spoting Stains",
                         imageList: resSpotImg,
                         status:spoting_status,
-                        date: spotting_date
+                        date: spotting_date || ''
                       },
                       {
                         title: "Cleaning",
                         imageList: resCleanImg,
                         status:cleaning_status,
-                        date: cleaning_date
+                        date: cleaning_date || ''
                       },
                       {
                         title: "Inspect / Reclean",
                         imageList: resInsImg,
                         status:inspect_status,
-                        date: inspect_date
+                        date: inspect_date || ''
                       },
                       {
                         title: "Press",
                         imageList: resInspectImg,
                         status:press_status,
-                        date: press_date
+                        date: press_date || ''
                       }, 
                       {
                         title: "Package",
                         imageList: resPackImg,
                         status:package_status,
                         imageList: resTagImg,
-                        date: package_date
+                        date: package_date || ''
                       }
                     ];
                     console.log('laundry_detail',laundry_detail)
@@ -787,19 +787,19 @@ export const booking_tracking_status_both = async(req,res)=>{
                         title: "Dry",
                         imageList: resDryImg,
                         status:dry_status,
-                        date: dry_date
+                        date: dry_date || ''
                       },
                       {
                         title: "Fold",
                         imageList: resFoldImg,
                         status:fold_status,
-                        date: fold_date
+                        date: fold_date || ''
                       },
                       {
                         title: "Pack",
                         imageList: resPackImg,
                         status:pickup_status,
-                        date: pack_date
+                        date: pack_date || ''
                       }
                     ];
 
