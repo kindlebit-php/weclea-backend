@@ -709,10 +709,10 @@ export const booking_tracking_status_both = async(req,res)=>{
                     {
                         resPickImg[key] = process.env.S3_URL+img;
                     })
-                    var pickup_status = 1;
+                    // var pickup_status = 1;
 
                 }else{
-                    var pickup_status = 0;
+                    // var pickup_status = 0;
                     resPickImg = [];
                 }
 
@@ -773,7 +773,7 @@ export const booking_tracking_status_both = async(req,res)=>{
                     const laundry_detail = [
                       {
                         title: "Pickup Request",
-                        status:pickup_status,
+                        status:1,
                         imageList: [],
                         date: request_confirm_date
                       },
@@ -781,7 +781,7 @@ export const booking_tracking_status_both = async(req,res)=>{
                         title: "Wash",
                         imageList: resWashImg,
                         status:wash_status,
-                        date: wash_date
+                        date: wash_date || ''
                       },
                       {
                         title: "Dry",
@@ -807,7 +807,7 @@ export const booking_tracking_status_both = async(req,res)=>{
                     "id":id,'laundry_detail':laundry_detail
                 }
                     resData.push(initi)
-                
+
                 }
             })
                 res.json({'status':true,"message":"user order list",'data':resData});
