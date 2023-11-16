@@ -1062,7 +1062,7 @@ export const order_list = async (req, res) => {
 				if (error) {
 				  reject(error);
 				} else {
-				  const separatedStrings = Data[0].wash_images.split(", ");
+				  const separatedStrings = Data[0].tagging_images.split(", ");
 				  const imageList = [];
 		  
 				  separatedStrings.forEach(val => {
@@ -1093,9 +1093,9 @@ export const order_list = async (req, res) => {
 				  } else {
 					const imageList = [];
 
-				  	if(Data[0].dry_images){
+				  	if(Data[0].spoting_images){
 
-					const separatedStrings = Data[0].tagging_images.split(", ");
+					const separatedStrings = Data[0].spoting_images.split(", ");
 			
 					separatedStrings.forEach(val => {
 					  const subImages = val.split(',').map(subVal => {
@@ -1685,6 +1685,14 @@ export const customer_list = async (req, res) => {
 			res.json({ status: false, message: error.message });
 		}
 	  }
+
+	  export const order_managament_user_history = async(req,res)=>{
+		try {
+			
+		} catch (error) {
+			res.json({ status: false, message: error.message });
+		}
+	  }
 export default {
 	user_registered_address,
 	customer_register,
@@ -1713,5 +1721,6 @@ export default {
 	order_managament_user_singup,
 	order_managament_user_update,
 	driver_data,
-	folder_data
+	folder_data,
+	order_managament_user_history
 }
