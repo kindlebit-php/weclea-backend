@@ -1196,8 +1196,13 @@ export default {
 	admin_login,
 	get_cities,
 	get_states,
+<<<<<<< HEAD
+	get_countries,
+	getGraphData
+=======
 	getGraphData,
 	update_admin_email,
 	get_countries
 
+>>>>>>> 1d6792f492f92b1de96b900612180137bf3c4edd
 }
