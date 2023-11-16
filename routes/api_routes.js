@@ -157,6 +157,7 @@ router.post("/update_extra_chagres_status",CheckAuth,AdminController.update_extr
 router.get("/get_countries",AdminController.get_countries)
 router.get("/get_states/:country_id?",AdminController.get_states)
 router.get("/get_cities/:state_id?",AdminController.get_cities)
+router.get("/getGraphData",CheckAuth,groupController.getGraphData)
 
 
 
