@@ -439,3 +439,56 @@ export const submit_dryClean_process_detail = async (req, res) => {
       res.json({ status: false, message: error.message });
     }
   };
+
+
+  const AWS = require('aws-sdk');
+const { v4: uuidv4 } = require('uuid');
+const puppeteer = require('puppeteer');
+
+const s3 = new AWS.S3({
+  accessKeyId: 'YOUR_ACCESS_KEY_ID',
+  secretAccessKey: 'YOUR_SECRET_ACCESS_KEY',
+  region: 'YOUR_S3_REGION',
+});
+
+export const generatePDF = async (data, qrCodesArray) => {
+  const executablePath = '/usr/bin/chromium-browser';
+  const browser = await puppeteer.launch({
+    executablePath: '/usr/bin/chromium-browser',
+    args: ['--no-sandbox'],
+  });
+
+  const page = await browser.newPage();
+
+  let htmlContent = '';
+
+  for (let i = 0; i < qrCodesArray.length; i++) {
+    // ... (unchanged)
+
+    htmlContent += sectionHtml;
+  }
+
+  await page.setContent(htmlContent);
+
+  const pdfBuffer = await page.pdf({
+    format: 'A4',
+  });
+
+  const pdfKey = `uploads/${uuidv4()}.pdf`;
+
+  const uploadParams = {
+    Bucket: 'YOUR_S3_BUCKET_NAME',
+    Key: pdfKey,
+    Body: pdfBuffer,
+    ContentType: 'application/pdf',
+    ACL: 'public-read', // Adjust the ACL as needed
+  };
+
+  // Upload the PDF to S3
+  const uploadResult = await s3.upload(uploadParams).promise();
+
+  await browser.close();
+
+  // Return the S3 URL of the uploaded PDF
+  return uploadResult.Location;
+};

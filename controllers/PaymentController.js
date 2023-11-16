@@ -726,6 +726,13 @@ export const customer_payment_BookingId = async (req, res) => {
             });
 
             if (paymentIntent.status === 'succeeded') {
+              const update_Status = `UPDATE users SET card_status = '1' WHERE id = '${userId}'`;
+              dbConnection.query(update_Status, async function (error,update_Status){
+                if(error){
+                  return res.json({ status: false, message: 'error updating payment status' });
+                } 
+  
+              })
               const updateStatus = `UPDATE bookings SET payment_status = '1' WHERE id = '${booking_id}'`;
               dbConnection.query(updateStatus, async function (error, updateStatus) {
                 if (error) {

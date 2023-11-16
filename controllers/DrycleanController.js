@@ -196,11 +196,11 @@ export const get_category = async (req, res) => {
   export const Scan_dryClean_received_loads = (req, res) => {
     const userData = res.user;
     const folder_id = userData[0].id;
-    const { qr_code, qr_codeID } = req.body;
+    const { qr_code } = req.body;
   
     try {
-      const verifyQr = "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ? AND id = ?";
-      dbConnection.query(verifyQr, [qr_code,qr_codeID], function (error, data) {
+      const verifyQr = "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ?";
+      dbConnection.query(verifyQr, [qr_code], function (error, data) {
         if (error) {
           return res.json({ status: false, message: error.message });
         }
@@ -230,6 +230,59 @@ export const get_category = async (req, res) => {
     }
   };
   
+  export const Scan_loads_dry_clean = (req, res) => {
+    try {
+      const userData = res.user;
+      const { qr_code, type } = req.body;
+      const currentTime = time();
+      const currentDate = date();
+      const wash_scan_timing = `${currentDate} ${currentTime}`;
+  
+      const verifyQr = "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ?";
+      dbConnection.query(verifyQr, [qr_code], function (error, data) {
+        if (error) {
+          return res.json({ status: false, message: error.message });
+        }
+  
+        if ((type == 0) || (type >= 9 && type <= 13)) {
+          if (data.length === 0 || data[0].driver_pickup_status !== 1 ) {
+            return res.json({ status: false, message: "Invalid QR code or load status" });
+          }
+  
+          let update_Date_Time2;
+  
+          if (type == 0) {
+            update_Date_Time2 = `UPDATE dry_clean_booking_timing SET tagging_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+          } else if (type == 9) {
+            update_Date_Time2 = `UPDATE dry_clean_booking_timing SET spotting_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+          } else if (type == 10) {
+            update_Date_Time2 = `UPDATE dry_clean_booking_timing SET cleaning_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+          } else if (type == 11) {
+            update_Date_Time2 = `UPDATE dry_clean_booking_timing SET inspect_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+          } else if (type == 12) {
+            update_Date_Time2 = `UPDATE dry_clean_booking_timing SET press_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+          } else if (type == 13) {
+            update_Date_Time2 = `UPDATE dry_clean_booking_timing SET package_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
+          }
+  
+          dbConnection.query(update_Date_Time2, function (updateTimeErr, updateTimeResult) {
+            if (updateTimeErr) {
+              return res.json({ status: false, message: updateTimeErr.message });
+            }
+            if (updateTimeResult.affectedRows === 1) {
+              return res.json({ status: true, message: "Load scanned and updated." });
+            }
+          });
+        } else {
+          return res.json({ status: false, message: "Invalid 'type' value" });
+        }
+      });
+    } catch (error) {
+      res.json({ status: false, message: error.message });
+    }
+  };
+
+
 export const customer_list_dryClean = (req, res) => {
   const userData = res.user;
   const folder_id = userData[0].id;
@@ -1118,6 +1171,7 @@ export const order_histroy_dryClean_detail= async(req,res)=>{
     get_cart_items,
     dry_clean_booking,
     Scan_dryClean_received_loads,
+    Scan_loads_dry_clean,
     customer_list_dryClean,
     submit_dryClean_process_detail,
     print_DryClean_extra_loads_QrCode,

@@ -37,9 +37,11 @@ router.get('/get-notification',CheckAuth ,userController.get_notification);
 router.post('/update-password',CheckAuth ,userController.update_password);
 router.post('/edit-user-profile',CheckAuth,uploadS3.single('profile_image') ,userController.edit_user_profile);
 router.get("/driver-list",userController.driver_list)
+router.post("/driver-data",userController.driver_data)
 router.get("/customer-list",userController.customer_list)
 router.get("/folder-list",userController.folder_list)
 router.get("/order-list",userController.order_list)
+router.get("/order_list_dry_clean",userController.order_list_dry_clean)
 
 router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
@@ -49,9 +51,10 @@ router.post('/get-user-home-data',CheckAuth ,loadController.get_user_home_data);
 router.get('/get-user-subscription',CheckAuth ,loadController.get_user_subscription);
 router.post('/customer-loads-subscription',CheckAuth ,loadController.customer_loads_subscription);
 router.post('/customer-booking',CheckAuth ,bookingController.customer_booking);
-router.post('/booking-rating',CheckAuth ,uploadS3.array("images", 5),bookingController.booking_rating);
+router.post('/booking-rating',CheckAuth ,bookingController.booking_rating);
 router.post('/assign-driver' ,bookingController.assign_driver);
 router.post('/assign-folder' ,bookingController.assign_folder);
+router.post('/get-rating-details' ,CheckAuth,bookingController.get_rating_details);
 router.post('/delete-booking-date',CheckAuth ,bookingController.delete_booking_date);
 router.get('/user-subscription-dates',CheckAuth ,bookingController.subscription_dates);
 router.get('/subscription-dates-fre',CheckAuth ,bookingController.subscription_dates_fre);
@@ -87,6 +90,7 @@ router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
 router.post("/submit_drop_details",CheckAuth,uploadS3.array("images", 5),driverController.submit_drop_details);
 //********************************Folder Module**************************************//
 router.post("/Scan-received-loads",CheckAuth,FolderController.Scan_received_loads)
+router.post("/Scan_loads_folder",CheckAuth,FolderController.Scan_loads_folder)
 router.post("/customer-list-wash",CheckAuth,FolderController.customer_list_wash)
 router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id)
 router.post("/submit-wash-detail",CheckAuth,uploadS3.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads_images", maxCount: 5 },]),FolderController.submit_wash_detail)
@@ -127,6 +131,7 @@ router.post("/delete-cart-item",CheckAuth,DrycleanController.delete_cart_item)
 router.post("/dry-clean-booking",CheckAuth,DrycleanController.dry_clean_booking)
                      //==============----------============------------//
 router.post("/Scan-dryClean-received-loads",CheckAuth,DrycleanController.Scan_dryClean_received_loads)
+router.post("/Scan_loads_dry_clean",CheckAuth,DrycleanController.Scan_loads_dry_clean)
 router.post("/customer-list-dryClean",CheckAuth,DrycleanController.customer_list_dryClean)
 router.post("/submit-dryClean-process-detail",CheckAuth,uploadS3.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads_images", maxCount: 5 },]),DrycleanController.submit_dryClean_process_detail)
 router.post("/print-DryClean-extra-loads-QrCode",CheckAuth,DrycleanController.print_DryClean_extra_loads_QrCode)
@@ -215,6 +220,7 @@ router.post("/update_drycleaning_service",uploadS3.single('service_pic'),AdminCo
 router.post("/add_drycleaning_service",uploadS3.single('service_pic'),AdminController.add_drycleaning_service)
 router.post("/update_service_status",CheckAuth,AdminController.update_service_status)
 router.post("/delete_service",CheckAuth,AdminController.delete_service)
+router.post("/update-admin-email",CheckAuth,AdminController.update_admin_email)
 router.get("/get_drycleaning_itemlist",CheckAuth,AdminController.get_drycleaning_itemlist)
 
 
