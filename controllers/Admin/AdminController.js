@@ -351,7 +351,7 @@ export const getGraphData=async(req,res)=>{
 							throw error;
 						}else{
 							//SELECT count(bookings.order_id) total_orders,sum(bookings.total_loads) total_loads,year(bookings.created_at) month,users.name FROM `bookings` LEFT JOIN users on users.id=bookings.user_id WHERE bookings.cron_status=1 GROUP by bookings.user_id,Year(bookings.created_at);
-							const qry = "SELECT count(bookings.order_id) total_orders,sum(bookings.total_loads) total_loads,year(bookings.created_at) month,users.name FROM `bookings` LEFT JOIN users on users.id=bookings.user_id WHERE bookings.cron_status=1 GROUP by bookings.user_id,Year(bookings.created_at)";
+							const qry = "SELECT count(bookings.order_id) total_orders,sum(bookings.total_loads) total_loads,year(bookings.created_at) year,users.name FROM `bookings` LEFT JOIN users on users.id=bookings.user_id WHERE bookings.cron_status=1 GROUP by bookings.user_id,Year(bookings.created_at)";
 							dbConnection.query(qry, function (error, userSalePerformance) {
 								if (error){ 
 									throw error;
