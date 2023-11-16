@@ -444,7 +444,9 @@ export const submit_dryClean_process_detail = async (req, res) => {
             }else{
               var userLoads = "select yeshiba as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
             }
+            console.log('userLoadsdryclean',userLoads)
                  dbConnection.query(userLoads, function (error, userLoadsresults){
+                  console.log('userLoadsresults',userLoadsresults)
                     if(Number(userLoadsresults[0].totalCount) >= Number(extra_loads)){
                       var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
                       if(bookingdata[0].category_id == 1){
