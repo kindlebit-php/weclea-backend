@@ -196,11 +196,11 @@ export const get_category = async (req, res) => {
   export const Scan_dryClean_received_loads = (req, res) => {
     const userData = res.user;
     const folder_id = userData[0].id;
-    const { qr_code, qr_codeID } = req.body;
+    const { qr_code } = req.body;
   
     try {
-      const verifyQr = "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ? AND id = ?";
-      dbConnection.query(verifyQr, [qr_code,qr_codeID], function (error, data) {
+      const verifyQr = "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ?";
+      dbConnection.query(verifyQr, [qr_code], function (error, data) {
         if (error) {
           return res.json({ status: false, message: error.message });
         }
@@ -251,17 +251,17 @@ export const get_category = async (req, res) => {
   
           let update_Date_Time2;
   
-          if (type == 1) {
+          if (type == 0) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET tagging_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          } else if (type == 2) {
+          } else if (type == 9) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET spotting_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          } else if (type == 3) {
+          } else if (type == 10) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET cleaning_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          } else if (type == 4) {
+          } else if (type == 11) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET inspect_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          } else if (type == 5) {
+          } else if (type == 12) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET press_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-          } else if (type == 6) {
+          } else if (type == 13) {
             update_Date_Time2 = `UPDATE dry_clean_booking_timing SET package_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
           }
   
