@@ -164,7 +164,8 @@ export const order_managament_user_update = async (req, res) => {
                             });
                         } else {
 							const sql = "SELECT password FROM users WHERE id = '" + id + "'";
-							const updateQuery = "UPDATE users SET name = '" + name + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
+							dbConnection.query(sql, function(err,result){
+							const updateQuery = "UPDATE users SET name = '" + name + "', password = '" + result[0].password + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
 							dbConnection.query(updateQuery, function (err, result) {
 								if (err) throw err;
 								const selectQuery = "SELECT id, name, email, mobile, comment, role, status, category_id FROM users WHERE id = '" + id + "'";
@@ -172,7 +173,9 @@ export const order_managament_user_update = async (req, res) => {
 									res.json({ 'status': true, "message": "User updated successfully!", 'data': updatedUserData[0] });
 								});
 							});
+						})
                         }
+					
                 } else {
                     res.json({ 'status': false, "message": 'User not found' });
                 }
