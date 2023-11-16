@@ -7,7 +7,7 @@ export const get_loads = async(req,res)=>{
       try { 
             const userData = res.user;
             const {category_id} = req.body;
-        	const loads = "select id,type,loads,price,note from admin_packages where category_id = '"+category_id+"' and isDelete = 0";
+        	const loads = "select id,type,loads,price,note from admin_packages where category_id = '"+category_id+"' and status = 1 and isDelete = 0";
 			dbConnection.query(loads, function (error, data) {
             const extraSQL = "select extra_chages from settings";
             dbConnection.query(extraSQL, function (error, extraSQLResult) {
@@ -91,21 +91,25 @@ export const get_user_loads = async(req,res)=>{
             }
             // var sql = "select * from users where id = '"+userData[0].id+"'";
             dbConnection.query(usrLoads, function (error, result) {
+            const extraSQL = "select extra_chages from settings";
+            dbConnection.query(extraSQL, function (error, extraSQLResult) {
+            if (error) throw error;
             if (result.length > 0){
-
             const available_loads = result[0].total_loads;
              let data = {
                     "available_loads":available_loads,
                 }
-                res.json({'status':true,"message":"Price get successfully!",'data':data,'card_status':userData[0].card_status});
+                res.json({'status':true,"message":"Price get successfully!",'data':data,'card_status':userData[0].card_status,'extra_charges':extraSQLResult[0].extra_chages});
 
             }else{
                 let nodata = {
                     "available_loads":'0',
                 }
-                res.json({'status':true,"message":"Price get successfully!",'data':nodata,'card_status':userData[0].card_status});
+                res.json({'status':true,"message":"Price get successfully!",'data':nodata,'card_status':userData[0].card_status,'extra_charges':extraSQLResult[0].extra_chages});
 
             }
+            })
+      
 
             });
         }else{

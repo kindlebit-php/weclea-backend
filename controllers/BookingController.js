@@ -865,28 +865,30 @@ export const delete_booking_date = async(req,res)=>{
         }
 }
 
+export const get_rating_details = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            const {rating_id} = req.body;
+            var sql = "select id,feedback from wc_rating_feeback where rating_id = '"+rating_id+"' and isDelete = 0";
+            dbConnection.query(sql, function (err, results) {
+                res.json({'status':true,"message":"Rating List",'data':results});
+            }); 
+        }catch (error) {
+            res.json({'status':false,"message":error.message});  
+        }
+}
+
 
 export const booking_rating = async(req,res)=>{
 
     try { 
         const userData = res.user;
-        const { booking_id,title,body,rating,images} = req.body;
-        if(booking_id  && rating ){
-             const imageArray = [];
-             var pickupImagesJSON ='';
-                if(req.files){
-                    req.files.forEach((e, i) => {
-                        imageArray.push(e.path);
-                    });
-                if (imageArray.length > 5) {
-                    return res.json({ status: false, message: "Only 5 images are allowed" });
-                }
-                    var pickupImagesJSON = imageArray.join(", ");
-                }
-            var sql = "INSERT INTO ratings (booking_id,user_id,rating,title,body,images) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating+"', '"+title+"', '"+body+"','"+pickupImagesJSON+"')";
-            console.log('sql',sql)
+        const { booking_id,rating_feedback_id} = req.body;
+        if(booking_id  && rating_feedback_id ){
+            var sql = "INSERT INTO ratings (booking_id,user_id,rating_feedback_id) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating_feedback_id+"')";
             dbConnection.query(sql, function (err, results) {
-                res.json({'status':true,"message":"Rating submitted"});
+                res.json({'status':true,"message":"Rating submitted successfully"});
             }); 
         }else{
             res.json({'status':false,"message":"All fields are required"});
@@ -955,6 +957,7 @@ export default {
     booking_delievery_instruction,
     assign_driver,
     assign_folder,
+    get_rating_details,
     subscription_dates_fre,
     subscription_dates_custom,
     booking_history,

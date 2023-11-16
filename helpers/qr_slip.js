@@ -179,4 +179,3 @@ export const generateQRCode = async (qr_codes) => {
 
 
 
-

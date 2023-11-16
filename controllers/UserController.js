@@ -7,6 +7,7 @@ import dateFormat from 'date-and-time';
 dotenv.config();
 import Stripe from "stripe";
 import path from "path";
+import { isThisMonth, isThisWeek, isToday } from '../helpers/date.js';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 
@@ -78,12 +79,11 @@ export const order_managament_user_singup = async(req,res)=>{
 					dbConnection.query(checkIfMobileExist,async function (error, mobiledata) {
 					if(mobiledata[0].mobiletotal == 0){
 
-
+						console.log('password',password)
 					bcrypt.hash(password, saltRounds, function(error, hash) {
+						console.log('hash',hash)
 						if(role == 2){
 						if(req.files.licence_front_image){
-							console.log('req.files.licence_front_image[0].key',req.files.licence_front_image[0].key)
-							console.log('req.files',req.files.licence_front_image)
 							var licence_front_image = req.files.licence_front_image[0].key;
 							console.log("1",licence_front_image)
 						}else{
@@ -102,15 +102,15 @@ export const order_managament_user_singup = async(req,res)=>{
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,group_id,zip_code,country,state,city,address,licence_front_image,licence_back_image,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+group_id+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+licence_front_image+"','"+licence_back_image+"','"+profile_image+"','"+area+"')";
 						}else{
 							if(req.files.profile_image){
-							var profile_image = "uploads/"+req.files.profile_image[0].key;
+							var profile_image = req.files.profile_image[0].key;
 							}else{
 							var profile_image = '';
 							}
 							var sql = "INSERT INTO users (name, email,password,mobile,role,latitude,longitude,dob,zip_code,country,state,city,address,profile_image,area) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+role+"','"+latitude+"','"+longitude+"','"+dob+"','"+zip_code+"','"+country+"','"+state+"','"+city+"','"+address+"','"+profile_image+"','"+area+"')";
 						}
+						console.log('kaisql',sql)
 						
 						dbConnection.query(sql, function (err, result) {
-							console.log(result)
 							if (err) throw err;
 							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
@@ -138,7 +138,6 @@ export const order_managament_user_singup = async(req,res)=>{
 }
 
 export const order_managament_user_update = async (req, res) => {
-	console.log(req.files)
     try {
         const saltRounds = 10;
         const { id, name, password, latitude, longitude, group_id, zip_code, country, state, city, address, area } = req.body;
@@ -155,6 +154,7 @@ export const order_managament_user_update = async (req, res) => {
                     const checkIfPasswordExist = "SELECT id FROM users WHERE password = '" + password + "'";
                     dbConnection.query(checkIfPasswordExist, async function (error, passwordData) {
                         if (passwordData.length === 0) {
+						
                             bcrypt.hash(password, saltRounds, function (error, hash) {
                                 const updateQuery = "UPDATE users SET name = '" + name + "', password = '" + hash + "', latitude = '" + latitude + "', longitude = '" + longitude + "', zip_code = '" + zip_code + "', country = '" + country + "', state = '" + state + "', city = '" + city + "', address = '" + address + "', area = '" + area + "', profile_image = '" + profile_image + "' WHERE id = '" + id + "'";
                                 dbConnection.query(updateQuery, function (err, result) {
@@ -322,7 +322,7 @@ export const forgot_password = async(req,res)=>{
 		const {email} = req.body;
 		if(email){
 			const checkIfEmailExist = "select * from users where email = '"+email+"'";
-			console.log('checkIfEmailExist',checkIfEmailExist)
+
 			dbConnection.query(checkIfEmailExist, function (err, data) {
 				if(data.length > 0){
 					var otp = 123456
@@ -968,6 +968,368 @@ export const order_list = async (req, res) => {
 	}
   };
   
+  export const order_list_dry_clean = async (req, res) => {
+	try {
+	var datetime = new Date();
+    const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
+	const list =
+		"SELECT b.id, b.order_id,b.driver_id,b.folder_id,b.order_id AS Folder, b.order_id AS Nearby_driver, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_status AS order_images, b.order_type, cda.address, bins.delievery_instruction ,users.name,users.email,users.mobile FROM bookings AS b left JOIN customer_drop_address AS cda ON b.user_id = cda.user_id left JOIN booking_instructions AS bins ON b.user_id = bins.user_id left join users on b.user_id = users.id WHERE b.cron_status = 1 and b.order_type = 3 and b.date = '"+currentFinalDate+"' order by id desc";
+	  const data = await new Promise((resolve, reject) => {
+		dbConnection.query(list, (error, data) => {
+		  if (error) {reject(error);
+		  } else {
+			resolve(data);
+		  }
+		});
+	  });
+	  console.log(data,"data1")
+	  const driverData = [];
+	  const folderData = [];
+	  const imagesData = [];
+  
+	  for (const item of data) {
+		if (item.Nearby_driver) {
+		  const driver_list = `SELECT id, name, SQRT(POW(69.1 * (30.7320 - latitude), 2) + POW(69.1 * ((longitude - 76.7726) * COS(30.7320 / 57.3)), 2)) AS distance FROM users   WHERE role = 2 ORDER BY distance ASC`;
+  
+		  const driverResults = await new Promise((resolve, reject) => {
+			dbConnection.query(driver_list, (error, Data) => {
+			  if (error) {
+				reject(error);
+			  } else {
+				resolve(Data);
+			  }
+			});
+		  });
+		  console.log(driverResults,"data2")
+		  driverData.push(driverResults);
+		  item.Nearby_driver = driverResults;
+		}
+		if (item.Folder) {
+			const Folder_list = `SELECT id, name FROM users WHERE role = 3`;
+	
+			const folderResults = await new Promise((resolve, reject) => {
+			  dbConnection.query(Folder_list, (error, Dataa) => {
+				if (error) {
+				  reject(error);
+				} else {
+				  resolve(Dataa);
+				}
+			  });
+			});
+			console.log(folderResults,"data3")
+			folderData.push(folderResults);
+			item.Folder = folderResults;
+		  }
+  
+		if (item.delievery_day === 0) {
+		  item.delievery_day = "Same Day";
+		} else if (item.delievery_day === 1) {
+		  item.delievery_day = "Next Day";
+		}
+  
+		if (item.status === 0) {
+		  item.status = "Inactive";
+		} else if (item.status === 1) {
+		  item.status = "Active";
+		}
+  
+		console.log(item.order_status)
+  
+		if (item.order_status === 9) {
+		  item.order_status = "tagging";
+		} else if (item.order_status === 10) {
+		  item.order_status = "Spotting";
+		} else if (item.order_status === 11) {
+		  item.order_status = "Cleaning";
+		} else if (item.order_status === 4) {
+		  item.order_status = "Package";
+		} else if (item.order_status === 12) {
+			item.order_status = "Inspect";
+		  } else if (item.order_status === 13) {
+			item.order_status = "Press";
+		  } else if (item.order_status === 5) {
+		  item.order_status = "Order Collected";
+		} else if (item.order_status === 6) {
+		  item.order_status = "Completed";
+		} else if (item.order_status === 7) {
+		  item.order_status = "Order Not Found";
+		} else if (item.order_status === 8) {
+		  item.order_status = "Order Pickup";
+		} else {
+		  item.order_status = "NA";
+		}
+		const imagesQuery= `SELECT bi.pickup_images,bi.tagging_images,bi.spoting_images,bi.cleaning_images,bi.inspect_images,bi.press_images,bi.package_images,bi.drop_image,bi.extra_load_images FROM dry_clean_booking_images AS bi left JOIN bookings AS b ON bi.booking_id = b.id WHERE bi.pickup_images IS NOT NULL and b.id = ${item.id} `
+		if (item.order_images === 9) {
+			const imagesResults = await new Promise((resolve, reject) => {
+			  dbConnection.query(imagesQuery, (error, Data) => {
+				if (error) {
+				  reject(error);
+				} else {
+				  const separatedStrings = Data[0].wash_images.split(", ");
+				  const imageList = [];
+		  
+				  separatedStrings.forEach(val => {
+					const subImages = val.split(',').map(subVal => {
+					  return `${process.env.S3_URL}${subVal.trim()}`;
+					});
+					const subImageObjects = subImages.map(subImagePath => ({
+					  path: subImagePath,
+					  type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					}));
+		  
+					imageList.push(subImageObjects);
+				  });
+				  const flattenedImageList = [].concat(...imageList);
+		  
+				  resolve(flattenedImageList);
+				}
+			  });
+			});
+		  
+			imagesData.push(imagesResults);
+			item.order_images = imagesResults;
+		  } else if (item.order_images === 10) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const imageList = [];
+
+				  	if(Data[0].dry_images){
+
+					const separatedStrings = Data[0].tagging_images.split(", ");
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.S3_URL}${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+				}
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		} else if (item.order_images === 11) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const imageList = [];
+				  	if(Data[0].cleaning_images){
+					const separatedStrings = Data[0].cleaning_images.split(", ");
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.S3_URL}${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+				}
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		} else if (item.order_images === 12) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const imageList = [];
+				  	if(Data[0].inspect_images){
+					const separatedStrings = Data[0].inspect_images.split(", ");
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.S3_URL}${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+				}
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		} else if (item.order_images === 13) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const imageList = [];
+				  	if(Data[0].press_images){
+					const separatedStrings = Data[0].press_images.split(", ");
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.S3_URL}${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+				}
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		} else if (item.order_images === 4) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const imageList = [];
+				  	if(Data[0].package_images){
+					const separatedStrings = Data[0].package_images.split(", ");
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.S3_URL}${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+				}
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		} else if (item.order_images === 6) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const imageList = [];
+
+				  	if(Data[0].drop_image){
+					const separatedStrings = Data[0].drop_image.split(", ");
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.S3_URL}${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+					}
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		}else if (item.order_images === 8) {
+			const imagesResults = await new Promise((resolve, reject) => {
+				dbConnection.query(imagesQuery, (error, Data) => {
+				  if (error) {
+					reject(error);
+				  } else {
+					const separatedStrings = Data[0].pickup_images.split(", ");
+					const imageList = [];
+			
+					separatedStrings.forEach(val => {
+					  const subImages = val.split(',').map(subVal => {
+						return `${process.env.S3_URL}${subVal.trim()}`;
+					  });
+					  const subImageObjects = subImages.map(subImagePath => ({
+						path: subImagePath,
+						type: path.extname(subImagePath) === '.mov' || path.extname(subImagePath) === '.mp4' ? 'video' : 'image',
+					  }));
+			
+					  imageList.push(subImageObjects);
+					});
+					const flattenedImageList = [].concat(...imageList);
+			
+					resolve(flattenedImageList);
+				  }
+				});
+			  });
+			
+			  imagesData.push(imagesResults);
+			  item.order_images = imagesResults;
+		} else {
+		  item.order_images = "No_images";
+		}
+  
+		if (item.order_type === 1) {
+		  item.order_type = "One Time Order";
+		} else if (item.order_type === 2) {
+		  item.order_type = "Subscription Order";
+		} else if (item.order_type === 3) {
+		  item.order_type = "Dry Clean Order";
+		}
+  
+		if (item.delievery_instruction) {
+		  item.delievery_instruction = 1;
+		} else {
+		  item.delievery_instruction = 0;
+		}
+	  }
+  
+	  res.json({ status: true, message: "List retrieved successfully", data });
+	} catch (error) {
+	  res.json({ status: false, message: error.message });
+	}
+  };
 
 export const driver_list = async (req, res) => {
 	try {
@@ -1150,6 +1512,101 @@ export const customer_list = async (req, res) => {
 		  	res.json({ status: false, message: error.message });
 		}
 	}
+
+	export const dry_clean_history = async (req, res) => {
+		try {
+		  const list = "SELECT order_id,name, order_status, date,time from bookings WHERE role = 3";
+		  dbConnection.query(list, function (error, data) {
+			if (error) throw error;
+			res.json({status: true, message: "List retrived succesfully", data: data});           
+		  });
+		} catch (error) {   
+		  res.json({ status: false, message: error.message });   
+		}   
+	  };  
+
+	  export const driver_data=async(req,res)=>{
+		try {
+			const driver_id= req.body.driver_id;
+			const user = "SELECT id,name, email, mobile,address,latitude,longitude FROM users WHERE id = ?";
+			dbConnection.query(user,[driver_id], function (error, data) {
+			  if (error) throw error;
+				const order= "SELECT id,date,order_id,order_status,order_type from bookings where driver_id=?";
+				dbConnection.query(order,[driver_id],async function(error,data2){
+					if(error) throw error;
+
+					const totalCountToday = data2.filter(row => isToday(row.date)).length;
+					const totalCountThisWeek = data2.filter(row => isThisWeek(row.date)).length;
+					const totalCountThisMonth = data2.filter(row => isThisMonth(row.date)).length;
+			
+					var order_status = data2.map((row) => {
+						if (row.order_status === 9) {
+						  return "tagging";
+						} else if (row.order_status === 10) {
+						  return "Spotting";
+						} else if (row.order_status === 11) {
+						  return "Cleaning";
+						} else if (row.order_status === 1) {
+						  return "wash";
+						} else if (row.order_status === 2) {
+						  return "Dry";
+						} else if (row.order_status === 3) {
+						  return "Fold";
+						} else if (row.order_status === 4) {
+						  return "Package";
+						} else if (row.order_status === 12) {
+						  return "Inspect";
+						} else if (row.order_status === 13) {
+						  return "Press";
+						} else if (row.order_status === 5) {
+						  return "Order Collected";
+						} else if (row.order_status === 6) {
+						  return "Completed";
+						} else if (row.order_status === 7) {
+						  return "Order Not Found";
+						} else if (row.order_status === 8) {
+						  return "Order Pickup";
+						} else {
+						  return "NA";
+						}
+					  });
+			  
+					  var order_type = data2.map((row) => {
+						if (row.order_type === 1) {
+						  return "Folder";
+						} else if (row.order_type === 2) {
+						  return "Folder";
+						} else if (row.order_type === 3) {
+						  return "Dry_Clean";
+						} else {
+						  return "NA";
+						}
+					  });
+			  
+					  const result = {
+						user: data[0],
+						booking_count: {
+						  totalCountToday,
+						  totalCountThisWeek,
+						  totalCountThisMonth,
+						},
+						booking_details: data2.map((row, index) => ({
+						  id: row.id,
+						  date: row.date,
+						  order_id: row.order_id,
+						  order_status: order_status[index],
+						  order_type: order_type[index],
+						})),
+					  };
+			  
+					  res.json({ status: true, message: "data retrieved successfully", data: result });
+				})
+			});
+
+		} catch (error) {
+			res.json({ status: false, message: error.message });
+		}
+	  }
 export default {
 	user_registered_address,
 	customer_register,
@@ -1168,6 +1625,7 @@ export default {
 	customer_list,
 	folder_list,
 	order_list,
+	order_list_dry_clean,
 	register_employee,
 	update_employee,
 	delete_employee,
@@ -1175,5 +1633,6 @@ export default {
 	customer_order_histroy,
 	get_deleivery_instruction,
 	order_managament_user_singup,
-	order_managament_user_update
+	order_managament_user_update,
+	driver_data
 }

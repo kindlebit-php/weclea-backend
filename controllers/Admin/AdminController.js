@@ -985,6 +985,27 @@ export const update_feedbackQes = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+export const update_admin_email = async(req,res)=>{
+
+        try { 
+            const userData = res.user;
+            const {email} = req.body;
+
+			const checkIfEmailExist = "select count(id) as total from users where email = '"+email+"'";
+			dbConnection.query(checkIfEmailExist,async function (error, data) {
+				if(data[0].total == 0){
+					var sql = "update users set email = '"+email+"' where id = '"+userData[0].id+"'";
+					dbConnection.query(sql, function (err, results) {
+					res.json({'status':true,"message":"Email updated successfully"});
+					}); 
+				}else{
+					res.json({'status':false,"message":'Email is already registered'});  
+				}
+			})
+        }catch (error) {
+            res.json({'status':false,"message":error.message});  
+        }
+}
 export const create_feedbackQes = async(req,res)=>{
 	const reqData = req.body;
     try { 
@@ -1175,7 +1196,8 @@ export default {
 	admin_login,
 	get_cities,
 	get_states,
-	get_countries,
-	getGraphData
+	getGraphData,
+	update_admin_email,
+	get_countries
 
 }
