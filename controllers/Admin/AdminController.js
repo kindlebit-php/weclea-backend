@@ -1177,5 +1177,4 @@ export default {
 	get_states,
 	get_countries,
 	getGraphData
-
 }
