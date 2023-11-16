@@ -316,7 +316,7 @@ export const update_service_status = async(req,res)=>{
 /******** Admin Dashboard Data API *********/
 export const get_dashboard_content = async(req,res)=>{
     try { 
-    	const loads = "SELECT COUNT(id) total_order,sum(total_loads) total_load  FROM `bookings` WHERE status=1 and bookings.order_type!=3";
+    	const loads = "SELECT COUNT(id) total_order,sum(total_loads) total_load  FROM `bookings` WHERE status=1 and cron_status=1";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
 			const qry = "SELECT count(id) total_users, users.role FROM `users` WHERE status=1 GROUP by role";
@@ -326,6 +326,41 @@ export const get_dashboard_content = async(req,res)=>{
 				}else{
 					data[0]['users']=users;
 					res.json({'status':true,"message":"Success",'data':data});
+				}
+			});
+
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const getGraphData=async(req,res)=>{
+	try { 
+    	const loads = "SELECT count(bookings.order_id) total_orders,sum(bookings.total_loads) total_loads,YEAR(bookings.created_at) years FROM `bookings` WHERE bookings.cron_status=1 and bookings.status=1 GROUP by YEAR(bookings.created_at)";
+		dbConnection.query(loads, function (error, data) {
+		if (error) throw error;
+			const qry = "SELECT count(bookings.order_id) total_orders,sum(bookings.total_loads) total_loads,month(bookings.created_at) month  FROM `bookings` WHERE bookings.cron_status=1 and bookings.status=1 and Year(now())=year(created_at) GROUP by month(bookings.created_at)";
+			dbConnection.query(qry, function (error, monthlyOrder) {
+				if (error){ 
+					throw error;
+				}else{
+					//
+					const qry = "SELECT count(bookings.order_id) total_orders,sum(bookings.total_loads) total_loads,month(bookings.created_at) month,users.city FROM `bookings` LEFT JOIN users on users.id=bookings.driver_id WHERE bookings.cron_status=1 and bookings.status=1 GROUP by users.city";
+					dbConnection.query(qry, function (error, countyOrder) {
+						if (error){ 
+							throw error;
+						}else{
+							//SELECT count(bookings.order_id) total_orders,sum(bookings.total_loads) total_loads,year(bookings.created_at) month,users.name FROM `bookings` LEFT JOIN users on users.id=bookings.user_id WHERE bookings.cron_status=1 GROUP by bookings.user_id,Year(bookings.created_at);
+							const qry = "SELECT count(bookings.order_id) total_orders,sum(bookings.total_loads) total_loads,year(bookings.created_at) month,users.name FROM `bookings` LEFT JOIN users on users.id=bookings.user_id WHERE bookings.cron_status=1 GROUP by bookings.user_id,Year(bookings.created_at)";
+							dbConnection.query(qry, function (error, userSalePerformance) {
+								if (error){ 
+									throw error;
+								}else{
+									res.json({'status':true,"message":"Success",'data':{yearly:data,monthlyOrder:monthlyOrder,countyOrder:countyOrder,userSalePerformance:userSalePerformance}});
+								}
+							});	
+						}
+					});	
 				}
 			});
 
@@ -1161,6 +1196,7 @@ export default {
 	admin_login,
 	get_cities,
 	get_states,
+	getGraphData,
 	update_admin_email,
 	get_countries
 
