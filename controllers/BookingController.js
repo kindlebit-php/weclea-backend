@@ -772,8 +772,6 @@ export const booking_tracking_details = async(req,res)=>{
                 if(deliever_date){
                    var bag_status = 1;
                 }
-
-
                     const laundry_detail = [
                       {
                         title: "Pickup Request",
@@ -784,19 +782,19 @@ export const booking_tracking_details = async(req,res)=>{
                       {
                         title: "Wash",
                         imageList: resWashImg,
-                        status:pickup_status,
+                        status:wash_status,
                         date: wash_date
                       },
                       {
                         title: "Dry",
                         imageList: resDryImg,
-                        status:pickup_status,
+                        status:dry_status,
                         date: dry_date
                       },
                       {
                         title: "Fold",
                         imageList: resFoldImg,
-                        status:pickup_status,
+                        status:fold_status,
                         date: fold_date
                       },
                       {
