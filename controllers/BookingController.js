@@ -556,6 +556,21 @@ export const booking_tracking_details = async(req,res)=>{
             var resSpotImg = [];
             var resTagImg = [];
             var resInspectImg = [];
+            var pickup_status = 0;
+            var press_status = 0;
+            var tagging_status = 0;
+            var spoting_status = 0;
+            var cleaning_status = 0;
+            var inspect_status = 0;
+            var package_status = 0;
+
+            var bag_status = 0;
+            var pack_status = 0;
+            var fold_status = 0;
+            var dry_status = 0;
+            var wash_status = 0;
+
+
             const userData = res.user;
             var datetime = new Date();
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
@@ -577,6 +592,7 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resPickImg[key] = process.env.S3_URL+img;
                     })
+                    var pickup_status = 1;
                 }
 
                 if(press_images){
@@ -585,6 +601,7 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resInspectImg[key] = process.env.S3_URL+img;
                     })
+                    var press_status = 1;
                 }
 
                 if(tagging_images){
@@ -593,6 +610,8 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resTagImg[key] = process.env.S3_URL+img;
                     })
+                    var tagging_status = 1;
+
                 }
 
                 if(spoting_images){
@@ -601,6 +620,8 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resSpotImg[key] = process.env.S3_URL+img;
                     })
+                    var spoting_status = 1;
+
                 }
 
                 if(cleaning_images){
@@ -609,6 +630,8 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resCleanImg[key] = process.env.S3_URL+img;
                     })
+                    var cleaning_status = 1;
+
                 }
 
                 if(inspect_images){
@@ -617,6 +640,8 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resInsImg[key] = process.env.S3_URL+img;
                     })
+                    var inspect_status = 1;
+
                 }
 
                 if(package_images){
@@ -625,55 +650,60 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resPackImg[key] = process.env.S3_URL+img;
                     })
+                    var package_status = 1;
+
+                }
+                if(deliever_date){
+                   var bag_status = 1;
                 }
 
                     const laundry_detail = [
                       {
                         title: "Pickup Request",
-                        status:1,
+                        status:pickup_status,
                         imageList: [],
                         date: request_confirm_date
                       },
                       {
                         title: "Tagging",
                         imageList: resTagImg,
-                        status:1,
+                        status:tagging_status,
                         date: tagging_date
                       }, 
                       {
                         title: "Spoting Stains",
                         imageList: resSpotImg,
-                        status:1,
+                        status:spoting_status,
                         date: spotting_date
                       },
                       {
                         title: "Cleaning",
                         imageList: resCleanImg,
-                        status:1,
+                        status:cleaning_status,
                         date: cleaning_date
                       },
                       {
                         title: "Inspect / Reclean",
                         imageList: resInsImg,
-                        status:1,
+                        status:inspect_status,
                         date: inspect_date
                       },
                       {
                         title: "Press",
                         imageList: resInspectImg,
-                        status:1,
+                        status:press_status,
                         date: press_date
                       }, 
                       {
                         title: "Package",
                         imageList: resPackImg,
-                        status:1,
+                        status:package_status,
                         imageList: resTagImg,
                         date: package_date
                       }, 
                       {
                         title: "Bags Delivered",
-                        status:1,
+                        status:bag_status,
                         imageList: [],
 
                         date: deliever_date
@@ -696,6 +726,8 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resPickImg[key] = process.env.S3_URL+img;
                     })
+                    var pickup_status = 1;
+
                 }
 
                 if(wash_images){
@@ -704,6 +736,8 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resWashImg[key] = process.env.S3_URL+img;
                     })
+                    var wash_status = 1;
+
                 }
 
                 if(dry_images){
@@ -712,6 +746,8 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resDryImg[key] = process.env.S3_URL+img;
                     })
+                    var dry_status = 1;
+
                 }
 
                 if(fold_images){
@@ -720,6 +756,8 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resFoldImg[key] = process.env.S3_URL+img;
                     })
+                    var fold_status = 1;
+
                 }
 
                 if(pack_images){
@@ -728,43 +766,48 @@ export const booking_tracking_details = async(req,res)=>{
                     {
                         resPackImg[key] = process.env.S3_URL+img;
                     })
+                    var pack_status = 1;
+
+                }
+                if(deliever_date){
+                   var bag_status = 1;
                 }
 
 
                     const laundry_detail = [
                       {
                         title: "Pickup Request",
-                        status:1,
+                        status:pickup_status,
                         imageList: [],
                         date: request_confirm_date
                       },
                       {
                         title: "Wash",
                         imageList: resWashImg,
-                        status:1,
+                        status:pickup_status,
                         date: wash_date
                       },
                       {
                         title: "Dry",
                         imageList: resDryImg,
-                        status:1,
+                        status:pickup_status,
                         date: dry_date
                       },
                       {
                         title: "Fold",
                         imageList: resFoldImg,
-                        status:1,
+                        status:pickup_status,
                         date: fold_date
                       },
                       {
                         title: "Pack",
                         imageList: resPackImg,
-                        status:1,
+                        status:pickup_status,
                         date: pack_date
                       }, 
                       {
                         title: "Bags Delivered",
-                        status:1,
+                        status:bag_status,
                         imageList: [],
                         date: deliever_date
                       }
