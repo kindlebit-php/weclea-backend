@@ -23,6 +23,30 @@ export const get_group_list = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+
+export const get_county_list = async(req,res)=>{
+    try { 
+    	const loads = "select * from wc_county where status=1 and isDeleted=0 order by name asc";
+		dbConnection.query(loads, function (error, data) {
+		if (error) throw error;
+			res.json({'status':true,"message":"Success",'data':data});
+		})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const get_all_county_list = async(req,res)=>{
+    try { 
+    	const loads = "select * from wc_county where isDeleted=0 order by name asc";
+		dbConnection.query(loads, function (error, data) {
+		if (error) throw error;
+			res.json({'status':true,"message":"Success",'data':data});
+		})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
 export const get_group_user_list = async(req,res)=>{
     try { 
     	const loads = "select * from wc_email_template  where wc_email_template.status=0 order by wc_rating_feeback.create_date desc";
@@ -34,6 +58,56 @@ export const get_group_user_list = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+export const update_county = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from wc_county where `name`=? and status=1 and city_id=? and id!=?";
+		dbConnection.query(qrySelect,[reqData.name, reqData.city_id, reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length<=0) { 
+			  
+			    
+					var addContnetQry = "update wc_county set `name`=?, city_id=? ,`status`=? where id=? ";
+				    dbConnection.query(addContnetQry,[reqData.name, reqData.city_id, 1,reqData.id], function (error, data) {
+					if (error) throw error;
+						res.json({'status':true,"message":"County has been updated successfully",'data':data});
+					});
+				
+
+			}else{
+				res.json({'status':false,"message":"Same county already exist"});
+			}
+		})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+export const create_county = async(req,res)=>{
+	const reqData = req.body;
+	console.log("create_county", reqData,req.files)
+	//wc_emp_group //`manage_name`, `profile_pic`, `location`, `country`, `group_name`, `zip_code`, 
+    try { 
+    	const qrySelect = "select id from wc_county where `name`=? and status=1 and city_id=?";
+		dbConnection.query(qrySelect,[reqData.name, reqData.city_id], function (error, data) {
+		if (error) throw error;
+			if (data.length<=0) {
+              	var addContnetQry = "insert wc_county set `name`=?, `city_id`=?,`status`=? ";
+			    dbConnection.query(addContnetQry,[reqData.name, reqData.city_id, 1], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":"County has been added successfully",'data':data});
+				});
+			    
+			}else{
+				res.json({'status':false,"message":"Same county already exist"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
+
+
 export const update_group = async(req,res)=>{
 	const reqData = req.body;
 	//`rating_id`, `feedback`
@@ -161,12 +235,66 @@ export const get_grouped_emp_list = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+export const update_county_status = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from wc_county where id=?";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "County has been deactivated successfully"
+				if (reqData.status==1) {
+					msg= "County has been activated successfully"
+				}
+			    var updateContnetQry = "update wc_county set status=? where id=? ";
+			    dbConnection.query(updateContnetQry,[reqData.status,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
 
+export const delete_County = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from wc_county where id=?";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "County has been activated successfully"
+				if (reqData.isDeleted==1) {
+					msg= "County has been deleted successfully"
+				}
+			    var updateContnetQry = "update wc_county set isDeleted=? where id=? ";
+			    dbConnection.query(updateContnetQry,[reqData.isDeleted,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
 /****** end Eamil section*******/
 export default {
 	get_group_list,
 	create_group,
 	update_group,
 	delete_group,
-	get_grouped_emp_list
+	get_grouped_emp_list,
+	get_county_list,
+	get_all_county_list,
+	create_county,
+	update_county,
+	update_county_status,
+	delete_County
 }
