@@ -733,7 +733,7 @@ export const customer_payment_BookingId = async (req, res) => {
                 } 
   
               })
-              const updateStatus = `UPDATE bookings SET payment_status = '1' WHERE id = '${booking_id}'`;
+              const updateStatus = `UPDATE bookings SET cron_status = 1, payment_status = '1' WHERE id = '${booking_id}'`;
               dbConnection.query(updateStatus, async function (error, updateStatus) {
                 if (error) {
                   return res.json({ status: false, message: 'error updating payment status' });

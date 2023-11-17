@@ -43,7 +43,7 @@ export const get_dry_clean_orders = async (req, res) => {
     const currentDate = dateFormat.format(datetime, "YYYY-MM-DD");
     // const order = `SELECT id,order_id, date, time FROM bookings WHERE cron_status = 1 AND date >= '${currentDate}' AND driver_id = ${userData[0].id}`;
     var order =
-      "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type = '3' and bookings.date = '" +
+      "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type = '3' and cron_status = 1 and bookings.date = '" +
       currentDate +
       "' and driver_id ='" +
       userData[0].id +
