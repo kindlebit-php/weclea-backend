@@ -1686,13 +1686,99 @@ export const customer_list = async (req, res) => {
 		}
 	  }
 
-	  export const order_managament_user_history = async(req,res)=>{
+	  export const order_managament_user_history = async (req, res) => {
 		try {
-			
+		 const list =
+      "SELECT b.id, b.order_id, b.category_id, b.delievery_day, CONCAT(b.date, ' ', b.time) AS Date_Time, b.total_loads, b.status, b.order_status, b.order_type, u.name AS user_name, d.name AS driver_name, f.name AS folder_name FROM bookings AS b LEFT JOIN users AS u ON b.user_id = u.id LEFT JOIN users AS d ON b.driver_id = d.id LEFT JOIN users AS f ON b.folder_id = f.id WHERE b.cron_status = 1 AND b.order_status = 6 ORDER BY b.id DESC";
+
+    const data = await new Promise((resolve, reject) => {
+      dbConnection.query(list, (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+		  
+		  const order_status = data.map((row) => {
+			if (row.order_status === 9) {
+			  return "tagging";
+			} else if (row.order_status === 10) {
+			  return "Spotting";
+			} else if (row.order_status === 11) {
+			  return "Cleaning";
+			} else if (row.order_status === 1) {
+			  return "wash";
+			} else if (row.order_status === 2) {
+			  return "Dry";
+			} else if (row.order_status === 3) {
+			  return "Fold";
+			} else if (row.order_status === 4) {
+			  return "Package";
+			} else if (row.order_status === 12) {
+			  return "Inspect";
+			} else if (row.order_status === 13) {
+			  return "Press";
+			} else if (row.order_status === 5) {
+			  return "Order Collected";
+			} else if (row.order_status === 6) {
+			  return "Completed";
+			} else if (row.order_status === 7) {
+			  return "Order Not Found";
+			} else if (row.order_status === 8) {
+			  return "Order Pickup";
+			} else {
+			  return "NA";
+			}
+		  });
+	  
+		  const order_type = data.map((row) => {
+			if (row.order_type === 1 || row.order_type === 2 || row.order_type === 4) {
+			  return "Laundry";
+			} else if (row.order_type === 3) {
+			  return "DryClean";
+			} else {
+			  return "NA";
+			}
+		  });
+
+		  const status = data.map((row) => {
+			if (row.status === 0 ) {
+			  return "inactive";
+			} else if (row.status === 1) {
+			  return "active";
+			} else {
+			  return "NA";
+			}
+		  });
+
+		  const delievery_day = data.map((row) => {
+			if (row.delievery_day === 0 ) {
+			  return "same day";
+			} else if (row.delievery_day === 1) {
+			  return "next day";
+			} else {
+			  return "NA";
+			}
+		  });
+	  
+		  res.json({
+			status: true,
+			message: "data retrieved successfully",
+			data: data.map((row, index) => ({
+			  ...row,
+			  order_status: order_status[index],
+			  order_type: order_type[index],
+			  status: status[index],
+			  delievery_day:delievery_day[index]
+			})),
+		  });
 		} catch (error) {
-			res.json({ status: false, message: error.message });
+		  res.json({ status: false, message: error.message });
 		}
-	  }
+	  };
+	  
 export default {
 	user_registered_address,
 	customer_register,
