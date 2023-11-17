@@ -102,21 +102,21 @@ export const assignRole = async(req,res)=>{
 export const getRoleAndPermissionById = async(req,res)=>{
 	var arg= req.params;
    	if (!arg.role_id || arg.role_id=='') {
-      return res.json({
-         "success":false,
-         "body":"",
-         "message":"All field required"
-       });
+		return res.json({
+		 	"success":false,
+		 	"body":"",
+		 	"message":"All field required"
+		});
    	}	
   	try {    
   	    console.log('getRoleAndPermissionById', arg);
 	    var role_id = arg.role_id;
 	    dbConnection.query("SELECT  wc_permissions.perm_mod,wc_permissions.perm_desc,wc_role.role ,wc_roles_permissions.*,wc_roles_permissions.id roles_permissions_id,wc_permissions.id permission_id FROM wc_permissions LEFT JOIN wc_roles_permissions on wc_roles_permissions.permission=wc_permissions.id and wc_roles_permissions.role_id=? LEFT JOIN wc_role on wc_role.id=wc_roles_permissions.role_id GROUP by wc_permissions.id", [role_id], (error, roleAndPermission, fields) => {
-	      if (!!error) {
-	        console.log(error)
-	        res.json({ "success": false, "message": error.code });
-	      }
-	      res.json({ "success": true, "message": "success", body: roleAndPermission });
+			if (!!error) {
+				console.log(error)
+				res.json({ "success": false, "message": error.code });
+			}			
+	      	res.json({ "success": true, "message": "success", body: roleAndPermission });
 	    });
   	}catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -485,7 +485,7 @@ export const updateLoginAccess = async(req,res)=>{
 	        if (arg.isAdmin) {
 	          msg = "Admin login access granted"
 	        }
-	        dbConnection.query("UPDATE `users` SET `isAdmin`=IF(isAdmin='1', '0', '1') where id=?", [arg.user_id], function (error, row) {
+	        dbConnection.query("UPDATE `users` SET `isAdmin`=IF(isAdmin=1, 0, 1) where id=?", [arg.user_id], function (error, row) {
 	          if (!!error) {
 	            console.log('error', error);
 	            res.json({ "success": false, "message": error.code });
