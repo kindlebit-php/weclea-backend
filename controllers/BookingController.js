@@ -699,7 +699,7 @@ export const booking_tracking_status_both = async(req,res)=>{
                     ];
                     console.log('laundry_detail',laundry_detail)
                     const init = {
-                    'id':id,"laundry_detail":laundry_detail
+                    'id':id,'order_type':order_type,"laundry_detail":laundry_detail
                     }
                     resData.push(init)
                 }else{
@@ -804,7 +804,7 @@ export const booking_tracking_status_both = async(req,res)=>{
                     ];
 
                 const initi = {
-                    "id":id,'laundry_detail':laundry_detail
+                    "id":id,'order_type':order_type,'laundry_detail':laundry_detail
                 }
                     resData.push(initi)
 
