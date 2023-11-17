@@ -112,8 +112,8 @@ export const update_group = async(req,res)=>{
 	const reqData = req.body;
 	//`rating_id`, `feedback`
     try { 
-    	const qrySelect = "select id from wc_emp_group where `group_name`=? and status=0 and zip_code=? and id!=?";
-		dbConnection.query(qrySelect,[reqData.group_name, reqData.zip_code, reqData.id], function (error, data) {
+    	const qrySelect = "select id from wc_emp_group where `group_name`=? and status=0 and county=? and id!=?";
+		dbConnection.query(qrySelect,[reqData.group_name, reqData.county, reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) { 
 			  
@@ -122,16 +122,16 @@ export const update_group = async(req,res)=>{
 			    	req.files.map(function(file) {
 			            console.log("File uplaod ===>", {url: file.location, name: file.key, type: file.mimetype, size: file.size});
 			       		reqData.profile_pic=file.location;
-		              	var addContnetQry = "update wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=?,`state`=?, `county`=? where id=?";
-					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.state,reqData.county ,reqData.id], function (error, data) {
+		              	var addContnetQry = "update wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=?,`state`=?, `county`=?, city=? where id=?";
+					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.state,reqData.county,reqData.city ,reqData.id], function (error, data) {
 						if (error) throw error;
 							res.json({'status':true,"message":"Group has been updated successfully",'data':data});
 						});
 			        });
 
 				}else{
-					var addContnetQry = "update wc_emp_group set `manage_name`=?, location=?,country=?,group_name=?, zip_code=? ,`state`=?, `county`=? where id=? ";
-				    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.location, reqData.country, reqData.group_name, reqData.zip_code, reqData.state,reqData.county ,reqData.id], function (error, data) {
+					var addContnetQry = "update wc_emp_group set `manage_name`=?, location=?,country=?,group_name=?, zip_code=? ,`state`=?, `county`=?, city=? where id=? ";
+				    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.location, reqData.country, reqData.group_name, reqData.zip_code, reqData.state,reqData.county,reqData.city ,reqData.id], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Group has been updated successfully",'data':data});
 					});
@@ -151,8 +151,8 @@ export const create_group = async(req,res)=>{
 	console.log("create_group", reqData,req.files)
 	//wc_emp_group //`manage_name`, `profile_pic`, `location`, `country`, `group_name`, `zip_code`, 
     try { 
-    	const qrySelect = "select id from wc_emp_group where `group_name`=? and status=0 and zip_code=?";
-		dbConnection.query(qrySelect,[reqData.group_name, reqData.zip_code], function (error, data) {
+    	const qrySelect = "select id from wc_emp_group where `group_name`=? and status=0 and county=?";
+		dbConnection.query(qrySelect,[reqData.group_name, reqData.county], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) {
 
@@ -161,16 +161,16 @@ export const create_group = async(req,res)=>{
 			    	req.files.map(function(file) {
 			            console.log("File uplaod ===>", {url: file.location, name: file.key, type: file.mimetype, size: file.size});
 			       		reqData.profile_pic=file.location;
-		              	var addContnetQry = "insert wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=?,`state`=?, `county`=? ";
-					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.state,reqData.county], function (error, data) {
+		              	var addContnetQry = "insert wc_emp_group set `manage_name`=?, `profile_pic`=?,location=?,country=?,group_name=?, zip_code=?,`state`=?, `county`=?, city=? ";
+					    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.profile_pic, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.state,reqData.county,reqData.city], function (error, data) {
 						if (error) throw error;
 							res.json({'status':true,"message":"Group has been created successfully",'data':data});
 						});
 			        });
 
 				}else{
-					var addContnetQry = "insert wc_emp_group set `manage_name`=?, location=?,country=?,group_name=?, zip_code=? ";
-				    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.location, reqData.country, reqData.group_name, reqData.zip_code], function (error, data) {
+					var addContnetQry = "insert wc_emp_group set `manage_name`=?, location=?,country=?,group_name=?, zip_code=?,city=? ";
+				    dbConnection.query(addContnetQry,[reqData.manage_name, reqData.location, reqData.country, reqData.group_name, reqData.zip_code,reqData.city], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":"Group has been created successfully",'data':data});
 					});
@@ -178,7 +178,7 @@ export const create_group = async(req,res)=>{
 
 			    
 			}else{
-				res.json({'status':false,"message":"Same email template already exist"});
+				res.json({'status':false,"message":"Same County Group already exist"});
 			}
 		});
     }catch (error) {
