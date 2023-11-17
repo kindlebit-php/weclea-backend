@@ -50,12 +50,12 @@ export const Scan_received_loads = (req, res) => {
 export const Scan_loads_folder = (req, res) => {
   try {
     const userData = res.user;
-    const { qr_code, type } = req.body;
+    const { qr_code, type,bookingId } = req.body;
     const currentTime = time();
     const currentDate = date();
     const wash_scan_timing = `${currentDate} ${currentTime}`;
-    const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ?";
-    dbConnection.query(verifyQr, [qr_code], function (error, data) {
+    const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ? AND booking_id = ?";
+    dbConnection.query(verifyQr, [qr_code,bookingId], function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
