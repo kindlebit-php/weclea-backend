@@ -26,7 +26,7 @@ export const get_group_list = async(req,res)=>{
 
 export const get_county_list = async(req,res)=>{
     try { 
-    	const loads = "select * from wc_county where status=1 and isDeleted=0 order by name asc";
+    	const loads = "select wc_county.*,wc_states.id state_id, wc_states.name state_name,wc_cities.name city_name from wc_county LEFT JOIN wc_cities on wc_cities.id=wc_county.city_id LEFT JOIN wc_states on wc_states.id=wc_cities.state_id where wc_county.status=1 and wc_county.isDeleted=0 order by wc_county.name asc;";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
 			res.json({'status':true,"message":"Success",'data':data});
@@ -37,7 +37,7 @@ export const get_county_list = async(req,res)=>{
 }
 export const get_all_county_list = async(req,res)=>{
     try { 
-    	const loads = "select * from wc_county where isDeleted=0 order by name asc";
+    	const loads = "select wc_county.*,wc_states.id state_id, wc_states.name state_name,wc_cities.name city_name from wc_county LEFT JOIN wc_cities on wc_cities.id=wc_county.city_id LEFT JOIN wc_states on wc_states.id=wc_cities.state_id where  wc_county.isDeleted=0 order by wc_county.name asc";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
 			res.json({'status':true,"message":"Success",'data':data});
