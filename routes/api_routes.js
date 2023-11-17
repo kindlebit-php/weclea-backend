@@ -42,7 +42,8 @@ router.post("/folder-data",userController.folder_data)
 router.get("/customer-list",userController.customer_list)
 router.get("/folder-list",userController.folder_list)
 router.get("/order-list",userController.order_list)
-router.get("/order_list_dry_clean",userController.order_list_dry_clean)
+router.get("/order-list-dry-clean",userController.order_list_dry_clean)
+router.get("/order-managament-user-history",userController.order_managament_user_history)
 
 router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
