@@ -876,15 +876,21 @@ export const booking_tracking_details = async(req,res)=>{
                         resPickImg[key] = process.env.S3_URL+img;
                     })
                     var pickup_status = 1;
+                }else{
+                    var pickup_status = 0;
+                    resPickImg = [];
                 }
 
                 if(press_images){
-                    const press_images_array = inspect_date.split(',');
+                    const press_images_array = press_images.split(',');
                     press_images_array.forEach(function callback(img, key)
                     {
                         resInspectImg[key] = process.env.S3_URL+img;
                     })
                     var press_status = 1;
+                }else{
+                    var press_status = 0;
+                    resInspectImg = [];
                 }
 
                 if(tagging_images){
@@ -895,6 +901,9 @@ export const booking_tracking_details = async(req,res)=>{
                     })
                     var tagging_status = 1;
 
+                }else{
+                    var tagging_status = 0;
+                    resTagImg = [];
                 }
 
                 if(spoting_images){
@@ -905,6 +914,9 @@ export const booking_tracking_details = async(req,res)=>{
                     })
                     var spoting_status = 1;
 
+                }else{
+                    var spoting_status = 0;
+                    resSpotImg = [];
                 }
 
                 if(cleaning_images){
@@ -915,6 +927,9 @@ export const booking_tracking_details = async(req,res)=>{
                     })
                     var cleaning_status = 1;
 
+                }else{
+                    var cleaning_status = 0;
+                    resCleanImg = [];
                 }
 
                 if(inspect_images){
@@ -925,6 +940,9 @@ export const booking_tracking_details = async(req,res)=>{
                     })
                     var inspect_status = 1;
 
+                }else{
+                    var inspect_status = 0;
+                    resInsImg = [];
                 }
 
                 if(package_images){
@@ -935,9 +953,15 @@ export const booking_tracking_details = async(req,res)=>{
                     })
                     var package_status = 1;
 
+                }else{
+                    var package_status = 0;
+                    resPackImg = [];
                 }
                 if(deliever_date){
                    var bag_status = 1;
+                }else{
+                   var bag_status = 0;
+
                 }
 
                     const laundry_detail = [
@@ -945,51 +969,51 @@ export const booking_tracking_details = async(req,res)=>{
                         title: "Pickup Request",
                         status:pickup_status,
                         imageList: [],
-                        date: request_confirm_date
+                        date: request_confirm_date || ''
                       },
                       {
                         title: "Tagging",
                         imageList: resTagImg,
                         status:tagging_status,
-                        date: tagging_date
+                        date: tagging_date || ''
                       }, 
                       {
                         title: "Spoting Stains",
                         imageList: resSpotImg,
                         status:spoting_status,
-                        date: spotting_date
+                        date: spotting_date || ''
                       },
                       {
                         title: "Cleaning",
                         imageList: resCleanImg,
                         status:cleaning_status,
-                        date: cleaning_date
+                        date: cleaning_date || ''
                       },
                       {
                         title: "Inspect / Reclean",
                         imageList: resInsImg,
                         status:inspect_status,
-                        date: inspect_date
+                        date: inspect_date || ''
                       },
                       {
                         title: "Press",
                         imageList: resInspectImg,
                         status:press_status,
-                        date: press_date
+                        date: press_date || ''
                       }, 
                       {
                         title: "Package",
                         imageList: resPackImg,
                         status:package_status,
                         imageList: resTagImg,
-                        date: package_date
+                        date: package_date || ''
                       }, 
                       {
                         title: "Bags Delivered",
                         status:bag_status,
                         imageList: [],
 
-                        date: deliever_date
+                        date: deliever_date || ''
                       }
                     ];
 
@@ -1011,6 +1035,9 @@ export const booking_tracking_details = async(req,res)=>{
                     })
                     var pickup_status = 1;
 
+                }else{
+                    var pickup_status = 0;
+                    resPickImg = [];
                 }
 
                 if(wash_images){
@@ -1021,6 +1048,9 @@ export const booking_tracking_details = async(req,res)=>{
                     })
                     var wash_status = 1;
 
+                }else{
+                    var wash_status = 0;
+                    resWashImg = [];
                 }
 
                 if(dry_images){
@@ -1031,6 +1061,9 @@ export const booking_tracking_details = async(req,res)=>{
                     })
                     var dry_status = 1;
 
+                }else{
+                    var dry_status = 0;
+                    resDryImg = [];
                 }
 
                 if(fold_images){
@@ -1041,6 +1074,9 @@ export const booking_tracking_details = async(req,res)=>{
                     })
                     var fold_status = 1;
 
+                }else{
+                    var fold_status = 0;
+                    resFoldImg = [];
                 }
 
                 if(pack_images){
@@ -1051,46 +1087,53 @@ export const booking_tracking_details = async(req,res)=>{
                     })
                     var pack_status = 1;
 
+                }else{
+                    var pack_status = 0;
+                    resPackImg = [];
                 }
+
                 if(deliever_date){
                    var bag_status = 1;
+                }else{
+                   var bag_status = 0;
+
                 }
                     const laundry_detail = [
                       {
                         title: "Pickup Request",
                         status:pickup_status,
                         imageList: [],
-                        date: request_confirm_date
+                        date: request_confirm_date || ''
                       },
                       {
                         title: "Wash",
                         imageList: resWashImg,
                         status:wash_status,
-                        date: wash_date
+                        date: wash_date || ''
                       },
                       {
                         title: "Dry",
                         imageList: resDryImg,
                         status:dry_status,
-                        date: dry_date
+                        date: dry_date || ''
                       },
                       {
                         title: "Fold",
                         imageList: resFoldImg,
                         status:fold_status,
-                        date: fold_date
+                        date: fold_date || ''
                       },
                       {
                         title: "Pack",
                         imageList: resPackImg,
                         status:pickup_status,
-                        date: pack_date
+                        date: pack_date || ''
                       }, 
                       {
                         title: "Bags Delivered",
                         status:bag_status,
                         imageList: [],
-                        date: deliever_date
+                        date: deliever_date || ''
                       }
                     ];
 
