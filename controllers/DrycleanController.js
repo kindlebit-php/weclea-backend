@@ -244,7 +244,7 @@ export const get_category = async (req, res) => {
           return res.json({ status: false, message: error.message });
         }
   
-        if ((type == 0) || (type >= 9 && type <= 13)) {
+        if ((type == 0 && type == 9 && type == 10 && type == 11 && type == 12 && type == 13)) {
           if (data.length === 0 || data[0].driver_pickup_status !== 1 ) {
             return res.json({ status: false, message: "Invalid QR code or load status" });
           }
