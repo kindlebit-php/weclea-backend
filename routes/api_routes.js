@@ -194,6 +194,15 @@ router.post("/create_group",uploadS3.array('profile_pic',25),groupController.cre
 router.post("/update_group",uploadS3.array('profile_pic',25),groupController.update_group);
 router.post("/delete_group",CheckAuth,groupController.delete_group)
 router.post("/get_grouped_emp_list",CheckAuth,groupController.get_grouped_emp_list)
+router.get("/get_county_list",groupController.get_county_list)
+router.get("/get_all_county_list",CheckAuth,groupController.get_all_county_list)
+router.post("/create_county",CheckAuth,groupController.create_county)
+router.post("/update_county",CheckAuth,groupController.update_county)
+router.post("/update_county_status",CheckAuth,groupController.update_county_status)
+router.post("/delete_County",CheckAuth,groupController.delete_County)
+
+
+
 
 /****** Admin Role & Permission ***********/
 router.get("/getRole",CheckAuth,permissionController.getRole)
