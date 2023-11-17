@@ -245,23 +245,23 @@ export const get_category = async (req, res) => {
             }
 
             if ([0, 9, 10, 11, 12, 13].includes(type)) {
-                if (data.length === 0 || data[0].driver_pickup_status !== 1) {
+                if (data.length == 0 || data[0].driver_pickup_status != 1) {
                     return res.json({ status: false, message: "Invalid QR code or load status" });
                 }
 
                 let update_Date_Time2;
 
-                if (type === 0) {
+                if (type == 0) {
                     update_Date_Time2 = `UPDATE dry_clean_booking_timing SET tagging_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-                } else if (type === 9) {
+                } else if (type == 9) {
                     update_Date_Time2 = `UPDATE dry_clean_booking_timing SET spotting_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-                } else if (type === 10) {
+                } else if (type == 10) {
                     update_Date_Time2 = `UPDATE dry_clean_booking_timing SET cleaning_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-                } else if (type === 11) {
+                } else if (type == 11) {
                     update_Date_Time2 = `UPDATE dry_clean_booking_timing SET inspect_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-                } else if (type === 12) {
+                } else if (type == 12) {
                     update_Date_Time2 = `UPDATE dry_clean_booking_timing SET press_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
-                } else if (type === 13) {
+                } else if (type == 13) {
                     update_Date_Time2 = `UPDATE dry_clean_booking_timing SET package_scan_timing = '${wash_scan_timing}' WHERE booking_id = ${data[0].booking_id}`;
                 }
 
