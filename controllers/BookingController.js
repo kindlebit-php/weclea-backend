@@ -699,7 +699,7 @@ export const booking_tracking_status_both = async(req,res)=>{
                     ];
                     console.log('laundry_detail',laundry_detail)
                     const init = {
-                    'id':id,"laundry_detail":laundry_detail
+                    'id':id,'order_type':order_type,"laundry_detail":laundry_detail
                     }
                     resData.push(init)
                 }else{
@@ -804,7 +804,7 @@ export const booking_tracking_status_both = async(req,res)=>{
                     ];
 
                 const initi = {
-                    "id":id,'laundry_detail':laundry_detail
+                    "id":id,'order_type':order_type,'laundry_detail':laundry_detail
                 }
                     resData.push(initi)
 
@@ -858,9 +858,9 @@ export const booking_tracking_details = async(req,res)=>{
             var datetime = new Date();
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
             if(type == 3){
-                var sql = "select bookings.id,bookings.user_id,bookings.extra_loads,bookings.total_loads,bookings.order_id,dry_clean_booking_images.tagging_images,dry_clean_booking_images.spoting_images,dry_clean_booking_images.cleaning_images,dry_clean_booking_images.inspect_images,dry_clean_booking_images.drop_image,dry_clean_booking_images.press_images,dry_clean_booking_images.package_images,bookings.order_status,bookings.order_type,dry_clean_booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(dry_clean_booking_timing.driver_pick_date, ' ', dry_clean_booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(dry_clean_booking_timing.tagging_date, ' ', dry_clean_booking_timing.tagging_time) AS tagging_date,CONCAT(dry_clean_booking_timing.spotting_date, ' ', dry_clean_booking_timing.spotting_time) AS spotting_date,CONCAT(dry_clean_booking_timing.cleaning_date, ' ', dry_clean_booking_timing.cleaning_time) AS cleaning_date,CONCAT(dry_clean_booking_timing.inspect_date, ' ', dry_clean_booking_timing.inspect_time) AS inspect_date,CONCAT(dry_clean_booking_timing.press_date, ' ', dry_clean_booking_timing.press_time) AS press_date,CONCAT(dry_clean_booking_timing.package_date, ' ', dry_clean_booking_timing.package_time) AS package_date,CONCAT(dry_clean_booking_timing.deliever_date, ' ', dry_clean_booking_timing.deliever_time) AS deliever_date,users.email,users.mobile,users.name from bookings left join dry_clean_booking_timing on bookings.id = dry_clean_booking_timing.booking_id left join dry_clean_booking_images on dry_clean_booking_images.booking_id = bookings.id left join users on users.id=bookings.user_id  where bookings.id = '"+booking_id+"'";
+                var sql = "select bookings.id,bookings.user_id,bookings.extra_loads,bookings.total_loads,bookings.order_id,dry_clean_booking_images.tagging_images,dry_clean_booking_images.spoting_images,dry_clean_booking_images.cleaning_images,dry_clean_booking_images.inspect_images,dry_clean_booking_images.drop_image,dry_clean_booking_images.press_images,dry_clean_booking_images.package_images,bookings.order_status,bookings.order_type,dry_clean_booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(dry_clean_booking_timing.driver_pick_date, ' ', dry_clean_booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(dry_clean_booking_timing.tagging_date, ' ', dry_clean_booking_timing.tagging_time) AS tagging_date,CONCAT(dry_clean_booking_timing.spotting_date, ' ', dry_clean_booking_timing.spotting_time) AS spotting_date,CONCAT(dry_clean_booking_timing.cleaning_date, ' ', dry_clean_booking_timing.cleaning_time) AS cleaning_date,CONCAT(dry_clean_booking_timing.inspect_date, ' ', dry_clean_booking_timing.inspect_time) AS inspect_date,CONCAT(dry_clean_booking_timing.press_date, ' ', dry_clean_booking_timing.press_time) AS press_date,CONCAT(dry_clean_booking_timing.package_date, ' ', dry_clean_booking_timing.package_time) AS package_date,CONCAT(dry_clean_booking_timing.deliever_date, ' ', dry_clean_booking_timing.deliever_time) AS deliever_date,users.email,users.mobile,users.name ,ratings.rating_id,ratings.rating_feedback  from bookings left join dry_clean_booking_timing on bookings.id = dry_clean_booking_timing.booking_id left join ratings on ratings.booking_id = bookings.id left join dry_clean_booking_images on dry_clean_booking_images.booking_id = bookings.id left join users on users.id=bookings.user_id  where bookings.id = '"+booking_id+"'";
             }else{
-            var sql = "select bookings.id,bookings.user_id,bookings.extra_loads,bookings.total_loads,bookings.order_id,booking_images.wash_images,booking_images.dry_images,booking_images.fold_images,booking_images.pack_images,booking_images.drop_image,bookings.order_status,bookings.order_type,booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.driver_pick_date, ' ', booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(booking_timing.wash_date, ' ', booking_timing.wash_time) AS wash_date,CONCAT(booking_timing.dry_date, ' ', booking_timing.dry_time) AS dry_date,CONCAT(booking_timing.fold_date, ' ', booking_timing.fold_time) AS fold_date,CONCAT(booking_timing.pack_date, ' ', booking_timing.pack_time) AS pack_date,CONCAT(booking_timing.deliever_date, ' ', booking_timing.deliever_time) AS deliever_date, users.email,users.mobile, users.name from bookings left join booking_timing on bookings.id = booking_timing.booking_id left join booking_images on booking_images.booking_id = bookings.id left join users on users.id=bookings.user_id where bookings.id = '"+booking_id+"'";
+            var sql = "select bookings.id,bookings.user_id,bookings.extra_loads,bookings.total_loads,bookings.order_id,booking_images.wash_images,booking_images.dry_images,booking_images.fold_images,booking_images.pack_images,booking_images.drop_image,bookings.order_status,bookings.order_type,booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.driver_pick_date, ' ', booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(booking_timing.wash_date, ' ', booking_timing.wash_time) AS wash_date,CONCAT(booking_timing.dry_date, ' ', booking_timing.dry_time) AS dry_date,CONCAT(booking_timing.fold_date, ' ', booking_timing.fold_time) AS fold_date,CONCAT(booking_timing.pack_date, ' ', booking_timing.pack_time) AS pack_date,CONCAT(booking_timing.deliever_date, ' ', booking_timing.deliever_time) AS deliever_date, users.email,users.mobile, users.name, ratings.rating_id,ratings.rating_feedback from bookings left join ratings on ratings.booking_id = bookings.id left join booking_timing on bookings.id = booking_timing.booking_id left join booking_images on booking_images.booking_id = bookings.id left join users on users.id=bookings.user_id where bookings.id = '"+booking_id+"'";
             }
             console.log('tracking_sql',sql)
             dbConnection.query(sql, function (err, resultss) {
@@ -868,7 +868,7 @@ export const booking_tracking_details = async(req,res)=>{
             if(type == 3){
             resultss.forEach(element =>
             {
-                const {id,extra_loads,total_loads,package_date,order_type,inspect_date,cleaning_date,tagging_date,deliever_date,order_id,tagging_images,spoting_images,cleaning_images,inspect_images,press_images,dry_date,fold_date,pack_date,order_status,package_images,spotting_date,pickup_images,press_date,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status,user_id,name,email,mobile} = element;
+                const {id,extra_loads,total_loads,package_date,order_type,inspect_date,cleaning_date,tagging_date,deliever_date,order_id,tagging_images,spoting_images,cleaning_images,inspect_images,press_images,dry_date,fold_date,pack_date,order_status,package_images,spotting_date,pickup_images,press_date,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status,user_id,name,email,mobile,rating_id,rating_feedback} = element;
                 if(pickup_images){
                     const pickup_images_array = pickup_images.split(',');
                     pickup_images_array.forEach(function callback(img, key)
@@ -1017,16 +1017,22 @@ export const booking_tracking_details = async(req,res)=>{
                       }
                     ];
 
-
+                    if(rating_id){
+                        var rating = rating_id;
+                        var rating_feed = rating_feedback.split(',');
+                    }else{
+                        var rating = 0;
+                        var rating_feed = [];
+                    }
                 const initi = {
-                    "id":id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_id":order_id,"order_type":order_type,'laundry_detail':laundry_detail
+                    "id":id,'rating_id':rating,'rating_feedback':rating_feed,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_id":order_id,"order_type":order_type,'laundry_detail':laundry_detail
                 }
                 res.json({'status':true,"message":"user order list","order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
             })
             }else{
             resultss.forEach(element =>
             {
-                const {id,extra_loads,total_loads,order_type,deliever_date,order_id,dry_images,wash_images,fold_images,pack_images,dry_date,fold_date,pack_date,order_status,pickup_images,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status,user_id,name,email,mobile} = element;
+                const {id,rating_id,rating_feedback,extra_loads,total_loads,order_type,deliever_date,order_id,dry_images,wash_images,fold_images,pack_images,dry_date,fold_date,pack_date,order_status,pickup_images,wash_date,request_confirm_date,status,pickup_confirm_date,drop_image,driver_pickup_status,user_id,name,email,mobile} = element;
                 if(pickup_images){
                     const pickup_images_array = pickup_images.split(',');
                     pickup_images_array.forEach(function callback(img, key)
@@ -1137,8 +1143,15 @@ export const booking_tracking_details = async(req,res)=>{
                       }
                     ];
 
+                    if(rating_id){
+                        var rating = rating_id;
+                        var rating_feed = rating_feedback.split(',');
+                    }else{
+                        var rating = 0;
+                        var rating_feed = [];
+                    }
                 const initi = {
-                    "id":id,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
+                    "id":id,'rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
                 }
                 res.json({'status':true,"message":"user order list","order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
             })
@@ -1251,9 +1264,9 @@ export const booking_rating = async(req,res)=>{
 
     try { 
         const userData = res.user;
-        const { booking_id,rating_feedback_id} = req.body;
-        if(booking_id  && rating_feedback_id ){
-            var sql = "INSERT INTO ratings (booking_id,user_id,rating_feedback_id) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating_feedback_id+"')";
+        const { booking_id,rating_feedback_id,rating_id} = req.body;
+        if(booking_id  && rating_feedback && rating_id ){
+            var sql = "INSERT INTO ratings (booking_id,user_id,rating_feedback,rating_id) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating_feedback+"','"+rating_id+"')";
             dbConnection.query(sql, function (err, results) {
                 res.json({'status':true,"message":"Rating submitted successfully"});
             }); 
@@ -1269,11 +1282,11 @@ export const booking_history = async(req,res)=>{
     try {   
             const userData = res.user;
             var resData = []
-            const sql = "select bookings.date,bookings.order_type ,bookings.id,dry_clean_booking_timing.deliever_time as dryCleanDelTime,dry_clean_booking_timing.deliever_date as dryCleanDelDate ,bookings.time, bookings.total_loads,booking_images.drop_image,dry_clean_booking_images.drop_image as dryCleanDropImage,booking_timing.deliever_date,booking_timing.deliever_time from bookings left join booking_timing on booking_timing.booking_id = bookings.id left join booking_images on booking_images.booking_id = bookings.id left join dry_clean_booking_images on dry_clean_booking_images.booking_id = bookings.id left join dry_clean_booking_timing on dry_clean_booking_timing.booking_id = bookings.id where bookings.order_status = 6 and user_id = '"+userData[0].id+"'";
+            const sql = "select bookings.date,bookings.order_type ,bookings.id,ratings.rating_feedback_id,ratings.rating_id,dry_clean_booking_timing.deliever_time as dryCleanDelTime,dry_clean_booking_timing.deliever_date as dryCleanDelDate ,bookings.time, bookings.total_loads,booking_images.drop_image,dry_clean_booking_images.drop_image as dryCleanDropImage,booking_timing.deliever_date,booking_timing.deliever_time from bookings left join booking_timing on booking_timing.booking_id = bookings.id left join booking_images on booking_images.booking_id = bookings.id left join ratings on bookings.id = ratings.booking_id left join dry_clean_booking_images on dry_clean_booking_images.booking_id = bookings.id left join dry_clean_booking_timing on dry_clean_booking_timing.booking_id = bookings.id where bookings.order_status = 6 and bookings.user_id = '"+userData[0].id+"'";
             console.log('sql',sql)
             dbConnection.query(sql, function (err, results) {
                 results.forEach(ele => {
-                const {id,date,order_type,dryCleanDropImage,time,total_loads,drop_image,deliever_date,deliever_time,dryCleanDelTime,dryCleanDelDate} = ele;
+                const {id,date,rating_feedback_id,order_type,dryCleanDropImage,time,total_loads,drop_image,deliever_date,deliever_time,dryCleanDelTime,dryCleanDelDate,rating_id} = ele;
                 if(order_type != 3){
                 var delivery_time = deliever_time;
                 var delivery_date = deliever_date;
@@ -1302,8 +1315,9 @@ export const booking_history = async(req,res)=>{
                     var imageList = [];
                 }
                 }
+
                     const init = {
-                        'id':id,'date':date,'time':time,'order_type':order_type,'total_loads':total_loads,'deliever_date':delivery_date,'deliever_time':delivery_time,'images':imageList
+                        'id':id,'date':date,'rating_id':rating_id,'time':time,'order_type':order_type,'total_loads':total_loads,'deliever_date':delivery_date,'deliever_time':delivery_time,'images':imageList
                     }
                     resData.push(init)
                 })
