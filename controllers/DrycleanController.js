@@ -233,17 +233,16 @@ export const get_category = async (req, res) => {
   export const Scan_loads_dry_clean = (req, res) => {
     try {
       const userData = res.user;
-      const { qr_code, type } = req.body;
+      const { qr_code, type,bookingId } = req.body;
       const currentTime = time();
       const currentDate = date();
       const wash_scan_timing = `${currentDate} ${currentTime}`;
   
-      const verifyQr = "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ?";
-      dbConnection.query(verifyQr, [qr_code], function (error, data) {
+      const verifyQr = "SELECT * FROM dry_clean_booking_qr WHERE qr_code = ? AND booking_id = ?";
+      dbConnection.query(verifyQr, [qr_code,bookingId], function (error, data) {
         if (error) {
           return res.json({ status: false, message: error.message });
         }
-  
         if (type == 0 || type == 9 || type == 10 || type == 11 || type == 12 || type == 13) {
           if (data.length === 0 || data[0].driver_pickup_status !== 1 ) {
             return res.json({ status: false, message: "Invalid QR code or load status" });
