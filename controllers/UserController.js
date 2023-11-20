@@ -277,7 +277,7 @@ export const customer_login = async(req,res)=>{
 						if(result == true){
 							data.forEach(element =>
 							{
-								const {id,name,email,mobile,comment,role,status,category_id,isAdmin,role_id,zip_code} = element;
+								const {id,name,email,mobile,comment,role,status,category_id,isAdmin,role_id,zip_code,customer_id} = element;
 								
 								const initi = {
 									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,"role_id":role_id,"isAdmin":isAdmin,"zip_code":zip_code,'token': generateToken({ userId: id, type: type }),
