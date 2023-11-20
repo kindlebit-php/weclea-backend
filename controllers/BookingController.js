@@ -1266,7 +1266,7 @@ export const booking_rating = async(req,res)=>{
         const userData = res.user;
         const { booking_id,rating_feedback,rating_id} = req.body;
         if(booking_id  && rating_feedback && rating_id ){
-            var sql = "INSERT INTO ratings (booking_id,user_id,rating_feedback,rating_id) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating_feedback+"','"+rating_id+"')";
+            var sql = "INSERT INTO ratings (booking_id,user_id,rating_feedback,rating_id) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating_feedback+"',"+rating_id+")";
             dbConnection.query(sql, function (err, results) {
                 res.json({'status':true,"message":"Rating submitted successfully"});
             }); 
