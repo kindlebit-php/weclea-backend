@@ -70,6 +70,7 @@ router.post('/booking-tracking-details',CheckAuth ,bookingController.booking_tra
 router.post("/add-bin",CheckAuth,bookingController.add_bin)
 router.get('/get-load-price',CheckAuth ,loadController.get_load_price);
 router.post('/customer-login',userController.customer_login);
+router.get('/generate-token',CheckAuth,userController.generate_token);
 router.post('/forgot-password',userController.forgot_password);
 router.post('/verify-otp',userController.verify_otp);
 router.post('/change-password',userController.change_password);

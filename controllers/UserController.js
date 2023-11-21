@@ -313,6 +313,81 @@ export const customer_login = async(req,res)=>{
 	}
 }
 
+// generate token
+
+
+export const generate_token = async (req, res) => {
+	try {
+	  const userData = res.user;
+	  const id = userData[0].id;
+	  const isAdmin = userData[0].isAdmin;
+	  const role_id = userData[0].role_id;
+  
+	  if (isAdmin !== 1) {
+		return res.json({ 'status': false, "message": "Not assigned as admin role" });
+	  } else {
+		const sql = "SELECT permission FROM wc_roles_permissions WHERE role_id = ?";
+		dbConnection.query(sql, [role_id], async function (error, data3) {
+		  if (error) {
+			return res.json({ 'status': false, "message": error.message });
+		  }
+		  if (data3[0].permission == 1) {
+			const getUserQuery = "SELECT email, password, role FROM users WHERE id = ?";
+			dbConnection.query(getUserQuery, [id], async function (error, data2) {
+			  if (error) {
+				return res.json({ 'status': false, "message": error.message });
+			  }
+  
+			  if (data2.length > 0 && data2[0].email && data2[0].password && data2[0].role) {
+				const { email, password, role } = data2[0];
+  
+				const checkIfEmailExistQuery = "SELECT * FROM users WHERE email = ? AND role = ?";
+				dbConnection.query(checkIfEmailExistQuery, [email, role], async function (error, data) {
+				  if (error) {
+					return res.json({ 'status': false, "message": error.message });
+				  }
+  
+				  if (data.length > 0) {
+					if (data[0].status === 1) {
+				
+						const { id, name, email, mobile, comment, role, status, category_id, isAdmin, role_id, zip_code, customer_id } = data[0];
+  
+						const initi = {
+						  "id": id, "name": name, "email": email, "mobile": mobile, "comment": comment, "role": role,
+						  "status": status, 'category_id': category_id, "role_id": role_id, "isAdmin": isAdmin, "zip_code": zip_code,
+						  "customer_id": customer_id, 'token': generateToken({ userId: id, type: role }),
+						};
+  
+						const getAddressCountQuery = "SELECT COUNT(id) AS total FROM customer_address WHERE user_id = ?";
+						dbConnection.query(getAddressCountQuery, [id], function (error, addressResult) {
+						  if (error) {
+							return res.json({ 'status': false, "message": error.message });
+						  }
+  
+						  const addressCount = (addressResult && addressResult[0] && addressResult[0].total) || 0;
+						  res.json({ 'status': true, "message": "Logged in successfully!", 'data': initi, 'address_count': addressCount });
+						});
+					 
+					} else {
+					  res.json({ 'status': false, "message": "Your account has been deactivated, please connect with admin!" });
+					}
+				  } else {
+					res.json({ 'status': false, "message": "User not found!" });
+				  }
+				});
+			  } else {
+				res.json({ 'status': false, "message": "All fields are required" });
+			  }
+			});
+		  } else {
+			res.json({ 'status': false, "message": "You are not authorised" });
+		  }
+		});
+	  }
+	} catch (error) {
+	  res.json({ 'status': false, "message": error.message });
+	}
+  };
 //customer forgot password API
 export const forgot_password = async(req,res)=>{
 	try { 
@@ -1786,6 +1861,7 @@ export default {
 	get_notification,
 	customer_address,
 	customer_login,
+	generate_token,
 	forgot_password,
 	verify_otp,
 	newsletter,
