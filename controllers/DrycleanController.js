@@ -830,11 +830,11 @@ export const print_DryClean_extra_loads_QrCode = async (req, res) => {
         const total_qr_code=data.map((row) => row.qr_code);
         const customerId_Query = "SELECT b.user_id AS customer_id,bin.delievery_instruction AS Note_From_Delivery FROM bookings AS b JOIN booking_instructions AS bin ON b.user_id = bin.user_id WHERE b.id = ?";
         if ( total_qr_code.length === count) {
-          let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
-          dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
-            if (updateOrderStatusErr) {
-              return res.json({ status: false, message: updateOrderStatusErr.message });
-            }
+          // let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
+          // dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
+          //   if (updateOrderStatusErr) {
+          //     return res.json({ status: false, message: updateOrderStatusErr.message });
+          //   }
            
       dbConnection.query(customerId_Query, [booking_id], function (error, data1) {
         if (error) {
@@ -853,7 +853,7 @@ export const print_DryClean_extra_loads_QrCode = async (req, res) => {
 
       })
             
-          });
+         // });
         } else {
           dbConnection.query(customerId_Query, [booking_id], function (error, data1) {
             if (error) {
