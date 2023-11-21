@@ -319,39 +319,39 @@ export const customer_login = async(req,res)=>{
 export const generate_token = async (req, res) => {
 	try {
 	  const userData = res.user;
-	//   const id = userData[0].id;
-	  const user_id=req.params.id;
+	  const user_id=req.body.id;
 	  const isAdmin = userData[0].isAdmin;
 	  const role_id = userData[0].role_id;
   
 	  if (isAdmin !== 1) {
 		return res.json({ 'status': false, "message": "Not assigned as admin role" });
 	  } else {
-		const sql = "SELECT permission FROM wc_roles_permissions WHERE role_id = ?";
+		const sql = "SELECT permission FROM wc_roles_permissions WHERE role_id = ? and  permission=1";
 		dbConnection.query(sql, [role_id], async function (error, data3) {
 		  if (error) {
 			return res.json({ 'status': false, "message": error.message });
 		  }
-		  if (data3[0].permission == 1) {
-			const getUserQuery = "SELECT email, password, role FROM users WHERE id = ?";
+		  console.log("(data3",data3,user_id);
+		  if (data3.length>0 && data3[0].permission == 1) {
+			const getUserQuery = "SELECT * FROM users WHERE id = ?";
 			dbConnection.query(getUserQuery, [user_id], async function (error, data2) {
 			  if (error) {
 				return res.json({ 'status': false, "message": error.message });
 			  }
-			  console.log(data2)
-			  if (data2.length > 0 && data2[0].email && data2[0].password && data2[0].role) {
-				const { email, password, role } = data2[0];
+			  console.log("dAta2",data2)
+			  if (data2.length > 0 ) {
+				// const { email, password, role } = data2[0];
   
-				const checkIfEmailExistQuery = "SELECT * FROM users WHERE email = ? AND role = ?";
-				dbConnection.query(checkIfEmailExistQuery, [email, role], async function (error, data) {
-				  if (error) {
-					return res.json({ 'status': false, "message": error.message });
-				  }
+				// const checkIfEmailExistQuery = "SELECT * FROM users WHERE email = ? AND role = ?";
+				// dbConnection.query(checkIfEmailExistQuery, [email, role], async function (error, data) {
+				//   if (error) {
+				// 	return res.json({ 'status': false, "message": error.message });
+				//   }
   
-				  if (data.length > 0) {
-					if (data[0].status === 1) {
+				//   if (data.length > 0) {
+					if (data2[0].status === 1) {
 				
-						const { id, name, email, mobile, comment, role, status, category_id, isAdmin, role_id, zip_code, customer_id } = data[0];
+						const { id, name, email, mobile, comment, role, status, category_id, isAdmin, role_id, zip_code, customer_id } = data2[0];
   
 						const initi = {
 						  "id": id, "name": name, "email": email, "mobile": mobile, "comment": comment, "role": role,
@@ -372,15 +372,16 @@ export const generate_token = async (req, res) => {
 					} else {
 					  res.json({ 'status': false, "message": "Your account has been deactivated, please connect with admin!" });
 					}
-				  } else {
-					res.json({ 'status': false, "message": "User not found!" });
-				  }
-				});
+				//   } else {
+				// 	res.json({ 'status': false, "message": "User not found!" });
+				//   }
+				// });
 			  } else {
 				res.json({ 'status': false, "message": "All fields are required" });
 			  }
 			});
 		  } else {
+			console.log("You are not authorised");
 			res.json({ 'status': false, "message": "You are not authorised" });
 		  }
 		});
