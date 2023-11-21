@@ -617,7 +617,7 @@ export const get_drop_order_detail = async (req, res) => {
         }
         const {
           name,
-          bin
+          bin,
           profile_image,
           comment,
           address,
