@@ -57,6 +57,7 @@ router.post('/booking-rating',CheckAuth ,bookingController.booking_rating);
 router.post('/assign-driver' ,bookingController.assign_driver);
 router.post('/assign-folder' ,bookingController.assign_folder);
 router.post('/get-rating-details' ,CheckAuth,bookingController.get_rating_details);
+router.post('/assign-drop-driver' ,bookingController.assign_drop_driver);
 router.post('/delete-booking-date',CheckAuth ,bookingController.delete_booking_date);
 router.get('/user-subscription-dates',CheckAuth ,bookingController.subscription_dates);
 router.get('/subscription-dates-fre',CheckAuth ,bookingController.subscription_dates_fre);

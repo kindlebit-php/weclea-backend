@@ -46,7 +46,7 @@ export const customer_booking = async(req,res)=>{
                         var driver_id = 0
                     }
                     console.log("data")
-                    var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+category_id+"',1)";
+                    var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,drop_drive_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"','"+category_id+"',1)";
                     dbConnection.query(sql, async function (err, result) {
                     var updateLoads = (results[0].total_loads - total_loads);
                     if(category_id == 1){
@@ -186,7 +186,7 @@ export const customer_booking = async(req,res)=>{
                             }else{
                                 var driver_id = 0
                             }
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id,frequency) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"',1,'"+category_id+"','"+frequency+"')";
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,frequency) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+frequency+"')";
                        console.log('sqlkailash',sql)
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
@@ -305,7 +305,7 @@ export const customer_booking = async(req,res)=>{
                             }
                             var order_types = 4
                             // console.log('currentBookingDate',currentBookingDate)
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_types+"','"+driver_id+"',1,'"+category_id+"')";
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_types+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"')";
                            
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
@@ -1185,6 +1185,24 @@ export const assign_driver = async(req,res)=>{
     }
 }
 
+export const assign_drop_driver = async(req,res)=>{
+     try {
+        const {booking_id,driver_id} = req.body;
+        if(booking_id  && driver_id ){
+                var sql = "update bookings set drop_drive_id = '"+driver_id+"' where id = '"+booking_id+"'";
+                dbConnection.query(sql, function (error, result) {
+                if (error) throw error;
+                    res.json({'status':true,"message":"Driver has been assigned successfully!"});
+                }); 
+        }else{
+            res.json({'status':false,"message":"All fields are required"});
+        }
+      
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
 export const assign_folder = async(req,res)=>{
      try {
         const {booking_id,folder_id} = req.body;
@@ -1340,6 +1358,7 @@ export default {
     get_rating_details,
     subscription_dates_fre,
     subscription_dates_custom,
+    assign_drop_driver,
     booking_history,
     booking_tracking_status_both,
     booking_rating
