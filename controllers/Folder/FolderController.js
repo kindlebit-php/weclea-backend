@@ -47,21 +47,22 @@ export const Scan_received_loads = (req, res) => {
   }
 };
 
+
 export const Scan_loads_folder = (req, res) => {
   try {
     const userData = res.user;
-    const { qr_code, type } = req.body;
+    const { qr_code, type,bookingId } = req.body;
     const currentTime = time();
     const currentDate = date();
     const wash_scan_timing = `${currentDate} ${currentTime}`;
-    const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ?";
-    dbConnection.query(verifyQr, [qr_code], function (error, data) {
+    const verifyQr = "SELECT * FROM booking_qr WHERE qr_code = ? AND booking_id = ?";
+    dbConnection.query(verifyQr, [qr_code,bookingId], function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
       }
       console.log("12323",data)
       if (type >= 0 && type <= 3) {
-        if (data.length === 0 || data[0].driver_pickup_status !== 1 ) {
+        if (data.length == 0 || data[0].driver_pickup_status != 1 ) {
           return res.json({ status: false, message: "Invalid QR code or load status" });
         }
 
@@ -91,8 +92,6 @@ export const Scan_loads_folder = (req, res) => {
     res.json({ status: false, message: error.message });
   }
 };
-
-
 
 
 // export const Scan_received_loads = (req, res) => {
@@ -782,11 +781,11 @@ export const print_extra_loads_QrCode = async (req, res) => {
         const total_qr_code=data.map((row) => row.qr_code);
         const customerId_Query = "SELECT b.user_id AS customer_id,bin.delievery_instruction AS Note_From_Delivery FROM bookings AS b JOIN booking_instructions AS bin ON b.user_id = bin.user_id WHERE b.id = ?";
         if ( total_qr_code.length === count) {
-          let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
-          dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
-            if (updateOrderStatusErr) {
-              return res.json({ status: false, message: updateOrderStatusErr.message });
-            }
+          // let updateOrderStatusQuery = "UPDATE bookings SET order_status = 4 WHERE id = ?";
+          // dbConnection.query(updateOrderStatusQuery, [booking_id], function (updateOrderStatusErr, updateOrderStatusResult) {
+          //   if (updateOrderStatusErr) {
+          //     return res.json({ status: false, message: updateOrderStatusErr.message });
+          //   }
            
       dbConnection.query(customerId_Query, [booking_id], function (error, data1) {
         if (error) {
@@ -805,7 +804,6 @@ export const print_extra_loads_QrCode = async (req, res) => {
 
       })
             
-          });
         } else {
           dbConnection.query(customerId_Query, [booking_id], function (error, data1) {
             if (error) {

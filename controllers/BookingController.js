@@ -1282,9 +1282,9 @@ export const booking_rating = async(req,res)=>{
 
     try { 
         const userData = res.user;
-        const { booking_id,rating_feedback_id,rating_id} = req.body;
+        const { booking_id,rating_feedback,rating_id} = req.body;
         if(booking_id  && rating_feedback && rating_id ){
-            var sql = "INSERT INTO ratings (booking_id,user_id,rating_feedback,rating_id) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating_feedback+"','"+rating_id+"')";
+            var sql = "INSERT INTO ratings (booking_id,user_id,rating_feedback,rating_id) VALUES ('"+booking_id+"','"+userData[0].id+"','"+rating_feedback+"',"+rating_id+")";
             dbConnection.query(sql, function (err, results) {
                 res.json({'status':true,"message":"Rating submitted successfully"});
             }); 
@@ -1345,6 +1345,23 @@ export const booking_history = async(req,res)=>{
     }
 }
 
+  export const add_bin = async (req, res) => {
+    try {
+        const userData = res.user;
+        const { booking_id, bin } = req.body;
+        const sql = `UPDATE bookings SET bin = ?, order_status = 4 WHERE id = ${booking_id}`;
+        
+        dbConnection.query(sql, [bin], function (updateerror, updateResult) {
+            if (updateerror) {
+                return res.json({ status: false, message: updateerror.message });
+            }
+            res.json({ status: true, message: 'Bin added successfully' });
+        });
+    } catch (error) {
+        res.json({ status: false, message: error.message });
+    }
+};
+
 export default {
 	customer_booking,
     booking_tracking_details,
@@ -1361,5 +1378,6 @@ export default {
     assign_drop_driver,
     booking_history,
     booking_tracking_status_both,
-    booking_rating
+    booking_rating,
+    add_bin
 }
