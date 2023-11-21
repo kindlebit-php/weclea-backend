@@ -545,18 +545,8 @@ export const laundry_NotFound = async (req, res) => {
 export const get_drop_orders = async (req, res) => {
   try {
     const userData = res.user;
-    const { type } = req.body;
-    // console.log('hi')
-    if(type == 1){
-    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
-
-    }else{
-    var order = "select * from (select bookings.order_id, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
-
-    }
-    console.log('order_type',order)
+    var order = "select * from (select bookings.order_id,bookings.order_type,bookings.bin, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and drop_drive_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
     dbConnection.query(order, function (error, data) {
-      console.log('kailashtest',data)
       if (error) throw error;
       res.json({
         status: true,
@@ -613,7 +603,7 @@ export const get_drop_order_detail = async (req, res) => {
       const userIds = userIdResult.map((row) => row.user_id);
       console.log(orderId, userIds);
       const query = `
-                SELECT u.name,u.profile_image, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude,b.id AS booking_id
+                SELECT u.name,u.profile_image, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude,b.id AS booking_id,b.bin
                 FROM bookings AS b
                 JOIN customer_address AS ca ON b.user_id = ca.user_id
                 JOIN users AS u ON b.user_id = u.id
@@ -627,6 +617,7 @@ export const get_drop_order_detail = async (req, res) => {
         }
         const {
           name,
+          bin
           profile_image,
           comment,
           address,
@@ -645,6 +636,7 @@ export const get_drop_order_detail = async (req, res) => {
           comment:`${comment == null || comment == undefined || comment == "" ? "There are no instructions from the customer" : comment}`,
           address,
           appartment,
+          bin,
           city,
           state,
           zip,
