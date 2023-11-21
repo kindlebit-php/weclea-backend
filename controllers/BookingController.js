@@ -1349,14 +1349,20 @@ export const booking_history = async(req,res)=>{
     try {
         const userData = res.user;
         const { booking_id, bin } = req.body;
-        const sql = `UPDATE bookings SET bin = ?, order_status = 4 WHERE id = ${booking_id}`;
+        if(booking_id  && bin ){
         
-        dbConnection.query(sql, [bin], function (updateerror, updateResult) {
-            if (updateerror) {
-                return res.json({ status: false, message: updateerror.message });
-            }
-            res.json({ status: true, message: 'Bin added successfully' });
-        });
+            const sql = `UPDATE bookings SET bin = ?, order_status = 4 WHERE id = ${booking_id}`;
+            
+            dbConnection.query(sql, [bin], function (updateerror, updateResult) {
+                if (updateerror) {
+                    return res.json({ status: false, message: updateerror.message });
+                }
+                res.json({ status: true, message: 'Bin added successfully' });
+            });
+        }else{
+            res.json({'status':false,"message":"All fields are required"});
+            
+        }
     } catch (error) {
         res.json({ status: false, message: error.message });
     }
