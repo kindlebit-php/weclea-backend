@@ -1327,6 +1327,23 @@ export const booking_history = async(req,res)=>{
     }
 }
 
+export const add_bin = async (req, res) => {
+    try {
+        const userData = res.user;
+        const { booking_id, bin } = req.body;
+        const sql = `UPDATE bookings SET bin = ? WHERE id = ${booking_id}`;
+        
+        dbConnection.query(sql, [bin], function (updateerror, updateResult) {
+            if (updateerror) {
+                return res.json({ status: false, message: updateerror.message });
+            }
+            res.json({ status: true, message: 'Bin added successfully' });
+        });
+    } catch (error) {
+        res.json({ status: false, message: error.message });
+    }
+};
+
 export default {
 	customer_booking,
     booking_tracking_details,
@@ -1342,5 +1359,6 @@ export default {
     subscription_dates_custom,
     booking_history,
     booking_tracking_status_both,
-    booking_rating
+    booking_rating,
+    add_bin
 }
