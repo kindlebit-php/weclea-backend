@@ -319,7 +319,8 @@ export const customer_login = async(req,res)=>{
 export const generate_token = async (req, res) => {
 	try {
 	  const userData = res.user;
-	  const id = userData[0].id;
+	//   const id = userData[0].id;
+	  const user_id=req.params.id;
 	  const isAdmin = userData[0].isAdmin;
 	  const role_id = userData[0].role_id;
   
@@ -333,11 +334,11 @@ export const generate_token = async (req, res) => {
 		  }
 		  if (data3[0].permission == 1) {
 			const getUserQuery = "SELECT email, password, role FROM users WHERE id = ?";
-			dbConnection.query(getUserQuery, [id], async function (error, data2) {
+			dbConnection.query(getUserQuery, [user_id], async function (error, data2) {
 			  if (error) {
 				return res.json({ 'status': false, "message": error.message });
 			  }
-  
+			  console.log(data2)
 			  if (data2.length > 0 && data2[0].email && data2[0].password && data2[0].role) {
 				const { email, password, role } = data2[0];
   
