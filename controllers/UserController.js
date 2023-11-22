@@ -1855,7 +1855,25 @@ export const customer_list = async (req, res) => {
 		  res.json({ status: false, message: error.message });
 		}
 	  };
-	  
+
+
+	  export const delete_account = async (req, res) => {
+		try {
+			const userData = res.user;
+			const user_id = userData[0].id;
+	
+			const sql = "UPDATE users SET is_deleted = ? WHERE id = ?";
+			dbConnection.query(sql, [1, user_id], function (updateerror, updateResult) {
+				if (updateerror) {
+					return res.status(500).json({ status: false, message: 'Error deleting account', error: updateerror.message });
+				}
+				res.json({ status: true, message: 'Account deleted successfully' });
+			});
+		} catch (error) {
+			res.status(500).json({ status: false, message: 'Error deleting account', error: error.message });
+		}
+	};
+	
 export default {
 	user_registered_address,
 	customer_register,
@@ -1886,5 +1904,6 @@ export default {
 	order_managament_user_update,
 	driver_data,
 	folder_data,
-	order_managament_user_history
+	order_managament_user_history,
+	delete_account
 }
