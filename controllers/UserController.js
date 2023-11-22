@@ -37,6 +37,11 @@ export const customer_register = async(req,res)=>{
 						var sql = "INSERT INTO users (name, email,password,mobile,customer_id,comment,role,latitude,longitude,category_id) VALUES ('"+name+"', '"+email+"','"+hash+"','"+mobile+"','"+customer_id+"','"+comment+"','"+role+"','"+latitude+"','"+longitude+"','"+category_id+"')";
 						dbConnection.query(sql, function (err, result) {
 							if (err) throw err;
+
+							var loadSQL = "INSERT INTO customer_loads_availabilty (user_id) VALUES ('"+result.insertId+"')";
+							dbConnection.query(loadSQL, function (error, loadResult) {
+							})
+
 							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
 								userList[0].token = generateToken({ userId: userList[0].id, type: role });
@@ -269,7 +274,7 @@ export const customer_login = async(req,res)=>{
 	try { 
 		const {email,password,type} = req.body;
 		if(email && password && type){
-			const checkIfEmailExist = "select * from users where email = '"+email+"' and role = '"+type+"'";
+			const checkIfEmailExist = "select * from users where email = '"+email+"' and role = '"+type+"' and is_deleted = 0";
 			dbConnection.query(checkIfEmailExist, function (error, data) {
 				if(data.length > 0){
 					if(data[0].status == 1){

@@ -187,11 +187,12 @@ router.post("/update_feedbackQes",CheckAuth,AdminController.update_feedbackQes)
 router.post("/create_feedbackQes",CheckAuth,AdminController.create_feedbackQes)
 router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
 router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
+router.post("/sendNotification",CheckAuth,AdminController.sendNotification)
 
 /**** Email template****/
 
 router.get("/get_emailTemplate",CheckAuth,emailController.get_emailTemplate)
-router.get("/get_emailTemplate_detail",CheckAuth,emailController.get_emailTemplate_detail)
+router.get("/get_emailTemplate_detail/:id?",CheckAuth,emailController.get_emailTemplate_detail)
 router.post("/update_emailTemplate",CheckAuth,emailController.update_emailTemplate)
 router.post("/create_emailTemplate",CheckAuth,emailController.create_emailTemplate)
 router.post("/delete_emailTemplate",CheckAuth,emailController.delete_emailTemplate)

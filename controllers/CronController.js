@@ -1,6 +1,8 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
 import transport from "../helpers/mail.js";
+import { assignDriver } from "../helpers/location.js";
+
 import { getDates,randomNumber,setDateForNotification } from "../helpers/date.js";
 //customer booking API
 
@@ -8,7 +10,7 @@ export const booking_subscription_cron = async(req,res)=>{
      try { 
         var datetime = new Date();
         const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
-     	const bookingsql = "select id,cron_status,user_id,category_id,total_loads from bookings where date = '"+currentFinalDate+"' and order_type = '2' and cron_status = '0'";
+     	const bookingsql = "select id,cron_status,date,time,user_id,category_id,total_loads from bookings where date = '"+currentFinalDate+"' and order_type != '3' and order_type != '1' and cron_status = '0'";
         dbConnection.query(bookingsql, function (err, bookingresult) {
             if(bookingresult){
                 Object.keys(bookingresult).forEach(function(key) {
@@ -21,7 +23,7 @@ export const booking_subscription_cron = async(req,res)=>{
                 }else{
                     var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+elem.user_id+"'";
                 }
-                dbConnection.query(usrLoads, function (error, resultss) {
+                dbConnection.query(usrLoads, async function (error, resultss) {
                     if(elem.total_loads > Number(resultss[0].total_loads)){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
@@ -73,6 +75,8 @@ export const booking_subscription_cron = async(req,res)=>{
                     dbConnection.query(bookingsql, function (err, bookingresult) {
 
                     });
+                    const driver_id = await assignDriver(elem.user_id,elem.date,elem.time)
+
                     var updatesql = "update bookings set cron_status = '1' where id = '"+elem.id+"'";
                     dbConnection.query(updatesql, function (err, resultss) {
                  

@@ -3,6 +3,7 @@ import dateFormat from 'date-and-time';
 import dateFormatFinalDate from 'date-and-time';
 import path from "path";
 import { getDates,randomNumber } from "../helpers/date.js";
+import { assignDriver } from "../helpers/location.js";
 import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
 
 //customer booking API
@@ -24,28 +25,17 @@ export const customer_booking = async(req,res)=>{
                 if(total_loads > Number(results[0].total_loads)){
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }else{
-                    console.log("data")
+                    // console.log("data")
                     let dateObject = new Date();
                     let hours = dateObject.getHours();
                     let minutes = dateObject.getMinutes();
                     const current_time = hours + ":" + minutes;
                     const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
                       const checkIfDateExist = "select count(id) as total_date from bookings where date = '"+oneTimeDate+"' and user_id = '"+userData[0].id+"' and order_type = 1";
-                    dbConnection.query(checkIfDateExist, function (error, checkIfresults) {
+                    dbConnection.query(checkIfDateExist, async function (error, checkIfresults) {
                         if(checkIfresults[0].total_date == 0){
 
-                    const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
-                    dbConnection.query(custmer_address, function (error, custmeraddressResult) {
-                    var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 and status = 1 ORDER BY distance) as vt where vt.distance < 25 order by distance asc;";
-                    dbConnection.query(sqlDistance, function (error, locationResult) {
-                    // return false;
-                    if(locationResult.length > 0){
-                        var driver_id = locationResult[0].id
-                        // var driver_id = 1
-                    }else{
-                        var driver_id = 0
-                    }
-                    console.log("data")
+                    const driver_id = await assignDriver(userData[0].id,oneTimeDate,current_time)
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,drop_drive_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"','"+category_id+"',1)";
                     dbConnection.query(sql, async function (err, result) {
                     var updateLoads = (results[0].total_loads - total_loads);
@@ -119,9 +109,7 @@ export const customer_booking = async(req,res)=>{
                         dbConnection.query(sql, function (err, resultss) {
                         res.json({'status':true,"message":"Booking added successfully!"});                        
                         });
-                    });
                     });  
-                }); 
                        }else{
                         res.json({'status':false,"message":"Booking already added for selected date!"});
                        }
@@ -160,7 +148,7 @@ export const customer_booking = async(req,res)=>{
                         const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
                         
                     const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"' and order_type = 2";
-                    dbConnection.query(checkIfDateExist, function (error, checkIfresults) 
+                    dbConnection.query(checkIfDateExist, async function (error, checkIfresults) 
                     {
                         if(checkIfresults[0].tpyedate == 0)
                         {
@@ -173,21 +161,10 @@ export const customer_booking = async(req,res)=>{
                         const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
 
                         if(frequencyDBDate == currentBookingDate ){
-                           console.log('asdsaasdsad')
-                            const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
-                            dbConnection.query(custmer_address, function (error, custmeraddressResult) {
-                            var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 and status = 1  ORDER BY distance) as vt where vt.distance < 25 order by distance asc;";
-                            dbConnection.query(sqlDistance, function (error, locationResult) {
-                            // return false;
-                            if(locationResult.length > 0){
-                                var driver_id = locationResult[0].id
-                                // var driver_id = 1
-
-                            }else{
-                                var driver_id = 0
-                            }
+                            // var driver_id = assignDriver(userData[0].id)
+                    var driver_id = await assignDriver(userData[0].id,currentBookingDate,current_time)
+                          console.log('driver_id',driver_id)
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,frequency) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+frequency+"')";
-                       console.log('sqlkailash',sql)
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
                                     var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
@@ -238,8 +215,7 @@ export const customer_booking = async(req,res)=>{
                                 dbConnection.query(sql, function (err, resultss) {
                                 });
                             }); 
-                            }); 
-                            }); 
+                         
                         }else{
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,frequency,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+frequency+"','"+category_id+"')";
                             dbConnection.query(sql, function (err, resultsub) {
@@ -281,7 +257,7 @@ export const customer_booking = async(req,res)=>{
                         const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
                         console.log('frequencyDBDate',frequencyDBDate)
                         const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"' and order_type = 3";
-                        dbConnection.query(checkIfDateExist, function (error, checkIfresults) {
+                        dbConnection.query(checkIfDateExist, async function (error, checkIfresults) {
                         if(checkIfresults[0].tpyedate == 0){
 
 
@@ -289,22 +265,10 @@ export const customer_booking = async(req,res)=>{
                         let hours = dateObject.getHours();
                         let minutes = dateObject.getMinutes();
                         const current_time = hours + ":" + minutes;
-                        // const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
+                       
+                    var driver_id = await assignDriver(userData[0].id,frequencyDBDate,current_time)
 
-                            const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
-                            dbConnection.query(custmer_address, function (error, custmeraddressResult) {
-                            var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 and status = 1  ORDER BY distance) as vt where vt.distance < 25 order by distance asc;";
-                            dbConnection.query(sqlDistance, function (error, locationResult) {
-                            // return false;
-                            if(locationResult.length > 0){
-                                var driver_id = locationResult[0].id
-                                // var driver_id = 1
-
-                            }else{
-                                var driver_id = 0
-                            }
-                            var order_types = 4
-                            // console.log('currentBookingDate',currentBookingDate)
+                      
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_types+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"')";
                            
                             dbConnection.query(sql, function (err, result) {
@@ -369,8 +333,6 @@ export const customer_booking = async(req,res)=>{
                                 var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
                                 dbConnection.query(sql, function (err, resultss) {
                                 });
-                            }); 
-                            }); 
                             }); 
                           }
                         })
@@ -1361,7 +1323,7 @@ export const booking_history = async(req,res)=>{
             });
         }else{
             res.json({'status':false,"message":"All fields are required"});
-            
+
         }
     } catch (error) {
         res.json({ status: false, message: error.message });

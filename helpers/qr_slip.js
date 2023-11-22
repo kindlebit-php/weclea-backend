@@ -72,7 +72,7 @@ export const generatePDF = async (data, qrCodesArray) => {
     executablePath: '/usr/bin/chromium-browser',
     args: ['--no-sandbox'], 
   });
- // const browser = await puppeteer.launch();
+  // const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
   let htmlContent = '';
@@ -113,7 +113,7 @@ export const generatePDF = async (data, qrCodesArray) => {
                               <th scope="col" style="font-size: 14px;font-weight: 600;padding: 15px 15px;width: 50%;text-align: left;border-bottom: 1px solid #ccc;">
                                   <p style="margin: 0 0 8px;display: flex;justify-content: space-between;align-items: center;font-weight: 600;">Contact:</p>
                                   <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">Weclea</p>
-                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">hello@weclea.com</p>
+                                  <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #mailto:4a4a4a;">hello@weclea.com</p>
                                   <p style="margin: 0 0 5px;display: flex;justify-content: space-between;align-items: center;font-weight: 500;color: #4a4a4a;">(123) 456-7890</p>
                               </th>
                               <th scope="col" style="padding: 0px 0px 0px;border-bottom: 1px solid #ccc;text-align: center;width: 20%;border-right: 1px solid #ccc;">${qrCodeImageTags}</th>

@@ -432,21 +432,21 @@ export const sendNotification=async(req,res)=>{
 	var reqData=req.body;
 	try{
 		const loads = "select wc_email_template.* from wc_email_template where id=12";
-		dbConnection.query(loads,[reqData.user_id], function (error, rows) {
+		dbConnection.query(loads, function (error, rows) {
 			if (error) throw error;
 			if (rows.length>0) {	    
 				var message= rows[0].body;
-				message =message.replace('[username]',argument.username );
-		        message =message.replace('[url]',argument.title );
-		        message =message.replace( '[subject]',argument.subject);
-		        message =message.replace('[message]',argument.message );
+				//message =message.replace('[username]',argument.username );
+		        //message =message.replace('[url]',argument.title );
+		        //message =message.replace( '[subject]',argument.subject);
+		        //message =message.replace('[message]',argument.message );
 
 				const mailOptions = 
 		     	{
 			        from: 'ankuchauhan68@gmail.com',
 			        to: reqData.emails,
 			        subject: reqData.subject,
-			        html: message,
+			        html: reqData.body,//message,
 		        };
 		        transport.sendMail(mailOptions, function (error, info) 
 		        {
@@ -1198,6 +1198,7 @@ export default {
 	get_states,
 	getGraphData,
 	update_admin_email,
-	get_countries
+	get_countries,
+	sendNotification
 
 }
