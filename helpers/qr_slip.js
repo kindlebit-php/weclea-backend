@@ -68,11 +68,11 @@ export const getUserData=async(booking_id)=>{
 
 export const generatePDF = async (data, qrCodesArray) => {
   const executablePath = '/usr/bin/chromium-browser';
-  // const browser = await puppeteer.launch({
-  //   executablePath: '/usr/bin/chromium-browser',
-  //   args: ['--no-sandbox'], 
-  // });
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    executablePath: '/usr/bin/chromium-browser',
+    args: ['--no-sandbox'], 
+  });
+  // const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
   let htmlContent = '';
