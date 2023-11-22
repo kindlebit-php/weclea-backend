@@ -73,6 +73,7 @@ router.post('/customer-login',userController.customer_login);
 router.post('/generate-token/:id',CheckAuth,userController.generate_token);
 router.post('/forgot-password',userController.forgot_password);
 router.get('/delete-account',CheckAuth,userController.delete_account);
+router.post('/delete-customer-account',userController.delete_customer_account);
 router.post('/verify-otp',userController.verify_otp);
 router.post('/change-password',userController.change_password);
 router.get("/customer-order-histroy",CheckAuth,userController.customer_order_histroy)
