@@ -89,7 +89,7 @@ router.post("/laundry-NotFound",CheckAuth,uploadS3.array("images", 5),driverCont
 router.post("/order-histroy",CheckAuth,driverController.order_histroy);
 router.post("/order-histroy-byOrderId",CheckAuth,driverController.order_histroy_byOrderId);
 router.get("/profile",CheckAuth,driverController.profile)
-router.post("/get-drop-orders",CheckAuth,driverController.get_drop_orders);
+router.get("/get-drop-orders",CheckAuth,driverController.get_drop_orders);
 router.post("/get-drop-order-detail",CheckAuth,driverController.get_drop_order_detail);
 router.post("/drop-loads",CheckAuth,driverController.drop_loads);
 router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
