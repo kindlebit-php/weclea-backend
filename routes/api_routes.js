@@ -70,13 +70,15 @@ router.post('/booking-tracking-details',CheckAuth ,bookingController.booking_tra
 router.post("/add-bin",CheckAuth,bookingController.add_bin)
 router.get('/get-load-price',CheckAuth ,loadController.get_load_price);
 router.post('/customer-login',userController.customer_login);
+router.post('/generate-token/:id',CheckAuth,userController.generate_token);
 router.post('/forgot-password',userController.forgot_password);
+router.get('/delete-account',CheckAuth,userController.delete_account);
 router.post('/verify-otp',userController.verify_otp);
 router.post('/change-password',userController.change_password);
 router.get("/customer-order-histroy",CheckAuth,userController.customer_order_histroy)
 router.post("/ss", qr_slip);
 //********************************Driver Module**************************************//
-router.get('/get-orders',CheckAuth,driverController.get_orders);
+router.get('/get-orders',CheckAuth,driverController.get_orders)
 router.post("/get-order-detail",CheckAuth,driverController.get_order_detail);
 router.post("/print-All-QrCode",CheckAuth,driverController.print_All_QrCode)
 router.get("/get-dry-clean-orders",CheckAuth,driverController.get_dry_clean_orders)
@@ -95,10 +97,10 @@ router.post("/drop-loads",CheckAuth,driverController.drop_loads);
 router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
 router.post("/submit_drop_details",CheckAuth,uploadS3.array("images", 5),driverController.submit_drop_details);
 //********************************Folder Module**************************************//
-router.post("/Scan-received-loads",CheckAuth,FolderController.Scan_received_loads)
-router.post("/Scan_loads_folder",CheckAuth,FolderController.Scan_loads_folder)
-router.post("/customer-list-wash",CheckAuth,FolderController.customer_list_wash)
-router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id)
+router.post("/Scan-received-loads",CheckAuth,FolderController.Scan_received_loads);
+router.post("/Scan_loads_folder",CheckAuth,FolderController.Scan_loads_folder);
+router.post("/customer-list-wash",CheckAuth,FolderController.customer_list_wash);
+router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id);
 router.post("/submit-wash-detail",CheckAuth,uploadS3.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads_images", maxCount: 5 },]),FolderController.submit_wash_detail)
 router.post("/print-extra-loads-QrCode",CheckAuth,FolderController.print_extra_loads_QrCode)
 router.post("/scanning-extra-loads",CheckAuth,FolderController.scanning_extra_loads)
@@ -184,11 +186,12 @@ router.post("/update_feedbackQes",CheckAuth,AdminController.update_feedbackQes)
 router.post("/create_feedbackQes",CheckAuth,AdminController.create_feedbackQes)
 router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
 router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
+router.post("/sendNotification",CheckAuth,AdminController.sendNotification)
 
 /**** Email template****/
 
 router.get("/get_emailTemplate",CheckAuth,emailController.get_emailTemplate)
-router.get("/get_emailTemplate_detail",CheckAuth,emailController.get_emailTemplate_detail)
+router.get("/get_emailTemplate_detail/:id?",CheckAuth,emailController.get_emailTemplate_detail)
 router.post("/update_emailTemplate",CheckAuth,emailController.update_emailTemplate)
 router.post("/create_emailTemplate",CheckAuth,emailController.create_emailTemplate)
 router.post("/delete_emailTemplate",CheckAuth,emailController.delete_emailTemplate)

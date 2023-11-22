@@ -285,7 +285,7 @@ export const customer_login = async(req,res)=>{
 								const {id,name,email,mobile,comment,role,status,category_id,isAdmin,role_id,zip_code,customer_id} = element;
 								
 								const initi = {
-									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,"role_id":role_id,"isAdmin":isAdmin,"zip_code":zip_code,'token': generateToken({ userId: id, type: type }),
+									"id":id,"name":name,"email":email,"mobile":mobile,"comment":comment,"role":role,"status":status,'category_id':category_id,"role_id":role_id,"isAdmin":isAdmin,"zip_code":zip_code,"customer_id":customer_id,'token': generateToken({ userId: id, type: type }),
 								}
 								const get_address_count = "select count(id)  as total from customer_address where user_id = '"+id+"'";
 								dbConnection.query(get_address_count, function (error, addressresult) {
@@ -318,6 +318,83 @@ export const customer_login = async(req,res)=>{
 	}
 }
 
+// generate token
+
+
+export const generate_token = async (req, res) => {
+	try {
+	  const userData = res.user;
+	  const user_id=req.body.id;
+	  const isAdmin = userData[0].isAdmin;
+	  const role_id = userData[0].role_id;
+  
+	  if (isAdmin !== 1) {
+		return res.json({ 'status': false, "message": "Not assigned as admin role" });
+	  } else {
+		const sql = "SELECT permission FROM wc_roles_permissions WHERE role_id = ? and  permission=1";
+		dbConnection.query(sql, [role_id], async function (error, data3) {
+		  if (error) {
+			return res.json({ 'status': false, "message": error.message });
+		  }
+		  console.log("(data3",data3,user_id);
+		  if (data3.length>0 && data3[0].permission == 1) {
+			const getUserQuery = "SELECT * FROM users WHERE id = ?";
+			dbConnection.query(getUserQuery, [user_id], async function (error, data2) {
+			  if (error) {
+				return res.json({ 'status': false, "message": error.message });
+			  }
+			  console.log("dAta2",data2)
+			  if (data2.length > 0 ) {
+				// const { email, password, role } = data2[0];
+  
+				// const checkIfEmailExistQuery = "SELECT * FROM users WHERE email = ? AND role = ?";
+				// dbConnection.query(checkIfEmailExistQuery, [email, role], async function (error, data) {
+				//   if (error) {
+				// 	return res.json({ 'status': false, "message": error.message });
+				//   }
+  
+				//   if (data.length > 0) {
+					if (data2[0].status === 1) {
+				
+						const { id, name, email, mobile, comment, role, status, category_id, isAdmin, role_id, zip_code, customer_id } = data2[0];
+  
+						const initi = {
+						  "id": id, "name": name, "email": email, "mobile": mobile, "comment": comment, "role": role,
+						  "status": status, 'category_id': category_id, "role_id": role_id, "isAdmin": isAdmin, "zip_code": zip_code,
+						  "customer_id": customer_id, 'token': generateToken({ userId: id, type: role }),
+						};
+  
+						const getAddressCountQuery = "SELECT COUNT(id) AS total FROM customer_address WHERE user_id = ?";
+						dbConnection.query(getAddressCountQuery, [id], function (error, addressResult) {
+						  if (error) {
+							return res.json({ 'status': false, "message": error.message });
+						  }
+  
+						  const addressCount = (addressResult && addressResult[0] && addressResult[0].total) || 0;
+						  res.json({ 'status': true, "message": "Logged in successfully!", 'data': initi, 'address_count': addressCount });
+						});
+					 
+					} else {
+					  res.json({ 'status': false, "message": "Your account has been deactivated, please connect with admin!" });
+					}
+				//   } else {
+				// 	res.json({ 'status': false, "message": "User not found!" });
+				//   }
+				// });
+			  } else {
+				res.json({ 'status': false, "message": "All fields are required" });
+			  }
+			});
+		  } else {
+			console.log("You are not authorised");
+			res.json({ 'status': false, "message": "You are not authorised" });
+		  }
+		});
+	  }
+	} catch (error) {
+	  res.json({ 'status': false, "message": error.message });
+	}
+  };
 //customer forgot password API
 export const forgot_password = async(req,res)=>{
 	try { 
@@ -1783,7 +1860,25 @@ export const customer_list = async (req, res) => {
 		  res.json({ status: false, message: error.message });
 		}
 	  };
-	  
+
+
+	  export const delete_account = async (req, res) => {
+		try {
+			const userData = res.user;
+			const user_id = userData[0].id;
+	
+			const sql = "UPDATE users SET is_deleted = ? WHERE id = ?";
+			dbConnection.query(sql, [1, user_id], function (updateerror, updateResult) {
+				if (updateerror) {
+					return res.status(500).json({ status: false, message: 'Error deleting account', error: updateerror.message });
+				}
+				res.json({ status: true, message: 'Account deleted successfully' });
+			});
+		} catch (error) {
+			res.status(500).json({ status: false, message: 'Error deleting account', error: error.message });
+		}
+	};
+	
 export default {
 	user_registered_address,
 	customer_register,
@@ -1791,6 +1886,7 @@ export default {
 	get_notification,
 	customer_address,
 	customer_login,
+	generate_token,
 	forgot_password,
 	verify_otp,
 	newsletter,
@@ -1813,5 +1909,6 @@ export default {
 	order_managament_user_update,
 	driver_data,
 	folder_data,
-	order_managament_user_history
+	order_managament_user_history,
+	delete_account
 }

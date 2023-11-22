@@ -24,15 +24,21 @@ export const get_emailTemplate = async(req,res)=>{
     }
 }
 export const get_emailTemplate_detail = async(req,res)=>{
+	const reqData = req.params;
+	if(reqData.id){
       try { 
-        	const loads = "select * from wc_email_template  where wc_email_template.status=0 order by wc_rating_feeback.create_date desc";
-			dbConnection.query(loads, function (error, data) {
+        	const loads = "select * from wc_email_template  where wc_email_template.status=0 and id=? order by wc_rating_feeback.create_date desc";
+			dbConnection.query(loads,[reqData.id], function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
 			})
-    }catch (error) {
-        res.json({'status':false,"message":error.message});  
-    }
+	    }catch (error) {
+	        res.json({'status':false,"message":error.message});  
+	    }
+	}else{
+		res.json({'status':false,"message":"All field required"});  
+
+	}
 }
 export const update_emailTemplate = async(req,res)=>{
 	const reqData = req.body;
