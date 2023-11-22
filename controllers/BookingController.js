@@ -671,6 +671,8 @@ export const booking_tracking_status_both = async(req,res)=>{
                     const init = {
                     'id':id,'order_id':order_id,'order_type':order_type,"laundry_detail":laundry_detail
                     }
+                console.log('initi',initi)
+                    
                     resData.push(init)
                 }else{
                     if(bpickup_images){
@@ -776,6 +778,7 @@ export const booking_tracking_status_both = async(req,res)=>{
                 const initi = {
                     "id":id,'order_id':order_id',order_type':order_type,'laundry_detail':laundry_detail
                 }
+                console.log('initi',initi)
                     resData.push(initi)
 
                 }
