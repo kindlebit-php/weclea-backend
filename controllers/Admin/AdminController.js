@@ -446,7 +446,7 @@ export const sendNotification=async(req,res)=>{
 			        from: 'ankuchauhan68@gmail.com',
 			        to: reqData.emails,
 			        subject: reqData.subject,
-			        html: message,
+			        html: reqData.body,//message,
 		        };
 		        transport.sendMail(mailOptions, function (error, info) 
 		        {
