@@ -1895,19 +1895,22 @@ export const customer_list = async (req, res) => {
 										return res.status(500).json({ status: false, message: 'Error deleting account', error: updateerror.message });
 										}
 									// res.json({ status: true, message: 'Account deleted successfully' });
-									res.render('Terms');
+									res.render('Success');
 									// res.render('Terms') });
 
 										});
 							}else{
-								res.json({'status':false,"message":"Incorrect password!"});
+								// res.json({'status':false,"message":"Incorrect password!"});
+								res.render('Error');
 							}
 						});
 					}else{
-						res.json({'status':false,"message":"Your account has been deactivated, please connect with admin!"});
+						// res.json({'status':false,"message":"Your account has been deactivated, please connect with admin!"});
+						res.render('Error');
 					}
 					}else{
-								res.json({'status':false,"message":"User not found!"});
+								// res.json({'status':false,"message":"User not found!"});
+								res.render('Error');
 							
 					}
 				});
@@ -1915,7 +1918,8 @@ export const customer_list = async (req, res) => {
 				res.json({'status':false,"message":"All fields are required"});
 			}
 		}catch (error) {
-			res.json({'status':false,"message":error.message});  
+			// res.json({'status':false,"message":error.message});  
+			res.render('Error');
 		}
 	}
 	
