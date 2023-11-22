@@ -21,7 +21,7 @@ export const assignDriver = (user_id,date,time) => {
 		})
 
 	}else{
-		var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 and status = 1 ORDER BY distance) as vt where vt.distance < 25 order by distance asc;";
+		var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 and status = 1 and is_deleted = 0 ORDER BY distance) as vt where vt.distance < 25 order by distance asc;";
 		dbConnection.query(sqlDistance, function (error, locationResult) {
 			if(locationResult.length > 0){
 				resolve(locationResult[0].id)

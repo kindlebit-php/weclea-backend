@@ -37,6 +37,7 @@ export const customer_booking = async(req,res)=>{
 
                     const driver_id = await assignDriver(userData[0].id,oneTimeDate,current_time)
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,drop_drive_id,category_id,cron_status,is_admin) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"','"+category_id+"',1,'"+is_admin+"')";
+                    console.log('onetimebOOKING',sql)
                     dbConnection.query(sql, async function (err, result) {
                     var updateLoads = (results[0].total_loads - total_loads);
                     if(category_id == 1){
