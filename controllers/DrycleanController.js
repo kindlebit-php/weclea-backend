@@ -1,6 +1,5 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
-import { assignDriver } from "../helpers/location.js";
 import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
 import { date, getDates,randomNumber,randomNumberDryClean, time} from "../helpers/date.js";
 import { fcm_notification } from '../helpers/fcm.js';
@@ -115,8 +114,16 @@ export const get_category = async (req, res) => {
         let minutes = dateObject.getMinutes();
         const current_time = hours + ":" + minutes;
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
-        const driver_id = await assignDriver(userData[0].id,oneTimeDate,current_time)
-        
+         const custmer_address = "select * from customer_address where user_id = '"+userData[0].id+"'"
+        dbConnection.query(custmer_address, function (error, custmeraddressResult) {
+          var sqlDistance = "select * from (select id, SQRT(POW(69.1 * ('"+custmeraddressResult[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+custmeraddressResult[0].longitude+"') * COS('"+custmeraddressResult[0].latitude+"' / 57.3)), 2)) AS distance FROM users where role = 2 and status = 1 ORDER BY distance) as vt where vt.distance < 25 order by distance asc;";
+          dbConnection.query(sqlDistance, function (error, locationResult) {
+            console.log('list of driver',locationResult)
+          if(locationResult.length > 0){
+            var driver_id = locationResult[0].id
+          }else{
+            var driver_id = 0
+          }
         var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,drop_drive_id,category_id,total_amount,total_loads) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,'"+driver_id+"','"+driver_id+"','"+userData[0].category_id+"','"+amount+"',1)";
 
         dbConnection.query(sql, function (err, result) {
@@ -173,7 +180,8 @@ export const get_category = async (req, res) => {
 
         }
         });
-              
+        });   
+        });        
         }else{
             res.json({'status':false,"message":"All fields are required"});
       }             
@@ -758,19 +766,10 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
               6: "Package process is completed order is ready to pickup"
             };
 
-            const order_status = {
-              1: 9,
-              2: 10,
-              3: 11,
-              4: 12,
-              5: 13,
-              6: 14
-            };
-
             const responseData = {
               status: true,
               message: processMessages[type],
-              data: { customer_id: data[0].user_id , Note_From_Delivery:data1[0].delievery_instruction,order_status:order_status[type] },
+              data: { customer_id: data[0].user_id , Note_From_Delivery:data1[0].delievery_instruction },
             };
             const title={
               1: "loads Tagging",

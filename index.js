@@ -30,7 +30,7 @@ app.use(express.static('public'));
 app.use("/uploads", express.static("uploads"));
 const PORT = process.env.PORT || 3000;
 app.use('/api', apiRouter);   
-app.get('/already_verified',(req, res) => { res.render('Login'); });
+app.get('/api/already_verified',(req, res) => { res.render('Login'); });
 const server = http.createServer(app);
 server.listen(PORT, () => console.log(`Server is running on port ${PORT}`));    
 
