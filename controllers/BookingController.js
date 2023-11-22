@@ -11,7 +11,7 @@ import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js'
 export const customer_booking = async(req,res)=>{
      try { 
      	const userData = res.user;
-        const {	delievery_day,date,total_loads,order_type,frequency,category_id} = req.body;
+        const {	delievery_day,is_admin,date,total_loads,order_type,frequency,category_id} = req.body;
         if(	date && total_loads && order_type){
         if(order_type == '1'){
             if(category_id == 1){
@@ -36,7 +36,7 @@ export const customer_booking = async(req,res)=>{
                         if(checkIfresults[0].total_date == 0){
 
                     const driver_id = await assignDriver(userData[0].id,oneTimeDate,current_time)
-                    var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,drop_drive_id,category_id,cron_status) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"','"+category_id+"',1)";
+                    var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,drop_drive_id,category_id,cron_status,is_admin) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"','"+category_id+"',1,'"+is_admin+"')";
                     dbConnection.query(sql, async function (err, result) {
                     var updateLoads = (results[0].total_loads - total_loads);
                     if(category_id == 1){
@@ -164,7 +164,7 @@ export const customer_booking = async(req,res)=>{
                             // var driver_id = assignDriver(userData[0].id)
                     var driver_id = await assignDriver(userData[0].id,currentBookingDate,current_time)
                           console.log('driver_id',driver_id)
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,frequency) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+frequency+"')";
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,frequency,is_admin) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+frequency+"','"+is_admin+"')";
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {
                                     var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
@@ -269,7 +269,7 @@ export const customer_booking = async(req,res)=>{
                     var driver_id = await assignDriver(userData[0].id,frequencyDBDate,current_time)
 
                       
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_types+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"')";
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,is_admin) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_types+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+is_admin+"')";
                            
                             dbConnection.query(sql, function (err, result) {
                                 for (var i = 0; total_loads > i; i++) {

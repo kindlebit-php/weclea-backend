@@ -108,7 +108,7 @@ export const get_category = async (req, res) => {
   export const dry_clean_booking = async (req, res) => {
     try {
         const userData = res.user;
-        const {date,amount,payment_id} = req.body;
+        const {date,amount,payment_id,is_admin} = req.body;
         if(date && amount){
         let dateObject = new Date();
         let hours = dateObject.getHours();
@@ -117,7 +117,7 @@ export const get_category = async (req, res) => {
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
         const driver_id = await assignDriver(userData[0].id,oneTimeDate,current_time)
         
-        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,drop_drive_id,category_id,total_amount,total_loads) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,'"+driver_id+"','"+driver_id+"','"+userData[0].category_id+"','"+amount+"',1)";
+        var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,drop_drive_id,category_id,total_amount,total_loads,is_admin) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,'"+driver_id+"','"+driver_id+"','"+userData[0].category_id+"','"+amount+"',1,'"+is_admin+"')";
 
         dbConnection.query(sql, function (err, result) {
         if(result){
