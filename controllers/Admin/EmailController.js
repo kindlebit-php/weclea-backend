@@ -30,7 +30,12 @@ export const get_emailTemplate_detail = async(req,res)=>{
         	const loads = "select * from wc_email_template  where  id=? ";
 			dbConnection.query(loads,[reqData.id], function (error, data) {
 			if (error) throw error;
-				res.json({'status':true,"message":"Success",'data':data});
+				if (data.length>0) {
+					res.json({'status':true,"message":"Success",'data':data[0]});
+				}else{
+					res.json({'status':false,"message":"No record found"});  		
+				}
+				
 			})
 	    }catch (error) {
 	        res.json({'status':false,"message":error.message});  
