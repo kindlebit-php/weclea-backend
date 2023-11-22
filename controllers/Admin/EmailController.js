@@ -27,7 +27,7 @@ export const get_emailTemplate_detail = async(req,res)=>{
 	const reqData = req.params;
 	if(reqData.id){
       try { 
-        	const loads = "select * from wc_email_template  where wc_email_template.status=0 and id=? order by wc_rating_feeback.create_date desc";
+        	const loads = "select * from wc_email_template  where  id=? ";
 			dbConnection.query(loads,[reqData.id], function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
