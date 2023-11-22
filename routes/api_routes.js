@@ -96,10 +96,10 @@ router.post("/drop-loads",CheckAuth,driverController.drop_loads);
 router.post("/drop-loads-detail",CheckAuth,driverController.drop_loads_detail);
 router.post("/submit_drop_details",CheckAuth,uploadS3.array("images", 5),driverController.submit_drop_details);
 //********************************Folder Module**************************************//
-router.post("/Scan-received-loads",CheckAuth,FolderController.Scan_received_loads)
-router.post("/Scan_loads_folder",CheckAuth,FolderController.Scan_loads_folder)
-router.post("/customer-list-wash",CheckAuth,FolderController.customer_list_wash)
-router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id)
+router.post("/Scan-received-loads",CheckAuth,FolderController.Scan_received_loads);
+router.post("/Scan_loads_folder",CheckAuth,FolderController.Scan_loads_folder);
+router.post("/customer-list-wash",CheckAuth,FolderController.customer_list_wash);
+router.post("/wash-detail-ByCustomer-id",CheckAuth,FolderController.wash_detail_ByCustomer_id);
 router.post("/submit-wash-detail",CheckAuth,uploadS3.fields([{ name: "images", maxCount: 5 },{ name: "extra_loads_images", maxCount: 5 },]),FolderController.submit_wash_detail)
 router.post("/print-extra-loads-QrCode",CheckAuth,FolderController.print_extra_loads_QrCode)
 router.post("/scanning-extra-loads",CheckAuth,FolderController.scanning_extra_loads)
