@@ -344,7 +344,7 @@ export const generate_token = async (req, res) => {
 				return res.json({ 'status': false, "message": error.message });
 			  }
 			  console.log("dAta2",data2)
-			  if (data2.length > 0 ) {
+			  if (data2.length > 0 && data2[0].is_deleted == 0) {
 				// const { email, password, role } = data2[0];
   
 				// const checkIfEmailExistQuery = "SELECT * FROM users WHERE email = ? AND role = ?";
@@ -1878,6 +1878,46 @@ export const customer_list = async (req, res) => {
 			res.status(500).json({ status: false, message: 'Error deleting account', error: error.message });
 		}
 	};
+
+	export const delete_customer_account = async(req,res)=>{
+		try { 
+			const {email,password} = req.body;
+			if(email && password){
+				const checkIfEmailExist = "select * from users where email = '"+email+"'";
+				dbConnection.query(checkIfEmailExist, function (error, data) {
+					if(data.length > 0){
+						if(data[0].status == 1){
+						bcrypt.compare(password, data[0].password, function(error, result) {
+							if(result == true){
+								const sql = "UPDATE users SET is_deleted = ? WHERE email = ?";
+									dbConnection.query(sql, [1,data[0].email ], function (updateerror, updateResult) {
+										if (updateerror) {
+										return res.status(500).json({ status: false, message: 'Error deleting account', error: updateerror.message });
+										}
+									// res.json({ status: true, message: 'Account deleted successfully' });
+									res.render('Terms');
+									// res.render('Terms') });
+
+										});
+							}else{
+								res.json({'status':false,"message":"Incorrect password!"});
+							}
+						});
+					}else{
+						res.json({'status':false,"message":"Your account has been deactivated, please connect with admin!"});
+					}
+					}else{
+								res.json({'status':false,"message":"User not found!"});
+							
+					}
+				});
+			}else{
+				res.json({'status':false,"message":"All fields are required"});
+			}
+		}catch (error) {
+			res.json({'status':false,"message":error.message});  
+		}
+	}
 	
 export default {
 	user_registered_address,
@@ -1910,5 +1950,6 @@ export default {
 	driver_data,
 	folder_data,
 	order_managament_user_history,
-	delete_account
+	delete_account,
+	delete_customer_account
 }
