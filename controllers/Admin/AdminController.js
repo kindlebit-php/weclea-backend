@@ -779,7 +779,7 @@ export const get_all_order = async(req,res)=>{
         var query=""
         var queryType=""
 		if (reqData.searchStr  && reqData.searchStr!='all') {
-		  query=" and ( users.name like '%"+reqData.searchStr+"%' or users.email like '%"+reqData.searchStr+"%') ";          
+		  query=" and ( bookings.date like '%"+reqData.searchStr+"%' or bookings.order_id like '%"+reqData.searchStr+"%' or users.name like '%"+reqData.searchStr+"%' or users.email like '%"+reqData.searchStr+"%') ";          
 		}
 		if (reqData.type  && reqData.type!='9') {
 		  	queryType=" and bookings.order_status like '%"+reqData.type+"%' ";          
