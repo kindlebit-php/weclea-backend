@@ -8,6 +8,7 @@ dotenv.config();
 import Stripe from "stripe";
 import path from "path";
 import { isThisMonth, isThisWeek, isToday } from '../helpers/date.js';
+import { temEmail } from '../helpers/templates.js';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 //customer register API
@@ -44,6 +45,8 @@ export const customer_register = async(req,res)=>{
 							var sql = "select id,name,email,mobile,comment,role,status,category_id from users where id = '"+result.insertId+"'";
 							dbConnection.query(sql, function (err, userList) {
 								userList[0].token = generateToken({ userId: userList[0].id, type: role });
+								var temp_id = 1;
+								temEmail(result.insertId,temp_id)
 								res.json({'status':true,"message":"User registered successfully!",'data':userList[0]});
 							}); 
 							}); 
