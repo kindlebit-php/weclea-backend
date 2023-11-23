@@ -30,9 +30,9 @@ jobs:
         run: |
           cd dev_docker_compose  # Move to the directory containing docker-compose.yml
           # Perform cleanup steps here (e.g., deleting temporary files)
-          docker-compose down
-          docker-compose up -d
-          #docker-compose stop app
-          #docker-compose up -d app
+          #docker-compose down
+          #docker-compose up -d
+          docker-compose stop app
+          docker-compose up -d app
           # Add your cleanup commands here
           #docker system prune -af
