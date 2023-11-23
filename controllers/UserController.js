@@ -195,6 +195,7 @@ export const customer_address = async(req,res)=>{
      try { 
      	const userData = res.user;
         const {delievery_instruction,pickup_address,pickup_appartment,pickup_city,pickup_state,pickup_zipcode,pickup_lat,pickup_long,drop_address,drop_appartment,drop_city,drop_state,drop_zipcode,drop_lat,drop_long,billing_address,billing_appartment,billing_city,billing_state,billing_zipcode,billing_lat,billing_long} = req.body;
+        console.log('req.body',req.body)
         if(pickup_address && pickup_city  && pickup_state && pickup_zipcode && pickup_lat && pickup_long && drop_address && drop_city && drop_state && drop_zipcode && drop_lat && drop_long && billing_address && billing_city && billing_state && billing_zipcode && billing_lat && billing_long){
         const checkIfAddressExist = "select count(id) as total from customer_address where user_id = '"+userData[0].id+"'";
         dbConnection.query(checkIfAddressExist, function (error, resultAddress) {
@@ -215,6 +216,7 @@ export const customer_address = async(req,res)=>{
 	        });
     	}
     	if(delievery_instruction != ''){
+    		console.log('delievery_instruction',delievery_instruction)
     		const delieverySql = "select count(id) as delieveryCount from booking_instructions where user_id = '"+userData[0].id+"'"
 	        dbConnection.query(delieverySql, function (error, delieveryresult) {
 	        if(delieveryresult[0].delieveryCount == 0){
@@ -222,6 +224,8 @@ export const customer_address = async(req,res)=>{
 				dbConnection.query(sql, function (error, result) {
 				});
 	        }else{
+    			console.log('delievery_instructionsdsds')
+
 	        	var sql = "update booking_instructions set delievery_instruction='"+delievery_instruction+"' where  user_id ='"+userData[0].id+"'";
 				dbConnection.query(sql, function (error, result) {
 				});
