@@ -20,7 +20,9 @@ jobs:
       - name: Copy .env file
         run: |
           cp /home/ubuntu/.env /var/weclea/dev_weclea/weclea_backend_dev/dev_weclea/weclea-backend/weclea-backend/dev_docker_compose
-
+      - name: Copy .env file
+        run: |
+          cp /home/ubuntu/.env /var/weclea/dev_weclea/weclea_backend_dev/dev_weclea/weclea-backend/weclea-backend
       - name: Build and Test
         run: |
           docker build . -t kindlebit143/weclea_backend:v0
