@@ -1,6 +1,5 @@
 import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
-import { assignDriver } from "../helpers/location.js";
 import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
 import { date, getDates,randomNumber,randomNumberDryClean, time} from "../helpers/date.js";
 import { fcm_notification } from '../helpers/fcm.js';
@@ -181,6 +180,7 @@ export const get_category = async (req, res) => {
       res.json({ status: false, message: error.message });
     }
   }
+
 
   //-------------------------------------------------------------------------------------------------------------------------------//
   //-------------------------------------------------------------------------------------------------------------------------------//
@@ -758,19 +758,10 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
               6: "Package process is completed order is ready to pickup"
             };
 
-            const order_status = {
-              1: 9,
-              2: 10,
-              3: 11,
-              4: 12,
-              5: 13,
-              6: 14
-            };
-
             const responseData = {
               status: true,
               message: processMessages[type],
-              data: { customer_id: data[0].user_id , Note_From_Delivery:data1[0].delievery_instruction,order_status:order_status[type] },
+              data: { customer_id: data[0].user_id , Note_From_Delivery:data1[0].delievery_instruction },
             };
             const title={
               1: "loads Tagging",

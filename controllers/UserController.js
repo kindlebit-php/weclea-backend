@@ -10,7 +10,6 @@ import path from "path";
 import { isThisMonth, isThisWeek, isToday } from '../helpers/date.js';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-
 //customer register API
 export const customer_register = async(req,res)=>{
       try { 
@@ -1897,25 +1896,25 @@ export const customer_list = async (req, res) => {
 									// res.json({ status: true, message: 'Account deleted successfully' });
 									res.render('Success');
 									// res.render('Terms') });
-
 										});
 							}else{
 								// res.json({'status':false,"message":"Incorrect password!"});
-								res.render('Error');
+								res.render('Error',{message:"Incorrect password!"});
 							}
 						});
 					}else{
 						// res.json({'status':false,"message":"Your account has been deactivated, please connect with admin!"});
-						res.render('Error');
+						res.render('Error',{message:"Your account has been deactivated, please connect with admin!"});
 					}
 					}else{
 								// res.json({'status':false,"message":"User not found!"});
-								res.render('Error');
+								res.render('Error',{message:"User not found!"});
 							
 					}
 				});
 			}else{
-				res.json({'status':false,"message":"All fields are required"});
+				// res.json({'status':false,"message":"All fields are required"});
+				res.render('Error',{message:"All fields are required"});
 			}
 		}catch (error) {
 			// res.json({'status':false,"message":error.message});  
