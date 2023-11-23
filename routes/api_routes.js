@@ -55,14 +55,14 @@ router.get("/terms",async(req,res)=>{
 })
 router.get("/privacy_policy",async(req,res)=>{
     try {
-        res.render('privacyPolicy')
+        res.render('PrivacyPolicy')
     } catch (error) {
         res.json({'status':false,"message":error.message});
     }
 })
 router.get("/delete_account",async(req,res)=>{
     try {
-        res.render('login')
+        res.render('Login')
     } catch (error) {
         res.json({'status':false,"message":error.message});
     }
