@@ -1,7 +1,7 @@
 import dbConnection from'../config/db.js';
 import transport from "./mail.js";
 export const temEmail = (user_id,temp_id) => {
-		const userSQL = "select name and email from users where id="+user_id+"";
+		const userSQL = "select name, email from users where id="+user_id+"";
 		dbConnection.query(userSQL, function (error, userresult) {
 		const template = "select wc_email_template.* from wc_email_template where id="+temp_id+"";
 		dbConnection.query(template, function (error, result) {
