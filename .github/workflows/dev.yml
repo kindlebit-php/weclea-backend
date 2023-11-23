@@ -23,8 +23,8 @@ jobs:
 
       - name: Build and Test
         run: |
-          cd dev_docker_compose  # Move to the directory containing docker-compose.yml
           docker build . -t kindlebit143/weclea_backend:v0
+          
 
       - name: Deploy on server
         run: |
