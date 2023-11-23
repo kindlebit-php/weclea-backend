@@ -53,6 +53,13 @@ router.get("/terms",async(req,res)=>{
         res.json({'status':false,"message":error.message});
     }
 })
+router.get("/privacy_policy",async(req,res)=>{
+    try {
+        res.render('privacyPolicy')
+    } catch (error) {
+        res.json({'status':false,"message":error.message});
+    }
+})
 
 router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
