@@ -451,6 +451,8 @@ export const sendNotification=async(req,res)=>{
 		        transport.sendMail(mailOptions, function (error, info) 
 		        {
 		        	console.log(error,info);
+		        	 res.json({'status':true,"message":"Success",'data':info,"error"error});
+
 		        })
     		}
 		})
