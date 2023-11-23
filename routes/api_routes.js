@@ -60,6 +60,13 @@ router.get("/privacy_policy",async(req,res)=>{
         res.json({'status':false,"message":error.message});
     }
 })
+router.get("/delete_account",async(req,res)=>{
+    try {
+        res.render('login')
+    } catch (error) {
+        res.json({'status':false,"message":error.message});
+    }
+})
 
 router.post('/get-loads' ,CheckAuth, loadController.get_loads);
 router.get('/get-user-profile' ,CheckAuth,userController.get_user_profile);
