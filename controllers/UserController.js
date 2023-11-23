@@ -410,7 +410,7 @@ export const forgot_password = async(req,res)=>{
 					var otp = 123456
 					const mailOptions = 
 					{
-					from: 'ankuchauhan68@gmail.com',
+					from: 'support@weclea.com',
 					to: email,
 					subject: "Verify Your Email",
 					html: `<div style="font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2">

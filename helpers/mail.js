@@ -10,11 +10,11 @@ import nodemailer from "nodemailer";
 //   }
 // });
 var transport = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
-  port: 2525,
+  host: "smtp.office365.com",
+  port: 587,
   auth: {
-    user: "1318c776b0e0a6",
-    pass: "e5a0badddf664c"
+    user: "support@weclea.com",
+    pass: "Smarketilikeitweclea.com!"
   }
 });
 
