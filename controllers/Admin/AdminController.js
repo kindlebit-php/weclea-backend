@@ -443,7 +443,7 @@ export const sendNotification=async(req,res)=>{
 
 				const mailOptions = 
 		     	{
-			        from: 'ankuchauhan68@gmail.com',
+			        from: 'support@weclea.com',
 			        to: reqData.emails,
 			        subject: reqData.subject,
 			        html: reqData.body,//message,
