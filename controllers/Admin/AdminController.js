@@ -431,7 +431,7 @@ export const get_user_history = async(req,res)=>{
 export const sendNotification=async(req,res)=>{
 	var reqData=req.body;
 	try{
-		const loads = "select wc_email_template.* from wc_email_template where id=12";
+		/*const loads = "select wc_email_template.* from wc_email_template where id=12";
 		dbConnection.query(loads, function (error, rows) {
 			if (error) throw error;
 			if (rows.length>0) {	    
@@ -440,10 +440,10 @@ export const sendNotification=async(req,res)=>{
 		        //message =message.replace('[url]',argument.title );
 		        //message =message.replace( '[subject]',argument.subject);
 		        //message =message.replace('[message]',argument.message );
-
+				*/
 				const mailOptions = 
 		     	{
-			        from: '"WeClea"<support@weclea.com>',
+			        from: '"WeClea" <support@weclea.com>',
 			        to: reqData.emails,
 			        subject: reqData.subject,
 			        html: reqData.body,//message,
@@ -451,13 +451,13 @@ export const sendNotification=async(req,res)=>{
 		        transport.sendMail(mailOptions, function (error, info) 
 		        {
 		        	console.log(error,info);
-		        	 res.json({'status':true,"message":"Success",'data':info,"error"error});
+		        	res.json({'status':true,"message":"Success",'data':info,"error":error});
 
-		        })
-    		}
-		})
+		        });
+    		//}
+		//})
 	}catch(error){
-
+		res.json({'status':false,"message":error.message});  
 	}
 }
 
