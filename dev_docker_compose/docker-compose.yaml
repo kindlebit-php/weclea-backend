@@ -1,0 +1,61 @@
+version: "3"
+services:
+  app:
+    image: "kindlebit143/weclea_backend:v0"
+    restart: always
+    ports:
+      - "5000:3000"
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - ACCESS_TOKEN_SECRET=${ACCESS_TOKEN_SECRET}
+      - file_uploads=On
+      - MAX_FILE_SIZE=5M
+      - max_execution_time=0
+      - post_max_size=5M # Increased post_max_size to 100MB
+      - upload_max_filesize=500M # Increased upload_max_filesize to 100MB
+      - max_input_time=-1
+    networks:
+      - dev_network
+    volumes:
+      - /home/ubuntu/uploads:/app/uploads
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_BIND_ADDRESS: "0.0.0.0"
+    volumes:
+     - ./my.cnf:/etc/mysql/my.cnf
+     - dev_backup:/var/lib/mysql
+    networks:
+      - dev_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - "8090:80"
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      UPLOAD_LIMIT: 10M # You can also adjust the PHPMyAdmin upload limit here
+    depends_on:
+      - mysql
+    networks:
+      - dev_network
+
+networks:
+  dev_network:
+    driver: bridge
+
+volumes:
+  dev_backup:

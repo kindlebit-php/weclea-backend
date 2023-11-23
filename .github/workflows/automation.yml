@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: production
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted  # Use your self-hosted runner label here
+    runs-on: weclea-backend  # Use your self-hosted runner label here
 
     steps:
       - name: Checkout code

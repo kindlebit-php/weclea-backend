@@ -1,0 +1,38 @@
+name: dev_server
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-and-deploy:
+    runs-on: dev_weclea  # Use your self-hosted runner label here
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+        env:
+          GIT_MAX_INPUT: 10000000 # Set a larger value for maxBuffer (in bytes)
+
+      - name: Copy .env file
+        run: |
+          cp /home/ubuntu/.env /var/weclea/dev_weclea/weclea_backend_dev/dev_weclea/weclea-backend/weclea-backend/dev_docker_compose
+
+      - name: Build and Test
+        run: |
+          docker build . -t kindlebit143/weclea_backend:v0
+          
+
+      - name: Deploy on server
+        run: |
+          cd dev_docker_compose  # Move to the directory containing docker-compose.yml
+          # Perform cleanup steps here (e.g., deleting temporary files)
+          #docker-compose down
+          #docker-compose up -d
+          docker-compose stop app
+          docker-compose up -d app
+          # Add your cleanup commands here
+          #docker system prune -af
