@@ -1,4 +1,4 @@
-name: production
+name: dev_server
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
 
       - name: Copy .env file
         run: |
-          cp /home/ubuntu/.env /var/weclea/weclea_backend/weclea-backend/weclea-backend/weclea-backend
+          cp /home/ubuntu/.env /var/weclea/dev_weclea/weclea_backend_dev/dev_weclea/weclea-backend/weclea-backend/dev_docker_compose
 
       - name: Build and Test
         run: |
