@@ -116,11 +116,11 @@ export const get_cities = async(req,res)=>{
     }
 }
 export const get_county_cities = async(req,res)=>{
-    var reqData=req.params
+    var reqData=req.params;
     try { 
     	if (reqData.state_id) {
-    		const state_id= reqData.state_id 
-			const loads = "select wc_cities.* from wc_cities inner join wc_county on wc_county.city_id=wc_cities.id where wc_county.state_id=? order by wc_cities.name asc";
+    		const state_id= reqData.state_id;
+			const loads = "select wc_cities.* from wc_cities inner join wc_county on wc_county.city_id=wc_cities.id where wc_county.name=? order by wc_cities.name asc";
 			dbConnection.query(loads,[state_id], function (error, data) {
 				if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});	
