@@ -115,6 +115,23 @@ export const get_cities = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+export const get_county_cities = async(req,res)=>{
+    var reqData=req.params
+    try { 
+    	if (reqData.state_id) {
+    		const state_id= reqData.state_id 
+			const loads = "select wc_cities.* from wc_cities inner join wc_county on wc_county.city_id=wc_cities.id where wc_county.state_id=? order by wc_cities.name asc";
+			dbConnection.query(loads,[state_id], function (error, data) {
+				if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});	
+			});
+		}else{
+			res.json({'status':false,"message":"Please send required parameters"});
+		}	
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
  export const get_drycleaning_itemlist = async(req,res)=>{
     try { 
 		const loads = "select * from dry_clean_services where isDelete=0 order by updated_at desc";
@@ -780,13 +797,19 @@ export const get_all_order = async(req,res)=>{
         }
         var query=""
         var queryType=""
+        var orderType=""
 		if (reqData.searchStr  && reqData.searchStr!='all') {
 		  query=" and ( bookings.date like '%"+reqData.searchStr+"%' or bookings.order_id like '%"+reqData.searchStr+"%' or users.name like '%"+reqData.searchStr+"%' or users.email like '%"+reqData.searchStr+"%') ";          
 		}
 		if (reqData.type  && reqData.type!='9') {
 		  	queryType=" and bookings.order_status like '%"+reqData.type+"%' ";          
 		}
-        dbConnection.query("SELECT bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,users.profile_image customer_pic FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1 "+queryType+" "+query+" order by bookings.id desc", (error, rows) => {
+		if (reqData.order_type  && reqData.order_type!='3') {
+		  	orderType=" and bookings.order_type like '%"+reqData.order_type+"%' ";          
+		}else if(reqData.order_type  && reqData.order_type='3') {
+		  	orderType=" and bookings.order_type like '%"+reqData.order_type+"%' ";          
+		}
+        dbConnection.query("SELECT bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,users.profile_image customer_pic FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1 "+queryType+" "+query+" "+orderType+" order by bookings.id desc", (error, rows) => {
             if (error) {
                  res.json({'status':false,"message":error.message}); 
             } else {
@@ -801,7 +824,7 @@ export const get_all_order = async(req,res)=>{
                 }else{
                     var totalRecords=false;
                 }
-				const loads = "SELECT ratings.rating_id, bookings.total_amount,bookings.id, bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,(SELECT users.mobile FROM users WHERE id=bookings.driver_id LIMIT 1) driver_mobile,(SELECT users.email FROM users WHERE id=bookings.driver_id LIMIT 1) driver_email,users.name customer_name,users.profile_image customer_pic, users.mobile customer_mobile,users.email customer_email FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id left join ratings on ratings.booking_id=bookings.id WHERE bookings.cron_status=1   "+queryType+" "+query+"  order by bookings.id desc limit ? offset ?";
+				const loads = "SELECT ratings.rating_id, bookings.total_amount,bookings.id, bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,(SELECT users.mobile FROM users WHERE id=bookings.driver_id LIMIT 1) driver_mobile,(SELECT users.email FROM users WHERE id=bookings.driver_id LIMIT 1) driver_email,users.name customer_name,users.profile_image customer_pic, users.mobile customer_mobile,users.email customer_email FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id left join ratings on ratings.booking_id=bookings.id WHERE bookings.cron_status=1   "+queryType+" "+query+" "+orderType+" order by bookings.id desc limit ? offset ?";
 				dbConnection.query(loads,[LimitNum,startNum],function (error, rows) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});
@@ -1201,6 +1224,7 @@ export default {
 	getGraphData,
 	update_admin_email,
 	get_countries,
-	sendNotification
+	sendNotification,
+	get_county_cities
 
 }
