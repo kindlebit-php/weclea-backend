@@ -804,10 +804,10 @@ export const get_all_order = async(req,res)=>{
 		if (reqData.type  && reqData.type!='9') {
 		  	queryType=" and bookings.order_status like '%"+reqData.type+"%' ";          
 		}
-		if (reqData.order_type  && reqData.order_type!='3') {
-		  	orderType=" and bookings.order_type like '%"+reqData.order_type+"%' ";          
+		if (reqData.order_type  && reqData.order_type!='3' && reqData.order_type!='0') {
+		  	orderType=" and bookings.order_type!='3' ";          
 		}else if(reqData.order_type  && reqData.order_type=='3') {
-		  	orderType=" and bookings.order_type like '%"+reqData.order_type+"%' ";          
+		  	orderType=" and bookings.order_type='3' ";          
 		}
         dbConnection.query("SELECT bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,users.profile_image customer_pic FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1 "+queryType+" "+query+" "+orderType+" order by bookings.id desc", (error, rows) => {
             if (error) {
