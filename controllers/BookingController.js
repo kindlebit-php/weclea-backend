@@ -44,6 +44,7 @@ export const customer_booking = async(req,res)=>{
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,drop_drive_id,category_id,cron_status,is_admin) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"','"+category_id+"',1,'"+isAdmin+"')";
                     console.log('onetimebOOKING',sql)
                     dbConnection.query(sql, async function (err, result) {
+                        console.log(err,result)
                     var updateLoads = (results[0].total_loads - total_loads);
                     if(category_id == 1){
                         var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
@@ -53,6 +54,7 @@ export const customer_booking = async(req,res)=>{
                         var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
                     }
                     dbConnection.query(usrLoadsup, function (error, resulst) {
+                        console.log(error,resulst)
                     })                    
                     if(typeof payment_id != 'undefined'){
                         var paymentsql = "update payment set booking_id = '"+result.insertId+"'where id = '"+payment_id+"'";
@@ -63,7 +65,7 @@ export const customer_booking = async(req,res)=>{
 
                         const qrCodesArray = [];
                         const insertIds=[]
-
+                    console.log("abcdefa",result)
     for (let i = 0; i < total_loads; i++) {
         const sql = "INSERT INTO booking_qr (booking_id, qr_code) VALUES (?, ?)";
         const values = [result.insertId, randomNumber(result.insertId)];
