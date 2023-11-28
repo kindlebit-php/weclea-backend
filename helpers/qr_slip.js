@@ -3,7 +3,17 @@ import qrcode from "qrcode";
 import { v4 as uuidv4 } from 'uuid'; 
 //import pdf from "pdf-creator-node"; 
 import puppeteer from 'puppeteer';
+//import { s3 } from "../utils/multerS3.js";
+import AWS from "aws-sdk";
 
+const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
+const USER_SECRET = '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';
+const BUCKET_NAME = 'weclea-bucket';
+const s3 = new AWS.S3({
+  accessKeyId: USER_KEY,
+  secretAccessKey: USER_SECRET,
+  region: "us-east-2",
+});
 
 
 export const qr_slip = async (req, res) => {
@@ -128,20 +138,43 @@ export const generatePDF = async (data, qrCodesArray) => {
     htmlContent += sectionHtml;
   }
 
+  // await page.setContent(htmlContent);
+
+  // const pdfPath = `uploads/${uuidv4()}.pdf`;
+
+  // const options = {
+  //   path: pdfPath,
+  //   format: 'A4',
+  // };
+
+  // await page.pdf(options);
+
+  // await browser.close();
+
+  // return pdfPath;
+
+
   await page.setContent(htmlContent);
 
-  const pdfPath = `uploads/${uuidv4()}.pdf`;
-
-  const options = {
-    path: pdfPath,
+  const pdfBuffer = await page.pdf({
     format: 'A4',
+  });
+
+  const pdfKey = `${uuidv4()}.pdf`;
+
+  const uploadParams = {
+    Bucket: BUCKET_NAME,
+    Key: pdfKey,
+    Body: pdfBuffer,
+    ContentType: 'application/pdf',
+    ACL: 'public-read',
   };
 
-  await page.pdf(options);
+  const uploadResult = await s3.upload(uploadParams).promise();
 
   await browser.close();
-
-  return pdfPath;
+  console.log(uploadResult.Location)
+  return uploadResult.Location;
 };
 
 

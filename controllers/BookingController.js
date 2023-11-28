@@ -39,8 +39,9 @@ export const customer_booking = async(req,res)=>{
                       const checkIfDateExist = "select count(id) as total_date from bookings where date = '"+oneTimeDate+"' and user_id = '"+userData[0].id+"' and order_type = 1";
                     dbConnection.query(checkIfDateExist, async function (error, checkIfresults) {
                         if(checkIfresults[0].total_date == 0){
-
+                            console.log(checkIfresults,userData[0].id,oneTimeDate,current_time,"1223446566")
                     const driver_id = await assignDriver(userData[0].id,oneTimeDate,current_time)
+                    console.log(driver_id,"djhkgsfkju")
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,drop_drive_id,category_id,cron_status,is_admin) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"','"+category_id+"',1,'"+isAdmin+"')";
                     console.log('onetimebOOKING',sql)
                     dbConnection.query(sql, async function (err, result) {
