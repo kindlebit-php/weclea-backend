@@ -25,9 +25,10 @@ export const get_group_list = async(req,res)=>{
 }
 
 export const get_county_list = async(req,res)=>{
+	var reqData= req.params
     try { 
-    	const loads = "select wc_county.*,wc_states.id state_id, wc_states.name state_name,wc_cities.name city_name from wc_county LEFT JOIN wc_cities on wc_states.id=wc_county.state_id LEFT JOIN wc_cities on wc_cities.id=wc_county.state_id where wc_county.status=1 and wc_county.isDeleted=0 order by wc_county.name asc;";
-		dbConnection.query(loads, function (error, data) {
+    	const loads = "select wc_county.*, wc_states.name state_name,wc_cities.name city_name from wc_county LEFT JOIN wc_cities on wc_cities.id=wc_county.city_id LEFT JOIN wc_states on wc_states.id=wc_county.state_id where wc_county.status=1 and wc_county.isDeleted=0 and wc_county.state_id=? order by wc_county.name asc;";
+		dbConnection.query(loads,[reqData.state_id], function (error, data) {
 		if (error) throw error;
 			res.json({'status':true,"message":"Success",'data':data});
 		})
@@ -61,7 +62,7 @@ export const get_group_user_list = async(req,res)=>{
 export const update_county = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	const qrySelect = "select id from wc_county where `name`=? and status=1  and id!=?";
+    	const qrySelect = "select id from wc_county where `name`=? and city_id=? and isDeleted=1  and id!=?";
 		dbConnection.query(qrySelect,[reqData.name, reqData.city_id, reqData.id], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) { 
@@ -83,8 +84,8 @@ export const create_county = async(req,res)=>{
 	console.log("create_county", reqData,req.files)
 	//wc_emp_group //`manage_name`, `profile_pic`, `location`, `country`, `group_name`, `zip_code`, 
     try { 
-    	const qrySelect = "select id from wc_county where `name`=? and status=1";
-		dbConnection.query(qrySelect,[reqData.name, reqData.city_id], function (error, data) {
+    	const qrySelect = "select id from wc_county where `name`=? and `city_id`=? and isDeleted=0";
+		dbConnection.query(qrySelect,[reqData.name,reqData.city_id], function (error, data) {
 		if (error) throw error;
 			if (data.length<=0) {
               	var addContnetQry = "insert wc_county set `name`=?, `city_id`=?,state_id=?,`status`=? ";
