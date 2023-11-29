@@ -45,6 +45,7 @@ export const customer_booking = async(req,res)=>{
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,drop_drive_id,category_id,cron_status,is_admin) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"','"+category_id+"',1,'"+isAdmin+"')";
                     console.log('onetimebOOKING',sql)
                     dbConnection.query(sql, async function (err, result) {
+                        console.log("INDERT",result.insertId)
                         console.log(err,result)
                     var updateLoads = (results[0].total_loads - total_loads);
                     if(category_id == 1){

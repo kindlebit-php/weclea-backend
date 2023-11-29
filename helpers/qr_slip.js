@@ -52,14 +52,16 @@ export const getUserData=async(booking_id)=>{
       if (data && data.length > 0) {
         const userId = data[0].user_id;
         const query = `
-          SELECT  b.order_id, b.date,
+          SELECT b.id AS order_id, b.date,
           CONCAT(ca.address, ', ', ca.appartment, ', ', ca.city, ', ', ca.state, ', ', ca.zip) AS address
           FROM bookings AS b
-          JOIN customer_address AS ca ON b.user_id = ca.user_id
-          JOIN users AS u ON b.user_id = u.id
+          LEFT JOIN customer_address AS ca ON b.user_id = ca.user_id
+          LEFT JOIN users AS u ON b.user_id = u.id
           WHERE b.user_id = ? AND b.id = ? `;
         
         dbConnection.query(query, [userId, booking_id], (error, data2) => {
+          data2[0].order_id='1001'+data2[0].order_id
+          console.log("==============================================",data2)
           if (error) {
             reject(error);
           }

@@ -151,12 +151,15 @@ export const get_category = async (req, res) => {
           dbConnection.query(sql2, async function (err, result1) {
           const qr_codes = result1.map((row) => row.qr_code);
           const getAll_qrCode= await generateQRCode(qr_codes)
+          console.log(getAll_qrCode,"skjfhdkj")
           const userData1 = await getUserData (result.insertId);
           const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+          console.log(pdfBytes,"pdfbytes")
           // const match = pdfBytes.match(/uploads\\(.+)/);
           // const newPath = 'uploads//' +match[1];
           const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
           dbConnection.query(updatePdf, async function (err, result2) {
+            console.log(result2)
           })
           });
         }

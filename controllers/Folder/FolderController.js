@@ -401,7 +401,7 @@ export const submit_wash_detail = async (req, res) => {
             }else{
               var userLoads = "select yeshiba as totalCount from customer_loads_availabilty where user_id = '"+bookingdata[0].user_id+"'";
             }
-                 dbConnection.query(userLoads, function (error, userLoadsresults){
+                 dbConnection.query(userLoads,async function (error, userLoadsresults){
                     if(Number(userLoadsresults[0].totalCount) >= Number(extra_loads)){
                       var updateLoads = (userLoadsresults[0].totalCount - extra_loads);
                       if(bookingdata[0].category_id == 1){
@@ -411,29 +411,45 @@ export const submit_wash_detail = async (req, res) => {
                       }else{
                       var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+bookingdata[0].user_id+"' ";
                       }
-                      dbConnection.query(usrLoadsup, function (error, result) {
+                      dbConnection.query(usrLoadsup,async function (error, result) {
                       })
 
+
+                      const qrCodesArray = [];
+                      const insertIds=[]
                       for (var i = 0; extra_loads > i; i++) {
                         var sql = "INSERT INTO booking_qr (booking_id,qr_code,driver_pickup_status,folder_recive_status,folder_dry_status,folder_fold_status) VALUES ('"+booking_id+"','"+randomNumber(booking_id)+"',1,1,1,1)";
-                        dbConnection.query(sql, function (err, results) {
-                          if(results){
-                            var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
-                            dbConnection.query(sql2, async function (err, result1) {
-                              const qr_codes = result1.map((row) => row.qr_code);
-                              const getAll_qrCode= await generateQRCode(qr_codes)
-                              const userData1 = await getUserData(booking_id);
-                              const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                              // const match = pdfBytes.match(/uploads\\(.+)/);
-                              // const newPath = 'uploads//' +match[1];
-                              const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
-                              dbConnection.query(updatePdf, async function (err, result2) {
-                               
-                              })
-                            });
-                          }
-                        });     
+                      
+        await new Promise((resolve, reject) => {
+          dbConnection.query(sql, values, function (err, results) {
+              if (err) {
+                  reject(err);
+              } else {
+                  const sql2 = `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`;
+                  dbConnection.query(sql2, function (err, result1) {
+                      if (err) {
+                          reject(err);
+                      } else {
+                          qrCodesArray.push(result1[0].qr_code);
+                          insertIds.push(results.insertId);
+                          resolve();
                       }
+                  });
+              }
+          });
+      });
+  }
+                              console.log("All QR codes:", qrCodesArray);
+                              const qr_codes = qrCodesArray.join(",")
+                      const getAll_qrCode= await generateQRCode(qr_codes)
+                      const userData1 = await getUserData(booking_id);
+                      console.log(userData1)
+                      const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                      console.log(pdfBytes)
+                      const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
+                      dbConnection.query(updatePdf, async function (err, result2) {
+                       
+                      })
 
                 const imageArray = [];
                 req.files.extra_loads_images.forEach((e, i) => {
