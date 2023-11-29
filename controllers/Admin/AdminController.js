@@ -830,7 +830,7 @@ export const get_all_order = async(req,res)=>{
 					res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});
 				});
 			}
-		});		
+		});
 
     }catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -1183,6 +1183,22 @@ export const admin_login = async(req,res)=>{
 	}
 }
 
+
+export const Update_Instruction = async (req, res) => {
+	try {
+	  const { id, delivery_instruction } = req.body;
+	  const sql = `UPDATE booking_instructions SET delievery_instruction=? WHERE user_id = ?`;
+	  dbConnection.query(sql, [delivery_instruction, id], function (err, results) {
+		if (err) {
+		  throw err;
+		}
+		res.json({ 'status': true, "message": "Instructions updated successfully" });
+	  });
+	} catch (error) {
+	  res.json({ 'status': false, "message": error.message });
+	}
+  };
+
 /****** end feedback section*******/
 export default {
 	get_page_content,
@@ -1225,6 +1241,7 @@ export default {
 	update_admin_email,
 	get_countries,
 	sendNotification,
-	get_county_cities
+	get_county_cities,
+	Update_Instruction
 
 }

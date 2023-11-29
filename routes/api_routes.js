@@ -210,6 +210,7 @@ router.post("/create_feedbackQes",CheckAuth,AdminController.create_feedbackQes)
 router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
 router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
 router.post("/sendNotification",CheckAuth,AdminController.sendNotification)
+router.post("/Update-Instruction",CheckAuth,AdminController.Update_Instruction)
 
 /**** Email template****/
 
