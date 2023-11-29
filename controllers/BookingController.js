@@ -144,13 +144,15 @@ export const customer_booking = async(req,res)=>{
             {
                 var usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
             }
-            dbConnection.query(usrLoads, function (error, resultss) 
+            dbConnection.query(usrLoads,async function (error, resultss) 
             {
                 if(total_loads > Number(resultss[0].total_loads))
+                
                 {
                     res.json({'status':false,"message":'Insufficient loads,Please buy loads'});  
                 }
                 else
+              
                 {
                     var resData = [];
                     allDates.forEach(function callback(element, key)
@@ -164,43 +166,63 @@ export const customer_booking = async(req,res)=>{
                         if(checkIfresults[0].tpyedate == 0)
                         {
 
-                    
                         let dateObject = new Date();
                         let hours = dateObject.getHours();
                         let minutes = dateObject.getMinutes();
                         const current_time = hours + ":" + minutes;
                         const currentBookingDate = dateFormat.format(dateObject,'YYYY-MM-DD');
-
+                        console.log("1231231234445555",checkIfresults[0].tpyedate)
+                        console.log(frequencyDBDate,currentBookingDate)
                         if(frequencyDBDate == currentBookingDate ){
                             // var driver_id = assignDriver(userData[0].id)
                     var driver_id = await assignDriver(userData[0].id,currentBookingDate,current_time)
                           console.log('driver_id',driver_id)
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,frequency,is_admin) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+frequency+"','"+isAdmin+"')";
-                            dbConnection.query(sql, function (err, result) {
-                                for (var i = 0; total_loads > i; i++) {
-                                    var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
-                                    dbConnection.query(sql, function (err, results) {
-                                        if(results){
-                                            var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
-                                           dbConnection.query(sql2, async function (err, result1) {
-                                            const qr_codes = result1.map((row) => row.qr_code);
-                                                const getAll_qrCode= await generateQRCode(qr_codes)
-                                                console.log(getAll_qrCode)
-                                                const userData1 = await getUserData (result.insertId);
-                                                const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                                // const match = pdfBytes.match(/uploads\\(.+)/);
-                                                // const newPath = 'uploads//' +match[1];
-                                                
-                  
-                
-                                                const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
-                                                dbConnection.query(updatePdf, async function (err, result2) {
-                                                    console.log(result2)
-                                                })
+                            dbConnection.query(sql,async function (err, result) {
+                                console.log("123123123444666666",checkIfresults[0].tpyedate)
+                                const qrCodesArray = [];
+                                const insertIds=[]
+                                console.log("12312312344")
+                                for (let i = 0; i < total_loads; i++) {
+                                    const sql = "INSERT INTO booking_qr (booking_id, qr_code) VALUES (?, ?)";
+                                    const values = [result.insertId, randomNumber(result.insertId)];
+                                    console.log("12312312344")
+                                    await new Promise((resolve, reject) => {
+                                        dbConnection.query(sql, values, function (err, results) {
+                                            console.log("12312312344",results)
+                                            if (err) {
+                                                reject(err);
+                                            } else {
+                                                const sql2 = `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`;
+                                                dbConnection.query(sql2, function (err, result1) {
+                                                    if (err) {
+                                                        reject(err);
+                                                    } else {
+                                                        qrCodesArray.push(result1[0].qr_code);
+                                                        insertIds.push(results.insertId);
+                                                        resolve();
+                                                    }
+                                                });
+                                            }
                                         });
-                                           }
-                                    });     
+                                    });
                                 }
+                                                            console.log("All QR codes:", qrCodesArray);
+                                                            const qr_codes = qrCodesArray.join(",")
+                                                            console.log("All QR codes1:", qr_codes);
+                                                             const getAll_qrCode= await generateQRCode(qrCodesArray)
+                                                             console.log('getAll_qrCode2',getAll_qrCode)
+                                                            const userData1 = await getUserData(result.insertId);
+                                                            console.log('userData1',userData1)
+                                                            
+                                                            const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                                                            console.log('pdfBytes',pdfBytes)
+                            
+                                                            const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
+                                                            dbConnection.query(updatePdf, async function (err, result2) {
+                                                            console.log(result2);
+                                                                });
+                            
                                 var updateLoads = (resultss[0].total_loads - total_loads);
 
                                 if(category_id == 1){
@@ -280,31 +302,51 @@ export const customer_booking = async(req,res)=>{
                     var driver_id = await assignDriver(userData[0].id,frequencyDBDate,current_time)
 
                       
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,is_admin) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_types+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+isAdmin+"')";
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,is_admin) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+isAdmin+"')";
                            
-                            dbConnection.query(sql, function (err, result) {
-                                for (var i = 0; total_loads > i; i++) {
-                                    var sql = "INSERT INTO booking_qr (booking_id,qr_code) VALUES ('"+result.insertId+"','"+randomNumber(result.insertId)+"')";
-                                    dbConnection.query(sql, function (err, results) {
-                                        if(results){
-                                            var sql2= `SELECT qr_code FROM booking_qr WHERE id=${results.insertId}`
-                                           dbConnection.query(sql2, async function (err, result1) {
-                                            const qr_codes = result1.map((row) => row.qr_code);
-                                                const getAll_qrCode= await generateQRCode(qr_codes)
-                                                const userData1 = await getUserData (result.insertId);
-                                                const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                                // const match = pdfBytes.match(/uploads\\(.+)/);
-                                                // const newPath = 'uploads//' +match[1];
-                  
-                
-                                                const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id = ${results.insertId}`;
-                                                dbConnection.query(updatePdf, async function (err, result2) {
-                                                    // console.log('result2',result2)
-                                                })
+                            dbConnection.query(sql,async function (err, result) {
+                                const qrCodesArray = [];
+                                const insertIds=[]
+                                for (let i = 0; i < total_loads; i++) {
+                                    const sql = "INSERT INTO dry_clean_booking_qr (booking_id, qr_code) VALUES (?, ?)";
+                                    const values = [result.insertId, randomNumber(result.insertId)];
+                            
+                                    await new Promise((resolve, reject) => {
+                                        dbConnection.query(sql, values, function (err, results) {
+                                            console.log("1231231233",results)
+                                            if (err) {
+                                                reject(err);
+                                            } else {
+                                                const sql2 = `SELECT qr_code FROM dry_clean_booking_qr WHERE id=${results.insertId}`;
+                                                dbConnection.query(sql2, function (err, result1) {
+                                                    if (err) {
+                                                        reject(err);
+                                                    } else {
+                                                        qrCodesArray.push(result1[0].qr_code);
+                                                        insertIds.push(results.insertId);
+                                                        resolve();
+                                                    }
+                                                });
+                                            }
                                         });
-                                           }
-                                    });     
+                                    });
                                 }
+                                                            console.log("All QR codes:", qrCodesArray);
+                                                            const qr_codes = qrCodesArray.join(",")
+                                                            console.log("All QR codes1:", qr_codes);
+                                                             const getAll_qrCode= await generateQRCode(qrCodesArray)
+                                                             console.log('getAll_qrCode2',getAll_qrCode)
+                                                            const userData1 = await getUserData(result.insertId);
+                                                            console.log('userData1',userData1)
+                                                            
+                                                            const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                                                            console.log('pdfBytes',pdfBytes)
+                            
+                                                            const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
+                                                            dbConnection.query(updatePdf, async function (err, result2) {
+                                                            console.log(result2);
+                                                                });
+                            
 
                                 if(category_id == 1){
                                 var usrLoadsD = "select commercial as total_loads from customer_loads_availabilty where user_id = '"+userData[0].id+"'";
