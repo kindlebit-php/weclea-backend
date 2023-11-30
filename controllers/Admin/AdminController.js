@@ -165,7 +165,7 @@ export const add_drycleaning_service = async(req,res)=>{
 				var product_image='';
 		      	if (req.file) {
 		      		if(req.file){
-						var product_image = req.file.originalname;
+						var product_image = req.file.location;//.originalname;
 					}
 			        /*let getFile = req.file.service_pic;//mimetype
 			        var ext=path.extname(getFile['name']);
@@ -230,7 +230,7 @@ export const update_drycleaning_service = async(req,res)=>{
 				var product_image='';
 		      	if (req.file) {
 		      		if(req.file){
-						var product_image = req.file.originalname;
+						var product_image = req.file.location;//req.file.originalname;
 					}
 			        /*let getFile = req.file.service_pic;//mimetype
 			        var ext=path.extname(getFile['name']);
