@@ -10,7 +10,7 @@ import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js'
 
 export const customer_booking = async(req,res)=>{
      try { 
-        const pdf=[]
+        
      	const userData = res.user;
         const {	delievery_day,is_admin,date,total_loads,order_type,frequency,category_id} = req.body;
         if(	date && total_loads && order_type){
@@ -101,7 +101,7 @@ export const customer_booking = async(req,res)=>{
                                 console.log('userData1',userData1)
                                 
                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                pdf.push(pdfBytes)
+                                
                                 console.log('pdfBytes',pdfBytes)
 
                                 const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
@@ -121,7 +121,7 @@ export const customer_booking = async(req,res)=>{
                         var order_id = '1001'+result.insertId;
                         var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
                         dbConnection.query(sql, function (err, resultss) {
-                        res.json({'status':true,"message":"Booking added successfully!",pdf:pdf[0]});                        
+                        res.json({'status':true,"message":"Booking added successfully!"});                        
                         });
                     });  
                        }else{
@@ -219,7 +219,7 @@ export const customer_booking = async(req,res)=>{
                                                             console.log('userData1',userData1)
                                                             
                                                             const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                                            pdf.push(pdfBytes)
+                                                            
                                                             console.log('pdfBytes',pdfBytes)
                             
                                                             const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
@@ -265,7 +265,7 @@ export const customer_booking = async(req,res)=>{
                             }
                     })
                     }) 
-                        res.json({'status':true,"message":"Booking added successfully!",pdf:pdf[0]});
+                        res.json({'status':true,"message":"Booking added successfully!"});
                 }
             });
         }
@@ -344,7 +344,7 @@ export const customer_booking = async(req,res)=>{
                                                             console.log('userData1',userData1)
                                                             
                                                             const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                                            pdf.push(pdfBytes)
+                                                            
                                                             console.log('pdfBytes',pdfBytes)
                             
                                                             const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
@@ -395,7 +395,7 @@ export const customer_booking = async(req,res)=>{
                           }
                         })
                     }) 
-                        res.json({'status':true,"message":"Booking added successfully!",pdf:pdf[0]});
+                        res.json({'status':true,"message":"Booking added successfully!"});
                 }
             });
         }

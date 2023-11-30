@@ -337,7 +337,7 @@ export const submit_wash_detail = async (req, res) => {
     const currentTime = time();
     const currentDate = date();
     const userIdQuery = "SELECT user_id FROM bookings WHERE id = ?";
-    const pdf=[]
+    
     dbConnection.query(userIdQuery, [booking_id], function (error, data) {
       if (error) {
         return res.json({ status: false, message: error.message });
@@ -446,7 +446,7 @@ export const submit_wash_detail = async (req, res) => {
                       const userData1 = await getUserData(booking_id);
                       console.log(userData1)
                       const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                      pdf.push(pdfBytes)
+                      
                       console.log(pdfBytes)
                       const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                 dbConnection.query(updatePdf, async function (err, result2) {
@@ -469,7 +469,7 @@ export const submit_wash_detail = async (req, res) => {
                   dbConnection.query(updateBooking, function (err, results) {
                   })
                   var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
-              return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)},pdf:pdf[0]});
+              return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
 
 
                     }else{
@@ -531,7 +531,7 @@ export const submit_wash_detail = async (req, res) => {
                                       const userData1 = await getUserData(booking_id);
                                       console.log(userData1)
                                       const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                      pdf.push(pdfBytes)
+                                      
                                       console.log(pdfBytes)
                                       const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                                 dbConnection.query(updatePdf, async function (err, result2) {
@@ -615,7 +615,7 @@ export const submit_wash_detail = async (req, res) => {
                                           const userData1 = await getUserData(booking_id);
                                           console.log(userData1)
                                           const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                          pdf.push(pdfBytes)
+                                          
                                           console.log(pdfBytes)
                                           const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                                     dbConnection.query(updatePdf, async function (err, result2) {
@@ -688,7 +688,7 @@ export const submit_wash_detail = async (req, res) => {
                                           const userData1 = await getUserData(booking_id);
                                           console.log(userData1)
                                           const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                          pdf.push(pdfBytes)
+                                          
                                           console.log(pdfBytes)
                                           const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                                     dbConnection.query(updatePdf, async function (err, result2) {
@@ -795,7 +795,7 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
             const responseData = {
               status: true,
               message: processMessages[type],
-              data: { customer_id: data[0].user_id , Note_From_Delivery:data1[0].delievery_instruction ,pdf:pdf[0]},
+              data: { customer_id: data[0].user_id , Note_From_Delivery:data1[0].delievery_instruction },
             };
             const title={
               1: "loads Washed",

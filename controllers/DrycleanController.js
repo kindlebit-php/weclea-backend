@@ -116,7 +116,7 @@ export const get_category = async (req, res) => {
         const current_time = hours + ":" + minutes;
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
         const driver_id = await assignDriver(userData[0].id,oneTimeDate,current_time)
-        const pdf=[];
+        
         const bookingid=[]
         var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,drop_drive_id,category_id,total_amount,total_loads,is_admin) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,'"+driver_id+"','"+driver_id+"','"+userData[0].category_id+"','"+amount+"',1,'"+is_admin+"')";
 
@@ -174,7 +174,7 @@ export const get_category = async (req, res) => {
                       const userData1 = await getUserData(bookingid[0]);
                       console.log(userData1)
                       const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                      pdf.push(pdfBytes)
+                      
                       console.log(pdfBytes)
                       const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                 dbConnection.query(updatePdf, async function (err, result2) {
@@ -184,7 +184,7 @@ export const get_category = async (req, res) => {
         const updateService = "update cart set booking_id = '"+result.insertId+"' where user_id = '"+userData[0].id+"' and status = '0'";
         dbConnection.query(updateService, function (error, data) {
              if(error) throw error;
-              res.json({'status':true,"message":"booking created successfully",'booking_id':result.insertId, 'card_status':userData[0].card_status,pdf:pdf[0]});  
+              res.json({'status':true,"message":"booking created successfully",'booking_id':result.insertId, 'card_status':userData[0].card_status});  
               
             });
         }else{
@@ -500,7 +500,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                                       const userData1 = await getUserData(booking_id);
                                       console.log(userData1)
                                       const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                      pdf.push(pdfBytes)
+                                      
                                       console.log(pdfBytes)
                                       const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                                 dbConnection.query(updatePdf, async function (err, result2) {
@@ -522,7 +522,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                   dbConnection.query(updateBooking, function (err, results) {
                   })
                   var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
-                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)},pdf:pdf[0]});
+                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
 
 
                     }else{
@@ -584,7 +584,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                                       const userData1 = await getUserData(booking_id);
                                       console.log(userData1)
                                       const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                      pdf.push(pdfBytes)
+                                      
                                       console.log(pdfBytes)
                                       const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                                 dbConnection.query(updatePdf, async function (err, result2) {
@@ -614,7 +614,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                   dbConnection.query(updateBooking, function (err, results) {
                   })
                   var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
-                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)},pdf:pdf[0]});
+                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
                           if(userLoadsresults[0].totalCount > 0){
@@ -665,7 +665,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                                           const userData1 = await getUserData(booking_id);
                                           console.log(userData1)
                                           const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                          pdf.push(pdfBytes)
+                                          
                                           console.log(pdfBytes)
                                           const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                                     dbConnection.query(updatePdf, async function (err, result2) {
@@ -690,7 +690,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                   })
                           }
                           var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
-                          return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)},pdf:pdf[0]});
+                          return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
                       
 
                         }else{
@@ -735,7 +735,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                                           const userData1 = await getUserData(booking_id);
                                           console.log(userData1)
                                           const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                          pdf.push(pdfBytes)
+                                          
                                           console.log(pdfBytes)
                                           const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                                     dbConnection.query(updatePdf, async function (err, result2) {
@@ -757,7 +757,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                         dbConnection.query(updateBooking, function (err, results) {
                         })
                         var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
-                        return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)},pdf:pdf[0]});
+                        return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
                        
                         }
 
@@ -791,7 +791,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
         })
         dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
         })
-          return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads: parseInt(bookingdata[0]?.total_loads)},pdf:pdf[0]});
+          return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads: parseInt(bookingdata[0]?.total_loads)}});
       })
 
         }
@@ -840,7 +840,7 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
             const responseData = {
               status: true,
               message: processMessages[type],
-              data: { customer_id: data[0].user_id , Note_From_Delivery:data1[0].delievery_instruction,pdf:pdf[0] },
+              data: { customer_id: data[0].user_id , Note_From_Delivery:data1[0].delievery_instruction },
             };
             const title={
               1: "loads Tagging",
@@ -857,6 +857,7 @@ console.log('updateQRtatusQueryss',updateQRtatusQuery)
               4: "Inspect process is completed! ",
               5: "Press process is completed! ",
               6: "Package process is completed! "
+
             };
             const fold_type={
               1: "Tagging",
