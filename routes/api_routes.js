@@ -45,6 +45,7 @@ router.get("/folder-list",userController.folder_list)
 router.get("/order-list",userController.order_list)
 router.get("/order-list-dry-clean",userController.order_list_dry_clean);
 router.get("/order-managament-user-history",userController.order_managament_user_history)
+router.post("/pdf-link",CheckAuth,userController.pdf_link)
 //ejs-terms
 router.get("/terms",async(req,res)=>{
     try {
