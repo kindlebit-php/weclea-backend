@@ -1941,6 +1941,7 @@ export const customer_list = async (req, res) => {
 				}
 	
 				if (qrCountresults[0].qrCount > 0) {
+
 					const pdfTable = (order_type == 3) ? 'dry_clean_booking_qr' : 'booking_qr';
 					const pdfSql = `SELECT pdf FROM ${pdfTable} WHERE booking_id = ?`;
 	
@@ -1949,7 +1950,7 @@ export const customer_list = async (req, res) => {
 							console.error(pdfError);
 							return res.json({ status: false, message: "An error occurred while retrieving PDF link." });
 						}
-						res.json({ message: "PDF link retrieved", pdf: pdfResult[0].pdf });
+						res.json({status: true, message: "PDF link retrieved", pdf: pdfResult[0].pdf });
 					});
 				} else {
 					res.json({ message: "No records found for the given booking ID and order type." });
