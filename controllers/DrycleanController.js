@@ -117,10 +117,11 @@ export const get_category = async (req, res) => {
         const oneTimeDate = dateFormat.format(new Date(date),'YYYY-MM-DD');
         const driver_id = await assignDriver(userData[0].id,oneTimeDate,current_time)
         const pdf=[];
-        
+        const bookingid=[]
         var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,drop_drive_id,category_id,total_amount,total_loads,is_admin) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,'"+driver_id+"','"+driver_id+"','"+userData[0].category_id+"','"+amount+"',1,'"+is_admin+"')";
 
         dbConnection.query(sql,async function (err, result) {
+          bookingid.push(result.insertId)
         if(result){
 
         if(payment_id != ''){
@@ -170,7 +171,7 @@ export const get_category = async (req, res) => {
                               const qr_codes = qrCodesArray.join(",")
                               console.log(qr_codes,"after all qrcode")
                       const getAll_qrCode= await generateQRCode(qrCodesArray)
-                      const userData1 = await getUserData(booking_id);
+                      const userData1 = await getUserData(bookingid[0]);
                       console.log(userData1)
                       const pdfBytes = await generatePDF(userData1, getAll_qrCode);
                       pdf.push(pdfBytes)
