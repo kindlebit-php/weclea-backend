@@ -85,7 +85,7 @@ export const generatePDF = async (data, qrCodesArray) => {
     args: ['--no-sandbox'], 
   });
   // const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+  const page = await browser.newPage();;
 
   let htmlContent = '';
 
