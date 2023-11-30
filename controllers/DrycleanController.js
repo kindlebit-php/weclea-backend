@@ -522,7 +522,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                   dbConnection.query(updateBooking, function (err, results) {
                   })
                   var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
-                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
+                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)},pdf:pdf[0]});
 
 
                     }else{
@@ -614,7 +614,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                   dbConnection.query(updateBooking, function (err, results) {
                   })
                   var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
-                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
+                  return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)},pdf:pdf[0]});
                             // res.json({'status':true,"message":"pack",'data':bookingdata[0].user_id});                        
                           }else{
                           if(userLoadsresults[0].totalCount > 0){
@@ -690,7 +690,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                   })
                           }
                           var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
-                          return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
+                          return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)},pdf:pdf[0]});
                       
 
                         }else{
@@ -757,7 +757,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
                         dbConnection.query(updateBooking, function (err, results) {
                         })
                         var totalPrintLoads = (Number(bookingdata[0].total_loads) + Number(extra_loads))
-                        return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)}});
+                        return res.json({ status: true,message: 'pack',data: { customer_id: bookingdata[0].user_id,total_loads: Number(totalPrintLoads)},pdf:pdf[0]});
                        
                         }
 
@@ -791,7 +791,7 @@ export const submit_dryClean_process_detail = async (req, res) => {
         })
         dbConnection.query(updatePickupImagesQuery, [pickupImagesJSON, booking_id], function (updateImagesErr, updateImagesResult) {
         })
-          return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads: parseInt(bookingdata[0]?.total_loads)}});
+          return res.json({ status: true,message: 'package',data: { customer_id: bookingdata[0].user_id,total_loads: parseInt(bookingdata[0]?.total_loads)},pdf:pdf[0]});
       })
 
         }
