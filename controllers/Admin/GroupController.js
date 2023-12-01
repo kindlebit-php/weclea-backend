@@ -38,10 +38,25 @@ export const get_county_list = async(req,res)=>{
 }
 export const get_all_county_list = async(req,res)=>{
     try { 
-    	const loads = "select wc_county.*,wc_states.id state_id, wc_states.name state_name,wc_cities.name city_name from wc_county LEFT JOIN wc_cities on wc_cities.id=wc_county.city_id LEFT JOIN wc_states on wc_states.id=wc_cities.state_id where  wc_county.isDeleted=0 Group by wc_county.name order by wc_county.name asc";
+    	const loads = "select wc_county.*, GROUP_CONCAT(wc_county.city_id) all_city ,wc_states.id state_id, wc_states.name state_name,wc_cities.name city_name from wc_county LEFT JOIN wc_cities on wc_cities.id=wc_county.city_id LEFT JOIN wc_states on wc_states.id=wc_cities.state_id where  wc_county.isDeleted=0 Group by wc_county.name order by wc_county.name asc";
 		dbConnection.query(loads, function (error, data) {
-		if (error) throw error;
-			res.json({'status':true,"message":"Success",'data':data});
+			if (error) throw error;
+			for (var i = 0; i < data.length; i++) {
+				var all_city= data[i].all_city;
+				//SELECT * FROM `wc_cities` WHERE find_in_set(id,'47774,47790,47687,47653');
+				var k=0;
+				const qrySelect = "SELECT * FROM `wc_cities` WHERE find_in_set(id,'"+all_city+"')";
+				dbConnection.query(qrySelect, function (error, allcity) {
+				if (error) throw error;
+					
+					data[k]['cities']=allcity;
+					if (k>=data.length-1) {
+						res.json({'status':true,"message":"Success",'data':data});
+					}
+					k++;
+				});
+			}
+			
 		})
     }catch (error) {
         res.json({'status':false,"message":error.message});  
