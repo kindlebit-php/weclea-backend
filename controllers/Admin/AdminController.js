@@ -1183,22 +1183,32 @@ export const admin_login = async(req,res)=>{
 	}
 }
 
-
 export const Update_Instruction = async (req, res) => {
 	try {
-	  const { id, delivery_instruction } = req.body;
-	  const sql = `UPDATE booking_instructions SET delievery_instruction=? WHERE user_id = ?`;
-	  dbConnection.query(sql, [delivery_instruction, id], function (err, results) {
+	  const { id, instruction, type } = req.body;
+	  
+	  let updateField;
+  
+	  if (type == 1) {
+		updateField = 'delievery_instruction';
+	  } else {
+		updateField = 'pickup_instruction';
+	  }
+  
+	  const sql = `UPDATE booking_instructions SET ${updateField}=? WHERE user_id = ?`;
+  
+	  dbConnection.query(sql, [instruction, id], function (err, results) {
 		if (err) {
 		  throw err;
 		}
+  
 		res.json({ 'status': true, "message": "Instructions updated successfully" });
 	  });
 	} catch (error) {
 	  res.json({ 'status': false, "message": error.message });
 	}
   };
-
+  
 /****** end feedback section*******/
 export default {
 	get_page_content,
