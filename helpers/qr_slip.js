@@ -3,7 +3,17 @@ import qrcode from "qrcode";
 import { v4 as uuidv4 } from 'uuid'; 
 //import pdf from "pdf-creator-node"; 
 import puppeteer from 'puppeteer';
+//import { s3 } from "../utils/multerS3.js";
+import AWS from "aws-sdk";
 
+const USER_KEY ='AKIAQN6QN5FKDLFL2AOZ';
+const USER_SECRET = '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';
+const BUCKET_NAME = 'weclea-bucket';
+const s3 = new AWS.S3({
+  accessKeyId: USER_KEY,
+  secretAccessKey: USER_SECRET,
+  region: "us-east-2",
+});
 
 
 export const qr_slip = async (req, res) => {
@@ -42,14 +52,16 @@ export const getUserData=async(booking_id)=>{
       if (data && data.length > 0) {
         const userId = data[0].user_id;
         const query = `
-          SELECT  b.order_id, b.date,
+          SELECT b.id AS order_id, b.date,
           CONCAT(ca.address, ', ', ca.appartment, ', ', ca.city, ', ', ca.state, ', ', ca.zip) AS address
           FROM bookings AS b
-          JOIN customer_address AS ca ON b.user_id = ca.user_id
-          JOIN users AS u ON b.user_id = u.id
+          LEFT JOIN customer_address AS ca ON b.user_id = ca.user_id
+          LEFT JOIN users AS u ON b.user_id = u.id
           WHERE b.user_id = ? AND b.id = ? `;
         
         dbConnection.query(query, [userId, booking_id], (error, data2) => {
+          data2[0].order_id='1001'+data2[0].order_id
+          console.log("==============================================",data2)
           if (error) {
             reject(error);
           }
@@ -73,7 +85,7 @@ export const generatePDF = async (data, qrCodesArray) => {
     args: ['--no-sandbox'], 
   });
   // const browser = await puppeteer.launch();
-  const page = await browser.newPage();
+  const page = await browser.newPage();;
 
   let htmlContent = '';
 
@@ -128,20 +140,43 @@ export const generatePDF = async (data, qrCodesArray) => {
     htmlContent += sectionHtml;
   }
 
+  // await page.setContent(htmlContent);
+
+  // const pdfPath = `uploads/${uuidv4()}.pdf`;
+
+  // const options = {
+  //   path: pdfPath,
+  //   format: 'A4',
+  // };
+
+  // await page.pdf(options);
+
+  // await browser.close();
+
+  // return pdfPath;
+
+
   await page.setContent(htmlContent);
 
-  const pdfPath = `uploads/${uuidv4()}.pdf`;
-
-  const options = {
-    path: pdfPath,
+  const pdfBuffer = await page.pdf({
     format: 'A4',
+  });
+
+  const pdfKey = `${uuidv4()}.pdf`;
+
+  const uploadParams = {
+    Bucket: BUCKET_NAME,
+    Key: pdfKey,
+    Body: pdfBuffer,
+    ContentType: 'application/pdf',
+    ACL: 'public-read',
   };
 
-  await page.pdf(options);
+  const uploadResult = await s3.upload(uploadParams).promise();
 
   await browser.close();
-
-  return pdfPath;
+  console.log(uploadResult.Location)
+  return uploadResult.Location;
 };
 
 

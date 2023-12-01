@@ -414,7 +414,7 @@ export const get_userList = async(req,res)=>{
 	            usrLoads = "select yeshiba as total_loads from customer_loads_availabilty where user_id = users.id";
 	        }
 	    }
-    	const loads = "select users.*, ("+usrLoads+") total_load from users where role=1";
+    	const loads = "select users.*,booking_instructions.pickup_instruction,booking_instructions.delievery_instruction, ("+usrLoads+") total_load from users LEFT JOIN booking_instructions on booking_instructions.user_id = users.id where users.role=1";
 		dbConnection.query(loads, function (error, data) {
 		if (error) throw error;
 			res.json({'status':true,"message":"Success",'data':data});
@@ -809,7 +809,7 @@ export const get_all_order = async(req,res)=>{
 		}else if(reqData.order_type  && reqData.order_type=='3') {
 		  	orderType=" and bookings.order_type='3' ";          
 		}
-        dbConnection.query("SELECT bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,users.profile_image customer_pic FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1 "+queryType+" "+query+" "+orderType+" order by bookings.id desc", (error, rows) => {
+        dbConnection.query("SELECT bookings.order_id,bookings.user_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,users.name customer_name,booking_instructions.pickup_instruction,booking_instructions.delievery_instruction,users.profile_image customer_pic FROM `bookings` LEFT join booking_instructions on booking_instructions.user_id = bookings.user_id LEFT JOIN users on  users.id=bookings.user_id WHERE bookings.cron_status=1 "+queryType+" "+query+" "+orderType+" order by bookings.id desc", (error, rows) => {
             if (error) {
                  res.json({'status':false,"message":error.message}); 
             } else {
@@ -824,13 +824,13 @@ export const get_all_order = async(req,res)=>{
                 }else{
                     var totalRecords=false;
                 }
-				const loads = "SELECT ratings.rating_id, bookings.total_amount,bookings.id, bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,(SELECT users.mobile FROM users WHERE id=bookings.driver_id LIMIT 1) driver_mobile,(SELECT users.email FROM users WHERE id=bookings.driver_id LIMIT 1) driver_email,users.name customer_name,users.profile_image customer_pic, users.mobile customer_mobile,users.email customer_email FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id left join ratings on ratings.booking_id=bookings.id WHERE bookings.cron_status=1   "+queryType+" "+query+" "+orderType+" order by bookings.id desc limit ? offset ?";
+				const loads = "SELECT ratings.rating_id, bookings.total_amount,bookings.id,bookings.user_id, bookings.order_id,bookings.delievery_day,bookings.date,bookings.time,bookings.total_loads,bookings.order_status,bookings.order_type,bookings.order_status,(SELECT users.name FROM users WHERE id=bookings.driver_id LIMIT 1) driver_name,(SELECT users.profile_image FROM users WHERE id=bookings.driver_id LIMIT 1) driver_pic,(SELECT users.mobile FROM users WHERE id=bookings.driver_id LIMIT 1) driver_mobile,(SELECT users.email FROM users WHERE id=bookings.driver_id LIMIT 1) driver_email,booking_instructions.pickup_instruction,booking_instructions.delievery_instruction,users.name customer_name,users.profile_image customer_pic, users.mobile customer_mobile,users.email customer_email FROM `bookings` LEFT JOIN users on  users.id=bookings.user_id LEFT join booking_instructions on booking_instructions.user_id = bookings.user_id left join ratings on ratings.booking_id=bookings.id WHERE bookings.cron_status=1   "+queryType+" "+query+" "+orderType+" order by bookings.id desc limit ? offset ?";
 				dbConnection.query(loads,[LimitNum,startNum],function (error, rows) {
 				if (error) throw error;
 					res.json({'status':true,"message":"Success",'data':{totalRecords,rows}});
 				});
 			}
-		});		
+		});
 
     }catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -1183,6 +1183,32 @@ export const admin_login = async(req,res)=>{
 	}
 }
 
+export const Update_Instruction = async (req, res) => {
+	try {
+	  const { id, instruction, type } = req.body;
+	  
+	  let updateField;
+  
+	  if (type == 1) {
+		updateField = 'delievery_instruction';
+	  } else {
+		updateField = 'pickup_instruction';
+	  }
+  
+	  const sql = `UPDATE booking_instructions SET ${updateField}=? WHERE user_id = ?`;
+  
+	  dbConnection.query(sql, [instruction, id], function (err, results) {
+		if (err) {
+		  throw err;
+		}
+  
+		res.json({ 'status': true, "message": "Instructions updated successfully" });
+	  });
+	} catch (error) {
+	  res.json({ 'status': false, "message": error.message });
+	}
+  };
+  
 /****** end feedback section*******/
 export default {
 	get_page_content,
@@ -1225,6 +1251,7 @@ export default {
 	update_admin_email,
 	get_countries,
 	sendNotification,
-	get_county_cities
+	get_county_cities,
+	Update_Instruction
 
 }

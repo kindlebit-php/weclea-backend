@@ -45,6 +45,7 @@ router.get("/folder-list",userController.folder_list)
 router.get("/order-list",userController.order_list)
 router.get("/order-list-dry-clean",userController.order_list_dry_clean);
 router.get("/order-managament-user-history",userController.order_managament_user_history)
+router.post("/pdf-link",CheckAuth,userController.pdf_link)
 //ejs-terms
 router.get("/terms",async(req,res)=>{
     try {
@@ -210,6 +211,7 @@ router.post("/create_feedbackQes",CheckAuth,AdminController.create_feedbackQes)
 router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
 router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
 router.post("/sendNotification",CheckAuth,AdminController.sendNotification)
+router.post("/Update-Instruction",CheckAuth,AdminController.Update_Instruction)
 
 /**** Email template****/
 

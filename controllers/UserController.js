@@ -1928,6 +1928,40 @@ export const customer_list = async (req, res) => {
 			res.render('Error');
 		}
 	}
+
+	export const pdf_link = async (req, res) => {
+		try {
+			const { order_type, booking_Id } = req.body;
+			let qrCountSql = "SELECT COUNT(id) AS qrCount FROM bookings WHERE id = ? AND order_type = ?";
+			
+			dbConnection.query(qrCountSql, [booking_Id, order_type], async (error, qrCountresults) => {
+				if (error) {
+					console.error(error);
+					return res.json({ status: false, message: "An error occurred." });
+				}
+	
+				if (qrCountresults[0].qrCount > 0) {
+
+					const pdfTable = (order_type == 3) ? 'dry_clean_booking_qr' : 'booking_qr';
+					const pdfSql = `SELECT pdf FROM ${pdfTable} WHERE booking_id = ?`;
+	
+					dbConnection.query(pdfSql, [booking_Id], async (pdfError, pdfResult) => {
+						if (pdfError) {
+							console.error(pdfError);
+							return res.json({ status: false, message: "An error occurred while retrieving PDF link." });
+						}
+						res.json({status: true, message: "PDF link retrieved", pdf: pdfResult[0].pdf });
+					});
+				} else {
+					res.json({ message: "No records found for the given booking ID and order type." });
+				}
+			});
+		} catch (error) {
+			console.error(error);
+			res.json({ status: false, message: error.message });
+		}
+	};
+	
 	
 export default {
 	user_registered_address,
@@ -1961,5 +1995,6 @@ export default {
 	folder_data,
 	order_managament_user_history,
 	delete_account,
-	delete_customer_account
+	delete_customer_account,
+	pdf_link
 }
