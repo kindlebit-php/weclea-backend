@@ -121,7 +121,6 @@ export const create_county = async(req,res)=>{
 			dbConnection.query(qrySelect,[reqData.name,reqData.state_id], function (error, data) {
 				if (error) throw error;
 				if (data.length<=0) {
-					console.log("create_county city_ids", city_ids[x],city_ids[k],x,k);
 	              	var addContnetQry = "insert wc_county set `name`=?, `city_id`=?,state_id=?,`status`=?";
 				    dbConnection.query(addContnetQry,[reqData.name,reqData.city_id,reqData.state_id, 1], function (error, data) {
 						if (error) throw error;
