@@ -84,20 +84,34 @@ export const create_county = async(req,res)=>{
 	console.log("create_county", reqData,req.files)
 	//wc_emp_group //`manage_name`, `profile_pic`, `location`, `country`, `group_name`, `zip_code`, 
     try { 
-    	const qrySelect = "select id from wc_county where `name`=? and `city_id`=? and isDeleted=0";
-		dbConnection.query(qrySelect,[reqData.name,reqData.city_id], function (error, data) {
-		if (error) throw error;
-			if (data.length<=0) {
-              	var addContnetQry = "insert wc_county set `name`=?, `city_id`=?,state_id=?,`status`=? ";
-			    dbConnection.query(addContnetQry,[reqData.name, reqData.city_id,reqData.state_id, 1], function (error, data) {
-				if (error) throw error;
-					res.json({'status':true,"message":"County has been added successfully",'data':data});
-				});
-			    
-			}else{
-				res.json({'status':false,"message":"Same county already exist"});
-			}
-		});
+    	const city_ids = reqData.city_id.split(',');
+    	console.log("create_county=",city_ids);
+    	const arr = for (var i = 0; i < city_ids.length; i++) {
+    		var city= city_ids[i];
+    		console.log("create_county",city);
+		  	const qrySelect = "select id from wc_county where `name`=? and `city_id`=? and isDeleted=0";
+			var k=0;
+			dbConnection.query(qrySelect,[reqData.name,city], function (error, data) {
+			if (error) throw error;
+				var x=0
+				if (data.length<=0) {
+	              	var addContnetQry = "insert wc_county set `name`=?, `city_id`=?,state_id=?,`status`=?";
+				    dbConnection.query(addContnetQry,[reqData.name, reqData.city_id,reqData.state_id, 1], function (error, data) {
+						if (error) throw error;
+						console.log("create_county==",k,x);
+						if (x>=k.length-1) {
+							res.json({'status':true,"message":"County has been added successfully",'data':data});
+						}
+						x++;
+					});
+				    k++;
+				}else{
+					res.json({'status':false,"message":"Same county already exist"});
+				}
+				
+			});
+		};
+    	
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
