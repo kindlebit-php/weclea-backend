@@ -101,14 +101,15 @@ export const create_county = async(req,res)=>{
 				    dbConnection.query(addContnetQry,[reqData.name, city_ids[k],reqData.state_id, 1], function (error, data) {
 						if (error) throw error;
 						console.log("create_county==",k,x);
-						if (x>=k-1) {
+						if (x>=k) {
 							res.json({'status':true,"message":"County has been added successfully",'data':data});
 						}
 						x++;
 					});
 				    k++;
 				}else{
-					res.json({'status':false,"message":"Same county already exist"});
+					
+					//res.json({'status':false,"message":"Same county already exist"});
 				}
 				
 			});
