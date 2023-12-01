@@ -48,7 +48,7 @@ export const get_all_county_list = async(req,res)=>{
 				const qrySelect = "SELECT * FROM `wc_cities` WHERE find_in_set(id,'"+all_city+"')";
 				dbConnection.query(qrySelect, function (error, allcity) {
 				if (error) throw error;
-					
+
 					data[k]['cities']=allcity;
 					if (k>=data.length-1) {
 						res.json({'status':true,"message":"Success",'data':data});
@@ -77,19 +77,37 @@ export const get_group_user_list = async(req,res)=>{
 export const update_county = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	const qrySelect = "select id from wc_county where `name`=? and city_id=? and isDeleted=1  and id!=?";
-		dbConnection.query(qrySelect,[reqData.name, reqData.city_id, reqData.id], function (error, data) {
-		if (error) throw error;
-			if (data.length<=0) { 
+ 
+	    	const qrySelect = "select id from wc_county where `name`=? and state_id=? and isDeleted=1  and id!=?";
+			dbConnection.query(qrySelect,[reqData.name, reqData.state_id, reqData.id], function (error, data) {
+			if (error) throw error;
+				if (data.length<=0) { 
 					var addContnetQry = "update wc_county set `name`=?, city_id=?, state_id=? ,`status`=? where id=? ";
 				    dbConnection.query(addContnetQry,[reqData.name, reqData.city_id,reqData.state_id , 1,reqData.id], function (error, data) {
 					if (error) throw error;
-						res.json({'status':true,"message":"County has been updated successfully",'data':data});
+						console.log("create_county==",k,x);
+						var city_ids = reqData.city_id.split(',');
+				    	console.log("create_county=",city_ids);
+				    	for (var i = 0; i < city_ids.length; i++) {
+				    		var city= city_ids[i];
+				    		console.log("create_county",city);
+				    		var k=0;
+				    		var addContnetQry = "UPDATE `wc_cities` SET `county_id`=? WHERE `id`= ?";
+						    dbConnection.query(addContnetQry,[reqData.id,city], function (error, data) {
+								if (error) throw error;
+								if (k>=city_ids.length-1) {
+									res.json({'status':true,"message":"County has been updated successfully",'data':data});
+								}
+								k++;
+							});
+						
+						}
 					});
-			}else{
-				res.json({'status':false,"message":"Same county already exist"});
-			}
-		})
+				}else{
+					res.json({'status':false,"message":"Same county already exist"});
+				}
+			});
+		
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
@@ -99,36 +117,38 @@ export const create_county = async(req,res)=>{
 	console.log("create_county", reqData,req.files)
 	//wc_emp_group //`manage_name`, `profile_pic`, `location`, `country`, `group_name`, `zip_code`, 
     try { 
-    	var city_ids = reqData.city_id.split(',');
-    	console.log("create_county=",city_ids);
-    	for (var i = 0; i < city_ids.length; i++) {
-    		var city= city_ids[i];
-    		console.log("create_county",city);
-		  	const qrySelect = "select id from wc_county where `name`=? and `city_id`=? and isDeleted=0";
-			var k=0;
-			var x=0;
-			dbConnection.query(qrySelect,[reqData.name,city], function (error, data) {
-			if (error) throw error;
-				
+		  	const qrySelect = "select id from wc_county where `name`=? and `state_id`=? and isDeleted=0";
+			dbConnection.query(qrySelect,[reqData.name,reqData.state_id], function (error, data) {
+				if (error) throw error;
 				if (data.length<=0) {
 					console.log("create_county city_ids", city_ids[x],city_ids[k],x,k);
 	              	var addContnetQry = "insert wc_county set `name`=?, `city_id`=?,state_id=?,`status`=?";
-				    dbConnection.query(addContnetQry,[reqData.name, city_ids[k],reqData.state_id, 1], function (error, data) {
+				    dbConnection.query(addContnetQry,[reqData.name,reqData.city_id,reqData.state_id, 1], function (error, data) {
 						if (error) throw error;
-						console.log("create_county==",k,x);
-						if (x>=k) {
-							res.json({'status':true,"message":"County has been added successfully",'data':data});
-						}
-						x++;
+						const county_id=data.insertId;
+						var city_ids = reqData.city_id.split(',');
+				    	console.log("create_county=",city_ids);
+				    	for (var i = 0; i < city_ids.length; i++) {
+				    		var city= city_ids[i];
+				    		console.log("create_county",city);
+				    		var k=0;
+							var addContnetQry = "UPDATE `wc_cities` SET `county_id`=? WHERE `id`= ?";
+						    dbConnection.query(addContnetQry,[county_id,city], function (error, data) {
+								if (error) throw error;
+								if (k>=city_ids.length-1) {
+									res.json({'status':true,"message":"County has been added successfully",'data':data});
+								}
+								k++;
+							});
+						}		
 					});
-				    k++;
+				    
 				}else{
 
-					//res.json({'status':false,"message":"Same county already exist"});
+					res.json({'status':false,"message":"Same county already exist"});
 				}
 				
 			});
-		};
     	
     }catch (error) {
         res.json({'status':false,"message":error.message});  
