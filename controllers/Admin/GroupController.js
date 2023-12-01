@@ -82,9 +82,13 @@ export const update_county = async(req,res)=>{
 			dbConnection.query(qrySelect,[reqData.name, reqData.state_id, reqData.id], function (error, data) {
 			if (error) throw error;
 				if (data.length<=0) { 
+					var addContnetQry = "UPDATE `wc_cities` SET `county_id`=0 WHERE `county_id`= ?";
+				    dbConnection.query(addContnetQry,[reqData.id], function (error, data) {
+						if (error) throw error;
+					});
 					var addContnetQry = "update wc_county set `name`=?, city_id=?, state_id=? ,`status`=? where id=? ";
 				    dbConnection.query(addContnetQry,[reqData.name, reqData.city_id,reqData.state_id , 1,reqData.id], function (error, data) {
-					if (error) throw error;
+						if (error) throw error;
 						console.log("create_county==",k);
 						var city_ids = reqData.city_id.split(',');
 				    	console.log("create_county=",city_ids);
