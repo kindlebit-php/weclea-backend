@@ -27,7 +27,7 @@ export const get_group_list = async(req,res)=>{
 export const get_county_list = async(req,res)=>{
 	var reqData= req.params
     try { 
-    	const loads = "select wc_county.*, wc_states.name state_name,wc_cities.name city_name from wc_county LEFT JOIN wc_cities on wc_cities.id=wc_county.city_id LEFT JOIN wc_states on wc_states.id=wc_county.state_id where wc_county.status=1 and wc_county.isDeleted=0 and wc_county.state_id=? order by wc_county.name asc;";
+    	const loads = "select wc_county.*, wc_states.name state_name,wc_cities.name city_name from wc_county LEFT JOIN wc_cities on wc_cities.id=wc_county.city_id LEFT JOIN wc_states on wc_states.id=wc_county.state_id where wc_county.status=1 and wc_county.isDeleted=0 and wc_county.state_id=?  Group by wc_county.name order by wc_county.name asc";
 		dbConnection.query(loads,[reqData.state_id], function (error, data) {
 		if (error) throw error;
 			res.json({'status':true,"message":"Success",'data':data});
@@ -38,10 +38,25 @@ export const get_county_list = async(req,res)=>{
 }
 export const get_all_county_list = async(req,res)=>{
     try { 
-    	const loads = "select wc_county.*,wc_states.id state_id, wc_states.name state_name,wc_cities.name city_name from wc_county LEFT JOIN wc_cities on wc_cities.id=wc_county.city_id LEFT JOIN wc_states on wc_states.id=wc_cities.state_id where  wc_county.isDeleted=0 order by wc_county.name asc";
+    	const loads = "select wc_county.*, GROUP_CONCAT(wc_county.city_id) all_city ,wc_states.id state_id, wc_states.name state_name,wc_cities.name city_name from wc_county LEFT JOIN wc_cities on wc_cities.id=wc_county.city_id LEFT JOIN wc_states on wc_states.id=wc_cities.state_id where  wc_county.isDeleted=0 Group by wc_county.name order by wc_county.name asc";
 		dbConnection.query(loads, function (error, data) {
-		if (error) throw error;
-			res.json({'status':true,"message":"Success",'data':data});
+			if (error) throw error;
+			for (var i = 0; i < data.length; i++) {
+				var all_city= data[i].all_city;
+				//SELECT * FROM `wc_cities` WHERE find_in_set(id,'47774,47790,47687,47653');
+				var k=0;
+				const qrySelect = "SELECT * FROM `wc_cities` WHERE find_in_set(id,'"+all_city+"')";
+				dbConnection.query(qrySelect, function (error, allcity) {
+				if (error) throw error;
+
+					data[k]['cities']=allcity;
+					if (k>=data.length-1) {
+						res.json({'status':true,"message":"Success",'data':data});
+					}
+					k++;
+				});
+			}
+			
 		})
     }catch (error) {
         res.json({'status':false,"message":error.message});  
@@ -62,19 +77,41 @@ export const get_group_user_list = async(req,res)=>{
 export const update_county = async(req,res)=>{
 	const reqData = req.body;
     try { 
-    	const qrySelect = "select id from wc_county where `name`=? and city_id=? and isDeleted=1  and id!=?";
-		dbConnection.query(qrySelect,[reqData.name, reqData.city_id, reqData.id], function (error, data) {
-		if (error) throw error;
-			if (data.length<=0) { 
+ 
+	    	const qrySelect = "select id from wc_county where `name`=? and state_id=? and isDeleted=1  and id!=?";
+			dbConnection.query(qrySelect,[reqData.name, reqData.state_id, reqData.id], function (error, data) {
+			if (error) throw error;
+				if (data.length<=0) { 
+					var addContnetQry = "UPDATE `wc_cities` SET `county_id`=0 WHERE `county_id`= ?";
+				    dbConnection.query(addContnetQry,[reqData.id], function (error, data) {
+						if (error) throw error;
+					});
 					var addContnetQry = "update wc_county set `name`=?, city_id=?, state_id=? ,`status`=? where id=? ";
 				    dbConnection.query(addContnetQry,[reqData.name, reqData.city_id,reqData.state_id , 1,reqData.id], function (error, data) {
-					if (error) throw error;
-						res.json({'status':true,"message":"County has been updated successfully",'data':data});
+						if (error) throw error;
+						console.log("create_county==",k);
+						var city_ids = reqData.city_id.split(',');
+				    	console.log("create_county=",city_ids);
+				    	for (var i = 0; i < city_ids.length; i++) {
+				    		var city= city_ids[i];
+				    		console.log("create_county",city);
+				    		var k=0;
+				    		var addContnetQry = "UPDATE `wc_cities` SET `county_id`=? WHERE `id`= ?";
+						    dbConnection.query(addContnetQry,[reqData.id,city], function (error, data) {
+								if (error) throw error;
+								if (k>=city_ids.length-1) {
+									res.json({'status':true,"message":"County has been updated successfully",'data':data});
+								}
+								k++;
+							});
+						
+						}
 					});
-			}else{
-				res.json({'status':false,"message":"Same county already exist"});
-			}
-		})
+				}else{
+					res.json({'status':false,"message":"Same county already exist"});
+				}
+			});
+		
     }catch (error) {
         res.json({'status':false,"message":error.message});  
     }
@@ -84,33 +121,37 @@ export const create_county = async(req,res)=>{
 	console.log("create_county", reqData,req.files)
 	//wc_emp_group //`manage_name`, `profile_pic`, `location`, `country`, `group_name`, `zip_code`, 
     try { 
-    	const city_ids = reqData.city_id.split(',');
-    	console.log("create_county=",city_ids);
-    	 for (var i = 0; i < city_ids.length; i++) {
-    		var city= city_ids[i];
-    		console.log("create_county",city);
-		  	const qrySelect = "select id from wc_county where `name`=? and `city_id`=? and isDeleted=0";
-			var k=0;
-			dbConnection.query(qrySelect,[reqData.name,city], function (error, data) {
-			if (error) throw error;
-				var x=0
+		  	const qrySelect = "select id from wc_county where `name`=? and `state_id`=? and isDeleted=0";
+			dbConnection.query(qrySelect,[reqData.name,reqData.state_id], function (error, data) {
+				if (error) throw error;
 				if (data.length<=0) {
 	              	var addContnetQry = "insert wc_county set `name`=?, `city_id`=?,state_id=?,`status`=?";
-				    dbConnection.query(addContnetQry,[reqData.name, reqData.city_id,reqData.state_id, 1], function (error, data) {
+				    dbConnection.query(addContnetQry,[reqData.name,reqData.city_id,reqData.state_id, 1], function (error, data) {
 						if (error) throw error;
-						console.log("create_county==",k,x);
-						if (x>=k.length-1) {
-							res.json({'status':true,"message":"County has been added successfully",'data':data});
-						}
-						x++;
+						const county_id=data.insertId;
+						var city_ids = reqData.city_id.split(',');
+				    	console.log("create_county=",city_ids);
+				    	for (var i = 0; i < city_ids.length; i++) {
+				    		var city= city_ids[i];
+				    		console.log("create_county",city);
+				    		var k=0;
+							var addContnetQry = "UPDATE `wc_cities` SET `county_id`=? WHERE `id`= ?";
+						    dbConnection.query(addContnetQry,[county_id,city], function (error, data) {
+								if (error) throw error;
+								if (k>=city_ids.length-1) {
+									res.json({'status':true,"message":"County has been added successfully",'data':data});
+								}
+								k++;
+							});
+						}		
 					});
-				    k++;
+				    
 				}else{
+
 					res.json({'status':false,"message":"Same county already exist"});
 				}
 				
 			});
-		};
     	
     }catch (error) {
         res.json({'status':false,"message":error.message});  
