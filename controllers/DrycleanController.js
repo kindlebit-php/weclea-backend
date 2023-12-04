@@ -21,7 +21,7 @@ export const get_category = async (req, res) => {
           {
             const {id,title,price,image,note} = element;
             if(image){
-              var img = process.env.S3_URL+image;
+              var img =image;// process.env.S3_URL+image;
             }else{
               var img = process.env.BASE_URL+'/uploads/pants.jpg';
             }
