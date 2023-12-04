@@ -487,10 +487,10 @@ export const get_packagesList = async(req,res)=>{
         	const loads = "select * from admin_packages where isDelete=0 order by created_at desc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
-				const dryCleanChares = `SELECT extra_chages FROM settings `;
+				const dryCleanChares = `SELECT extra_chages,loads_price FROM settings `;
         		dbConnection.query(dryCleanChares, function (error, dryCleanCharesdata) {
         			if (error) throw error;
-        			res.json({'status':true,"message":"Success",'data':data,"mini_order_amount":dryCleanCharesdata[0].extra_chages});
+        			res.json({'status':true,"message":"Success",'data':data,"mini_order_amount":dryCleanCharesdata[0].extra_chages,"loads_price":dryCleanCharesdata[0].loads_price});
         		})	
 			})
     }catch (error) {
@@ -1111,9 +1111,17 @@ export const update_extra_chagres_status = async(req,res)=>{
 				var msg= "Extra Charges has been updated successfully"
 				if (reqData.type=='dry') {
 					msg= "Minimum order amount has been updated successfully"
+				}else if (reqData.type=='loads_price') {
+					msg= "Load price has been updated successfully"
 				}
 				if (reqData.type=='dry') {
 					var updateContnetQry = "update settings set dry_clean_charges=? where id=1 ";
+				    dbConnection.query(updateContnetQry,[reqData.extra_chages,1], function (error, data) {
+					if (error) throw error;
+						res.json({'status':true,"message":msg,'data':data});
+					});
+				}else if (reqData.type=='loads_price') {
+					var updateContnetQry = "update settings set loads_price=? where id=1 ";
 				    dbConnection.query(updateContnetQry,[reqData.extra_chages,1], function (error, data) {
 					if (error) throw error;
 						res.json({'status':true,"message":msg,'data':data});
