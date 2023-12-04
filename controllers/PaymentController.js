@@ -1030,7 +1030,7 @@ export const customer_extra_payment_cardId = async (req, res) => {
        
 
     const currentBookingDate = dateFormat.format(new Date(date1), 'YYYY-MM-DD');
-
+    
       const order = `SELECT count(id) FROM bookings WHERE user_id = ${userData[0].id} AND date = '${currentBookingDate}'`; 
       dbConnection.query(order, async function (error, datas) {
         

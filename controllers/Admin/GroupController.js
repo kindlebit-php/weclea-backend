@@ -86,7 +86,7 @@ export const create_county = async(req,res)=>{
     try { 
     	const city_ids = reqData.city_id.split(',');
     	console.log("create_county=",city_ids);
-    	const arr = for (var i = 0; i < city_ids.length; i++) {
+    	 for (var i = 0; i < city_ids.length; i++) {
     		var city= city_ids[i];
     		console.log("create_county",city);
 		  	const qrySelect = "select id from wc_county where `name`=? and `city_id`=? and isDeleted=0";
