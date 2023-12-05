@@ -1233,7 +1233,7 @@ export const Update_Instruction = async (req, res) => {
   	export const app_screen_content = async(req,res)=>{
   		var reqData= req.params;
 	      try { 
-	    	const loads = "select * from wc_mobile_screens where app_type=? order by id asc";
+	    	const loads = "select id,app_type,title,description from wc_mobile_screens where app_type=? order by id asc";
 			dbConnection.query(loads,[reqData.app_type], function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
