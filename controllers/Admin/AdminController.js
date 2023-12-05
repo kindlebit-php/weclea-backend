@@ -1218,6 +1218,40 @@ export const Update_Instruction = async (req, res) => {
   };
   
 /****** end feedback section*******/
+/********Mobile landing screen content ********/
+  export const mobile_screen_content = async(req,res)=>{
+      try { 
+        	const loads = "select * from wc_mobile_screens order by app_type asc";
+			dbConnection.query(loads, function (error, data) {
+			if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});
+			})
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+  export const update_mobile_content = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select app_type from wc_mobile_screens where id=?";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "App content has been updated successfully"
+				// `app_type`, `title`, `description`,
+				var updateContnetQry = "update wc_mobile_screens set title=?, description=? where id=? ";
+			    dbConnection.query(updateContnetQry,[reqData.title,reqData.description,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
 export default {
 	get_page_content,
 	get_faq_content,
@@ -1260,6 +1294,8 @@ export default {
 	get_countries,
 	sendNotification,
 	get_county_cities,
-	Update_Instruction
+	Update_Instruction,
+	mobile_screen_content,
+	update_mobile_content
 
 }
