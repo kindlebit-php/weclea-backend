@@ -196,6 +196,7 @@ router.get("/get_states/:country_id?",AdminController.get_states)
 router.get("/get_cities/:state_id?",AdminController.get_cities)
 router.get("/getGraphData",CheckAuth,AdminController.getGraphData)
 router.get("/get_county_cities/:state_id?",AdminController.get_county_cities)
+router.get("/mobile_screen_content/",AdminController.mobile_screen_content)
 
 
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
@@ -212,6 +213,8 @@ router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
 router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
 router.post("/sendNotification",CheckAuth,AdminController.sendNotification)
 router.post("/Update-Instruction",CheckAuth,AdminController.Update_Instruction)
+router.post("/update_mobile_content",CheckAuth,AdminController.update_mobile_content)
+    
 
 /**** Email template****/
 
