@@ -1219,17 +1219,29 @@ export const Update_Instruction = async (req, res) => {
   
 /****** end feedback section*******/
 /********Mobile landing screen content ********/
-  export const mobile_screen_content = async(req,res)=>{
-      try { 
+	export const mobile_screen_content = async(req,res)=>{
+	    try { 
         	const loads = "select * from wc_mobile_screens order by app_type asc";
 			dbConnection.query(loads, function (error, data) {
 			if (error) throw error;
 				res.json({'status':true,"message":"Success",'data':data});
 			})
-    }catch (error) {
-        res.json({'status':false,"message":error.message});  
-    }
-}
+	    }catch (error) {
+	        res.json({'status':false,"message":error.message});  
+	    }
+	}
+  	export const app_screen_content = async(req,res)=>{
+  		var reqData= req.params;
+	      try { 
+	    	const loads = "select * from wc_mobile_screens where app_type=? order by id asc";
+			dbConnection.query(loads,[reqData.app_type], function (error, data) {
+			if (error) throw error;
+				res.json({'status':true,"message":"Success",'data':data});
+			})
+	    }catch (error) {
+	        res.json({'status':false,"message":error.message});  
+	    }
+	}
   export const update_mobile_content = async(req,res)=>{
 	const reqData = req.body;
     try { 
@@ -1296,6 +1308,7 @@ export default {
 	get_county_cities,
 	Update_Instruction,
 	mobile_screen_content,
-	update_mobile_content
+	update_mobile_content,
+	app_screen_content
 
 }

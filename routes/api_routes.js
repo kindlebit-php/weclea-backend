@@ -197,6 +197,7 @@ router.get("/get_cities/:state_id?",AdminController.get_cities)
 router.get("/getGraphData",CheckAuth,AdminController.getGraphData)
 router.get("/get_county_cities/:state_id?",AdminController.get_county_cities)
 router.get("/mobile_screen_content/",AdminController.mobile_screen_content)
+router.get("/app_screen_content/:app_type?",AdminController.app_screen_content)
 
 
 router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
