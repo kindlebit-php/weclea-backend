@@ -1176,11 +1176,11 @@ export const booking_tracking_details = async(req,res)=>{
                         const pamentSQL = "select amount from payment where booking_id = '"+booking_id+"'";
                         dbConnection.query(pamentSQL, function (err, resultss) {
                             if(resultss){
-                                const initi = {
+                                var initi = {
                                 "id":id,'extra_charge':pamentSQL[0].amount,'total_amount':total_amount,'rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
                                 }
                             }else{
-                               const initi = {
+                               var initi = {
                                 "id":id,'extra_charge':0,'total_amount':total_amount,'rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
                                 } 
                             }
