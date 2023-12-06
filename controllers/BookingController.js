@@ -1170,6 +1170,17 @@ export const booking_tracking_details = async(req,res)=>{
                         var rating = 0;
                         var rating_feed = [];
                     }
+                    if(type == 1){
+                        const pamentSQL = "select amount from payment where booking_id = '"+booking_id+"'";
+                        dbConnection.query(pamentSQL, function (err, resultss) {
+                            if(resultss){
+                                 const initi = {
+                    "id":id,'extra_charge':pamentSQL[0].amount,'total_amount':total_amount,'rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
+                }
+                res.json({'status':true,"message":"user order list","order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
+                            }
+                        })
+                    }
                 const initi = {
                     "id":id,'total_amount':total_amount,'rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
                 }
