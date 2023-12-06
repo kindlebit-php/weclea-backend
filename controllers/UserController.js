@@ -1033,11 +1033,17 @@ export const order_list = async (req, res) => {
 		}
   
 		if (item.order_type === 1) {
-		  item.order_type = "One Time Order";
+			item.order_type_id = 1
+			item.order_type = "One Time Order";
 		} else if (item.order_type === 2) {
-		  item.order_type = "Subscription Order";
+			item.order_type_id = 2
+			item.order_type = "Subscription Order";
 		} else if (item.order_type === 3) {
-		  item.order_type = "Dry Clean Order";
+			item.order_type_id = 3
+			item.order_type = "Dry Clean Order";
+		} else if(item.order_type === 4){
+			item.order_type_id = 4
+			item.order_type = "Custom Order";
 		}
   
 		if (item.delievery_instruction) {
