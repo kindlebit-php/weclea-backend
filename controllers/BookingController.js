@@ -12,7 +12,7 @@ export const customer_booking = async(req,res)=>{
      try { 
         
      	const userData = res.user;
-        const {	delievery_day,is_admin,date,total_loads,order_type,frequency,category_id} = req.body;
+        const {	delievery_day,is_admin,date,total_loads,payment_id,order_type,frequency,category_id} = req.body;
         if(	date && total_loads && order_type){
         if(typeof is_admin != 'undefined'){
             var isAdmin = 1
@@ -59,8 +59,7 @@ export const customer_booking = async(req,res)=>{
                     dbConnection.query(usrLoadsup, function (error, resulst) {
                         console.log(error,resulst)
                     })                    
-                    if(payment_id){
-                        console.log('hey kailash')
+                    if(typeof payment_id != 'undefined'){
                         var paymentsql = "update payment set booking_id = '"+result.insertId+"' where id = '"+payment_id+"'";
                         dbConnection.query(paymentsql, function (err,paymentResult ) {
                         });
