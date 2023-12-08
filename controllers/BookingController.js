@@ -62,6 +62,7 @@ export const customer_booking = async(req,res)=>{
                     if(typeof paymentId != 'undefined'){
                         console.log('enter in paymentsql')
                         var paymentsql = "update payment set booking_id = '"+result.insertId+"' where id = '"+paymentId+"'";
+                        console.log('paymentsqlKailash',paymentsql)
                         dbConnection.query(paymentsql, function (err,paymentResult ) {
                         });
                     }
