@@ -1046,7 +1046,7 @@ export const booking_tracking_details = async(req,res)=>{
                     }
 
                 const initi = {
-                    "id":id,"category_id":category_id,"address":address,'total_amount':total_amount,'rating_id':rating,'rating_feedback':rating_feed,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_id":order_id,"order_type":order_type,'laundry_detail':laundry_detail
+                    "id":id,"category_id":category_id,"address":address,'total_amount':total_amount || '0','rating_id':rating,'rating_feedback':rating_feed,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_id":order_id,"order_type":order_type,'laundry_detail':laundry_detail
                 }
                 res.json({'status':true,"message":"user order list","order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
             })
@@ -1178,13 +1178,13 @@ export const booking_tracking_details = async(req,res)=>{
                             if (resultss?.length > 0) {
                                 console.log('resultss',resultss)
                                 var initi = {
-                                "id":id,'extra_charge':pamentSQL[0].amount,'total_amount':total_amount,'rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
+                                "id":id,'extra_charge':pamentSQL[0].amount,'total_amount':total_amount || '0','rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
                                 }
                             }else{
                                 console.log('resultss secondss')
 
                                var initi = {
-                                "id":id,'extra_charge':0,'total_amount':total_amount,'rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
+                                "id":id,'extra_charge':0,'total_amount':total_amount || '0','rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
                                 } 
                             }
                             res.json({'status':true,"message":"user order list","order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
@@ -1193,7 +1193,7 @@ export const booking_tracking_details = async(req,res)=>{
                                 console.log('case secondss')
 
                 const initi = {
-                    "id":id,"category_id":category_id,"address":address,'total_amount':total_amount,'rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
+                    "id":id,"category_id":category_id,"address":address,'total_amount':total_amount || '0','rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
                 }
                 res.json({'status':true,"message":"user order list","order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,'extra_loads':extra_loads,'total_loads':total_loads,'deliever_date':deliever_date,'data':initi});
                 }
