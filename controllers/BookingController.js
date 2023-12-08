@@ -60,7 +60,7 @@ export const customer_booking = async(req,res)=>{
                         console.log(error,resulst)
                     })                    
                     if(payment_id){
-                        var paymentsql = "update payment set booking_id = '"+result.insertId+"'where id = '"+payment_id+"'";
+                        var paymentsql = "update payment set booking_id = '"+result.insertId+"' where id = '"+payment_id+"'";
                         dbConnection.query(paymentsql, function (err,paymentResult ) {
                         });
                     }
