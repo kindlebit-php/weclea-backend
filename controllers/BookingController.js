@@ -12,7 +12,7 @@ export const customer_booking = async(req,res)=>{
      try { 
         
      	const userData = res.user;
-        const {	delievery_day,is_admin,date,total_loads,payment_id,order_type,frequency,category_id} = req.body;
+        const {	delievery_day,is_admin,date,total_loads,paymentId,order_type,frequency,category_id} = req.body;
         if(	date && total_loads && order_type){
         if(typeof is_admin != 'undefined'){
             var isAdmin = 1
@@ -59,8 +59,9 @@ export const customer_booking = async(req,res)=>{
                     dbConnection.query(usrLoadsup, function (error, resulst) {
                         console.log(error,resulst)
                     })                    
-                    if(payment_id){
-                        var paymentsql = "update payment set booking_id = '"+result.insertId+"' where id = '"+payment_id+"'";
+                    if(typeof paymentId != 'undefined'){
+                        console.log('enter in paymentsql')
+                        var paymentsql = "update payment set booking_id = '"+result.insertId+"' where id = '"+paymentId+"'";
                         dbConnection.query(paymentsql, function (err,paymentResult ) {
                         });
                     }
@@ -69,7 +70,7 @@ export const customer_booking = async(req,res)=>{
                         const qrCodesArray = [];
                         const insertIds=[]
                     console.log("abcdefa",result)
-    for (let i = 0; i < total_loads; i++) {
+    for (let i = 0; i < total_loads; i++) { 
         const sql = "INSERT INTO booking_qr (booking_id, qr_code) VALUES (?, ?)";
         const values = [result.insertId, randomNumber(result.insertId)];
 
