@@ -1264,6 +1264,31 @@ export const Update_Instruction = async (req, res) => {
         res.json({'status':false,"message":error.message});  
     }
 }
+
+export const update_user_status = async(req,res)=>{
+	const reqData = req.body;
+    try { 
+    	const qrySelect = "select id from users where id=?";
+		dbConnection.query(qrySelect,[reqData.id], function (error, data) {
+		if (error) throw error;
+			if (data.length>0) {
+				var msg= "User has been deactivated successfully"
+				if (reqData.status==1) {
+					msg= "User has been activated successfully"
+				}
+			    var updateContnetQry = "update users set status=? where id=? ";
+			    dbConnection.query(updateContnetQry,[reqData.status,reqData.id], function (error, data) {
+				if (error) throw error;
+					res.json({'status':true,"message":msg,'data':data});
+				});
+			}else{
+				res.json({'status':false,"message":"Record not found"});
+			}
+		});
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
 export default {
 	get_page_content,
 	get_faq_content,
@@ -1309,6 +1334,7 @@ export default {
 	Update_Instruction,
 	mobile_screen_content,
 	update_mobile_content,
-	app_screen_content
+	app_screen_content,
+	update_user_status
 
 }
