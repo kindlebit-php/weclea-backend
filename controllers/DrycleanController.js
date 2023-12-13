@@ -4,6 +4,8 @@ import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js'
 import { date, getDates,randomNumber,randomNumberDryClean, time} from "../helpers/date.js";
 import { fcm_notification } from '../helpers/fcm.js';
 import path from "path";
+import { orderAddress } from "../helpers/orderAddress.js";
+
 import Stripe from "stripe";
 import { assignDriver } from "../helpers/location.js";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -121,6 +123,7 @@ export const get_category = async (req, res) => {
         var sql = "INSERT INTO bookings (user_id,date,time,order_type,driver_id,drop_drive_id,category_id,total_amount,total_loads,is_admin) VALUES ('"+userData[0].id+"','"+oneTimeDate+"', '"+current_time+"',3,'"+driver_id+"','"+driver_id+"','"+userData[0].category_id+"','"+amount+"',1,'"+is_admin+"')";
 
         dbConnection.query(sql,async function (err, result) {
+        orderAddress(userData[0].id,result.insertId)
           bookingid.push(result.insertId)
         if(result){
 

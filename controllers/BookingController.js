@@ -3,6 +3,7 @@ import dateFormat from 'date-and-time';
 import dateFormatFinalDate from 'date-and-time';
 import path from "path";
 import { getDates,randomNumber } from "../helpers/date.js";
+import { orderAddress } from "../helpers/orderAddress.js";
 import { assignDriver } from "../helpers/location.js";
 import { generatePDF, generateQRCode, getUserData } from '../helpers/qr_slip.js';
 
@@ -40,14 +41,15 @@ export const customer_booking = async(req,res)=>{
                       const checkIfDateExist = "select count(id) as total_date from bookings where date = '"+oneTimeDate+"' and user_id = '"+userData[0].id+"' and order_type = 1";
                     dbConnection.query(checkIfDateExist, async function (error, checkIfresults) {
                         if(checkIfresults[0].total_date == 0){
-                            console.log(checkIfresults,userData[0].id,oneTimeDate,current_time,"1223446566")
+                            
                     const driver_id = await assignDriver(userData[0].id,oneTimeDate,current_time)
-                    console.log(driver_id,"djhkgsfkju")
+                  
                     var sql = "INSERT INTO bookings (user_id,delievery_day,date,time,total_loads,order_type,driver_id,drop_drive_id,category_id,cron_status,is_admin) VALUES ('"+userData[0].id+"','"+delievery_day+"', '"+oneTimeDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"','"+category_id+"',1,'"+isAdmin+"')";
-                    console.log('onetimebOOKING',sql)
+
                     dbConnection.query(sql, async function (err, result) {
-                        console.log("INDERT",result.insertId)
-                        console.log(err,result)
+                    if(result.insertId){
+                    orderAddress(userData[0].id,result.insertId)
+
                     var updateLoads = (results[0].total_loads - total_loads);
                     if(category_id == 1){
                         var usrLoadsup = "update customer_loads_availabilty set  commercial = '"+updateLoads+"' where user_id = '"+userData[0].id+"'";
@@ -70,7 +72,6 @@ export const customer_booking = async(req,res)=>{
 
                         const qrCodesArray = [];
                         const insertIds=[]
-                    console.log("abcdefa",result)
     for (let i = 0; i < total_loads; i++) { 
         const sql = "INSERT INTO booking_qr (booking_id, qr_code) VALUES (?, ?)";
         const values = [result.insertId, randomNumber(result.insertId)];
@@ -94,21 +95,13 @@ export const customer_booking = async(req,res)=>{
             });
         });
     }
-                                console.log("All QR codes:", qrCodesArray);
                                 const qr_codes = qrCodesArray.join(",")
-                                console.log("All QR codes1:", qr_codes);
                                  const getAll_qrCode= await generateQRCode(qrCodesArray)
-                                 console.log('getAll_qrCode2',getAll_qrCode)
                                 const userData1 = await getUserData(result.insertId);
-                                console.log('userData1',userData1)
-                                
                                 const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                
-                                console.log('pdfBytes',pdfBytes)
-
                                 const updatePdf = `UPDATE booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
                                 dbConnection.query(updatePdf, async function (err, result2) {
-                                console.log(result2);
+
                                     });
 
                         
@@ -119,12 +112,16 @@ export const customer_booking = async(req,res)=>{
                         var bookingsql = "INSERT INTO booking_timing (booking_id) VALUES ('"+result.insertId+"')";
                         dbConnection.query(bookingsql, function (err, bookingresult) {
                         });
-
+                        
                         var order_id = '1001'+result.insertId;
                         var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
                         dbConnection.query(sql, function (err, resultss) {
                         res.json({'status':true,"message":"Booking added successfully!"});                        
                         });
+                    }else{
+                        res.json({'status':false,"message":"There are some problems with server connectivity. Please place order your again"});
+                      
+                    }
                     });  
                        }else{
                         res.json({'status':false,"message":"Booking already added for selected date!"});
@@ -184,17 +181,15 @@ export const customer_booking = async(req,res)=>{
                           console.log('driver_id',driver_id)
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,frequency,is_admin) VALUES ('"+userData[0].id+"', '"+currentBookingDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+frequency+"','"+isAdmin+"')";
                             dbConnection.query(sql,async function (err, result) {
-                                console.log("123123123444666666",checkIfresults[0].tpyedate)
+                            orderAddress(userData[0].id,result.insertId)
+                                
                                 const qrCodesArray = [];
                                 const insertIds=[]
-                                console.log("12312312344")
                                 for (let i = 0; i < total_loads; i++) {
                                     const sql = "INSERT INTO booking_qr (booking_id, qr_code) VALUES (?, ?)";
                                     const values = [result.insertId, randomNumber(result.insertId)];
-                                    console.log("12312312344")
                                     await new Promise((resolve, reject) => {
                                         dbConnection.query(sql, values, function (err, results) {
-                                            console.log("12312312344",results)
                                             if (err) {
                                                 reject(err);
                                             } else {
@@ -258,6 +253,8 @@ export const customer_booking = async(req,res)=>{
                         }else{
                             var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,frequency,category_id) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+frequency+"','"+category_id+"')";
                             dbConnection.query(sql, function (err, resultsub) {
+                            orderAddress(userData[0].id,resultsub.insertId)
+
                                 var order_id = '1001'+resultsub.insertId;
                                 var sql = "update bookings set order_id = '"+order_id+"'where id = '"+resultsub.insertId+"'";
                                 dbConnection.query(sql, function (err, resultss) {
@@ -294,7 +291,7 @@ export const customer_booking = async(req,res)=>{
                     {
                         var frequencyDate = new Date(allDates[key]);
                         const frequencyDBDate = dateFormat.format(frequencyDate,'YYYY-MM-DD');
-                        console.log('frequencyDBDate',frequencyDBDate)
+
                         const checkIfDateExist = "select count(id) as tpyedate from bookings where date = '"+frequencyDBDate+"' and user_id = '"+userData[0].id+"' and order_type = 3";
                         dbConnection.query(checkIfDateExist, async function (error, checkIfresults) {
                         if(checkIfresults[0].tpyedate == 0){
@@ -308,9 +305,11 @@ export const customer_booking = async(req,res)=>{
                     var driver_id = await assignDriver(userData[0].id,frequencyDBDate,current_time)
 
                       
-                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,is_admin) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','"+order_type+"','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+isAdmin+"')";
+                            var sql = "INSERT INTO bookings (user_id,date,time,total_loads,order_type,driver_id,drop_drive_id,cron_status,category_id,is_admin) VALUES ('"+userData[0].id+"', '"+frequencyDBDate+"', '"+current_time+"','"+total_loads+"','4','"+driver_id+"','"+driver_id+"',1,'"+category_id+"','"+isAdmin+"')";
                            
                             dbConnection.query(sql,async function (err, result) {
+                            orderAddress(userData[0].id,result.insertId)
+
                                 const qrCodesArray = [];
                                 const insertIds=[]
                                 for (let i = 0; i < total_loads; i++) {
@@ -319,7 +318,7 @@ export const customer_booking = async(req,res)=>{
                             
                                     await new Promise((resolve, reject) => {
                                         dbConnection.query(sql, values, function (err, results) {
-                                            console.log("1231231233",results)
+                                 
                                             if (err) {
                                                 reject(err);
                                             } else {
@@ -337,22 +336,17 @@ export const customer_booking = async(req,res)=>{
                                         });
                                     });
                                 }
-                                                            console.log("All QR codes:", qrCodesArray);
-                                                            const qr_codes = qrCodesArray.join(",")
-                                                            console.log("All QR codes1:", qr_codes);
-                                                             const getAll_qrCode= await generateQRCode(qrCodesArray)
-                                                             console.log('getAll_qrCode2',getAll_qrCode)
-                                                            const userData1 = await getUserData(result.insertId);
-                                                            console.log('userData1',userData1)
-                                                            
-                                                            const pdfBytes = await generatePDF(userData1, getAll_qrCode);
-                                                            
-                                                            console.log('pdfBytes',pdfBytes)
+                            const qr_codes = qrCodesArray.join(",")
+                             const getAll_qrCode= await generateQRCode(qrCodesArray)
+                            const userData1 = await getUserData(result.insertId);
                             
-                                                            const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
-                                                            dbConnection.query(updatePdf, async function (err, result2) {
-                                                            console.log(result2);
-                                                                });
+                            const pdfBytes = await generatePDF(userData1, getAll_qrCode);
+                            
+
+                            const updatePdf = `UPDATE dry_clean_booking_qr SET pdf = '${pdfBytes}' WHERE id IN (${insertIds.join(',')})`;
+                            dbConnection.query(updatePdf, async function (err, result2) {
+                  
+                                });
                             
 
                                 if(category_id == 1){
@@ -376,7 +370,7 @@ export const customer_booking = async(req,res)=>{
                                     var usrLoadsup = "update customer_loads_availabilty set yeshiba = '"+updateLoads+"' where user_id = '"+userData[0].id+"' ";
                                 }
                                 // console.log('usrLoadsup',usrLoadsup)
-                                dbConnection.query(usrLoadsup, function (error, result) {
+                                dbConnection.query(usrLoadsup, function (error, resultUserUP) {
                                 })
 
                             })
@@ -384,6 +378,8 @@ export const customer_booking = async(req,res)=>{
                                 dbConnection.query(bookingsql, function (err, bookingresult) {
 
                                 });
+                                console.log('order_idTOP',result.insertId)
+
                                 var bookingsql = "INSERT INTO booking_timing (booking_id) VALUES ('"+result.insertId+"')";
                                 dbConnection.query(bookingsql, function (err, bookingresult) {
 
@@ -391,6 +387,7 @@ export const customer_booking = async(req,res)=>{
 
                                 var order_id = '1001'+result.insertId;
                                 var sql = "update bookings set order_id = '"+order_id+"'where id = '"+result.insertId+"'";
+                                console.log('sqlLat',sql)
                                 dbConnection.query(sql, function (err, resultss) {
                                 });
                             }); 
@@ -880,9 +877,9 @@ export const booking_tracking_details = async(req,res)=>{
             var datetime = new Date();
             const currentFinalDate = dateFormat.format(datetime,'YYYY-MM-DD');
             if(type == 3){
-                var sql = "select bookings.id,customer_address.address,bookings.category_id,bookings.total_amount,bookings.user_id,bookings.extra_loads,bookings.total_loads,bookings.order_id,dry_clean_booking_images.tagging_images,dry_clean_booking_images.spoting_images,dry_clean_booking_images.cleaning_images,dry_clean_booking_images.inspect_images,dry_clean_booking_images.drop_image,dry_clean_booking_images.press_images,dry_clean_booking_images.package_images,bookings.order_status,bookings.order_type,dry_clean_booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(dry_clean_booking_timing.driver_pick_date, ' ', dry_clean_booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(dry_clean_booking_timing.tagging_date, ' ', dry_clean_booking_timing.tagging_time) AS tagging_date,CONCAT(dry_clean_booking_timing.spotting_date, ' ', dry_clean_booking_timing.spotting_time) AS spotting_date,CONCAT(dry_clean_booking_timing.cleaning_date, ' ', dry_clean_booking_timing.cleaning_time) AS cleaning_date,CONCAT(dry_clean_booking_timing.inspect_date, ' ', dry_clean_booking_timing.inspect_time) AS inspect_date,CONCAT(dry_clean_booking_timing.press_date, ' ', dry_clean_booking_timing.press_time) AS press_date,CONCAT(dry_clean_booking_timing.package_date, ' ', dry_clean_booking_timing.package_time) AS package_date,CONCAT(dry_clean_booking_timing.deliever_date, ' ', dry_clean_booking_timing.deliever_time) AS deliever_date,users.email,users.mobile,users.name ,ratings.rating_id,ratings.rating_feedback  from bookings left join dry_clean_booking_timing on bookings.id = dry_clean_booking_timing.booking_id left join ratings on ratings.booking_id = bookings.id left join dry_clean_booking_images on dry_clean_booking_images.booking_id = bookings.id left join customer_address on customer_address.user_id=bookings.user_id left join users on users.id=bookings.user_id  where bookings.id = '"+booking_id+"'";
+                var sql = "select bookings.id,order_billing_address.address,bookings.category_id,bookings.total_amount,bookings.user_id,bookings.extra_loads,bookings.total_loads,bookings.order_id,dry_clean_booking_images.tagging_images,dry_clean_booking_images.spoting_images,dry_clean_booking_images.cleaning_images,dry_clean_booking_images.inspect_images,dry_clean_booking_images.drop_image,dry_clean_booking_images.press_images,dry_clean_booking_images.package_images,bookings.order_status,bookings.order_type,dry_clean_booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(dry_clean_booking_timing.driver_pick_date, ' ', dry_clean_booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(dry_clean_booking_timing.tagging_date, ' ', dry_clean_booking_timing.tagging_time) AS tagging_date,CONCAT(dry_clean_booking_timing.spotting_date, ' ', dry_clean_booking_timing.spotting_time) AS spotting_date,CONCAT(dry_clean_booking_timing.cleaning_date, ' ', dry_clean_booking_timing.cleaning_time) AS cleaning_date,CONCAT(dry_clean_booking_timing.inspect_date, ' ', dry_clean_booking_timing.inspect_time) AS inspect_date,CONCAT(dry_clean_booking_timing.press_date, ' ', dry_clean_booking_timing.press_time) AS press_date,CONCAT(dry_clean_booking_timing.package_date, ' ', dry_clean_booking_timing.package_time) AS package_date,CONCAT(dry_clean_booking_timing.deliever_date, ' ', dry_clean_booking_timing.deliever_time) AS deliever_date,users.email,users.mobile,users.name ,ratings.rating_id,ratings.rating_feedback  from bookings left join dry_clean_booking_timing on bookings.id = dry_clean_booking_timing.booking_id left join ratings on ratings.booking_id = bookings.id left join dry_clean_booking_images on dry_clean_booking_images.booking_id = bookings.id left join order_billing_address on order_billing_address.booking_id=bookings.id left join users on users.id=bookings.user_id  where bookings.id = '"+booking_id+"'";
             }else{
-            var sql = "select bookings.id,customer_address.address,bookings.category_id,bookings.total_amount,bookings.user_id,bookings.extra_loads,bookings.total_loads,bookings.order_id,booking_images.wash_images,booking_images.dry_images,booking_images.fold_images,booking_images.pack_images,booking_images.drop_image,bookings.order_status,bookings.order_type,booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.driver_pick_date, ' ', booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(booking_timing.wash_date, ' ', booking_timing.wash_time) AS wash_date,CONCAT(booking_timing.dry_date, ' ', booking_timing.dry_time) AS dry_date,CONCAT(booking_timing.fold_date, ' ', booking_timing.fold_time) AS fold_date,CONCAT(booking_timing.pack_date, ' ', booking_timing.pack_time) AS pack_date,CONCAT(booking_timing.deliever_date, ' ', booking_timing.deliever_time) AS deliever_date, users.email,users.mobile, users.name, ratings.rating_id,ratings.rating_feedback from bookings left join ratings on ratings.booking_id = bookings.id left join booking_timing on bookings.id = booking_timing.booking_id left join booking_images on booking_images.booking_id = bookings.id join customer_address on customer_address.user_id=bookings.user_id left join users on users.id=bookings.user_id where bookings.id = '"+booking_id+"'";
+            var sql = "select bookings.id,order_billing_address.address,bookings.category_id,bookings.total_amount,bookings.user_id,bookings.extra_loads,bookings.total_loads,bookings.order_id,booking_images.wash_images,booking_images.dry_images,booking_images.fold_images,booking_images.pack_images,booking_images.drop_image,bookings.order_status,bookings.order_type,booking_images.pickup_images,bookings.created_at as request_confirm_date,bookings.status,CONCAT(booking_timing.driver_pick_date, ' ', booking_timing.driver_pick_time) AS pickup_confirm_date ,CONCAT(booking_timing.wash_date, ' ', booking_timing.wash_time) AS wash_date,CONCAT(booking_timing.dry_date, ' ', booking_timing.dry_time) AS dry_date,CONCAT(booking_timing.fold_date, ' ', booking_timing.fold_time) AS fold_date,CONCAT(booking_timing.pack_date, ' ', booking_timing.pack_time) AS pack_date,CONCAT(booking_timing.deliever_date, ' ', booking_timing.deliever_time) AS deliever_date, users.email,users.mobile, users.name, ratings.rating_id,ratings.rating_feedback from bookings left join ratings on ratings.booking_id = bookings.id left join booking_timing on bookings.id = booking_timing.booking_id left join booking_images on booking_images.booking_id = bookings.id left join order_billing_address on order_billing_address.booking_id=bookings.id left join users on users.id=bookings.user_id where bookings.id = '"+booking_id+"'";
             }
             console.log('tracking_sql',sql)
             dbConnection.query(sql, function (err, resultss) {
@@ -1177,12 +1174,10 @@ export const booking_tracking_details = async(req,res)=>{
                         const pamentSQL = "select amount from payment where booking_id = '"+booking_id+"'";
                         dbConnection.query(pamentSQL, function (err, resultss) {
                             if (resultss?.length > 0) {
-                                console.log('resultss',resultss[0].amount)
                                 var initi = {
                                 "id":id,"category_id":category_id,"address":address,'extra_charge':resultss[0].amount,'total_amount':total_amount || '0','rating_id':rating,'rating_feedback':rating_feed,"order_id":order_id,"user_id":user_id,"name":name,"email":email,"mobile":mobile,"order_type":order_type,'laundry_detail':laundry_detail
                                 }
-                                console.log('resultss',initi)
-                                
+
                             }else{
 
                                var initi = {

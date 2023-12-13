@@ -13,7 +13,7 @@ export const get_orders = async (req, res) => {
 
   const currentDate = dateFormat.format(datetime,'YYYY-MM-DD'); 
    
-    var order = "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.order_type,bookings.time, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '8' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance desc;";
+    var order = "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.order_type,bookings.time, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join order_pick_address on bookings.id = order_pick_address.booking_id where bookings.order_status != '7' and bookings.order_status != '8' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.date = '"+currentDate+"' and driver_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance desc;";
     console.log('order',order)
   dbConnection.query(order, function (error, data) {
       if (error) throw error;
@@ -37,7 +37,7 @@ export const get_dry_clean_orders = async (req, res) => {
     const currentDate = dateFormat.format(datetime, "YYYY-MM-DD");
     // const order = `SELECT id,order_id, date, time FROM bookings WHERE cron_status = 1 AND date >= '${currentDate}' AND driver_id = ${userData[0].id}`;
     var order =
-      "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status != '7' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type = '3' and cron_status = 1 and bookings.date = '" +
+      "select * from (select bookings.id,bookings.order_id,bookings.date,bookings.time, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join order_pick_address on bookings.id = order_pick_address.booking_id where bookings.order_status != '7' and bookings.order_status != '6' and bookings.order_status != '4' and bookings.order_status != '5' and bookings.order_type = '3' and cron_status = 1 and bookings.date = '" +
       currentDate +
       "' and driver_id ='" +
       userData[0].id +
@@ -74,7 +74,7 @@ export const get_order_detail = async (req, res) => {
       const query = `
                 SELECT u.name,u.profile_image,u.mobile, bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.id AS booking_id, b.total_loads
                 FROM bookings AS b
-                left JOIN customer_address AS ca ON b.user_id = ca.user_id
+                left JOIN order_pick_address AS ca ON b.id = ca.booking_id
                 left JOIN users AS u ON b.user_id = u.id
                 left JOIN booking_instructions AS bin ON b.user_id = bin.user_id
                 WHERE b.order_id = ? AND b.user_id IN (?)`;
@@ -283,7 +283,7 @@ export const pickup_loads_detail = async (req, res) => {
         const query = `
             SELECT u.name,bin.pickup_instruction AS comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
             FROM bookings AS b
-            JOIN customer_address AS ca ON b.user_id = ca.user_id
+            JOIN order_pick_address AS ca ON b.id = ca.booking_id
             JOIN users AS u ON b.user_id = u.id
             JOIN booking_instructions AS bin ON b.user_id = bin.user_id
             WHERE  b.user_id = ? AND b.id = ? `;
@@ -324,7 +324,7 @@ export const submit_pickup_details = async (req, res) => {
         const query = `
             SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
             FROM bookings AS b
-            JOIN customer_address AS ca ON b.user_id = ca.user_id
+            JOIN order_pick_address AS ca ON b.id = ca.booking_id
             JOIN users AS u ON b.user_id = u.id
             WHERE  b.user_id = ? AND b.id = ? `;
 
@@ -437,7 +437,7 @@ export const laundry_NotFound = async (req, res) => {
       const query = `
         SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude, b.total_loads
         FROM bookings AS b
-        JOIN customer_address AS ca ON b.user_id = ca.user_id
+        JOIN order_pick_address AS ca ON b.id = ca.booking_id
         JOIN users AS u ON b.user_id = u.id
         WHERE b.user_id = ? AND b.id = ?`;
 
@@ -545,7 +545,7 @@ export const laundry_NotFound = async (req, res) => {
 export const get_drop_orders = async (req, res) => {
   try {
     const userData = res.user;
-    var order = "select * from (select bookings.order_id,bookings.order_type,bookings.bin, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join customer_drop_address on bookings.user_id = customer_drop_address.user_id where bookings.order_status = '4' and drop_drive_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
+    var order = "select * from (select bookings.order_id,bookings.order_type,bookings.bin, SQRT(POW(69.1 * ('"+userData[0].latitude+"' - latitude), 2) + POW(69.1 * ((longitude - '"+userData[0].longitude+"') * COS('"+userData[0].latitude+"' / 57.3)), 2)) AS distance FROM bookings left join order_drop_address on bookings.id = order_drop_address.booking_id where bookings.order_status = '4' and drop_drive_id ='"+userData[0].id+"' and cron_status = 1 ORDER BY distance) as vt where vt.distance < 50 order by distance asc;";
     dbConnection.query(order, function (error, data) {
       if (error) throw error;
       res.json({
@@ -568,7 +568,7 @@ export const get_dry_clean_drop_orders = async (req, res) => {
     const currentDate = dateFormat.format(datetime, "YYYY-MM-DD");
     // const order = `SELECT order_id FROM bookings WHERE order_status = '4' AND driver_id = ${userData[0].id}`;
     var order =
-      "select * from (select bookings.order_id, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join customer_address on bookings.user_id = customer_address.user_id where bookings.order_status = '4' and bookings.order_type = '3' and bookings.date = '" +
+      "select * from (select bookings.order_id, SQRT(POW(69.1 * ('30.7320' - latitude), 2) + POW(69.1 * ((longitude - '76.7726') * COS('30.7320' / 57.3)), 2)) AS distance FROM bookings left join order_pick_address on bookings.id = order_pick_address.booking_id where bookings.order_status = '4' and bookings.order_type = '3' and bookings.date = '" +
       currentDate +
       "' and driver_id ='" +
       userData[0].id +
@@ -605,7 +605,7 @@ export const get_drop_order_detail = async (req, res) => {
       const query = `
                 SELECT u.name,u.profile_image, u.comment, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude,b.id AS booking_id,b.bin
                 FROM bookings AS b
-                JOIN customer_address AS ca ON b.user_id = ca.user_id
+                JOIN order_pick_address AS ca ON b.id = ca.booking_id
                 JOIN users AS u ON b.user_id = u.id
                 WHERE b.order_id = ? AND b.user_id IN (?)`;
       dbConnection.query(query, [orderId, userIds], (error, data) => {
@@ -757,7 +757,7 @@ export const drop_loads_detail = async (req, res) => {
         const query = `
             SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
             FROM bookings AS b
-            JOIN customer_address AS ca ON b.user_id = ca.user_id
+            JOIN order_pick_address AS ca ON b.id = ca.booking_id
             JOIN users AS u ON b.user_id = u.id
             WHERE  b.user_id = ? AND b.id = ? `;
 
@@ -805,7 +805,7 @@ export const submit_drop_details = async (req, res) => {
         const query = `
           SELECT u.name, ca.address, ca.appartment, ca.city, ca.state, ca.zip, ca.latitude, ca.longitude
           FROM bookings AS b
-          JOIN customer_address AS ca ON b.user_id = ca.user_id
+          JOIN order_pick_address AS ca ON b.id = ca.booking_id
           JOIN users AS u ON b.user_id = u.id
           WHERE b.user_id = ? AND b.id = ? `;
 
@@ -934,7 +934,7 @@ export const order_histroy = async (req, res) => {
         b.date AS DATE,
         CONCAT(b.date, ' ', b.time) AS PickUp_date_time
       FROM bookings AS b
-      JOIN customer_address AS ca ON b.user_id = ca.user_id
+      JOIN order_pick_address AS ca ON b.id = ca.booking_id
       JOIN users AS u ON b.user_id = u.id
       WHERE b.order_status = '6' AND b.driver_id = ? AND b.user_id IN (?) ORDER BY DATE DESC`;
       dbConnection.query(query, [driverId, userIds], (error, data) => {
@@ -999,7 +999,7 @@ export const order_histroy_byOrderId = async (req, res) => {
         b.date AS DATE,
         CONCAT(b.date, ' ', b.time) AS PickUp_date_time
       FROM bookings AS b
-      JOIN customer_address AS ca ON b.user_id = ca.user_id
+      JOIN order_pick_address AS ca ON b.id = ca.booking_id
       JOIN users AS u ON b.user_id = u.id
       WHERE b.order_status = '6' AND b.order_id = ? AND b.driver_id = ? AND b.user_id IN (?)`;
 

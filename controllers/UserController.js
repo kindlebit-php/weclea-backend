@@ -4,7 +4,6 @@ import { generateToken } from "../config/generateToken.js";
 import transport from "../helpers/mail.js";
 import dotenv from "dotenv";
 import dateFormat from 'date-and-time';
-dotenv.config();
 import Stripe from "stripe";
 import path from "path";
 import { isThisMonth, isThisWeek, isToday } from '../helpers/date.js';

@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-dotenv.config();
 import dbConnection from'../config/db.js';
 import Stripe from "stripe";
 import { customer_loads_subscription } from "./LoadController.js";

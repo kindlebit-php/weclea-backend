@@ -7,11 +7,6 @@ import { CheckAuth } from "../middlewares/checkAuth.js";
 import driverController from "../controllers/DriverController.js";
 import paymentController from "../controllers/PaymentController.js";
 import cronController from "../controllers/CronController.js";
-import AdminController from "../controllers/Admin/AdminController.js";
-import emailController from "../controllers/Admin/EmailController.js";
-import groupController from "../controllers/Admin/GroupController.js";
-import permissionController from "../controllers/Admin/PermissionController.js";
-
 
 import multer from 'multer';
 import { upload } from "../utils/multer.js";
@@ -171,106 +166,5 @@ router.post("/scanning-extra-loads-dryClean",CheckAuth,DrycleanController.scanni
 router.post("/order-history-dryClean",CheckAuth,DrycleanController.order_histroy_dryClean);
 router.post("/order-histroy-dryClean-detail",CheckAuth,DrycleanController.order_histroy_dryClean_detail)
 
-/*********** ------------ Admin panel ---------------***************/
 
-router.post("/admin_login",AdminController.admin_login)
-router.get("/get_content",AdminController.get_page_content)
-router.get("/get_faq",AdminController.get_faq_content)
-router.post("/update_page_content",CheckAuth,AdminController.update_page_content)
-router.post("/create_faq",CheckAuth,AdminController.create_faq)
-router.post("/update_faq",CheckAuth,AdminController.update_faq)
-router.post("/delete_faq",CheckAuth,AdminController.delete_faq)
-router.get("/get_dashboard_content",CheckAuth,AdminController.get_dashboard_content)
-router.get("/get_packagesList",CheckAuth,AdminController.get_packagesList)
-router.post("/update_packages",CheckAuth,AdminController.update_packages)
-router.post("/create_packages",CheckAuth,AdminController.create_packages)
-router.post("/delete_packages",CheckAuth,AdminController.delete_packages)
-router.get("/get_package_details/:id?",CheckAuth,AdminController.get_package_details)
-router.get("/get_userList/:category_id?",CheckAuth,AdminController.get_userList)
-router.get("/get_user_history/:user_id?",CheckAuth,AdminController.get_user_history)
-router.get("/get_all_userList/",CheckAuth,AdminController.get_all_userList)
-router.post("/update_extra_chagres_status",CheckAuth,AdminController.update_extra_chagres_status)
-
-router.get("/get_countries",AdminController.get_countries)
-router.get("/get_states/:country_id?",AdminController.get_states)
-router.get("/get_cities/:state_id?",AdminController.get_cities)
-router.get("/getGraphData",CheckAuth,AdminController.getGraphData)
-router.get("/get_county_cities/:state_id?",AdminController.get_county_cities)
-router.get("/mobile_screen_content/",AdminController.mobile_screen_content)
-router.get("/app_screen_content/:app_type?",AdminController.app_screen_content)
-
-
-router.post("/update_package_status",CheckAuth,AdminController.update_package_status)
-router.post("/update_faq_index",CheckAuth,AdminController.update_faq_index)
-router.get("/get_all_order/:type?/:searchStr?/:start?/:limit?/:order_type?",CheckAuth,AdminController.get_all_order)
-router.get("/get_order_detail/:booking_id?/:user_id?",CheckAuth,AdminController.get_order_detail)
-router.get("/get_all_driver/:searchStr?/:start?/:limit?",AdminController.get_all_driver)
-router.get("/get_driver_detail/:user_id?/:searchStr?/:start?/:limit?",AdminController.get_driver_detail)
-router.get("/get_ratingList",CheckAuth,AdminController.get_ratingList)
-router.get("/get_feedbackQesList",CheckAuth,AdminController.get_feedbackQesList)
-router.post("/update_feedbackQes",CheckAuth,AdminController.update_feedbackQes)
-router.post("/create_feedbackQes",CheckAuth,AdminController.create_feedbackQes)
-router.post("/delete_feedbackQes",CheckAuth,AdminController.delete_feedbackQes)
-router.post("/update_feedbackQes_status",CheckAuth,AdminController.update_feedbackQes_status)
-router.post("/sendNotification",CheckAuth,AdminController.sendNotification)
-router.post("/Update-Instruction",CheckAuth,AdminController.Update_Instruction)
-router.post("/update_mobile_content",CheckAuth,AdminController.update_mobile_content)
-    
-
-/**** Email template****/
-
-router.get("/get_emailTemplate",CheckAuth,emailController.get_emailTemplate)
-router.get("/get_emailTemplate_detail/:id?",CheckAuth,emailController.get_emailTemplate_detail)
-router.post("/update_emailTemplate",CheckAuth,emailController.update_emailTemplate)
-router.post("/create_emailTemplate",CheckAuth,emailController.create_emailTemplate)
-router.post("/delete_emailTemplate",CheckAuth,emailController.delete_emailTemplate)
-router.post("/update_emailTemplate_status",CheckAuth,emailController.update_emailTemplate_status)
-
-/****** Admin group ***********/
-router.get("/get_group_list",CheckAuth,groupController.get_group_list)
-router.post("/create_group",uploadS3.array('profile_pic',25),groupController.create_group);
-router.post("/update_group",uploadS3.array('profile_pic',25),groupController.update_group);
-router.post("/delete_group",CheckAuth,groupController.delete_group)
-router.post("/get_grouped_emp_list",CheckAuth,groupController.get_grouped_emp_list)
-router.get("/get_county_list/:state_id?",groupController.get_county_list)
-router.get("/get_all_county_list",CheckAuth,groupController.get_all_county_list)
-router.post("/create_county",CheckAuth,groupController.create_county)
-router.post("/update_county",CheckAuth,groupController.update_county)
-router.post("/update_county_status",CheckAuth,groupController.update_county_status)
-router.post("/delete_County",CheckAuth,groupController.delete_County)
-
-
-
-
-/****** Admin Role & Permission ***********/
-router.get("/getRole",CheckAuth,permissionController.getRole)
-router.get("/getRoleDetail/:role_id/",CheckAuth,permissionController.getRoleDetail)
-router.get("/delRole/:role_id/",CheckAuth,permissionController.delRole)
-router.get("/getPermissionsDetail/:permission_id/",CheckAuth,permissionController.getPermissionsDetail)
-router.get("/delPermission/:permission_id/",CheckAuth,permissionController.delPermissions)
-router.get("/getPermissions",CheckAuth,permissionController.getPermissions)
-router.get("/getRoleAndPermissionById/:role_id/",CheckAuth,permissionController.getRoleAndPermissionById)
-router.get("/getRoleAndPermission",CheckAuth,permissionController.getRoleAndPermission)
-     
-//router.post("/updateLoginAccess",CheckAuth,permissionController.updateLoginAccess)
-router.post("/updateAssignRole",CheckAuth,permissionController.updateAssignRole)
-router.post("/assignRole",CheckAuth,permissionController.assignRole)
-router.post("/addRoleAndPermission",CheckAuth,permissionController.addRoleAndPermission)
-router.post("/addPermission",CheckAuth,permissionController.addPermission)
-router.post("/addRole",CheckAuth,permissionController.addRole)
-router.post("/updateLoginAccess",CheckAuth,permissionController.updateLoginAccess)
-    
-	
-/*****  ---------- Admin API End ---------- *****/
-/*dry cleaning*/
-router.post("/update_drycleaning_service",uploadS3.single('service_pic'),AdminController.update_drycleaning_service)
-router.post("/add_drycleaning_service",uploadS3.single('service_pic'),AdminController.add_drycleaning_service)
-router.post("/update_service_status",CheckAuth,AdminController.update_service_status)
-router.post("/delete_service",CheckAuth,AdminController.delete_service)
-router.post("/update-admin-email",CheckAuth,AdminController.update_admin_email)
-router.get("/get_drycleaning_itemlist",CheckAuth,AdminController.get_drycleaning_itemlist)
-
-
-
-/**********************/
 export default router;

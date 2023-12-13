@@ -2,6 +2,8 @@ import dbConnection from'../config/db.js';
 import dateFormat from 'date-and-time';
 import transport from "../helpers/mail.js";
 import { assignDriver } from "../helpers/location.js";
+import { orderAddress } from "../helpers/orderAddress.js";
+
 
 import { getDates,randomNumber,setDateForNotification } from "../helpers/date.js";
 //customer booking API
@@ -79,6 +81,7 @@ export const booking_subscription_cron = async(req,res)=>{
 
                     var updatesql = "update bookings set cron_status = '1' where id = '"+elem.id+"'";
                     dbConnection.query(updatesql, function (err, resultss) {
+                        orderAddress(elem.user_id,elem.id)
                  
                     });
               

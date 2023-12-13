@@ -55,7 +55,7 @@ export const getUserData=async(booking_id)=>{
           SELECT b.id AS order_id, b.date,
           CONCAT(ca.address, ', ', ca.appartment, ', ', ca.city, ', ', ca.state, ', ', ca.zip) AS address
           FROM bookings AS b
-          LEFT JOIN customer_address AS ca ON b.user_id = ca.user_id
+          LEFT JOIN order_pick_address AS ca ON b.id = ca.booking_id
           LEFT JOIN users AS u ON b.user_id = u.id
           WHERE b.user_id = ? AND b.id = ? `;
         
