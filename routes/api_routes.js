@@ -166,5 +166,4 @@ router.post("/scanning-extra-loads-dryClean",CheckAuth,DrycleanController.scanni
 router.post("/order-history-dryClean",CheckAuth,DrycleanController.order_histroy_dryClean);
 router.post("/order-histroy-dryClean-detail",CheckAuth,DrycleanController.order_histroy_dryClean_detail)
 
-
 export default router;
