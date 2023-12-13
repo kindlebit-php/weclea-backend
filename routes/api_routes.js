@@ -240,6 +240,8 @@ router.post("/create_county",CheckAuth,groupController.create_county)
 router.post("/update_county",CheckAuth,groupController.update_county)
 router.post("/update_county_status",CheckAuth,groupController.update_county_status)
 router.post("/delete_County",CheckAuth,groupController.delete_County)
+router.post("/add_new_city",CheckAuth,groupController.add_new_city)
+
 
 
 

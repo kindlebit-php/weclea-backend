@@ -336,6 +336,34 @@ export const delete_County = async(req,res)=>{
         res.json({'status':false,"message":error.message});  
     }
 }
+
+export const add_new_city = async(req,res)=>{
+	const reqData = req.body;
+	console.log("add_new_city", reqData,req.files)
+    try { 
+		  	const qrySelect = "select id from wc_cities where `name`=? and `state_id`=? and status=1";
+			dbConnection.query(qrySelect,[reqData.city_name,reqData.state_id], function (error, data) {
+				if (error) throw error;
+				if (data.length<=0) {
+	              	var addContnetQry = "insert wc_cities set `name`=?,state_id=?,`status`=?";
+				    dbConnection.query(addContnetQry,[reqData.city_name,reqData.state_id, 1], function (error, data) {
+						if (error) throw error;
+						const county_id=data.insertId;
+						res.json({'status':true,"message":"City has been added successfully",'data':data});			
+					});
+				    
+				}else{
+
+					res.json({'status':false,"message":"Same city already exist"});
+				}
+				
+			});
+    	
+    }catch (error) {
+        res.json({'status':false,"message":error.message});  
+    }
+}
+
 /****** end Eamil section*******/
 export default {
 	get_group_list,
@@ -348,5 +376,6 @@ export default {
 	create_county,
 	update_county,
 	update_county_status,
-	delete_County
+	delete_County,
+	add_new_city
 }
